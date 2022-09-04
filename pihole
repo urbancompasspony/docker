@@ -6,8 +6,9 @@ sudo docker run \
 --name=pihole \
 --network macvlan-hotel \
 --ip=192.168.0.14 \
+--mac-address 02:42:c0:a8:00:02 \
 -e SERVERIP=192.168.0.14 \
--e WEBPASSWORD=1345278 \
+-e WEBPASSWORD=p4ssw0rd \
 -e TZ=America/bahia \
 -v $(pwd)/pihole/pihole/:/etc/pihole \
 -v $(pwd)/pihole/dnsmasq.d/:/etc/dnsmasq.d \
