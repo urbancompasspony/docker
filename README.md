@@ -5,6 +5,9 @@ everything under this repository is made to be run with bash through .sh scripts
 
 Maintenance and other configurations need to be made separately.
 
+## Installing on Debian-based:
+sudo apt install docker.io
+
 ## Configuring Network:
 sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0 macvlan-custom
 
