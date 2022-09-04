@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Config files will be stored under Working Directory when bash is started!
+
+sudo docker run \
+--name=pihole \
+--network macvlan-hotel \
+--ip=192.168.0.14 \
+-e SERVERIP=192.168.0.14 \
+-e WEBPASSWORD=1345278 \
+-e TZ=America/bahia \
+-v $(pwd)/pihole/pihole/:/etc/pihole \
+-v $(pwd)/pihole/dnsmasq.d/:/etc/dnsmasq.d \
+-p 80:80 \
+-p 67:67/tcp \
+-p 67:67/udp \
+-p 53:53/tcp \
+-p 53:53/udp \
+--restart=unless-stopped \
+pihole/pihole
