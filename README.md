@@ -5,11 +5,30 @@ everything under this repository is made to be run with bash through .sh scripts
 
 Maintenance and other configurations need to be made separately.
 
+## If running on Ubuntu:
+First, run these:
+$ sudo systemctl stop systemd-resolved
+$ sudo systemctl disable systemd-resolved
+$ sudo unlink /etc/resolv.conf
+
+Then edit /etc/resolv.conf creating a new file and put this inside:
+$ sudo nano /etc/resolvconf
+
+nameserver IP_OF_YOUR_GATEWAY
+search HOSTNAME_OF_GATEWAY_IF_THERES_ANY
+
+Example with pfSense:
+
+nameserver 192.168.0.1
+search mypfsense.localdomain
+
+With this, you will not lost ethernet connection on Docker server.
+
 ## Installing on Debian-based:
-sudo apt install docker.io
+$ sudo apt install docker.io
 
 ## Configuring Network:
-sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0 macvlan-custom
+$ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0 macvlan-custom
 
 ## To connect to an container that is running:
-sudo docker exec -it pihole /bin/bash
+$ sudo docker exec -it pihole /bin/bash
