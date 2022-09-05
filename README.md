@@ -19,11 +19,13 @@ Then edit /etc/resolv.conf creating a new file and put this inside:
 $ sudo nano /etc/resolvconf
 
 nameserver IP_OF_YOUR_GATEWAY
+
 search HOSTNAME_OF_GATEWAY_IF_THERES_ANY
 
 Example with pfSense:
 
 nameserver 192.168.0.1
+
 search mypfsense.localdomain
 
 With this, you will not lost ethernet connection on Docker server.
