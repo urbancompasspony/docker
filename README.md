@@ -7,11 +7,15 @@ Maintenance and other configurations need to be made separately.
 
 ## If running on Ubuntu:
 First, run these:
+
 $ sudo systemctl stop systemd-resolved
+
 $ sudo systemctl disable systemd-resolved
+
 $ sudo unlink /etc/resolv.conf
 
 Then edit /etc/resolv.conf creating a new file and put this inside:
+
 $ sudo nano /etc/resolvconf
 
 nameserver IP_OF_YOUR_GATEWAY
