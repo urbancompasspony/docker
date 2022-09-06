@@ -40,7 +40,9 @@ If you need to create more different subnets through same parent, change .10 to 
 Example:
 $ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0.20 macvlan-custom
 
-Docker will assume that number from . is a sub-parent!
+Docker will assume that number from . is a sub-parent! But it needs more adjusts, not work out of box. 
+
+WIP.
 
 ## To connect to an container that is running:
 $ sudo docker exec -it pihole /bin/bash
