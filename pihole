@@ -4,18 +4,24 @@
 
 sudo docker run \
 --name=pihole \
---network macvlan-hotel \
---ip=192.168.0.14 \
---mac-address 02:42:c0:a8:00:02 \
--e SERVERIP=192.168.0.14 \
--e WEBPASSWORD=p4ssw0rd \
+--network macvlan-dns \
+--ip=192.168.0.11 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=pi.hole \
+-e SERVERIP=192.168.0.11 \
+-e WEBPASSWORD=13A08a93b \
 -e TZ=America/bahia \
 -v $(pwd)/pihole/pihole/:/etc/pihole \
 -v $(pwd)/pihole/dnsmasq.d/:/etc/dnsmasq.d \
 -p 80:80 \
+-p 443:443 \
 -p 67:67/tcp \
 -p 67:67/udp \
 -p 53:53/tcp \
 -p 53:53/udp \
 --restart=unless-stopped \
-pihole/pihole
+pihole/pihole:latest
+
+# Add this to change mac!
+#--mac-address 02:42:c0:a8:00:02 \
