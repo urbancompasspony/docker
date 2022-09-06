@@ -44,3 +44,7 @@ Docker will assume that number from . is a sub-parent!
 
 ## To connect to an container that is running:
 $ sudo docker exec -it pihole /bin/bash
+
+## Raspberry Pi
+Install this: linux-modules-extra-raspi 
+Or you will get the error "failed to create the macvlan port: operation not supported."
