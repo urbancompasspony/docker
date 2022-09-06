@@ -10,7 +10,7 @@ sudo docker run \
 --dns=127.0.0.1 \
 --hostname=pi.hole \
 -e SERVERIP=192.168.0.11 \
--e WEBPASSWORD=13A08a93b \
+-e WEBPASSWORD=P4ss0rd \
 -e TZ=America/bahia \
 -v $(pwd)/pihole/pihole/:/etc/pihole \
 -v $(pwd)/pihole/dnsmasq.d/:/etc/dnsmasq.d \
