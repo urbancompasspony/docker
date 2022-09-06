@@ -16,7 +16,7 @@ $ sudo unlink /etc/resolv.conf
 
 Then edit /etc/resolv.conf creating a new file and put this inside:
 
-$ sudo nano /etc/resolvconf
+$ sudo nano /etc/resolv.conf
 
 nameserver IP_OF_YOUR_GATEWAY
 
