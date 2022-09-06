@@ -46,6 +46,6 @@ Docker will assume that number from . is a sub-parent!
 $ sudo docker exec -it pihole /bin/bash
 
 ## Raspberry Pi
-Install this: linux-modules-extra-raspi
+Install this: linux-modules-extra-raspi AND REBOOT!
 
 Or you will get the error "failed to create the macvlan port: operation not supported."
