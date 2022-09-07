@@ -93,6 +93,22 @@ sudo docker commit -p ID_HERE my-backup # Necessary to stop Container and make a
 
 sudo docker save -o /path/to/my-backup.tar my-backup
 
+Do not forget about -v (volume) folders and some parameters when running! 
+
+Container backup will store only system configurations, not data files.
+
 ## Restore
 
 sudo docker image load -i /path/to/my-backup.tar
+
+Then run with all parameters used before, to keep everything as needed. Example, to restore a backup from SAMBA Domain Controller:
+
+docker run -t -i -d \
+	--network macvlan \
+	--ip=THE_SAME_IP_AS_BEFORE \
+	-v /SAME/PATH/TO:/var/lib/samba \
+	-v /SAME/PATH/TO/ANOTHER:/etc/samba/external \
+	--privileged \
+  --restart=unless-stopped \
+  --name samba \
+	my-backup
