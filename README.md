@@ -35,17 +35,25 @@ With this, you will not lost ethernet connection on Docker server.
 
 ## Installing on Debian-based:
 
+Just install this:
+
 $ sudo apt install docker.io
 
-## Configuring Network:
+It's enough to catch stable packages.
+
+## Some options to configure Network:
 
 $ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0.10 macvlan-custom
 
 If you need to create more different subnets through same parent, change .10 to .20 and so on.
+
 Example:
+
 $ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0.20 macvlan-custom
 
-Docker will assume that number from . is a sub-parent! But it needs more adjusts, not work out of box. 
+Docker will assume that number from . is a sub-parent! But it needs more adjusts, not work out of box.
+
+So for now, run a docker server and it's subs-services on an unique subnet, inside the same DHCP.
 
 WIP.
 
