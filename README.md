@@ -5,7 +5,10 @@ everything under this repository is made to be run with bash through .sh scripts
 
 Maintenance and other configurations need to be made separately.
 
+# F.A.Q.
+
 ## If running on Ubuntu:
+
 First, run these:
 
 $ sudo systemctl stop systemd-resolved
@@ -31,9 +34,11 @@ search mypfsense.localdomain
 With this, you will not lost ethernet connection on Docker server.
 
 ## Installing on Debian-based:
+
 $ sudo apt install docker.io
 
 ## Configuring Network:
+
 $ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0.10 macvlan-custom
 
 If you need to create more different subnets through same parent, change .10 to .20 and so on.
@@ -44,10 +49,24 @@ Docker will assume that number from . is a sub-parent! But it needs more adjusts
 
 WIP.
 
-## To connect to an container that is running:
+## To connect to an container through SSH
+
 $ sudo docker exec -it pihole /bin/bash
 
 ## Raspberry Pi
+
 Install this: linux-modules-extra-raspi AND REBOOT!
 
 Or you will get the error "failed to create the macvlan port: operation not supported."
+
+## PiHole
+
+Inside Container:
+
+apt update; apt install nano
+
+nano /etc/pihole/pihole-FTL.conf
+
+Add: RATE_LIMIT=0/0
+
+Restart docker container!
