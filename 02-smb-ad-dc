@@ -10,15 +10,15 @@
 
 docker run -t -i \
 	--network macvlan \
-  --ip=192.168.0.16 \
+	--ip=192.168.0.16 \
 	-h atomicpi \
-  --dns-search ad.atomic.local \
+ 	--dns-search ad.atomic.local \
 	--dns 192.168.0.16 \
 	--dns 192.168.0.1 \
 	--add-host atomicpi.ad.atomic.local:192.168.0.16 \
 	--name sambaaddc \
 	--privileged \
-  --restart=unless-stopped \
+  	--restart=unless-stopped \
 	-e "DOMAIN=ad.atomic.local" \
 	-e "DOMAINPASS=P4ss0rd" \
 	-e "DNSFORWARDER=192.168.0.1" \
