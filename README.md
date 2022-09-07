@@ -55,6 +55,8 @@ Docker will assume that number from . is a sub-parent! But it needs more adjusts
 
 So for now, run a docker server and it's subs-services on an unique subnet, inside the same DHCP.
 
+Recommended to run every macvlan on it's on network adapter!
+
 WIP.
 
 ## To connect to an container through SSH
