@@ -5,7 +5,7 @@ everything under this repository is made to be run with bash through .sh scripts
 
 Maintenance and other configurations need to be made separately.
 
-# F.A.Q.
+# F.A.Q. / Cheat Sheet
 
 # Installation
 
