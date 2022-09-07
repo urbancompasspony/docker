@@ -67,7 +67,7 @@ Install this: linux-modules-extra-raspi AND REBOOT!
 
 Or you will get the error "failed to create the macvlan port: operation not supported."
 
-## PiHole
+## PiHole on Domain Network
 
 Inside Container:
 
