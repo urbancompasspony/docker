@@ -23,5 +23,4 @@ sudo docker run \
   --restart=unless-stopped \
   pihole/pihole:latest
 
-# Add this to change mac!
-#--mac-address 02:42:c0:a8:00:02 \
+
