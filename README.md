@@ -45,6 +45,10 @@ It's enough to catch stable packages.
 
 ## Some options to configure Network:
 
+To change MAC Address, add this line inside script:
+
+--mac-address 02:42:c0:a8:00:02 \
+
 $ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0 macvlan-custom
 
 If you need to create more different subnets through same parent, change .10 to .20 and so on.
