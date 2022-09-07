@@ -7,6 +7,8 @@ Maintenance and other configurations need to be made separately.
 
 # F.A.Q.
 
+# Installation
+
 ## If running on Ubuntu:
 
 First, run these:
@@ -57,10 +59,6 @@ So for now, run a docker server and it's subs-services on an unique subnet, insi
 
 Recommended to run every macvlan on it's on network adapter!
 
-## To connect to a container through SSH
-
-$ sudo docker exec -it pihole /bin/bash
-
 ## Raspberry Pi
 
 Install this: linux-modules-extra-raspi AND REBOOT!
@@ -78,3 +76,23 @@ nano /etc/pihole/pihole-FTL.conf
 Add: RATE_LIMIT=0/0
 
 Restart docker container, not just the pihole-FTL.service.
+
+# Use Cases
+
+## To connect to a container through SSH
+
+$ sudo docker exec -it pihole /bin/bash
+
+# Backup & Restore
+
+## Backup
+
+sudo docker images -> catch the ID!
+
+sudo docker commit -p ID_HERE my-backup # Necessary to stop Container and make an read-only secure version.
+
+sudo docker save -o /path/to/my-backup.tar my-backup
+
+## Restore
+
+sudo docker image load -i /path/to/my-backup.tar
