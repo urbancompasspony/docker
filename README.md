@@ -1,6 +1,6 @@
 # docker
 
-Since is hard to find compose.yaml base code to use Docker Compose,
+Since it is hard to find compose.yaml base code to use Docker Compose,
 everything under this repository is made to be run with bash through .sh scripts.
 
 Maintenance and other configurations need to be made separately.
@@ -57,9 +57,7 @@ So for now, run a docker server and it's subs-services on an unique subnet, insi
 
 Recommended to run every macvlan on it's on network adapter!
 
-WIP.
-
-## To connect to an container through SSH
+## To connect to a container through SSH
 
 $ sudo docker exec -it pihole /bin/bash
 
@@ -79,4 +77,4 @@ nano /etc/pihole/pihole-FTL.conf
 
 Add: RATE_LIMIT=0/0
 
-Restart docker container!
+Restart docker container, not just the pihole-FTL.service.
