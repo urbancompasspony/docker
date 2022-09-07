@@ -93,7 +93,7 @@ sudo docker commit -p ID_HERE my-backup # Necessary to stop Container and make a
 
 sudo docker save -o /path/to/my-backup.tar my-backup
 
-Do not forget about -v (volume) folders and some parameters when running! 
+Do not forget about -v (volume) folders and some parameters when running! - And permissions too.
 
 Container backup will store only system configurations, not data files.
 
