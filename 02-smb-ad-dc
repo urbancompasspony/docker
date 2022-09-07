@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Change and customize where:
+# FQDN: ad.atomic.local
+# Static IP of new Domain: 192.168.0.16
+# Hostname of Domain: atomicpi
+# Gateway: 192.168.0.1
+# Name of this container: sambaaddc
+# Where all files are stored: $(pwd)/samba # Being pwd the working directory of commandline!
+
+docker run -t -i \
+	--network macvlan \
+  --ip=192.168.0.16 \
+	-h atomicpi \
+  --dns-search ad.atomic.local \
+	--dns 192.168.0.16 \
+	--dns 192.168.0.1 \
+	--add-host atomicpi.ad.atomic.local:192.168.0.16 \
+	--name sambaaddc \
+	--privileged \
+  --restart=unless-stopped \
+	-e "DOMAIN=ad.atomic.local" \
+	-e "DOMAINPASS=P4ss0rd" \
+	-e "DNSFORWARDER=192.168.0.1" \
+	-e "HOSTIP=192.168.0.16" \
+	-p 192.168.0.16:53:53 \
+	-p 192.168.0.16:53:53/udp \
+	-p 192.168.0.16:88:88 \
+	-p 192.168.0.16:88:88/udp \
+	-p 192.168.0.16:135:135 \
+	-p 192.168.0.16:137-138:137-138/udp \
+	-p 192.168.0.16:139:139 \
+	-p 192.168.0.16:389:389 \
+	-p 192.168.0.16:389:389/udp \
+	-p 192.168.0.16:445:445 \
+	-p 192.168.0.16:464:464 \
+	-p 192.168.0.16:464:464/udp \
+	-p 192.168.0.16:636:636 \
+	-p 192.168.0.16:1024-1044:1024-1044 \
+	-p 192.168.0.16:3268-3269:3268-3269 \
+	-v /etc/localtime:/etc/localtime:ro \
+	-v $(pwd)/samba/data/:/var/lib/samba \
+	-v $(pwd)/samba/config/samba:/etc/samba/external \
+	nowsci/samba-domain
