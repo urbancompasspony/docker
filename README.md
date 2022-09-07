@@ -101,7 +101,7 @@ Container backup will store only system configurations, not data files.
 
 sudo docker image load -i /path/to/my-backup.tar
 
-Then run with all parameters used before, to keep everything as needed. Example, to restore a backup from SAMBA Domain Controller:
+Then run with all parameters used before, to keep everything as needed. Example, to restore a backup from file 02-smb-ad-dc:
 
 docker run -t -i -d \
 	--network macvlan \
@@ -109,6 +109,6 @@ docker run -t -i -d \
 	-v /SAME/PATH/TO:/var/lib/samba \
 	-v /SAME/PATH/TO/ANOTHER:/etc/samba/external \
 	--privileged \
-  --restart=unless-stopped \
-  --name samba \
+  	--restart=unless-stopped \
+  	--name samba \
 	my-backup
