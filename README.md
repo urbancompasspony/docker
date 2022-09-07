@@ -45,7 +45,7 @@ It's enough to catch stable packages.
 
 ## Some options to configure Network:
 
-$ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0.10 macvlan-custom
+$ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0 macvlan-custom
 
 If you need to create more different subnets through same parent, change .10 to .20 and so on.
 
