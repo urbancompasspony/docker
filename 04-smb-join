@@ -15,14 +15,14 @@ docker run -t -i \
 	--dns-search $FQDN \
 	--dns $LOCALIP \
 	--dns $GATEWAYS \
-  --dns $OLDDOMAIN \
+	--dns $OLDDOMAIN \
 	--add-host $HOSTNAME.$FQDN:$LOCALIP \
 	--privileged \
 	--network $NETWORKLAN \
 	--ip=$LOCALIP \
-  --restart=unless-stopped \
+	--restart=unless-stopped \
 	-h $HOSTNAME \
-  -e "JOIN=true" \
+	-e "JOIN=true" \
 	-e DOMAIN=$FQDN \
 	-e DOMAINPASS=$MYPASSWORD \
 	-e DNSFORWARDER=$GATEWAYS \
