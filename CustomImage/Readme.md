@@ -15,4 +15,8 @@ To build, open terminal
 
 $ cd build
 
-$ docker build -t samba-domain .
+$ docker build -t my_new_image .
+
+To run:
+
+$ docker run my_new_image
