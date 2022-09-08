@@ -9,7 +9,7 @@ Maintenance and other configurations need to be made separately.
 
 # Installation
 
-## If running on Ubuntu:
+## If running on Ubuntu and you DON'T pretend to use a virtual IP:
 
 First, run these:
 
@@ -34,6 +34,8 @@ nameserver 192.168.0.1
 search mypfsense.localdomain
 
 With this, you will not lost ethernet connection on Docker server.
+
+This is not necessary if using macvlan network!
 
 ## Installing on Debian-based:
 
