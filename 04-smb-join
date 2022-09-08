@@ -46,11 +46,3 @@ docker run -t -i \
 	-v $(pwd)/sambajoined/data/:/var/lib/samba \
 	-v $(pwd)/sambajoined/config/samba:/etc/samba/external \
 	nowsci/samba-domain
-
-# Some information:
-# Run this on the actual DC if on docker: 
-# docker exec sambaaddc samba-tool drs showrepl
-# And catch the DSA object GUID code,for example faf297a8-6cd3-4162-b204-1945e4ed5569.
-# Remove your docker container, keep the files and run again adding this line:
-# --add-host faf297a8-6cd3-4162-b204-1945e4ed5569._msdcs.$FQDN:$NEWIP \
-# Where is --add-host
