@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Change here to create a new DC and JOIN this container to an existing domain controller!
+FQDN="ad.atomic.local" # Actual existing DC to be joined
+LOCALIP="172.20.0.44" # New IP for this New DC
+MYPASSWORD="P4ssw0rd" # Actual password of existing DC
+GATEWAYS="172.20.0.1" # Gateway of same Network
+HOSTNAME="btomicpi" # New hostname for this container, to join existing DC
+NAME="sambajoined" # New name for Container
+NETWORKLAN="macvlan" # Change only if you change your docker network to another name or configuration
+OLDDOMAIN="172.20.0.42" # IP of existing DC!
+
+docker run -t -i \
+	--name $NAME \
+	--dns-search $FQDN \
+	--dns $LOCALIP \
+	--dns $GATEWAYS \
+  --dns $OLDDOMAIN \
+	--add-host $HOSTNAME.$FQDN:$LOCALIP \
+	--privileged \
+	--network $NETWORKLAN \
+	--ip=$LOCALIP \
+  --restart=unless-stopped \
+	-h $HOSTNAME \
+  -e "JOIN=true" \
+	-e DOMAIN=$FQDN \
+	-e DOMAINPASS=$MYPASSWORD \
+	-e DNSFORWARDER=$GATEWAYS \
+	-e HOSTIP=$LOCALIP \
+	-p $LOCALIP:53:53 \
+	-p $LOCALIP:53:53/udp \
+	-p $LOCALIP:88:88 \
+	-p $LOCALIP:88:88/udp \
+	-p $LOCALIP:135:135 \
+	-p $LOCALIP:137-138:137-138/udp \
+	-p $LOCALIP:139:139 \
+	-p $LOCALIP:389:389 \
+	-p $LOCALIP:389:389/udp \
+	-p $LOCALIP:445:445 \
+	-p $LOCALIP:464:464 \
+	-p $LOCALIP:464:464/udp \
+	-p $LOCALIP:636:636 \
+	-p $LOCALIP:1024-1044:1024-1044 \
+	-p $LOCALIP:3268-3269:3268-3269 \
+	-v /etc/localtime:/etc/localtime:ro \
+	-v $(pwd)/sambajoined/data/:/var/lib/samba \
+	-v $(pwd)/sambajoined/config/samba:/etc/samba/external \
+	nowsci/samba-domain
