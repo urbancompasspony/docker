@@ -14,7 +14,7 @@ LOCALIP="172.20.0.42"
 MYPASSWORD="P4ssw0rd"
 GATEWAYS="172.20.0.1"
 HOSTNAME="atomicpi"
-NAME="sambaaddc"
+NAME="smbaddc"
 NETWORKLAN="macvlan"
 
 docker run -t -i \
