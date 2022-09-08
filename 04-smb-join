@@ -36,7 +36,10 @@ docker run -t -i \
 	-p $LOCALIP:88:88 \
 	-p $LOCALIP:88:88/udp \
 	-p $LOCALIP:135:135 \
-	-p $LOCALIP:137-138:137-138/udp \
+        -p $LOCALIP:137:137 \
+        -p $LOCALIP:137:137/udp \
+        -p $LOCALIP:138:138 \
+        -p $LOCALIP:138:138/udp \
 	-p $LOCALIP:139:139 \
 	-p $LOCALIP:389:389 \
 	-p $LOCALIP:389:389/udp \
