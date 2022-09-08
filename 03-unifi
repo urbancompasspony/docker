@@ -1,9 +1,13 @@
 #!/bin/bash
 
+# IP for web access. Default port is 8443!
+# DOES NOT WORK on ARM arch.
+SETIP="192.168.0.15"
+
 docker run -d \
   --name=unifi \
   --network macvlan \
-  --ip=192.168.0.15 \
+  --ip=$SETIP \
   --dns=1.1.1.1  \
   --dns=127.0.0.1 \
   -e PUID=1000 \
