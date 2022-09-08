@@ -49,7 +49,11 @@ To change MAC Address, add this line inside script:
 
 --mac-address 02:42:c0:a8:00:02 \
 
-$ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0 macvlan-custom
+Creating a new network to expose your docker container on LAN through a different IP:
+
+$ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0 macvlan
+
+All scripts inside this repository consider macvlan as default network as default. Change if needed.
 
 If you need to create more different subnets through same parent, change .10 to .20 and so on.
 
