@@ -1,10 +1,4 @@
-# Change and customize where:
-# FQDN: ad.atomic.local
-# Static IP of new Domain: 192.168.0.16
-# Hostname of Domain: atomicpi
-# Gateway: 192.168.0.1
-# Name of this container: sambaaddc
-# Where all files are stored: $(pwd)/samba # Being pwd the working directory of commandline!
+#!/bin/bash
 
 # Change here to create a new domain controller!
 FQDN="ad.atomic.local"
