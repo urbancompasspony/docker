@@ -10,6 +10,10 @@ NAME="sambajoined" # New name for Container
 NETWORKLAN="macvlan" # Change only if you change your docker network to another name or configuration
 OLDDOMAIN="172.20.0.42" # IP of existing DC!
 
+# To demote a samba DC, login inside container and:
+# samba-tool domain demote -U administrator
+# After this, stop and remove container, and delete all files related to this container.
+
 docker run -t -i \
 	--name $NAME \
 	--dns-search $FQDN \
