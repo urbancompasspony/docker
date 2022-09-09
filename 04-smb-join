@@ -52,4 +52,4 @@ docker run -t -i \
 	-v /etc/localtime:/etc/localtime:ro \
 	-v $(pwd)/sambajoined/data/:/var/lib/samba \
 	-v $(pwd)/sambajoined/config/samba:/etc/samba/external \
-	nowsci/samba-domain
+	urbancompasspony/domain
