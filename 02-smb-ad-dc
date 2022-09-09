@@ -53,7 +53,7 @@ docker run -t -i \
         -v /etc/localtime:/etc/localtime:ro \
         -v $(pwd)/samba/data/:/var/lib/samba \
         -v $(pwd)/samba/config/samba:/etc/samba/external \
-        nowsci/samba-domain
+        urbancompasspony/domain
 
 # If some DC join to this DC, use this if there is any error:
 #REMOTEDC="172.20.0.44"
