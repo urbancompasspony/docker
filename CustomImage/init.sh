@@ -35,12 +35,16 @@ appSetup () {
         fi
 
 	# Set up samba
-	mv /etc/krb5.conf /etc/krb5.conf.orig
-	echo "[libdefaults]" > /etc/krb5.conf
-	echo "    dns_lookup_realm = false" >> /etc/krb5.conf
-	echo "    dns_lookup_kdc = true" >> /etc/krb5.conf
-	echo "    default_realm = ${UDOMAIN}" >> /etc/krb5.conf
+	#mv /etc/krb5.conf /etc/krb5.conf.orig
+	#echo "[libdefaults]" > /etc/krb5.conf
+	#echo "    dns_lookup_realm = false" >> /etc/krb5.conf
+	#echo "    dns_lookup_kdc = true" >> /etc/krb5.conf
+	#echo "    default_realm = ${UDOMAIN}" >> /etc/krb5.conf
 	# If the finished file isn't there, this is brand new, we're not just moving to a new container
+	
+	# Let's use the native configured krb5!
+	mv /etc/krb5.conf /etc/krb5.conf.orig
+	
 	if [[ ! -f /etc/samba/external/smb.conf ]]; then
 		mv /etc/samba/smb.conf /etc/samba/smb.conf.orig
 		if [[ ${JOIN,,} == "true" ]]; then
@@ -63,8 +67,6 @@ appSetup () {
 			wins support = yes\\n\
 			template shell = /bin/bash\\n\
 			winbind nss info = rfc2307\\n\
-			idmap config ${URDOMAIN}: range = 10000-20000\\n\
-			idmap config ${URDOMAIN}: backend = ad\
 			" /etc/samba/smb.conf
 		if [[ $DNSFORWARDER != "NONE" ]]; then
 			sed -i "/\[global\]/a \
@@ -81,7 +83,9 @@ appSetup () {
 	else
 		cp /etc/samba/external/smb.conf /etc/samba/smb.conf
 	fi
-        
+    
+    cp /var/lib/samba/private/krb5.conf /etc
+    
 	# Set up supervisor
 	echo "[supervisord]" > /etc/supervisor/conf.d/supervisord.conf
 	echo "nodaemon=true" >> /etc/supervisor/conf.d/supervisord.conf
