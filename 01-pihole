@@ -15,7 +15,7 @@ sudo docker run \
 --hostname=pi.hole \
 -e SERVERIP=$LOCALIP \
 -e WEBPASSWORD=$MYPASSWORD \
--e TZ=America/bahia \
+-v /etc/localtime:/etc/localtime:ro \
 -v $(pwd)/pihole/pihole/:/etc/pihole \
 -v $(pwd)/pihole/dnsmasq.d/:/etc/dnsmasq.d \
 -p 80:80 \
