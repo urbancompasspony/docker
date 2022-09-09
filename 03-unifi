@@ -24,5 +24,6 @@ docker run -d \
   -p 6789:6789 `#optional` \
   -p 5514:5514/udp `#optional` \
   -v $(pwd)/unifi/:/config \
+  -v /etc/localtime:/etc/localtime:ro \
   --restart unless-stopped \
   lscr.io/linuxserver/unifi-controller:latest
