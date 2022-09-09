@@ -9,9 +9,9 @@ RUN apt update && apt upgrade -y
 
 # Install all apps
 # The third line is for multi-site config (ping is for testing later)
-RUN apt-get install -y pkg-config
-RUN apt-get install -y attr acl samba smbclient ldap-utils winbind libnss-winbind libpam-winbind krb5-user krb5-kdc supervisor
-RUN apt-get install -y openvpn inetutils-ping
+RUN apt install -y pkg-config
+RUN apt install -y attr acl samba smbclient ldap-utils winbind libnss-winbind libpam-winbind krb5-user krb5-kdc supervisor
+RUN apt install -y openvpn inetutils-ping nano libpam-krb5 samba-dsdb-modules samba-vfs-modules
 
 # Set up script and run
 ADD init.sh /init.sh
