@@ -6,7 +6,7 @@
 LOCALIP="172.20.0.41"
 MYPASSWORD="P4ssw0rd"
 
-sudo docker run \
+docker run \
 --name=pihole \
 --network macvlan \
 --ip=$LOCALIP \
