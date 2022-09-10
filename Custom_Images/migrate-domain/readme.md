@@ -18,4 +18,4 @@ If you want to make a definitive migration, catch all these files and folders:
 
 /etc/resolv.conf
 
-After this, just run the service samba-ad-dc
+After this, just run the service samba-ad-dc, Dockerfile will run automatically.
