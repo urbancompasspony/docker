@@ -1,5 +1,6 @@
-Use this to migrate an existing domain controller from host to inside a container!
-Use this dockerfile to build a new whole system with these folders and files inside, extracted from original server:
+## Use this to migrate an existing domain controller from host to inside a container!
+
+If you want to make a definitive migration, catch all these files and folders:
 
 /var/cache/samba
 
