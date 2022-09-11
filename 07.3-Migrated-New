@@ -1,9 +1,15 @@
 #!/bin/bash
 
-HOSTNAME="atomic-pi"
-NAME="dominio"
-USERNAME="administrador"
-NETWORKLAN="host"
+# IP FIXO DO NOVO CONTAINER - Mesmo IP usado no Dominio anterior!
+LOCALIP="$1"
+# HOSTNAME DO CONTAINER - Mesmo hostname usado no Dominio anterior!
+HOSTNAME="$2"
+# NOME DO CONTAINER
+NAME="$3"
+# USUARIO DO HOST
+USERNAME="$4"
+# PLACA DE REDE A SER USADA
+NETWORKLAN="macvlan"
 
 docker run -t -i \
 -h $HOSTNAME \
