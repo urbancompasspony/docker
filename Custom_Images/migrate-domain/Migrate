@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Change here to the SAME configurations of Domain to be migrated!
+HOSTNAME="atomic-pi"
+NAME="dominio"
+NETWORKLAN="host"
+
+docker run -t -i \
+-h $HOSTNAME \
+--name $NAME \
+--privileged \
+--restart=unless-stopped \
+-v /etc/localtime:/etc/localtime:ro \
+--network $NETWORKLAN \
+-v $USER/ACTIVE_DIRECTORY/cache/:/var/cache/samba \
+-v $USER/ACTIVE_DIRECTORY/lib/:/var/lib/samba \
+-v $USER/ACTIVE_DIRECTORY/log/:/var/log/samba \
+-v $USER/ACTIVE_DIRECTORY/etc/:/etc/samba \
+-v $USER/ACTIVE_DIRECTORY/run/:/run/samba \
+-v $USER/ACTIVE_DIRECTORY/config/hosts:/etc/hosts \
+-v $USER/ACTIVE_DIRECTORY/config/krb5.conf:/etc/krb5.conf \
+-v $USER/ACTIVE_DIRECTORY/config/resolv.conf:/etc/resolv.conf \
+urbancompasspony/migrate-domain:latest
+
+#-v /mnt:/mnt \
+#-v $(pwd)/FOLDER:/mnt \
