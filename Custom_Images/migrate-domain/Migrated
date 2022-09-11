@@ -18,9 +18,9 @@ docker run -t -i \
 -v /home/"$USERNAME"/ACTIVE_DIRECTORY/log/:/var/log/samba \
 -v /home/"$USERNAME"/ACTIVE_DIRECTORY/etc/:/etc/samba \
 -v /home/"$USERNAME"/ACTIVE_DIRECTORY/run/:/run/samba \
--v /home/"$USERNAME"/ACTIVE_DIRECTORY/config/hosts:/etc/hosts \
--v /home/"$USERNAME"/ACTIVE_DIRECTORY/config/krb5.conf:/etc/ \
--v /home/"$USERNAME"/ACTIVE_DIRECTORY/config/resolv.conf:/etc/ \
+-v /home/"$USERNAME"/ACTIVE_DIRECTORY/config/hosts/:/etc/ \
+-v /home/"$USERNAME"/ACTIVE_DIRECTORY/config/krb5/:/etc/ \
+-v /home/"$USERNAME"/ACTIVE_DIRECTORY/config/resolv/:/etc/ \
 urbancompasspony/migrate-domain:latest
 
 #-v /mnt:/mnt \
