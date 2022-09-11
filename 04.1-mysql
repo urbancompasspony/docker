@@ -15,6 +15,7 @@ mkdir -p /home/"$USERNAME"/.CONTAINERS/
 } || {
   docker run -d \
   --name mysql \
+  --ip=$LOCALIP \
   --network macvlan \
   --hostname=mysql \
   --restart=unless-stopped \
