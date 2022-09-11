@@ -1,20 +1,22 @@
 #!/bin/bash
 
-# NOME DA NOVA FLORESTA
-FQDN="ad.atomic.local"
+# Passe o parâmetro antes, ou edite a linha abaixo adicionando o parâmetro entre aspas!
+
+# FQDN DA NOVA FLORESTA
+FQDN="$1"
 # IP FIXO DO NOVO CONTAINER
-LOCALIP="172.20.0.42"
+LOCALIP="$2"
 # SENHA DO USUARIO ADMINISTRATOR
-MYPASSWORD="P4ssw0rd"
+MYPASSWORD="$3"
 # DEFINA O DNS QUE O DOMINIO USARÁ
-DNSFW="172.20.0.41"
+DNSFW="$4"
 # HOSTNAME DO CONTAINER
-HOSTNAME="atomicpi"
+HOSTNAME="$5"
 # NOME DO CONTAINER
-NAME="dominio"
+NAME="$6"
 # USUARIO DO HOST
-USERNAME="urbancompasspony"
-# PLACA DE REDE A SER USADA
+USERNAME="$7"
+# PLACA DE REDE A SER USADA - Normalmente não muda.
 NETWORKLAN="macvlan"
 
 mkdir -p /home/"$USERNAME"/.CONTAINERS/
@@ -57,9 +59,3 @@ docker run -t -i \
         -v /home/"$USERNAME"/.CONTAINERS/active_directory/config/:/etc/samba/external \
         -v /mnt:/mnt \
         urbancompasspony/domain
-
-# If some DC join to this DC, use this if there is any error:
-#REMOTEDC="172.20.0.44"
-#REMOTEHOSTNAME="btomicpi"
-
-#--add-host 14300161-0666-4cb6-8f46-4cb41f2ceda6._msdcs.$REMOTEHOSTNAME.$FQDN:$REMOTEDC \
