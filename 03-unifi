@@ -2,11 +2,14 @@
 
 # Passe o parâmetro antes, ou edite a linha abaixo adicionando o parâmetro entre aspas!
 
-# IP for web access. Default port is 8443!
+# IP FIXO DO NOVO CONTAINER
 SETIP="$1"
+# USUARIO DO HOST
+USERNAME="$2"
 
 [ $(arch) = "x86_64" ] && {
   echo "Sistema compatível!"
+  echo "Ao finalizar, acesse pelo IP definido e na Porta 8443"
 } || {
   echo "Sistema incompatível com esta arquitetura. Saindo."
   exit
