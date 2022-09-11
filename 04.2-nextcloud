@@ -21,3 +21,7 @@ docker run -d \
 -v /home/"$USERNAME"/.CONTAINERS/nextcloud/data:/var/www/html/data \
 -v /home/"$USERNAME"/.CONTAINERS/nextcloud/mysql:/var/lib/mysql \
 nextcloud
+
+docker network connect bridge nextcloud
+
+#-p 80:80 \
