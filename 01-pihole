@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Passe o parâmetro antes, ou edite a linha abaixo adicionando o parâmetro entre aspas!
+
 # IP FIXO DO NOVO CONTAINER
 LOCALIP="$1"
 # SENHA PARA O PIHOLE
