@@ -10,6 +10,7 @@ USERNAME="$2"
 [ $(arch) = "x86_64" ] && {
   echo "Sistema compatível!"
   echo "Ao finalizar, acesse pelo IP definido e na Porta 8443"
+  echo " "
 } || {
   echo "Sistema incompatível com esta arquitetura. Saindo."
   exit
