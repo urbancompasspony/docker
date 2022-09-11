@@ -25,12 +25,11 @@ mkdir -p /home/"$USERNAME"/.CONTAINERS/
   mysql:8
 
 docker network connect bridge mysql
-
-docker exec -it mysql mysql -p
 }
 
 # Execute manualmente:
 
+# docker exec -it mysql mysql -p
 # CREATE DATABASE nextcloud;
 # CREATE USER nextcloud IDENTIFIED BY 'P4ssw0rd';
 # GRANT ALL PRIVILEGES ON nextcloud.* TO nextcloud;
