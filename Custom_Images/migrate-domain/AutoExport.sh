@@ -8,6 +8,7 @@
 wd=$(pwd)
 
 service samba-ad-dc stop
+chmod 777 -R  /var/lib/samba/sysvol/
 
 mkdir -p "$wd"/ACTIVE_DIRECTORY/cache
 mkdir -p "$wd"/ACTIVE_DIRECTORY/lib
