@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# Change here to the SAME configurations of Domain to be migrated!
 HOSTNAME="atomic-pi"
 NAME="dominio"
-NETWORKLAN="host"
 USERNAME="administrador"
+NETWORKLAN="host"
 
 docker run -t -i \
 -h $HOSTNAME \
