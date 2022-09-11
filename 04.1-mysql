@@ -21,6 +21,7 @@ mkdir -p /home/"$USERNAME"/.CONTAINERS/
   -v /etc/localtime:/etc/localtime:ro \
   -v /home/"$USERNAME"/.CONTAINERS/mysql:/var/lib/mysql \
   -e MYSQL_ROOT_PASSWORD="$MROOT" \
+  --restart=unless-stopped \
   mysql:8
 }
 
