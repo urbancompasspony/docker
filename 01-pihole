@@ -1,10 +1,13 @@
 #!/bin/bash
 
-# Config files will be stored under Working Directory when bash is started!
+# IP FIXO DO NOVO CONTAINER
+LOCALIP="192.168.0.15"
+# SENHA PARA O PIHOLE
+MYPASSWORD="P4ss0rd"
+# USUARIO DO HOST
+USERNAME="urbancompasspony"
 
-# Change here:
-LOCALIP="172.20.0.41"
-MYPASSWORD="P4ssw0rd"
+mkdir -p /home/"$USERNAME"/.CONTAINERS/
 
 docker run \
 --name=pihole \
@@ -16,8 +19,8 @@ docker run \
 -e SERVERIP=$LOCALIP \
 -e WEBPASSWORD=$MYPASSWORD \
 -v /etc/localtime:/etc/localtime:ro \
--v $(pwd)/pihole/pihole/:/etc/pihole \
--v $(pwd)/pihole/dnsmasq.d/:/etc/dnsmasq.d \
+-v /home/"$USERNAME"/.CONTAINERS/pihole/pihole/:/etc/pihole \
+-v /home/"$USERNAME"/.CONTAINERS/pihole/dnsmasq.d/:/etc/dnsmasq.d \
 -p 80:80 \
 -p 443:443 \
 -p 67:67/tcp \
