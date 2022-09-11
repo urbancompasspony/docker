@@ -9,8 +9,9 @@ RUN set -ex; \
         procps \
         smbclient \
         supervisor \
-        mysql-server \
 #       libreoffice \
+    apt-get install -y \
+        mysql-server \
     ; \
     rm -rf /var/lib/apt/lists/*
 
