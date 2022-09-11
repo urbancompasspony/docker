@@ -13,13 +13,24 @@ mkdir -p /home/"$USERNAME"/.CONTAINERS/
 [ -d "/home/"$USERNAME"/.CONTAINERS/mysql" ] && {
   echo "Banco de Dados já existe!"
 } || {
-  docker run -d --network bridge --name mysql -v /home/"$USERNAME"/.CONTAINERS/mysql:/var/lib/mysql -e MYSQL_ROOT_PASSWORD="$MROOT" mysql:8
-  docker exec -it mysql mysql -p
-  
-  # Execute manualmente:
-
-  # CREATE DATABASE nextcloud;
-  # CREATE USER nextcloud IDENTIFIED BY 'P4ssw0rd';
-  # GRANT ALL PRIVILEGES ON nextcloud.* TO nextcloud;
-  # FLUSH PRIVILEGES;
+  docker run -d \
+  --name mysql \
+  --network macvlan \
+  --hostname=mysql \
+  -p 80:80 \
+  -v /etc/localtime:/etc/localtime:ro \
+  -v /home/"$USERNAME"/.CONTAINERS/mysql:/var/lib/mysql \
+  -e MYSQL_ROOT_PASSWORD="$MROOT" \
+  mysql:8
 }
+
+docker network connect bridge mysql
+
+# Execute manualmente:
+
+# docker exec -it mysql mysql -p
+# CREATE DATABASE nextcloud;
+# CREATE USER nextcloud IDENTIFIED BY 'P4ssw0rd';
+# GRANT ALL PRIVILEGES ON nextcloud.* TO nextcloud;
+# FLUSH PRIVILEGES;
+# exit
