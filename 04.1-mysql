@@ -4,32 +4,33 @@
 LOCALIP="$1"
 # USUARIO DO HOST
 USERNAME="$2"
-# SENHA DO ROOT MYSQL
+# NOVA SENHA DO ROOT MYSQL
 MROOT="$3"
 
 mkdir -p /home/"$USERNAME"/.CONTAINERS/
 
 # INICIANDO MYSQL DATABASE
 [ -d "/home/"$USERNAME"/.CONTAINERS/mysql" ] && {
-  echo "Banco de Dados já existe!"
+  echo "Banco de Dados já existente encontrado!"
 } || {
   docker run -d \
   --name mysql \
   --network macvlan \
   --hostname=mysql \
+  --restart=unless-stopped \
   -p 80:80 \
   -v /etc/localtime:/etc/localtime:ro \
   -v /home/"$USERNAME"/.CONTAINERS/mysql:/var/lib/mysql \
   -e MYSQL_ROOT_PASSWORD="$MROOT" \
-  --restart=unless-stopped \
   mysql:8
-}
 
 docker network connect bridge mysql
 
+docker exec -it mysql mysql -p
+}
+
 # Execute manualmente:
 
-# docker exec -it mysql mysql -p
 # CREATE DATABASE nextcloud;
 # CREATE USER nextcloud IDENTIFIED BY 'P4ssw0rd';
 # GRANT ALL PRIVILEGES ON nextcloud.* TO nextcloud;
