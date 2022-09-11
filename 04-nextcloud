@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# IP FIXO DO NOVO CONTAINER
+LOCALIP="$1"
+# USUARIO DO HOST
+USERNAME="$2"
+
+mkdir -p /home/"$USERNAME"/.CONTAINERS/
+
+docker run -d \
+--name=nextcloud \
+--network macvlan \
+--ip=$LOCALIP \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=next.cloud \
+-v /etc/localtime:/etc/localtime:ro \
+-v /home/"$USERNAME"/.CONTAINERS/nextcloud/nextcloud:/var/www/html \
+-v /home/"$USERNAME"/.CONTAINERS/nextcloud/apps:/var/www/html/custom_apps \
+-v /home/"$USERNAME"/.CONTAINERS/nextcloud/config:/var/www/html/config \
+-v /home/"$USERNAME"/.CONTAINERS/nextcloud/data:/var/www/html/data \
+-v /home/"$USERNAME"/.CONTAINERS/nextcloud/mysql:/var/lib/mysql \
+nextcloud
