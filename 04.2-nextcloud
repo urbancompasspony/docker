@@ -14,6 +14,7 @@ docker run -d \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
 --hostname=next.cloud \
+--restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 -v /home/"$USERNAME"/.CONTAINERS/nextcloud/nextcloud:/var/www/html \
 -v /home/"$USERNAME"/.CONTAINERS/nextcloud/apps:/var/www/html/custom_apps \
