@@ -1,0 +1,17 @@
+#!/bin/bash
+
+docker run -d \
+    --name=rclone \
+    --cap-add SYS_ADMIN \
+    --device /dev/fuse \
+    --security-opt apparmor=unconfined \
+    -v ${DOCKER_ROOT}/rclone/config:/config \
+    -v ${DOCKER_ROOT}/rclone/log:/log \
+    -v ${DOCKER_ROOT}/rclone/cache:/cache \
+    -v /your/mounting/point:/data:shared \
+    -v /local/dir/to/be/merged/with:/local \
+    -e PUID=${PUID} \
+    -e PGID=${PGID} \
+    -e TZ=Asia/Seoul \
+    -e RCLONE_REMOTE_PATH=remote_name:path/to/mount \
+    wiserain/rclone
