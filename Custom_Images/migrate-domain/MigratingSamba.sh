@@ -20,5 +20,7 @@ docker run -t -i \
 -v /etc/hosts:/etc/hosts \
 -v /etc/krb5.conf:/etc/krb5.conf \
 -v /etc/resolv.conf:/etc/resolv.conf \
--v /mnt:/mnt \
 urbancompasspony/migrate-domain:latest
+
+#-v /mnt:/mnt \
+#-v $(pwd)/FOLDER:/mnt \
