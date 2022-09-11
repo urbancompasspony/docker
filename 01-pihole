@@ -11,7 +11,7 @@ USERNAME="$3"
 
 mkdir -p /home/"$USERNAME"/.CONTAINERS/
 
-docker run \
+docker run -d \
 --name=pihole \
 --network macvlan \
 --ip=$LOCALIP \
