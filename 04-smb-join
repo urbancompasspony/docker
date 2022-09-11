@@ -1,3 +1,6 @@
+
+WIP!
+
 #!/bin/bash
 
 # Change here to create a new DC and JOIN this container to an existing domain controller!
