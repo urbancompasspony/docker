@@ -1,0 +1,23 @@
+#!/bin/bash
+
+HOSTNAME="atomic-pi"
+NAME="dominio"
+USERNAME="administrador"
+NETWORKLAN="host"
+
+docker run -t -i \
+-h $HOSTNAME \
+--name $NAME \
+--privileged \
+--restart=unless-stopped \
+-v /etc/localtime:/etc/localtime:ro \
+--network $NETWORKLAN \
+-v /home/"$USERNAME"/ACTIVE_DIRECTORY/cache/samba:/var/cache/samba \
+-v /home/"$USERNAME"/ACTIVE_DIRECTORY/lib/samba:/var/lib/samba \
+-v /home/"$USERNAME"/ACTIVE_DIRECTORY/log/samba:/var/log/samba \
+-v /home/"$USERNAME"/ACTIVE_DIRECTORY/run/samba:/run/samba \
+-v /home/"$USERNAME"/ACTIVE_DIRECTORY/etc:/etc \
+-v /mnt:/mnt \
+urbancompasspony/migrate-domain:latest
+
+#-v $(pwd)/FOLDER:/mnt \
