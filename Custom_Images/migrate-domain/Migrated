@@ -13,14 +13,14 @@ docker run -t -i \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
--v $USERNAME/ACTIVEDIRECTORY/cache/:/var/cache/samba \
--v $USERNAME/ACTIVEDIRECTORY/lib/:/var/lib/samba \
--v $USERNAME/ACTIVEDIRECTORY/log/:/var/log/samba \
--v $USERNAME/ACTIVEDIRECTORY/etc/:/etc/samba \
--v $USERNAME/ACTIVEDIRECTORY/run/:/run/samba \
--v $USERNAME/ACTIVEDIRECTORY/config/hosts:/etc/hosts \
--v $USERNAME/ACTIVEDIRECTORY/config/krb5.conf:/etc/krb5.conf \
--v $USERNAME/ACTIVEDIRECTORY/config/resolv.conf:/etc/resolv.conf \
+-v $USERNAME/activedirectory/cache/:/var/cache/samba \
+-v $USERNAME/activedirectory/lib/:/var/lib/samba \
+-v $USERNAME/activedirectory/log/:/var/log/samba \
+-v $USERNAME/activedirectory/etc/:/etc/samba \
+-v $USERNAME/activedirectory/run/:/run/samba \
+-v $USERNAME/activedirectory/config/hosts:/etc/hosts \
+-v $USERNAME/activedirectory/config/krb5.conf:/etc/krb5.conf \
+-v $USERNAME/activedirectory/config/resolv.conf:/etc/resolv.conf \
 urbancompasspony/migrate-domain:latest
 
 #-v /mnt:/mnt \
