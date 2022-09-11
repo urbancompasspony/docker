@@ -7,6 +7,9 @@ USERNAME="$2"
 
 mkdir -p /home/"$USERNAME"/.CONTAINERS/
 
+[ -d "/home/"$USERNAME"/.CONTAINERS/nextcloud" ] && {
+  echo "Uma instância do Nextcloud já existe!"
+} || {
 docker run -d \
 --name=nextcloud \
 --network macvlan \
@@ -25,4 +28,7 @@ nextcloud
 
 docker network connect bridge nextcloud
 
-#-p 80:80 \
+docker exec -it nextcloud apt update
+docker exec -it nextcloud apt install smbclient
+docker restart nextcloud
+}
