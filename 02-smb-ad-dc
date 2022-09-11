@@ -1,21 +1,23 @@
 #!/bin/bash
 
-# Some information for multisites (replication with more DC)
-# After everything up and ok, run this:
-# docker exec sambaaddc samba-tool drs showrepl
-# And catch the DSA object GUID.
-# Remove your docker container, keep the files and run again adding this line:
-# --add-host 14300161-0666-4cb6-8f46-4cb41f2ceda6._msdcs.$FQDN:$LOCALIP \
-# Where is --add-host
-
-# Change here to create a new domain controller!
+# NOME DA NOVA FLORESTA
 FQDN="ad.atomic.local"
+# IP FIXO DO NOVO CONTAINER
 LOCALIP="172.20.0.42"
+# SENHA DO USUARIO ADMINISTRATOR
 MYPASSWORD="P4ssw0rd"
+# DEFINA O DNS QUE O DOMINIO USARÁ
 DNSFW="172.20.0.41"
+# HOSTNAME DO CONTAINER
 HOSTNAME="atomicpi"
-NAME="smbaddc"
+# NOME DO CONTAINER
+NAME="dominio"
+# USUARIO DO HOST
+USERNAME="urbancompasspony"
+# PLACA DE REDE A SER USADA
 NETWORKLAN="macvlan"
+
+mkdir -p /home/"$USERNAME"/.CONTAINERS/
 
 docker run -t -i \
         --name $NAME \
@@ -51,8 +53,9 @@ docker run -t -i \
         -p $LOCALIP:1024-1044:1024-1044 \
         -p $LOCALIP:3268-3269:3268-3269 \
         -v /etc/localtime:/etc/localtime:ro \
-        -v $(pwd)/samba/data/:/var/lib/samba \
-        -v $(pwd)/samba/config/samba:/etc/samba/external \
+        -v /home/"$USERNAME"/.CONTAINERS/active_directory/data/:/var/lib/samba \
+        -v /home/"$USERNAME"/.CONTAINERS/active_directory/config/:/etc/samba/external \
+        -v /mnt:/mnt \
         urbancompasspony/domain
 
 # If some DC join to this DC, use this if there is any error:
