@@ -9,6 +9,7 @@ RUN set -ex; \
         procps \
         smbclient \
         supervisor \
+        mysql-server \
 #       libreoffice \
     ; \
     rm -rf /var/lib/apt/lists/*
