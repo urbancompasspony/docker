@@ -1,8 +1,18 @@
 #!/bin/bash
 
+# Passe o parâmetro antes, ou edite a linha abaixo adicionando o parâmetro entre aspas!
+
 # IP for web access. Default port is 8443!
-# DOES NOT WORK on ARM arch.
-SETIP="192.168.0.15"
+SETIP="$1"
+
+[ $(arch) = "x86_64" ] && {
+  echo "Sistema compatível!"
+} || {
+  echo "Sistema incompatível com esta arquitetura. Saindo."
+  exit
+}
+
+mkdir -p /home/"$USERNAME"/.CONTAINERS/
 
 docker run -d \
   --name=unifi \
@@ -23,7 +33,7 @@ docker run -d \
   -p 8880:8880 `#optional` \
   -p 6789:6789 `#optional` \
   -p 5514:5514/udp `#optional` \
-  -v $(pwd)/unifi/:/config \
   -v /etc/localtime:/etc/localtime:ro \
+  -v /home/"$USERNAME"/.CONTAINERS/unifi/:/config \
   --restart unless-stopped \
   lscr.io/linuxserver/unifi-controller:latest
