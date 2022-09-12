@@ -20,9 +20,9 @@ NAME="dominio"
 NETWORKLAN="macvlan"
 
 [ $(arch) = "x86_64" ] && {
-  REPOSITORY="urbancompasspony/pandora"
+  REPOSITORY="urbancompasspony/domain"
 } || {
-  REPOSITORY="urbancompasspony/pandora-arm"
+  REPOSITORY="urbancompasspony/domain-arm"
 }
 
 mkdir -p /home/"$USERNAME"/.CONTAINERS/
