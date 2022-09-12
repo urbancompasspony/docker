@@ -1,17 +1,30 @@
 #!/bin/bash
 
+# Passe o parâmetro antes, ou edite a linha abaixo adicionando o parâmetro entre aspas!
+
+# IP FIXO DO NOVO CONTAINER
+LOCALIP="$1"
+# USUARIO DO HOST
+USERNAME="$2"
+
+mkdir -p /home/"$USERNAME"/.CONTAINERS/
+
 docker run -d \
-    --name=rclone \
-    --cap-add SYS_ADMIN \
-    --device /dev/fuse \
-    --security-opt apparmor=unconfined \
-    -v ${DOCKER_ROOT}/rclone/config:/config \
-    -v ${DOCKER_ROOT}/rclone/log:/log \
-    -v ${DOCKER_ROOT}/rclone/cache:/cache \
-    -v /your/mounting/point:/data:shared \
-    -v /local/dir/to/be/merged/with:/local \
-    -e PUID=${PUID} \
-    -e PGID=${PGID} \
-    -e TZ=Asia/Seoul \
-    -e RCLONE_REMOTE_PATH=remote_name:path/to/mount \
-    wiserain/rclone
+--name=backup \
+--network macvlan \
+--ip=$LOCALIP \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=backup \
+-v /etc/localtime:/etc/localtime:ro \
+-v /home/"$USERNAME"/.CONTAINERS/rclone:/root/.config/rclone \
+-v /mnt:/mnt \
+-p 80:80 \
+-p 443:443 \
+--restart=unless-stopped \
+urbancompasspony/backup
+
+# Passing parameters!
+docker exec -it backup mkdir /root/.config/rclone
+docker exec -it backup bash -c "echo '00 12,19 * * * rclone copy --no-traverse /mnt/disk01/folder OneDrive:folder' >> cronjob"
+docker exec -it backup crontab /cronjob    
