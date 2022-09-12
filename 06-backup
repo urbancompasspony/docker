@@ -7,6 +7,12 @@ LOCALIP="$1"
 # USUARIO DO HOST
 USERNAME="$2"
 
+[ $(arch) = "x86_64" ] && {
+  REPO="urbancompasspony/backup"
+} || {
+  REPO="urbancompasspony/backup-arm"
+}
+
 mkdir -p /home/"$USERNAME"/.CONTAINERS/
 
 docker run -d \
@@ -22,7 +28,7 @@ docker run -d \
 -p 80:80 \
 -p 443:443 \
 --restart=unless-stopped \
-urbancompasspony/backup
+$REPO
 
 # Passing parameters!
 docker exec -it backup mkdir /root/.config/rclone
