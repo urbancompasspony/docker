@@ -16,4 +16,4 @@ RUN touch /etc/samba/smb.conf
 HEALTHCHECK --interval=60s --timeout=15s \
             CMD smbclient -L \\localhost -U % -m SMB3
 
-ENTRYPOINT service start smbd && service start nmbd && systemctl start winbind && /bin/bash
+ENTRYPOINT service smbd start && service nmbd start && systemctl winbind start && /bin/bash
