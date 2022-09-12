@@ -9,8 +9,6 @@ USERNAME="$1"
 
 service smbd stop; service nmbd stop
 
-chmod 777 -R  /var/lib/samba/sysvol/
-
 mkdir -p /home/"$USERNAME"/SAMBA_SHARE
 
 mkdir -p /home/"$USERNAME"/SAMBA_SHARE/cache
