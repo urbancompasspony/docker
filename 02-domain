@@ -19,6 +19,12 @@ NAME="dominio"
 # PLACA DE REDE A SER USADA - Normalmente não muda.
 NETWORKLAN="macvlan"
 
+[ $(arch) = "x86_64" ] && {
+  REPOSITORY="urbancompasspony/pandora"
+} || {
+  REPOSITORY="urbancompasspony/pandora-arm"
+}
+
 mkdir -p /home/"$USERNAME"/.CONTAINERS/
 
 docker run -t -i \
@@ -58,4 +64,4 @@ docker run -t -i \
         -v /home/"$USERNAME"/.CONTAINERS/active_directory/data/:/var/lib/samba \
         -v /home/"$USERNAME"/.CONTAINERS/active_directory/config/:/etc/samba/external \
         -v /mnt:/mnt \
-        urbancompasspony/domain
+        $REPOSITORY
