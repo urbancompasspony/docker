@@ -22,6 +22,3 @@ docker run -t -i \
 -v /etc/resolv.conf:/etc/resolv.conf \
 -v /mnt:/mnt \
 urbancompasspony/migrate-samba:latest
-
-#-v /mnt:/mnt \
-#-v $(pwd)/FOLDER:/mnt \
