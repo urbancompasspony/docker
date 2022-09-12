@@ -1,1 +1,23 @@
+#!/bin/bash
 
+HOSTNAME="atomic-pi"
+NAME="samba"
+USERNAME="administrador"
+NETWORKLAN="host"
+
+docker run -t -i \
+-h $HOSTNAME \
+--name $NAME \
+--privileged \
+--restart=unless-stopped \
+-v /etc/localtime:/etc/localtime:ro \
+--network $NETWORKLAN \
+-v /home/"$USERNAME"/SAMBA_SHARE/cache/samba:/var/cache/samba \
+-v /home/"$USERNAME"/SAMBA_SHARE/lib/samba:/var/lib/samba \
+-v /home/"$USERNAME"/SAMBA_SHARE/log/samba:/var/log/samba \
+-v /home/"$USERNAME"/SAMBA_SHARE/run/samba:/run/samba \
+-v /home/"$USERNAME"/SAMBA_SHARE/etc:/etc \
+-v /mnt:/mnt \
+urbancompasspony/migrate-samba:latest
+
+#-v $(pwd)/FOLDER:/mnt \
