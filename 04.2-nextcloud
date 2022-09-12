@@ -29,6 +29,6 @@ nextcloud
 docker network connect bridge nextcloud
 
 docker exec -it nextcloud apt update
-docker exec -it nextcloud apt install smbclient
+docker exec -it nextcloud apt install smbclient -y
 docker restart nextcloud
 }
