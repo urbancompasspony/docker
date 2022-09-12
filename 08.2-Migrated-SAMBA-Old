@@ -5,7 +5,7 @@ NAME="samba"
 USERNAME="administrador"
 NETWORKLAN="host"
 
-docker run -t -i \
+docker run -d \
 -h $HOSTNAME \
 --name $NAME \
 --privileged \
