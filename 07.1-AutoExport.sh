@@ -9,7 +9,8 @@ USERNAME="$1"
 
 wd=$(pwd)
 
-service samba-ad-dc stop
+service smbd stop; service nmbd stop; service samba-ad-dc stop
+
 chmod 777 -R  /var/lib/samba/sysvol/
 
 mkdir -p /home/"$USERNAME"/ACTIVE_DIRECTORY
