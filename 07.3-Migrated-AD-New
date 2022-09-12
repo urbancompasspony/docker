@@ -15,6 +15,7 @@ docker run -t -i \
 -h $HOSTNAME \
 --name $NAME \
 --privileged \
+--ip $LOCALIP \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
