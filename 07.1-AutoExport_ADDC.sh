@@ -7,9 +7,7 @@ USERNAME="$1"
   exit
   }
 
-wd=$(pwd)
-
-service smbd stop; service nmbd stop; service samba-ad-dc stop
+service samba-ad-dc stop
 
 chmod 777 -R  /var/lib/samba/sysvol/
 
