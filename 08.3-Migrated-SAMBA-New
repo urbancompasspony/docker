@@ -13,7 +13,7 @@ NAME="samba"
 # PLACA DE REDE A SER USADA
 NETWORKLAN="macvlan"
 
-docker run -t -i \
+docker run -d \
 -h $HOSTNAME \
 --ip $LOCALIP \
 --name $NAME \
