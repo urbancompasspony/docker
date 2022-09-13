@@ -30,7 +30,8 @@ docker run -d \
 -v /mnt:/mnt \
 urbancompasspony/migrate-samba:latest
 
-#-v $(pwd)/FOLDER:/mnt \
+# Generate a new smb.conf!
+wget https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smb.conf -P /etc/samba/
 
-# WITH RCLONE:
+# IF WILL WORK WITH RCLONE:
 # docker network connect bridge samba
