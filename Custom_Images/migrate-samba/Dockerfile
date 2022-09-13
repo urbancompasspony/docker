@@ -13,7 +13,4 @@ RUN apt install -y attr acl samba smbclient ldap-utils winbind libnss-winbind li
 COPY init.sh /usr/bin/init.sh
 RUN chmod 777 /usr/bin/init.sh
 
-HEALTHCHECK --interval=60s --timeout=15s \
-            CMD smbclient -L \\localhost -U % -m SMB3
-
 CMD ["/usr/bin/init.sh"]
