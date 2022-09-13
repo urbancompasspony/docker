@@ -19,11 +19,11 @@ docker run -t -i \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
--v /home/"$USERNAME"/SAMBA_SHARE/cache/samba:/var/cache/samba \
--v /home/"$USERNAME"/SAMBA_SHARE/lib/samba:/var/lib/samba \
--v /home/"$USERNAME"/SAMBA_SHARE/log/samba:/var/log/samba \
--v /home/"$USERNAME"/SAMBA_SHARE/run/samba:/run/samba \
--v /home/"$USERNAME"/SAMBA_SHARE/etc:/etc \
+-v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/cache/samba:/var/cache/samba \
+-v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/lib/samba:/var/lib/samba \
+-v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/log/samba:/var/log/samba \
+-v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/run/samba:/run/samba \
+-v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/etc:/etc \
 -v /mnt:/mnt \
 urbancompasspony/migrate-samba:latest
 
