@@ -1,9 +1,36 @@
+#!/bin/bash
 
-# WIP
+# IP FIXO DO NOVO CONTAINER
+LOCALIP="$1"
+# HOSTNAME DO CONTAINER
+HOSTNAME="$2"
+# USUARIO DO HOST
+USERNAME="$3"
+# NOME DO COMPARTILHAMENTO
+NOMESHARE="$4"
+# NOME DO CONTAINER
 
+NAME="samba"
+# PLACA DE REDE A SER USADA
+NETWORKLAN="macvlan"
 
+docker run -d \
+-h $HOSTNAME \
+--ip $LOCALIP \
+--name $NAME \
+--privileged \
+--restart=unless-stopped \
+-v /etc/localtime:/etc/localtime:ro \
+--network $NETWORKLAN \
+-v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/cache/samba:/var/cache/samba \
+-v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/lib/samba:/var/lib/samba \
+-v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/log/samba:/var/log/samba \
+-v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/run/samba:/run/samba \
+-v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/etc:/etc \
+-v /mnt:/mnt \
+urbancompasspony/migrate-samba:latest
 
-
+#-v $(pwd)/FOLDER:/mnt \
 
 # WITH RCLONE:
 # docker network connect bridge samba
