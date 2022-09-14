@@ -1,34 +1,110 @@
 #!/bin/bash
 
+# Global config for replication:
+export NOMECONTAINER="nextcloud"
+
 # IP FIXO DO NOVO CONTAINER
-LOCALIP="$1"
-# USUARIO DO HOST
-USERNAME="$2"
+export var1
 
-mkdir -p /home/"$USERNAME"/.CONTAINERS/
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
 
-[ -d "/home/"$USERNAME"/.CONTAINERS/nextcloud" ] && {
-  echo "Uma instância do Nextcloud já existe!"
-} || {
+function checkB {
+  export var1
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+        
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+
+          create
+        } || {
+          create
+        }
+        
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        rm -R /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1
+
+  VALUE1=""
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  [ -z "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    create
+    }
+}
+
+function create {
+  export var1
+  
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+
 docker run -d \
---name=nextcloud \
+--name=$NOMECONTAINER \
 --network macvlan \
---ip=$LOCALIP \
+--ip=$var1 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
 --hostname=next.cloud \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
--v /home/"$USERNAME"/.CONTAINERS/nextcloud/nextcloud:/var/www/html \
--v /home/"$USERNAME"/.CONTAINERS/nextcloud/apps:/var/www/html/custom_apps \
--v /home/"$USERNAME"/.CONTAINERS/nextcloud/config:/var/www/html/config \
--v /home/"$USERNAME"/.CONTAINERS/nextcloud/data:/var/www/html/data \
--v /home/"$USERNAME"/.CONTAINERS/nextcloud/mysql:/var/lib/mysql \
+-v /srv/containers/"$NOMECONTAINER"/nextcloud:/var/www/html \
+-v /srv/containers/"$NOMECONTAINER"/apps:/var/www/html/custom_apps \
+-v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
+-v /srv/containers/"$NOMECONTAINER"/data:/var/www/html/data \
+-v /srv/containers/"$NOMECONTAINER"/mysql:/var/lib/mysql \
 nextcloud
 
 docker network connect bridge nextcloud
 
-docker exec -it nextcloud apt update
-docker exec -it nextcloud apt install smbclient -y
+docker exec nextcloud apt update
+docker exec nextcloud apt install smbclient -y
 docker restart nextcloud
 }
+
+function clean {
+  unset var1
+}
+
+# Start
+checkA
+checkB
+clean
+
+exit
