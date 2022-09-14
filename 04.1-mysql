@@ -1,32 +1,110 @@
 #!/bin/bash
 
+# Global config for replication:
+export NOMECONTAINER="mysql"
+
 # IP FIXO DO NOVO CONTAINER
-LOCALIP="$1"
-# USUARIO DO HOST
-USERNAME="$2"
+export var1
 # NOVA SENHA DO ROOT MYSQL
-MROOT="$3"
+export var2
 
-mkdir -p /home/"$USERNAME"/.CONTAINERS/
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
 
-# INICIANDO MYSQL DATABASE
-[ -d "/home/"$USERNAME"/.CONTAINERS/mysql" ] && {
-  echo "Banco de Dados já existente encontrado!"
-} || {
+function checkB {
+  export var1; export var2
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+        
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+
+          create
+        } || {
+          create
+        }
+        
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        rm -R /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1; export var2
+
+  VALUE1=""; VALUE2=""
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+"MySQL PW:" 2 1 "$VALUE2" 2 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  
+  [ -z "$var1" ] || [ -z "$var2" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    create
+    }
+}
+
+function create {
+  export var1; export var2
+  
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+
   docker run -d \
   --name mysql \
-  --ip=$LOCALIP \
+  --ip=$var1 \
   --network macvlan \
   --hostname=mysql \
   --restart=unless-stopped \
   -p 80:80 \
   -v /etc/localtime:/etc/localtime:ro \
-  -v /home/"$USERNAME"/.CONTAINERS/mysql:/var/lib/mysql \
-  -e MYSQL_ROOT_PASSWORD="$MROOT" \
+  -e MYSQL_ROOT_PASSWORD="$var2" \
   mysql:8
+}
+
+function clean {
+  unset var1
+  unset var2
+}
+
+# Start
+checkA
+checkB
+clean
 
 docker network connect bridge mysql
-}
+
+exit
 
 # Execute manualmente:
 
