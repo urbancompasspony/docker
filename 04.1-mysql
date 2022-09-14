@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: HOW TO CHANGE /VAR/LIB/MYSQL TO ANOTHER DIR!
+
 # Global config for replication:
 export NOMECONTAINER="mysql"
 
