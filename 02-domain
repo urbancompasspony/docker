@@ -1,23 +1,8 @@
 #!/bin/bash
 
-# Passe o parâmetro antes, ou edite a linha abaixo adicionando o parâmetro entre aspas!
+export NOMECONTAINER="Dominio"
 
-# FQDN DA NOVA FLORESTA
-FQDN="$1"
-# IP FIXO DO NOVO CONTAINER
-LOCALIP="$2"
-# SENHA DO USUARIO ADMINISTRATOR
-MYPASSWORD="$3"
-# DEFINA O DNS QUE O DOMINIO USARÁ
-DNSFW="$4"
-# HOSTNAME DO CONTAINER
-HOSTNAME="$5"
-# USUARIO DO HOST
-USERNAME="$6"
-# NOME DO CONTAINER
-NAME="dominio"
-# PLACA DE REDE A SER USADA - Normalmente não muda.
-NETWORKLAN="macvlan"
+export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
 
 [ $(arch) = "x86_64" ] && {
   REPOSITORY="urbancompasspony/domain"
@@ -25,10 +10,90 @@ NETWORKLAN="macvlan"
   REPOSITORY="urbancompasspony/domain-arm"
 }
 
-mkdir -p /home/"$USERNAME"/.CONTAINERS/
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
 
-docker run -t -i \
-        --name $NAME \
+function menu {
+  export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
+
+  VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5=""; VALUE6=""; VALUE7="macvlan"
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
+"F.Q.D.N.: " 1 1 "$VALUE1" 1 10 34 0 \
+"Local IP:" 2 1 "$VALUE2" 2 10 34 0 \
+"ADM Pass:" 3 1 "$VALUE3" 3 10 34 0 \
+"LAN DNS :" 4 1 "$VALUE4" 4 10 34 0 \
+"Hostname:" 5 1 "$VALUE5" 5 10 34 0 \
+"HostUser:" 6 1 "$VALUE6" 6 10 34 0 \
+"NetLAN  :" 7 1 "$VALUE7" 7 10 34 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+
+  FQDNV=$(echo "$VALUE0" | sed -n 1p)
+  iplocal=$(echo "$VALUE0" | sed -n 2p)
+  admps=$(echo "$VALUE0" | sed -n 3p)
+  dnslan=$(echo "$VALUE0" | sed -n 4p)
+  namehost=$(echo "$VALUE0" | sed -n 5p)
+  userhost=$(echo "$VALUE0" | sed -n 6p)
+  lannet=$(echo "$VALUE0" | sed -n 7p)
+  
+  # FQDN DA NOVA FLORESTA
+  FQDN="$FQDNV"
+  # IP FIXO DO NOVO CONTAINER
+  LOCALIP="$iplocal"
+  # SENHA DO USUARIO ADMINISTRATOR
+  MYPASSWORD="$admps"
+  # DEFINA O DNS QUE O DOMINIO USARÁ
+  DNSFW="$dnslan"
+  # HOSTNAME DO CONTAINER
+  HOSTNAME="$namehost"
+  # USUARIO DO HOST
+  USERNAME="$userhost"
+  # PLACA DE REDE A SER USADA - Normalmente não muda.
+  NETWORKLAN="$lannet"
+  
+  [ -z "$FQDN" ] || [ -z "$LOCALIP" ] || [ -z "$MYPASSWORD" ] || [ -z "$DNSFW" ] || [ -z "$HOSTNAME" ] || [ -z "$USERNAME" ] || [ -z "$NETWORKLAN" ] && {
+  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+  menu
+  }
+}
+
+function checkB {
+  export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
+
+  [ -f "/home/"$USERNAME"/.CONTAINERS/active_directory/Information" ] && {
+    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja remover o container?" 6 40
+    [ $? = 0 ] && {
+      docker stop pihole
+      docker rm pihole
+      rm -R /home/"$USERNAME"/.CONTAINERS/active_directory
+      mkdir -p /home/"$USERNAME"/.CONTAINERS/active_directory
+    } || {
+      echo "A instalação local será mantida!"
+      exit
+    }
+  }
+}
+
+function create {
+  export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
+  
+  touch /home/"$USERNAME"/.CONTAINERS/active_directory/Information
+  echo "F.Q.D.N.: $FQDNV" > /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "Local IP: $iplocal" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "ADM Pass: $admps" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "LAN DNS : $dnslan" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "Hostname: $namehost" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "HostUser: $userhost" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "NetLAN  : $lannet" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+
+docker run -d \
+        --name dominio \
         --dns-search $FQDN \
         --dns $LOCALIP \
         --dns $DNSFW \
@@ -65,3 +130,25 @@ docker run -t -i \
         -v /home/"$USERNAME"/.CONTAINERS/active_directory/config/:/etc/samba/external \
         -v /mnt:/mnt \
         $REPOSITORY
+}
+
+function clean {
+  # This will clean all personal data!
+  unset USERNAME
+  unset FQDNV
+  unset iplocal
+  unset admps
+  unset dnslan
+  unset namehost
+  unset userhost
+  unset lannet
+}
+
+# Start
+checkA
+menu
+checkB
+create
+clean
+
+exit
