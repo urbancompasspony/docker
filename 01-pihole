@@ -50,9 +50,9 @@ function menu {
 
   VALUE1=""; VALUE2=""; VALUE3=""
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
-"Local IP: " 1 1 "$VALUE1" 1 10 34 0 \
-"Web Pass:" 2 1 "$VALUE2" 2 10 34 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+"Web Pass:" 2 1 "$VALUE2" 2 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
