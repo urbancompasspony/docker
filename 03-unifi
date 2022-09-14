@@ -105,7 +105,7 @@ docker run -d \
   -p 6789:6789 `#optional` \
   -p 5514:5514/udp `#optional` \
   -v /etc/localtime:/etc/localtime:ro \
-  -v /srv/containers/"$NOMECONTAINER"/:/config \
+  -v /srv/containers/"$NOMECONTAINER":/config \
   --restart unless-stopped \
   lscr.io/linuxserver/unifi-controller:latest
   }
