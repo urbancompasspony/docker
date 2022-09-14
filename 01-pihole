@@ -11,7 +11,7 @@ VALUE3=""
 VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "PiHole" 15 50 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 34 0 \
 "Web Pass:" 2 1 "$VALUE2" 2 10 34 0 \
-"Host User:" 3 1 "$VALUE3" 3 10 34 0 \
+"HostUser:" 3 1 "$VALUE3" 3 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && m10
 IP1=$(echo "$VALUE0" | sed -n 1p)
