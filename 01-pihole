@@ -22,7 +22,7 @@ function menu {
 "HostUser:" 3 1 "$VALUE3" 3 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
-  [ $? -ne 0 ] && exit
+  [ $? -ne 0 ] && curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
 
   IP1=$(echo "$VALUE0" | sed -n 1p)
   pass2=$(echo "$VALUE0" | sed -n 2p)
@@ -51,7 +51,6 @@ function checkB {
       docker rm pihole
       rm -R /home/"$USERNAME"/.CONTAINERS/pihole
       mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
-      create
     } || {
       echo "A instalação local será mantida!"
       curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
@@ -112,3 +111,5 @@ menu
 checkB
 create
 clean
+
+curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
