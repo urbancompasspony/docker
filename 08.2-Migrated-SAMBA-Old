@@ -4,8 +4,6 @@
 HOSTNAME="$1"
 # USUARIO DO HOST
 USERNAME="$2"
-# NOME DO COMPARTILHAMENTO
-NOMESHARE="$3"
 
 NETWORKLAN="host"
 NAME="samba"
@@ -17,11 +15,11 @@ docker run -d \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
--v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/cache/samba:/var/cache/samba \
--v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/lib/samba:/var/lib/samba \
--v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/log/samba:/var/log/samba \
--v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/run/samba:/run/samba \
--v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/etc:/etc \
+-v /home/"$USERNAME"/.CONTAINERS/SAMBA_SHARE/cache/samba:/var/cache/samba \
+-v /home/"$USERNAME"/.CONTAINERS/SAMBA_SHARE/lib/samba:/var/lib/samba \
+-v /home/"$USERNAME"/.CONTAINERS/SAMBA_SHARE/log/samba:/var/log/samba \
+-v /home/"$USERNAME"/.CONTAINERS/SAMBA_SHARE/run/samba:/run/samba \
+-v /home/"$USERNAME"/.CONTAINERS/SAMBA_SHARE/etc:/etc \
 -v /mnt:/mnt \
 urbancompasspony/migrate-samba:latest
 
