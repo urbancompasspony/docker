@@ -89,10 +89,10 @@ function create {
 pihole/pihole:latest
 
   docker start pihole
-  docker exec -it pihole rm /etc/pihole/pihole-FTL.conf
-  docker exec -it pihole touch /etc/pihole/pihole-FTL.conf
-  docker exec -it pihole bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
-  docker exec -it pihole bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
+  docker exec pihole rm /etc/pihole/pihole-FTL.conf
+  docker exec pihole touch /etc/pihole/pihole-FTL.conf
+  docker exec pihole bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
+  docker exec pihole bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
   docker restart pihole
 }
 
