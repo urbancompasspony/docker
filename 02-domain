@@ -46,6 +46,8 @@ function checkB {
 
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
+
+          create
         } || {
           create
         }
@@ -92,8 +94,9 @@ function menu {
   [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
+  } || {
+    create
     }
-  create
 }
 
 function create {
@@ -155,7 +158,7 @@ function clean {
   unset var4
   unset var5
   unset var6
-}
+}a
 
 # Start
 checkA
