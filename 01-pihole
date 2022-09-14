@@ -18,10 +18,6 @@ IP1=$(echo "$VALUE0" | sed -n 1p)
 pass2=$(echo "$VALUE0" | sed -n 2p)
 user2=$(echo "$VALUE0" | sed -n 3p)
 
-echo $IP1
-echo $pass2
-echo $user2
-
 [ -z "$IP1" ] || [ -z "$user2" ] || [ -z "$pass2" ] && {
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
@@ -36,6 +32,15 @@ USERNAME="$user2"
 
 mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
 
+[ -d "/home/"$USERNAME"/.CONTAINERS/pihole/Information" ] && {
+  dialog --title "Container do PiHole encontrado!" --yesno "Deseja remover o container?" 6 40
+  [ $? = 0 ] && {
+    docker rm pihole
+  }||{
+    echo "Instalação local será mantida!"
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
+  }
+} || {
 touch /home/"$USERNAME"/.CONTAINERS/pihole/Information
 echo " " > /home/"$USERNAME"/.CONTAINERS/pihole/Information
 echo "IP FIXO DO NOVO CONTAINER: $IP1" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
@@ -69,4 +74,6 @@ docker exec -it pihole touch /etc/pihole/pihole-FTL.conf
 docker exec -it pihole bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
 docker exec -it pihole bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
 docker restart pihole
+
+  }
 }
