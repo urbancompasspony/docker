@@ -19,16 +19,15 @@ function checkB {
   export var1; export var2
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
-    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja remover o container?" 6 40
+    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja destruir o container?" 6 40
     [ $? = 0 ] && {
-    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os parâmetros da instalação anterior?" 6 40
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
       [ $? = 0 ] && {
         var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
         var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
          
         docker stop "$NOMECONTAINER"
         docker rm "$NOMECONTAINER"
-        rm -R /srv/containers/"$NOMECONTAINER"
       } || {
         docker stop "$NOMECONTAINER"
         docker rm "$NOMECONTAINER"
