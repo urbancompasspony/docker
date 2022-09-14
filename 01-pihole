@@ -61,6 +61,7 @@ function checkB {
 function create {
   export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
   
+  mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
   touch /home/"$USERNAME"/.CONTAINERS/pihole/Information
   echo "Local IP: $IP1" > /home/"$USERNAME"/.CONTAINERS/pihole/Information
   echo "Web Pass: $pass2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
