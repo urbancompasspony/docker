@@ -90,11 +90,10 @@ function menu {
   var6=$(echo "$VALUE0" | sed -n 6p)
   
   [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
-  } || {
-    create
     }
+  create
 }
 
 function create {
