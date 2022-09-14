@@ -62,9 +62,9 @@ function create {
   export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
   
   touch /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "IP FIXO DO NOVO CONTAINER: $IP1" > /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "SENHA WEB DO PIHOLE: $pass2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "USUARIO DO HOST: $user2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "Local IP: $IP1" > /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "Web Pass: $pass2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "HostUser: $user2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
 
   docker run -d \
 --name=pihole \
