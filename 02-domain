@@ -44,7 +44,7 @@ function checkB {
         var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
         var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
 
-        [ docker stop "$NOMECONTAINER" ] && {
+        [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
         } || {
           create
@@ -91,8 +91,10 @@ function menu {
   
   [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] && {
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-  menu
-  }
+    menu
+  } || {
+    create
+    }
 }
 
 function create {
@@ -159,7 +161,6 @@ function clean {
 # Start
 checkA
 checkB
-create
 clean
 
 exit
