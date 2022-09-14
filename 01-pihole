@@ -3,7 +3,10 @@
 # Global config for replication:
 export NOMECONTAINER="pihole"
 
-export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
+# IP FIXO DO NOVO CONTAINER
+export var1
+# SENHA PARA O PIHOLE
+export var2
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -12,85 +15,76 @@ function checkA {
     }
 }
 
+function checkB {
+  export var1; export var2
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja remover o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os parâmetros da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+         
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        rm -R /srv/containers/"$NOMECONTAINER"
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        rm -R /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
 function menu {
-  export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
+  export var1; export var2
 
   VALUE1=""; VALUE2=""; VALUE3=""
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 34 0 \
 "Web Pass:" 2 1 "$VALUE2" 2 10 34 0 \
-"HostUser:" 3 1 "$VALUE3" 3 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
-
-  IP1=$(echo "$VALUE0" | sed -n 1p)
-  pass2=$(echo "$VALUE0" | sed -n 2p)
-  user2=$(echo "$VALUE0" | sed -n 3p)
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
   
-  # IP FIXO DO NOVO CONTAINER
-  LOCALIP=$IP1
-  # SENHA PARA O PIHOLE
-  MYPASSWORD=$pass2
-  # USUARIO DO HOST
-  USERNAME=$user2
-  
-  [ -z "$IP1" ] || [ -z "$user2" ] || [ -z "$pass2" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] && {
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
   menu
   }
 }
 
-function checkB {
-  export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
-
-  [ -f "/home/$USERNAME/.CONTAINERS/$NOMECONTAINER/Information" ] && {
-    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja remover o container?" 6 40
-    [ $? = 0 ] && {
-    dialog --title "Recriar o container $NOMECONTAINER" --yesno "Deseja reaproveitar os parâmetros existentes?" 6 40
-    [ $? = 0 ] && {
-        LOCALIP=$(sed -n '1p' /home/$USERNAME/.CONTAINERS/$NOMECONTAINER/Information)
-        MYPASSWORD
-        USERNAME
-        docker stop "$NOMECONTAINER"
-        docker rm "$NOMECONTAINER"
-        rm -R /home/"$USERNAME"/.CONTAINERS/"$NOMECONTAINER"
-        mkdir -p /home/"$USERNAME"/.CONTAINERS/"$NOMECONTAINER"
-      }||{
-        docker stop "$NOMECONTAINER"
-        docker rm "$NOMECONTAINER"
-        rm -R /home/"$USERNAME"/.CONTAINERS/"$NOMECONTAINER"
-        mkdir -p /home/"$USERNAME"/.CONTAINERS/"$NOMECONTAINER"
-      }
-    } || {
-      echo "A instalação local será mantida!"
-      exit
-    }
-  }
-}
-
 function create {
-  export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
+  export var1; export var2
   
-  mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
-  touch /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "$IP1" > /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "$pass2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "$user2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
 
   docker run -d \
---name=pihole \
+--name=$NOMECONTAINER \
 --network macvlan \
---ip=$LOCALIP \
+--ip=$var1 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
 --hostname=pi.hole \
--e SERVERIP=$LOCALIP \
--e WEBPASSWORD=$MYPASSWORD \
+-e SERVERIP=$var1 \
+-e WEBPASSWORD=$var2 \
 -v /etc/localtime:/etc/localtime:ro \
--v /home/"$USERNAME"/.CONTAINERS/pihole/pihole/:/etc/pihole \
--v /home/"$USERNAME"/.CONTAINERS/pihole/dnsmasq.d/:/etc/dnsmasq.d \
+-v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
+-v /srv/containers/"$NOMECONTAINER"/dnsmasq.d/:/etc/dnsmasq.d \
 -p 80:80 \
 -p 443:443 \
 -p 67:67/tcp \
@@ -100,29 +94,24 @@ function create {
 --restart=unless-stopped \
 pihole/pihole:latest
 
-  docker start pihole
-  docker exec pihole rm /etc/pihole/pihole-FTL.conf
-  docker exec pihole touch /etc/pihole/pihole-FTL.conf
-  docker exec pihole bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
-  docker exec pihole bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
-  docker restart pihole
+  docker start "$NOMECONTAINER"
+  docker exec "$NOMECONTAINER" rm /etc/pihole/pihole-FTL.conf
+  docker exec "$NOMECONTAINER" touch /etc/pihole/pihole-FTL.conf
+  docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
+  docker exec "$NOMECONTAINER" bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
+  docker restart "$NOMECONTAINER"
 }
 
 function clean {
-  # This will clean all personal data!
-  unset USERNAME
-  unset IP1
-  unset pass2
-  unset user2
-  unset LOCALIP
-  unset MYPASSWORD
+  unset var1
+  unset var2
 }
 
 # Start
 checkA
-menu
 checkB
 create
 clean
 
-exit
+# Encerrar em caso de erros
+exit 1
