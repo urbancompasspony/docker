@@ -2,6 +2,27 @@
 
 # Passe o parâmetro antes, ou edite a linha abaixo adicionando o parâmetro entre aspas!
 
+#!/bin/bash
+
+VALUE1=""
+VALUE2=""
+VALUE3=""
+
+VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "PiHole" 15 50 0 \
+"Local IP: " 1 1 "$VALUE1" 1 10 34 0 \
+"Web Pass:" 2 1 "$VALUE2" 2 10 34 0 \
+"Host User:" 3 1 "$VALUE3" 3 10 34 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && m10
+IP1=$(echo "$VALUE0" | sed -n 1p)
+user2=$(echo "$VALUE0" | sed -n 2p)
+pass2=$(echo "$VALUE0" | sed -n 3p)
+
+[ -z "$IP1" ] || [ -z "$user2" ] || [ -z "$pass2" ] && {
+  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
+} || {
+
 # IP FIXO DO NOVO CONTAINER
 LOCALIP="$1"
 # SENHA PARA O PIHOLE
@@ -38,3 +59,4 @@ docker exec -it pihole touch /etc/pihole/pihole-FTL.conf
 docker exec -it pihole bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
 docker exec -it pihole bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
 docker restart pihole
+}
