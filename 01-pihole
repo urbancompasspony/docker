@@ -26,8 +26,12 @@ function checkB {
         var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
         var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
          
-        docker stop "$NOMECONTAINER"
-        docker rm "$NOMECONTAINER"
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+        } || {
+          create
+        }
+        
       } || {
         docker stop "$NOMECONTAINER"
         docker rm "$NOMECONTAINER"
@@ -109,7 +113,6 @@ function clean {
 # Start
 checkA
 checkB
-create
 clean
 
 # Encerrar em caso de erros
