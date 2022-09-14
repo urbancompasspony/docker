@@ -15,8 +15,8 @@ VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "PiHole" 15 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && m10
 IP1=$(echo "$VALUE0" | sed -n 1p)
-user2=$(echo "$VALUE0" | sed -n 2p)
-pass2=$(echo "$VALUE0" | sed -n 3p)
+pass2=$(echo "$VALUE0" | sed -n 2p)
+user2=$(echo "$VALUE0" | sed -n 3p)
 
 [ -z "$IP1" ] || [ -z "$user2" ] || [ -z "$pass2" ] && {
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
@@ -24,19 +24,19 @@ pass2=$(echo "$VALUE0" | sed -n 3p)
 } || {
 
 # IP FIXO DO NOVO CONTAINER
-LOCALIP="$1"
+LOCALIP="$IP1"
 # SENHA PARA O PIHOLE
-MYPASSWORD="$2"
+MYPASSWORD="$pass2"
 # USUARIO DO HOST
-USERNAME="$3"
+USERNAME="$user2"
 
 mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
 
 touch /home/"$USERNAME"/.CONTAINERS/pihole/Information
 echo " " > /home/"$USERNAME"/.CONTAINERS/pihole/Information
-echo "IP FIXO DO NOVO CONTAINER: $1" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-echo "SENHA WEB DO PIHOLE: $2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-echo "USUARIO DO HOST: $3" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+echo "IP FIXO DO NOVO CONTAINER: $IP1" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+echo "SENHA WEB DO PIHOLE: $pass2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+echo "USUARIO DO HOST: $user2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
 
 docker run -d \
 --name=pihole \
