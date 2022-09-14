@@ -45,7 +45,7 @@ function checkB {
   export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
 
   [ -f "/home/$USERNAME/.CONTAINERS/pihole/Information" ] && {
-    dialog --title "Container PiHole já existe!" --yesno "Deseja remover o container?" 6 40
+    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja remover o container?" 6 40
     [ $? = 0 ] && {
       docker stop pihole
       docker rm pihole
