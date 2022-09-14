@@ -18,6 +18,10 @@ IP1=$(echo "$VALUE0" | sed -n 1p)
 pass2=$(echo "$VALUE0" | sed -n 2p)
 user2=$(echo "$VALUE0" | sed -n 3p)
 
+echo $IP1
+echo $pass2
+echo $user2
+
 [ -z "$IP1" ] || [ -z "$user2" ] || [ -z "$pass2" ] && {
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
