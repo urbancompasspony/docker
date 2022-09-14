@@ -16,7 +16,6 @@ export var5
 # PLACA DE REDE A SER USADA - Normalmente não muda.
 export var6
 
-
 [ $(arch) = "x86_64" ] && {
   REPOSITORY="urbancompasspony/domain"
 } || {
