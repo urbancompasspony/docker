@@ -108,7 +108,7 @@ function create {
   echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
 
 docker run -d \
-        --name dominio \
+        --name $NOMECONTAINER \
         --dns-search $var1 \
         --dns $var2 \
         --dns $var4 \
