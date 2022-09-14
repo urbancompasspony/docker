@@ -53,7 +53,7 @@ function checkB {
       mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
     } || {
       echo "A instalação local será mantida!"
-      curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
+      exit
     }
   }
 }
@@ -112,4 +112,4 @@ checkB
 create
 clean
 
-curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
+exit
