@@ -63,9 +63,9 @@ function menu {
   var2=$(echo "$VALUE0" | sed -n 2p)
   
   [ -z "$var1" ] || [ -z "$var2" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-  menu
-  }
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+    }
   create
 }
 
