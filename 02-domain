@@ -69,8 +69,8 @@ function checkB {
   [ -f "/home/"$USERNAME"/.CONTAINERS/active_directory/Information" ] && {
     dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja remover o container?" 6 40
     [ $? = 0 ] && {
-      docker stop pihole
-      docker rm pihole
+      docker stop dominio
+      docker rm dominio
       rm -R /home/"$USERNAME"/.CONTAINERS/active_directory
       mkdir -p /home/"$USERNAME"/.CONTAINERS/active_directory
     } || {
