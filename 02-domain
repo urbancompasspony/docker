@@ -1,8 +1,21 @@
 #!/bin/bash
 
-export NOMECONTAINER="Dominio"
+# Global config for replication:
+export NOMECONTAINER="dominio"
 
-export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
+# FQDN DA NOVA FLORESTA
+export var1
+# IP FIXO DO NOVO CONTAINER
+export var2
+# SENHA DO USUARIO ADMINISTRATOR
+export var3
+# DEFINA O DNS QUE O DOMINIO USARÁ
+export var4
+# HOSTNAME DO CONTAINER
+export var5
+# PLACA DE REDE A SER USADA - Normalmente não muda.
+export var6
+
 
 [ $(arch) = "x86_64" ] && {
   REPOSITORY="urbancompasspony/domain"
@@ -17,10 +30,43 @@ function checkA {
     }
 }
 
-function menu {
-  export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
+function checkB {
+  export var1; export var2; export var3; export var4; export var5; export var6
 
-  VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5="$HOSTNAME"; VALUE6=""; VALUE7="macvlan"
+  [ -f "/srv/containers/"$NOMECONTAINER"/Information" ] && {
+    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+      dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+        var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+        var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+        var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
+        var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
+
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        rm -R /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1; export var2; export var3; export var4; export var5; export var6
+
+  VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5="$HOSTNAME"; VALUE6="macvlan"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
 "F.Q.D.N.: " 1 1 "$VALUE1" 1 10 34 0 \
@@ -28,126 +74,87 @@ function menu {
 "ADM Pass:" 3 1 "$VALUE3" 3 10 34 0 \
 "LAN DNS :" 4 1 "$VALUE4" 4 10 34 0 \
 "Hostname:" 5 1 "$VALUE5" 5 10 34 0 \
-"HostUser:" 6 1 "$VALUE6" 6 10 34 0 \
-"NetLAN  :" 7 1 "$VALUE7" 7 10 34 0 \
+"NetLAN  :" 6 1 "$VALUE6" 6 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
 
-  FQDNV=$(echo "$VALUE0" | sed -n 1p)
-  iplocal=$(echo "$VALUE0" | sed -n 2p)
-  admps=$(echo "$VALUE0" | sed -n 3p)
-  dnslan=$(echo "$VALUE0" | sed -n 4p)
-  namehost=$(echo "$VALUE0" | sed -n 5p)
-  userhost=$(echo "$VALUE0" | sed -n 6p)
-  lannet=$(echo "$VALUE0" | sed -n 7p)
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
+  var5=$(echo "$VALUE0" | sed -n 5p)
+  var6=$(echo "$VALUE0" | sed -n 6p)
   
-  # FQDN DA NOVA FLORESTA
-  FQDN="$FQDNV"
-  # IP FIXO DO NOVO CONTAINER
-  LOCALIP="$iplocal"
-  # SENHA DO USUARIO ADMINISTRATOR
-  MYPASSWORD="$admps"
-  # DEFINA O DNS QUE O DOMINIO USARÁ
-  DNSFW="$dnslan"
-  # HOSTNAME DO CONTAINER
-  HOSTNAME="$namehost"
-  # USUARIO DO HOST
-  USERNAME="$userhost"
-  # PLACA DE REDE A SER USADA - Normalmente não muda.
-  NETWORKLAN="$lannet"
-  
-  [ -z "$FQDN" ] || [ -z "$LOCALIP" ] || [ -z "$MYPASSWORD" ] || [ -z "$DNSFW" ] || [ -z "$HOSTNAME" ] || [ -z "$USERNAME" ] || [ -z "$NETWORKLAN" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] && {
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
   menu
   }
 }
 
-function checkB {
-  export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
-
-  [ -f "/home/"$USERNAME"/.CONTAINERS/active_directory/Information" ] && {
-    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja remover o container?" 6 40
-    [ $? = 0 ] && {
-      docker stop dominio
-      docker rm dominio
-      rm -R /home/"$USERNAME"/.CONTAINERS/active_directory
-      mkdir -p /home/"$USERNAME"/.CONTAINERS/active_directory
-    } || {
-      echo "A instalação local será mantida!"
-      exit
-    }
-  }
-}
-
 function create {
-  export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
+  export var1; export var2; export var3; export var4; export var5; export var6
   
-  mkdir -p /home/"$USERNAME"/.CONTAINERS/active_directory
-  touch /home/"$USERNAME"/.CONTAINERS/active_directory/Information
-  echo "F.Q.D.N.: $FQDNV" > /home/"$USERNAME"/.CONTAINERS/active_directory/Information
-  echo "Local IP: $iplocal" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
-  echo "ADM Pass: $admps" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
-  echo "LAN DNS : $dnslan" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
-  echo "Hostname: $namehost" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
-  echo "HostUser: $userhost" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
-  echo "NetLAN  : $lannet" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
+  mkdir -p /srv/containers/"$NOMECONTAINER"/
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
 
 docker run -d \
         --name dominio \
-        --dns-search $FQDN \
-        --dns $LOCALIP \
-        --dns $DNSFW \
-        --add-host "$HOSTNAME"."$FQDN":"$LOCALIP" \
+        --dns-search $var1 \
+        --dns $var2 \
+        --dns $var4 \
+        --add-host "$var5"."$var1":"$var2" \
         --privileged \
-        --network $NETWORKLAN \
-        --ip=$LOCALIP \
+        --network $var6 \
+        --ip=$var2 \
         --restart=unless-stopped \
-        -h $HOSTNAME \
-        -e "DOMAIN=$FQDN" \
-        -e "DOMAINPASS=$MYPASSWORD" \
-        -e "DNSFORWARDER=$DNSFW" \
-        -e "HOSTIP=$LOCALIP" \
-        -p $LOCALIP:53:53 \
-        -p $LOCALIP:53:53/udp \
-        -p $LOCALIP:88:88 \
-        -p $LOCALIP:88:88/udp \
-        -p $LOCALIP:135:135 \
-        -p $LOCALIP:137:137 \
-        -p $LOCALIP:137:137/udp \
-        -p $LOCALIP:138:138 \
-        -p $LOCALIP:138:138/udp \
-        -p $LOCALIP:139:139 \
-        -p $LOCALIP:389:389 \
-        -p $LOCALIP:389:389/udp \
-        -p $LOCALIP:445:445 \
-        -p $LOCALIP:464:464 \
-        -p $LOCALIP:464:464/udp \
-        -p $LOCALIP:636:636 \
-        -p $LOCALIP:1024-1044:1024-1044 \
-        -p $LOCALIP:3268-3269:3268-3269 \
+        -h $var5 \
+        -e "DOMAIN=$var1" \
+        -e "DOMAINPASS=$var3" \
+        -e "DNSFORWARDER=$var4" \
+        -e "HOSTIP=$var2" \
+        -p $var2:53:53 \
+        -p $var2:53:53/udp \
+        -p $var2:88:88 \
+        -p $var2:88:88/udp \
+        -p $var2:135:135 \
+        -p $var2:137:137 \
+        -p $var2:137:137/udp \
+        -p $var2:138:138 \
+        -p $var2:138:138/udp \
+        -p $var2:139:139 \
+        -p $var2:389:389 \
+        -p $var2:389:389/udp \
+        -p $var2:445:445 \
+        -p $var2:464:464 \
+        -p $var2:464:464/udp \
+        -p $var2:636:636 \
+        -p $var2:1024-1044:1024-1044 \
+        -p $var2:3268-3269:3268-3269 \
         -v /etc/localtime:/etc/localtime:ro \
-        -v /home/"$USERNAME"/.CONTAINERS/active_directory/data/:/var/lib/samba \
-        -v /home/"$USERNAME"/.CONTAINERS/active_directory/config/:/etc/samba/external \
+        -v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
+        -v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
         -v /mnt:/mnt \
         $REPOSITORY
 }
 
 function clean {
-  # This will clean all personal data!
-  unset USERNAME
-  unset FQDNV
-  unset iplocal
-  unset admps
-  unset dnslan
-  unset namehost
-  unset userhost
-  unset lannet
+  unset var1
+  unset var2
+  unset var3
+  unset var4
+  unset var5
+  unset var6
 }
 
 # Start
 checkA
-menu
 checkB
 create
 clean
