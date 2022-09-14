@@ -84,13 +84,13 @@ function create {
   export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
   
   touch /home/"$USERNAME"/.CONTAINERS/active_directory/Information
-  echo "F.Q.D.N.: $FQDNV" > /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "Local IP: $iplocal" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "ADM Pass: $admps" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "LAN DNS : $dnslan" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "Hostname: $namehost" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "HostUser: $userhost" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "NetLAN  : $lannet" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "F.Q.D.N.: $FQDNV" > /home/"$USERNAME"/.CONTAINERS/active_directory/Information
+  echo "Local IP: $iplocal" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
+  echo "ADM Pass: $admps" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
+  echo "LAN DNS : $dnslan" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
+  echo "Hostname: $namehost" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
+  echo "HostUser: $userhost" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
+  echo "NetLAN  : $lannet" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
 
 docker run -d \
         --name dominio \
