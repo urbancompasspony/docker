@@ -20,7 +20,7 @@ function checkA {
 function menu {
   export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
 
-  VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5=""; VALUE6=""; VALUE7="macvlan"
+  VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5="$HOSTNAME"; VALUE6=""; VALUE7="macvlan"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
 "F.Q.D.N.: " 1 1 "$VALUE1" 1 10 34 0 \
