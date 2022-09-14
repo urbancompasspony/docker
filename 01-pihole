@@ -30,7 +30,13 @@ MYPASSWORD="$2"
 # USUARIO DO HOST
 USERNAME="$3"
 
-mkdir -p /home/"$USERNAME"/.CONTAINERS/
+mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
+
+touch /home/"$USERNAME"/.CONTAINERS/pihole/Information
+echo " " > /home/"$USERNAME"/.CONTAINERS/pihole/Information
+echo "IP FIXO DO NOVO CONTAINER: $1" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+echo "SENHA WEB DO PIHOLE: $2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+echo "USUARIO DO HOST: $3" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
 
 docker run -d \
 --name=pihole \
