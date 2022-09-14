@@ -1,52 +1,73 @@
 #!/bin/bash
 
-[ "$EUID" -ne 0 ] && {
-  echo "Execute esse script como Root!"
-  exit
-  }
+export NOMECONTAINER="PiHole"
 
-VALUE1=""; VALUE2=""; VALUE3="$(whoami)"
+export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
 
-VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "PiHole" 15 50 0 \
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function menu {
+  export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
+
+  VALUE1=""; VALUE2=""; VALUE3="$(whoami)"
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 34 0 \
 "Web Pass:" 2 1 "$VALUE2" 2 10 34 0 \
 "HostUser:" 3 1 "$VALUE3" 3 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && m10
-IP1=$(echo "$VALUE0" | sed -n 1p)
-pass2=$(echo "$VALUE0" | sed -n 2p)
-user2=$(echo "$VALUE0" | sed -n 3p)
 
-[ -z "$IP1" ] || [ -z "$user2" ] || [ -z "$pass2" ] && {
-  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+  [ $? -ne 0 ] && exit
+
+  IP1=$(echo "$VALUE0" | sed -n 1p)
+  pass2=$(echo "$VALUE0" | sed -n 2p)
+  user2=$(echo "$VALUE0" | sed -n 3p)
+  
+  # IP FIXO DO NOVO CONTAINER
+  LOCALIP=$IP1
+  # SENHA PARA O PIHOLE
+  MYPASSWORD=$pass2
+  # USUARIO DO HOST
+  USERNAME=$user2
+  
+  [ -z "$IP1" ] || [ -z "$user2" ] || [ -z "$pass2" ] && {
+  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio! Saindo..." 8 40
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
-} || {
-
-# IP FIXO DO NOVO CONTAINER
-LOCALIP="$IP1"
-# SENHA PARA O PIHOLE
-MYPASSWORD="$pass2"
-# USUARIO DO HOST
-USERNAME="$user2"
-
-mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
-
-[ -d "/home/"$USERNAME"/.CONTAINERS/pihole/Information" ] && {
-  dialog --title "Container do PiHole encontrado!" --yesno "Deseja remover o container?" 6 40
-  [ $? = 0 ] && {
-    docker rm pihole
-  }||{
-    echo "Instalação local será mantida!"
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
   }
-} || {
-touch /home/"$USERNAME"/.CONTAINERS/pihole/Information
-echo " " > /home/"$USERNAME"/.CONTAINERS/pihole/Information
-echo "IP FIXO DO NOVO CONTAINER: $IP1" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-echo "SENHA WEB DO PIHOLE: $pass2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-echo "USUARIO DO HOST: $user2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+}
 
-docker run -d \
+function checkB {
+  export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
+
+  [ -f "/home/$USERNAME/.CONTAINERS/pihole/Information" ] && {
+    dialog --title "Container PiHole já existe!" --yesno "Deseja remover o container?" 6 40
+    [ $? = 0 ] && {
+      docker stop pihole
+      docker rm pihole
+      rm -R /home/"$USERNAME"/.CONTAINERS/pihole
+      mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
+      create
+    } || {
+      echo "A instalação local será mantida!"
+      curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash
+    }
+  }
+}
+
+function create {
+  export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
+  
+  touch /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "IP FIXO DO NOVO CONTAINER: $IP1" > /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "SENHA WEB DO PIHOLE: $pass2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "USUARIO DO HOST: $user2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+
+  docker run -d \
 --name=pihole \
 --network macvlan \
 --ip=$LOCALIP \
@@ -67,12 +88,27 @@ docker run -d \
 --restart=unless-stopped \
 pihole/pihole:latest
 
-docker start pihole
-docker exec -it pihole rm /etc/pihole/pihole-FTL.conf
-docker exec -it pihole touch /etc/pihole/pihole-FTL.conf
-docker exec -it pihole bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
-docker exec -it pihole bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
-docker restart pihole
-
-  }
+  docker start pihole
+  docker exec -it pihole rm /etc/pihole/pihole-FTL.conf
+  docker exec -it pihole touch /etc/pihole/pihole-FTL.conf
+  docker exec -it pihole bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
+  docker exec -it pihole bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
+  docker restart pihole
 }
+
+function clean {
+  # This will clean all personal data!
+  unset USERNAME
+  unset IP1
+  unset pass2
+  unset user2
+  unset LOCALIP
+  unset MYPASSWORD
+}
+
+# Start
+checkA
+menu
+checkB
+create
+clean
