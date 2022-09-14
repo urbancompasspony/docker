@@ -1,11 +1,7 @@
 #!/bin/bash
 
-# Passe o parâmetro antes, ou edite a linha abaixo adicionando o parâmetro entre aspas!
-
-# IP FIXO DO NOVO CONTAINER
-SETIP="$1"
-# USUARIO DO HOST
-USERNAME="$2"
+# Global config for replication:
+export NOMECONTAINER="unifi"
 
 [ $(arch) = "x86_64" ] && {
   echo "Sistema compatível!"
@@ -16,12 +12,83 @@ USERNAME="$2"
   exit
 }
 
-mkdir -p /home/"$USERNAME"/.CONTAINERS/
+# IP FIXO DO NOVO CONTAINER
+export var1
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function checkB {
+  export var1
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+
+          create
+        } || {
+          create
+        }
+        
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        rm -R /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1
+
+  VALUE1=""; VALUE2=""; VALUE3=""
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  [ -z "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    create
+    }
+}
+
+function create {
+  export var1
+  
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+
+mkdir -p /srv/containers/"$NOMECONTAINER"
 
 docker run -d \
   --name=unifi \
   --network macvlan \
-  --ip=$SETIP \
+  --ip=$var1 \
   --dns=1.1.1.1  \
   --dns=127.0.0.1 \
   -e PUID=1000 \
@@ -38,6 +105,18 @@ docker run -d \
   -p 6789:6789 `#optional` \
   -p 5514:5514/udp `#optional` \
   -v /etc/localtime:/etc/localtime:ro \
-  -v /home/"$USERNAME"/.CONTAINERS/unifi/:/config \
+  -v /srv/containers/"$NOMECONTAINER"/:/config \
   --restart unless-stopped \
   lscr.io/linuxserver/unifi-controller:latest
+  }
+
+function clean {
+  unset var1
+}
+
+# Start
+checkA
+checkB
+clean
+
+exit
