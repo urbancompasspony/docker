@@ -1,12 +1,6 @@
 #!/bin/bash
 
-# Passe o parâmetro antes, ou edite a linha abaixo adicionando o parâmetro entre aspas!
-
-#!/bin/bash
-
-VALUE1=""
-VALUE2=""
-VALUE3=""
+VALUE1=""; VALUE2=""; VALUE3=""
 
 VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "PiHole" 15 50 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 34 0 \
