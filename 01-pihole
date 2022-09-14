@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export NOMECONTAINER="PiHole"
+# Global config for replication:
+export NOMECONTAINER="pihole"
 
 export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
 
@@ -44,13 +45,24 @@ function menu {
 function checkB {
   export USERNAME; export IP1; export pass2; export user2; export LOCALIP; export MYPASSWORD
 
-  [ -f "/home/$USERNAME/.CONTAINERS/pihole/Information" ] && {
+  [ -f "/home/$USERNAME/.CONTAINERS/$NOMECONTAINER/Information" ] && {
     dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja remover o container?" 6 40
     [ $? = 0 ] && {
-      docker stop pihole
-      docker rm pihole
-      rm -R /home/"$USERNAME"/.CONTAINERS/pihole
-      mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
+    dialog --title "Recriar o container $NOMECONTAINER" --yesno "Deseja reaproveitar os parâmetros existentes?" 6 40
+    [ $? = 0 ] && {
+        LOCALIP=$(sed -n '1p' /home/$USERNAME/.CONTAINERS/$NOMECONTAINER/Information)
+        MYPASSWORD
+        USERNAME
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        rm -R /home/"$USERNAME"/.CONTAINERS/"$NOMECONTAINER"
+        mkdir -p /home/"$USERNAME"/.CONTAINERS/"$NOMECONTAINER"
+      }||{
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        rm -R /home/"$USERNAME"/.CONTAINERS/"$NOMECONTAINER"
+        mkdir -p /home/"$USERNAME"/.CONTAINERS/"$NOMECONTAINER"
+      }
     } || {
       echo "A instalação local será mantida!"
       exit
@@ -63,9 +75,9 @@ function create {
   
   mkdir -p /home/"$USERNAME"/.CONTAINERS/pihole
   touch /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "Local IP: $IP1" > /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "Web Pass: $pass2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
-  echo "HostUser: $user2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "$IP1" > /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "$pass2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
+  echo "$user2" >> /home/"$USERNAME"/.CONTAINERS/pihole/Information
 
   docker run -d \
 --name=pihole \
