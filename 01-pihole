@@ -19,7 +19,7 @@ function checkB {
   export var1; export var2
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
-    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja destruir o container e preservar os dados?" 6 40
+    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja refazer o container?" 6 40
     [ $? = 0 ] && {
     dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
       [ $? = 0 ] && {
