@@ -65,9 +65,8 @@ function menu {
   [ -z "$var1" ] || [ -z "$var2" ] && {
   dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
   menu
-  } || {
-    create
-    }
+  }
+  create
 }
 
 function create {
@@ -117,5 +116,4 @@ checkA
 checkB
 clean
 
-# Encerrar em caso de erros
-exit 1
+exit
