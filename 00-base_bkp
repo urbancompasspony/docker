@@ -1,6 +1,3 @@
 #!/bin/bash
 
-# USUARIO DO HOST
-USERNAME="$1"
-
-for i in /home/"$USERNAME"/.CONTAINERS/; do zip -r "${i%/}.zip" "$i"; done
+for i in /srv; do zip -r "${i%/}.zip" "$i"; done
