@@ -83,6 +83,7 @@ function checkB {
 function create {
   export USERNAME; export FQDNV; export iplocal; export admps; export dnslan; export namehost; export userhost; export lannet
   
+  mkdir -p /home/"$USERNAME"/.CONTAINERS/active_directory
   touch /home/"$USERNAME"/.CONTAINERS/active_directory/Information
   echo "F.Q.D.N.: $FQDNV" > /home/"$USERNAME"/.CONTAINERS/active_directory/Information
   echo "Local IP: $iplocal" >> /home/"$USERNAME"/.CONTAINERS/active_directory/Information
