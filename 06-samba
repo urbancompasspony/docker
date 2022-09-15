@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Global config for replication:
-export NOMECONTAINER="samba"
-
 # IP FIXO DO NOVO CONTAINER
 export var1
-# SENHA PARA O PIHOLE
+# NOME DO COMPARTILHAMENTO E DO CONTAINER!
 export var2
+
+# PLACA DE REDE A SER USADA
+NETWORKLAN="macvlan"
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -55,9 +55,9 @@ function menu {
 
   VALUE1=""; VALUE2=""
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "New Samba Share" 10 40 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
-"Web Pass:" 2 1 "$VALUE2" 2 10 20 0 \
+"Shr Name:" 2 1 "$VALUE2" 2 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
@@ -75,52 +75,29 @@ function menu {
 function create {
   export var1; export var2
   
-  mkdir -p /srv/containers/"$NOMECONTAINER"
-  touch /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+  mkdir -p /srv/containers/"$var2"
+  touch /srv/containers/"$var2"/Information
+  echo "$var1" > /srv/containers/"$var2"/Information
+  echo "$var2" >> /srv/containers/"$var2"/Information
 
-
-
-
-
-
-
-
-# IP FIXO DO NOVO CONTAINER
-LOCALIP="$1"
-# HOSTNAME DO CONTAINER
-HOSTNAME="$2"
-# USUARIO DO HOST
-USERNAME="$3"
-# NOME DO COMPARTILHAMENTO
-NOMESHARE="$4"
-
-# NOME DO CONTAINER
-NAME="samba"
-# PLACA DE REDE A SER USADA
-NETWORKLAN="macvlan"
+  wget https://codeload.github.com/urbancompasspony/samba_share/zip/refs/heads/main -P /srv/containers/"$var2"
+  unzip -d /srv/containers/"$var2" /srv/containers/"$var2"/main
 
 docker run -d \
 -h $HOSTNAME \
---ip $LOCALIP \
---name $NAME \
+--ip $var1 \
+--name $var2 \
 --privileged \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
--v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/cache/samba:/var/cache/samba \
--v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/lib/samba:/var/lib/samba \
--v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/log/samba:/var/log/samba \
--v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/run/samba:/run/samba \
--v /home/"$USERNAME"/.CONTAINERS/"$NOMESHARE"/etc:/etc \
+-v /srv/containers/"$var2"/samba_share-main/cache/samba:/var/cache/samba \
+-v /srv/containers/"$var2"/samba_share-main/lib/samba:/var/lib/samba \
+-v /srv/containers/"$var2"/samba_share-main/log/samba:/var/log/samba \
+-v /srv/containers/"$var2"/samba_share-main/run/samba:/run/samba \
+-v /srv/containers/"$var2"/samba_share-main/etc:/etc \
 -v /mnt:/mnt \
 urbancompasspony/migrate-samba:latest
-
-# Generate a new smb.conf!
-
-# IF WILL WORK WITH RCLONE:
-# docker network connect bridge samba
 
 }
 
@@ -133,12 +110,5 @@ function clean {
 checkA
 checkB
 clean
-
-[ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
-docker exec "$NOMECONTAINER" bash -c "wget https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smb.conf -P /etc/samba/"
-
-
-
-
 
 exit
