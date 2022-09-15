@@ -9,6 +9,12 @@ export NOMECONTAINER="mysql"
 export var1
 # NOVA SENHA DO ROOT MYSQL
 export var2
+# NOVO BANCO DE DADOS
+export var3
+# USUARIO BANCO DE DADOS
+export var4
+# SENHA DO BANCO DE DADOS
+export var5
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -27,6 +33,9 @@ function checkB {
       [ $? = 0 ] && {
         var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
         var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+        var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+        var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+        var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
         
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
@@ -55,18 +64,24 @@ function checkB {
 function menu {
   export var1; export var2
 
-  VALUE1=""; VALUE2=""
+  VALUE1=""; VALUE2=""; VALUE3="nextcloud"; VALUE4="nextcloud"; VALUE5=""
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
-"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 13 40 0 \
+"Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
 "MySQL PW:" 2 1 "$VALUE2" 2 10 20 0 \
+"DataBase:" 3 1 "$VALUE3" 3 10 20 0 \
+"DB User :" 4 1 "$VALUE4" 4 10 20 0 \
+"DB Pass :" 5 1 "$VALUE5" 5 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
+  var5=$(echo "$VALUE0" | sed -n 5p)
   
-  [ -z "$var1" ] || [ -z "$var2" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -75,12 +90,15 @@ function menu {
 }
 
 function create {
-  export var1; export var2
+  export var1; export var2; export var3; export var4; export var5
   
   mkdir -p /srv/containers/"$NOMECONTAINER"
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
 
   docker run -d \
   --name mysql \
@@ -91,12 +109,18 @@ function create {
   -p 80:80 \
   -v /etc/localtime:/etc/localtime:ro \
   -e MYSQL_ROOT_PASSWORD="$var2" \
+  -e MYSQL_DATABASE="$var3" \
+  -e MYSQL_USER="$var4" \
+  -e MYSQL_PASSWORD="$var5" \
   mysql:8
 }
 
 function clean {
   unset var1
   unset var2
+  unset var3
+  unset var4
+  unset var5
 }
 
 # Start
@@ -107,12 +131,3 @@ clean
 docker network connect bridge mysql
 
 exit
-
-# Execute manualmente:
-
-# docker exec -it mysql mysql -p
-# CREATE DATABASE nextcloud;
-# CREATE USER nextcloud IDENTIFIED BY 'P4ssw0rd';
-# GRANT ALL PRIVILEGES ON nextcloud.* TO nextcloud;
-# FLUSH PRIVILEGES;
-# exit
