@@ -158,7 +158,7 @@ function clean {
   unset var4
   unset var5
   unset var6
-}a
+}
 
 # Start
 checkA
