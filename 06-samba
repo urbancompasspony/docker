@@ -8,52 +8,10 @@ export var2
 # PLACA DE REDE A SER USADA
 NETWORKLAN="macvlan"
 
-function checkA {
-  [ "$EUID" -ne 0 ] && {
-    echo "Execute esse script como Root!"
-    exit
-    }
-}
-
-function checkB {
-  export var1; export var2
-
-  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
-    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
-    [ $? = 0 ] && {
-    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
-      [ $? = 0 ] && {
-        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
-        
-        [ $(docker stop "$NOMECONTAINER") ] && {
-          docker rm "$NOMECONTAINER"
-
-          create
-        } || {
-          create
-        }
-        
-      } || {
-        docker stop "$NOMECONTAINER"
-        docker rm "$NOMECONTAINER"
-        rm -R /srv/containers/"$NOMECONTAINER"
-
-        menu
-        }
-    } || {
-      echo "A instalação local será mantida! Saindo..."
-      exit
-    }
-  } || {
-    menu
-    }
-}
-
 function menu {
   export var1; export var2
 
-  VALUE1=""; VALUE2=""
+  VALUE1=""; VALUE2="samba"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "New Samba Share" 10 40 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
@@ -68,6 +26,53 @@ function menu {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
+    checkB
+    }
+}
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function checkB {
+  export var1; export var2
+
+  [ -f "/srv/containers/$var2/Information" ] && {
+    dialog --title "Dados de $var2 encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $var2" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$var2/Information)
+        var2=$(sed -n '2p' /srv/containers/$var2/Information)
+        
+        [ $(docker stop "$var2") ] && {
+          docker rm "$var2"
+
+          create
+        } || {
+          create
+        }
+        
+      } || {
+        docker stop "$var2"
+        docker rm "$var2"
+        rm -R /srv/containers/"$var2"
+
+        wget https://codeload.github.com/urbancompasspony/samba/zip/refs/heads/main -P /srv/containers/
+        unzip -d /srv/containers/ /srv/containers/main
+        mv /srv/containers/samba-main /srv/containers/"$var2"
+        rm /srv/containers/main
+
+        create
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
     create
     }
 }
@@ -80,11 +85,8 @@ function create {
   echo "$var1" > /srv/containers/"$var2"/Information
   echo "$var2" >> /srv/containers/"$var2"/Information
 
-  wget https://codeload.github.com/urbancompasspony/samba_share/zip/refs/heads/main -P /srv/containers/"$var2"
-  unzip -d /srv/containers/"$var2" /srv/containers/"$var2"/main
-
 docker run -d \
--h $HOSTNAME \
+-h $var2 \
 --ip $var1 \
 --name $var2 \
 --privileged \
@@ -93,11 +95,11 @@ docker run -d \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
--v /srv/containers/"$var2"/samba_share-main/cache/samba:/var/cache/samba \
--v /srv/containers/"$var2"/samba_share-main/lib/samba:/var/lib/samba \
--v /srv/containers/"$var2"/samba_share-main/log/samba:/var/log/samba \
--v /srv/containers/"$var2"/samba_share-main/run/samba:/run/samba \
--v /srv/containers/"$var2"/samba_share-main/etc:/etc \
+-v /srv/containers/"$var2"/samba-main/etc/samba:/etc/samba \
+-v /srv/containers/"$var2"/samba-main/cache/samba:/var/cache/samba \
+-v /srv/containers/"$var2"/samba-main/lib/samba:/var/lib/samba \
+-v /srv/containers/"$var2"/samba-main/log/samba:/var/log/samba \
+-v /srv/containers/"$var2"/samba-main/run/samba:/run/samba \
 -v /mnt:/mnt \
 urbancompasspony/migrate-samba:latest
 }
@@ -109,7 +111,7 @@ function clean {
 
 # Start
 checkA
-checkB
+menu
 clean
 
 exit
