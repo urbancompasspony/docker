@@ -1,7 +1,10 @@
 FROM ubuntu:latest
 
 # Install cron
-RUN apt update && apt install -y cron
+RUN apt update && apt install -y cron && \
+    apt autoremove && \
+    apt clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Add files
 ADD script.sh /script.sh
