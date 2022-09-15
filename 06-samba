@@ -88,6 +88,8 @@ docker run -d \
 --ip $var1 \
 --name $var2 \
 --privileged \
+--dns 127.0.0.1 \
+--dns 1.1.1.1 \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
@@ -98,7 +100,6 @@ docker run -d \
 -v /srv/containers/"$var2"/samba_share-main/etc:/etc \
 -v /mnt:/mnt \
 urbancompasspony/migrate-samba:latest
-
 }
 
 function clean {
