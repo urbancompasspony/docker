@@ -1,5 +1,92 @@
 #!/bin/bash
 
+# Global config for replication:
+export NOMECONTAINER="samba"
+
+# IP FIXO DO NOVO CONTAINER
+export var1
+# SENHA PARA O PIHOLE
+export var2
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function checkB {
+  export var1; export var2
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+        
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+
+          create
+        } || {
+          create
+        }
+        
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        rm -R /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1; export var2
+
+  VALUE1=""; VALUE2=""
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+"Web Pass:" 2 1 "$VALUE2" 2 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  
+  [ -z "$var1" ] || [ -z "$var2" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    create
+    }
+}
+
+function create {
+  export var1; export var2
+  
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+
+
+
+
+
+
+
+
 # IP FIXO DO NOVO CONTAINER
 LOCALIP="$1"
 # HOSTNAME DO CONTAINER
@@ -8,8 +95,8 @@ HOSTNAME="$2"
 USERNAME="$3"
 # NOME DO COMPARTILHAMENTO
 NOMESHARE="$4"
-# NOME DO CONTAINER
 
+# NOME DO CONTAINER
 NAME="samba"
 # PLACA DE REDE A SER USADA
 NETWORKLAN="macvlan"
@@ -31,7 +118,27 @@ docker run -d \
 urbancompasspony/migrate-samba:latest
 
 # Generate a new smb.conf!
-docker exec "$NOMECONTAINER" bash -c "wget https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smb.conf -P /etc/samba/"
 
 # IF WILL WORK WITH RCLONE:
 # docker network connect bridge samba
+
+}
+
+function clean {
+  unset var1
+  unset var2
+}
+
+# Start
+checkA
+checkB
+clean
+
+[ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+docker exec "$NOMECONTAINER" bash -c "wget https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smb.conf -P /etc/samba/"
+
+
+
+
+
+exit
