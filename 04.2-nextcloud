@@ -90,12 +90,6 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/www/html/data \
 -v /srv/containers/"$NOMECONTAINER"/mysql:/var/lib/mysql \
 nextcloud
-
-docker network connect bridge nextcloud
-
-docker exec nextcloud apt update
-docker exec nextcloud apt install smbclient -y
-docker restart nextcloud
 }
 
 function clean {
@@ -106,5 +100,11 @@ function clean {
 checkA
 checkB
 clean
+
+docker exec nextcloud apt update
+docker exec nextcloud apt install smbclient -y
+docker restart nextcloud
+
+docker network connect bridge nextcloud
 
 exit
