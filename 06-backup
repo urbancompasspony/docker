@@ -110,6 +110,4 @@ docker exec -it backup mkdir /root/.config/rclone
 docker exec -it backup bash -c "echo '00 12,19 * * * rclone copy --no-traverse /mnt/disk01/folder OneDrive:folder' >> cronjob"
 docker exec -it backup crontab /cronjob
 
-docker network connect bridge backup
-
 exit
