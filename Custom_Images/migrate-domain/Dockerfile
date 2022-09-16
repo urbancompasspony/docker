@@ -15,7 +15,8 @@ RUN touch /etc/hosts
 RUN touch /etc/krb5.conf
 RUN touch /etc/samba/smb.conf
 
-HEALTHCHECK --interval=60s --timeout=15s \
-            CMD smbclient -L \\localhost -U % -m SMB3
+# too many logs ;/
+#HEALTHCHECK --interval=60s --timeout=15s \
+#            CMD smbclient -L \\localhost -U % -m SMB3
 
 ENTRYPOINT service samba-ad-dc start && /bin/bash
