@@ -41,6 +41,11 @@ function checkB {
       } || {
         docker stop "$NOMECONTAINER"
         docker rm "$NOMECONTAINER"
+        
+        datetime=$(date +"%d-%m %H-%M")
+        mkdir -p /srv/containers/.backupcnt
+        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
+        
         rm -R /srv/containers/"$NOMECONTAINER"
 
         menu
