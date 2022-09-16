@@ -107,7 +107,7 @@ docker run -d \
 -v /srv/containers/"$var2"/samba-main/log/samba:/var/log/samba \
 -v /srv/containers/"$var2"/samba-main/run/samba:/run/samba \
 -v /mnt:/mnt \
-urbancompasspony/migrate-samba:latest
+$REPOSITORY
 }
 
 function clean {
