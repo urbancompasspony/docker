@@ -106,6 +106,7 @@ function create {
   --network macvlan \
   --hostname=mysql \
   --restart=unless-stopped \
+  --no-healthcheck \
   -p 80:80 \
   -v /etc/localtime:/etc/localtime:ro \
   -e MYSQL_ROOT_PASSWORD="$var2" \
