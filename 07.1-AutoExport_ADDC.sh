@@ -11,17 +11,17 @@ service samba-ad-dc stop
 
 chmod 777 -R  /var/lib/samba/sysvol/
 
-mkdir -p /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY
+mkdir -p /srv/containers//ACTIVE_DIRECTORY
 
-mkdir -p /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY/cache
-mkdir -p /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY/lib
-mkdir -p /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY/log
-mkdir -p /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY/run
-mkdir -p /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY/etc
+mkdir -p /srv/containers/ACTIVE_DIRECTORY/cache
+mkdir -p /srv/containers/ACTIVE_DIRECTORY/lib
+mkdir -p /srv/containers/ACTIVE_DIRECTORY/log
+mkdir -p /srv/containers/ACTIVE_DIRECTORY/run
+mkdir -p /srv/containers/ACTIVE_DIRECTORY/etc
 
 # Backup Folders:
-cp -Rf /var/cache/samba /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY/cache/
-cp -Rf /var/lib/samba /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY/lib/
-cp -Rf /var/log/samba /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY/log/
-cp -Rf /run/samba /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY/run/
-cp -Rf /etc /home/"$USERNAME"/.CONTAINERS/ACTIVE_DIRECTORY/
+cp -Rf /var/cache/samba /srv/containers/ACTIVE_DIRECTORY/cache/
+cp -Rf /var/lib/samba /srv/containers/ACTIVE_DIRECTORY/lib/
+cp -Rf /var/log/samba /srv/containers/ACTIVE_DIRECTORY/log/
+cp -Rf /run/samba /srv/containers/ACTIVE_DIRECTORY/run/
+cp -Rf /etc /srv/containers/ACTIVE_DIRECTORY/
