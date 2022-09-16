@@ -19,6 +19,7 @@ docker run -d \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
+--no-healthcheck \
 -v /srv/containers/ACTIVE_DIRECTORY/cache/samba:/var/cache/samba \
 -v /srv/containers/ACTIVE_DIRECTORY/lib/samba:/var/lib/samba \
 -v /srv/containers/ACTIVE_DIRECTORY/log/samba:/var/log/samba \
