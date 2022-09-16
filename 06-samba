@@ -14,6 +14,8 @@ export var2
 # PLACA DE REDE A SER USADA
 NETWORKLAN="macvlan"
 
+
+
 function menu {
   export var1; export var2
 
@@ -72,11 +74,7 @@ function checkB {
         
         rm -R /srv/containers/"$var2"
 
-        wget https://codeload.github.com/urbancompasspony/samba/zip/refs/heads/main -P /srv/containers/
-        unzip -d /srv/containers/ /srv/containers/main
-        mv /srv/containers/samba-main /srv/containers/"$var2"
-        rm /srv/containers/main
-
+        configfiles
         create
         }
     } || {
@@ -84,6 +82,7 @@ function checkB {
       exit
     }
   } || {
+    configfiles
     create
     }
 }
@@ -114,6 +113,13 @@ docker run -d \
 -v /srv/containers/"$var2"/run/samba:/run/samba \
 -v /mnt:/mnt \
 $REPOSITORY
+}
+
+function configfiles {
+  wget https://codeload.github.com/urbancompasspony/samba/zip/refs/heads/main -P /srv/containers/
+  unzip -d /srv/containers/ /srv/containers/main
+  mv /srv/containers/samba-main /srv/containers/"$var2"
+  rm /srv/containers/main
 }
 
 function clean {
