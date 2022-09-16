@@ -89,6 +89,7 @@ docker run -d \
   --ip=$var1 \
   --dns=1.1.1.1  \
   --dns=127.0.0.1 \
+  --no-healthcheck \
   -e PUID=1000 \
   -e PGID=1000 \
   -e MEM_LIMIT=1024 `#optional` \
