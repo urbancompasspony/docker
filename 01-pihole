@@ -87,6 +87,7 @@ function create {
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
 --hostname=pi.hole \
+--no-healthcheck \
 -e SERVERIP=$var1 \
 -e WEBPASSWORD=$var2 \
 -v /etc/localtime:/etc/localtime:ro \
