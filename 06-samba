@@ -65,6 +65,11 @@ function checkB {
       } || {
         docker stop "$var2"
         docker rm "$var2"
+        
+        datetime=$(date +"%d-%m %H-%M")
+        mkdir -p /srv/containers/.backupcnt
+        zip "/srv/containers/.backupcnt/$var2-$datetime.zip" -r /srv/containers/$var2
+        
         rm -R /srv/containers/"$var2"
 
         wget https://codeload.github.com/urbancompasspony/samba/zip/refs/heads/main -P /srv/containers/
