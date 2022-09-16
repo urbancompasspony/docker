@@ -130,4 +130,8 @@ clean
 
 docker network connect bridge mysql
 
+echo "Finalizado!"
+echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
+echo "Localização padrão em: /var/lib/mysql"
+
 exit
