@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
 #Install Cron
 RUN apt update && apt -y install cron && \
