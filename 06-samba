@@ -5,6 +5,12 @@ export var1
 # NOME DO COMPARTILHAMENTO E DO CONTAINER!
 export var2
 
+[ $(arch) = "x86_64" ] && {
+  REPOSITORY="urbancompasspony/migrate-samba"
+} || {
+  REPOSITORY="urbancompasspony/migrate-samba-arm"
+}
+
 # PLACA DE REDE A SER USADA
 NETWORKLAN="macvlan"
 
