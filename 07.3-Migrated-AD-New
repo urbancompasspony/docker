@@ -13,6 +13,8 @@ NETWORKLAN="macvlan"
 
 docker run -d \
 -h $HOSTNAME \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
 --name $NAME \
 --privileged \
 --ip $LOCALIP \
