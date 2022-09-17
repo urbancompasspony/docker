@@ -108,6 +108,8 @@ function create {
   docker run -d \
   --name mysql \
   --ip=$var1 \
+  --dns=1.1.1.1  \
+  --dns=127.0.0.1 \
   --network macvlan \
   --hostname=mysql \
   --restart=unless-stopped \
