@@ -12,6 +12,8 @@ docker run -d \
 -h $HOSTNAME \
 --name $NAME \
 --privileged \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
