@@ -20,7 +20,7 @@ docker run -d \
 --no-healthcheck \
 -v /srv/containers/SAMBA_SHARE/cache/samba:/var/cache/samba \
 -v /srv/containers/SAMBA_SHARE/lib/samba:/var/lib/samba \
--v /srv/containers/SAMBA_SHARE/log/samba:/var/log/samba \
+-v /srv/containers/SAMBA_SHARE/log:/var/log \
 -v /srv/containers/SAMBA_SHARE/run/samba:/run/samba \
 -v /srv/containers/SAMBA_SHARE/etc:/etc \
 -v /mnt:/mnt \
