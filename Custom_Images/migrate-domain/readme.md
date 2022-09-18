@@ -6,7 +6,8 @@ Put them inside container, passing through the -volume of the folder ACTIVE_DIRE
 
 After this, just run the service samba-ad-dc, Dockerfile will run automatically.
 
-Aways take note about Server Parameters!
+Aways take note about Server Parameters:
 
 Local IP: Static IP for Domain
+
 FQDN: ad.server.local
