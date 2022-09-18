@@ -24,7 +24,7 @@ docker run -d \
 --no-healthcheck \
 -v /srv/containers/ACTIVE_DIRECTORY/cache/samba:/var/cache/samba \
 -v /srv/containers/ACTIVE_DIRECTORY/lib/samba:/var/lib/samba \
--v /srv/containers/ACTIVE_DIRECTORY/log/samba:/var/log/samba \
+-v /srv/containers/ACTIVE_DIRECTORY/log:/var/log \
 -v /srv/containers/ACTIVE_DIRECTORY/run/samba:/run/samba \
 -v /srv/containers/ACTIVE_DIRECTORY/etc:/etc \
 -v /mnt:/mnt \
