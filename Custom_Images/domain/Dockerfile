@@ -10,12 +10,10 @@ RUN apt install -y attr acl rsyslog samba smbclient ldap-utils winbind libnss-wi
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-# too many logs ;/
-#HEALTHCHECK --interval=60s --timeout=15s \
-#            CMD smbclient -L \\localhost -U % -m SMB3
-
-ADD ./logentries.conf /etc/rsyslog.d/logentries.conf
-
 ADD init.sh /init.sh
 RUN chmod 755 /init.sh
-CMD /init.sh setup
+
+ADD 50-default.conf /etc/rsyslog.d/
+ADD rsyslog.conf /etc/
+
+CMD /usr/sbin/rsyslogd && /init.sh setup
