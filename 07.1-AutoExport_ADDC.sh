@@ -1,7 +1,5 @@
 #!/bin/bash
 
-USERNAME="$1"
-
 [ "$EUID" -ne 0 ] && {
   echo "Run this script as Root!"
   exit
