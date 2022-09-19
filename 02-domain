@@ -148,10 +148,10 @@ docker run -d \
         -v /etc/localtime:/etc/localtime:ro \
         -v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
         -v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
-        -v /srv/containers/"$NOMECONTAINER"/var:/var \
         -v /mnt:/mnt \
         $REPOSITORY
 }
+#        -v /srv/containers/"$NOMECONTAINER"/var:/var \
 
 function clean {
   unset var1
