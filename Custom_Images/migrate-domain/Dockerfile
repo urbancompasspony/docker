@@ -17,5 +17,6 @@ RUN touch /etc/resolv.conf
 RUN touch /etc/hosts
 RUN touch /etc/krb5.conf
 RUN touch /etc/samba/smb.conf
+RUN touch /var/log/syslog
 
 ENTRYPOINT /usr/sbin/rsyslogd && service samba-ad-dc start && /bin/bash
