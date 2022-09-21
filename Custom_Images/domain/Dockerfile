@@ -15,5 +15,6 @@ RUN chmod 755 /init.sh
 
 ADD 50-default.conf /etc/rsyslog.d/
 ADD rsyslog.conf /etc/
+RUN touch /var/log/syslog
 
 CMD /usr/sbin/rsyslogd && /init.sh setup
