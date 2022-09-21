@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# notSUDO Cron: "@reboot sleep 15; bash /path/out/drbd/Cluster"
+# enabled systemd-networkd-wait-online.service
+
+function init {
+# ============================================================================ #
+
+# Primary Node Private IP
+IP1="170.11.1.2"
+ # Secondary Node Private IP
+IP2="170.11.1.3"
+
+# ============================================================================ #
+
+lognull="/dev/null"
+logpath="/var/log/cluster"
+
+touch /var/log/cluster
+
+while true; do
+  data=$(date +"%Y_%m_%d_%H:%M")
+  sleep 3;
+  cluster00
+done
+}
+
+function cluster00 {
+  # Check if folder ir mounted under DRBD
+  [ -d /mnt/cluster01/Containers ] && {
+    # Check if localhost and node02 are pinging
+    result1=$(ping -c 1 $IP1 &> /dev/null && echo sim || echo nao)
+    result2=$(ping -c 1 $IP2 &> /dev/null && echo sim || echo nao)
+    
+    # If both ping = Ok
+    [ $result1 = "sim" ] && [ $result2 = "sim" ] && {
+      echo "Nothing to do here." >> $lognull
+    } || {
+      # Mounted but not ping = Start
+      echo "$data ERROR 01: Cluster does not ping." >> $logpath
+      for i in $(docker container ls --format 'table {{.Names}}' | tail -n +2); do docker start $i; echo "$data started $i" >> $logpath; done
+      }
+    }
+
+  } || {
+    # Not mounted but ping = Stop
+    echo "$data ERROR 02: Main folder is not found! Stopping all containers." >> $logpath
+    for i in $(docker container ls --format 'table {{.Names}}' | tail -n +2); do docker stop $i; echo "$data stopped $i" >> $logpath; done
+    }
+
+# Start #
+init
