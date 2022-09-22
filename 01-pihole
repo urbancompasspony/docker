@@ -95,7 +95,6 @@ function create {
 --no-healthcheck \
 -e SERVERIP=$var1 \
 -e WEBPASSWORD=$var2 \
--e TZ=America/Bahia \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
 -v /srv/containers/"$NOMECONTAINER"/dnsmasq.d/:/etc/dnsmasq.d \
