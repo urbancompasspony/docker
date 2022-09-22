@@ -12,6 +12,7 @@ docker run -d \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
 --restart=unless-stopped \
+-e TZ=America/Bahia \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
 --no-healthcheck \
