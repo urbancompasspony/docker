@@ -122,6 +122,7 @@ docker run -d \
         --ip=$var2 \
         --restart=unless-stopped \
         --no-healthcheck \
+        -e TZ=America/Bahia \
         -h $var5 \
         -e "DOMAIN=$var1" \
         -e "DOMAINPASS=$var3" \
