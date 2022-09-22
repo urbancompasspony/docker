@@ -93,7 +93,6 @@ docker run -d \
 --dns=127.0.0.1 \
 --hostname=backup \
 --no-healthcheck \
--e TZ=America/Bahia \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER":/root/.config/rclone \
 -v /mnt:/mnt \
