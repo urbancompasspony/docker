@@ -120,7 +120,6 @@ function create {
   -e MYSQL_DATABASE="$var3" \
   -e MYSQL_USER="$var4" \
   -e MYSQL_PASSWORD="$var5" \
-  -e TZ=America/Bahia \
   mysql:8
 }
 
