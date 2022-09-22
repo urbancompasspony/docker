@@ -99,7 +99,6 @@ docker run -d \
   -e PGID=1000 \
   -e MEM_LIMIT=1024 `#optional` \
   -e MEM_STARTUP=1024 `#optional` \
-  -e TZ=America/Bahia \
   -p 8443:8443 \
   -p 3478:3478/udp \
   -p 10001:10001/udp \
