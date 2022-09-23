@@ -4,7 +4,7 @@
 export NOMECONTAINER="nextcloud"
 
 # IP FIXO DO NOVO CONTAINER
-export var1
+export var1; export var2
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -14,7 +14,7 @@ function checkA {
 }
 
 function checkB {
-  export var1
+  export var1; export var2
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
@@ -54,18 +54,20 @@ function checkB {
 }
 
 function menu {
-  export var1
+  export var1; export var2
 
-  VALUE1=""
+  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
-"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+"Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
+"Path    :" 2 1 "$VALUE2" 2 10 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
   var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
   
-  [ -z "$var1" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -74,11 +76,14 @@ function menu {
 }
 
 function create {
-  export var1
+  export var1; export var2
   
   mkdir -p /srv/containers/"$NOMECONTAINER"
+  mkdir -p "$var2"
+  
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
 
 docker run -d \
 --name=$NOMECONTAINER \
@@ -93,13 +98,14 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/nextcloud:/var/www/html \
 -v /srv/containers/"$NOMECONTAINER"/apps:/var/www/html/custom_apps \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
--v /srv/containers/"$NOMECONTAINER"/data:/var/www/html/data \
+-v "$var2"/data:/var/www/html/data \
 -v /srv/containers/"$NOMECONTAINER"/mysql:/var/lib/mysql \
 nextcloud
 }
 
 function clean {
   unset var1
+  unset var2
 }
 
 # Start
@@ -107,6 +113,7 @@ checkA
 checkB
 clean
 
+# Some scripts to run after installation
 docker exec nextcloud apt update
 docker exec nextcloud apt install smbclient -y
 docker restart nextcloud
