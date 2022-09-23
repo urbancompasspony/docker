@@ -122,3 +122,34 @@ docker run -t -i -d \
   	--restart=unless-stopped \
   	--name samba \
 	my-backup
+
+## Samba Domain
+
+Credits:
+https://github.com/Fmstrat/samba-domain
+
+Inspired:
+https://github.com/crazy-max/docker-samba
+
+Helped by:
+https://hub.docker.com/r/instantlinux/samba-dc
+
+Environment variables for quick start
+
+DOMAIN defaults to CORP.EXAMPLE.COM and should be set to your domain
+DOMAINPASS should be set to your administrator password, be it existing or new. This can be removed from the environment after the first setup run.
+HOSTIP can be set to the IP you want to advertise.
+JOIN defaults to false and means the container will provision a new domain. Set this to true to join an existing domain.
+JOINSITE is optional and can be set to a site name when joining a domain, otherwise the default site will be used.
+DNSFORWARDER is optional and if an IP such as 192.168.0.1 is supplied will forward all DNS requests samba can't resolve to that DNS server
+INSECURELDAP defaults to false. When set to true, it removes the secure LDAP requirement. While this is not recommended for production it is required for some LDAP tools. You can remove it later from the smb.conf file stored in the config directory.
+MULTISITE defaults to false and tells the container to connect to an OpenVPN site via an ovpn file with no password. For instance, if you have two locations where you run your domain controllers, they need to be able to interact. The VPN allows them to do that.
+NOCOMPLEXITY defaults to false. When set to true it removes password complexity requirements including complexity, history-length, min-pwd-age, max-pwd-age
+
+Volumes for quick start
+/etc/localtime:/etc/localtime:ro - Sets the timezone to match the host
+/data/docker/containers/samba/data/:/var/lib/samba - Stores samba data so the container can be moved to another host if required.
+/data/docker/containers/samba/config/samba:/etc/samba/external - Stores the smb.conf so the container can be mored or updates can be easily made.
+/data/docker/containers/samba/config/openvpn/docker.ovpn:/docker.ovpn - Optional for connecting to another site via openvpn.
+/data/docker/containers/samba/config/openvpn/credentials:/credentials - Optional for connecting to another site via openvpn that requires a username/password. The format for this file should be two lines, with the username on the first, and the password on the second. Also, make sure your ovpn file contains auth-user-pass /credentials
+
