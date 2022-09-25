@@ -2,3 +2,18 @@ export HOST_IP=`hostname -I | cut -d' ' -f1`
 docker run --restart unless-stopped --name lancache-dns --detach -p 53:53/udp -e USE_GENERIC_CACHE=true -e LANCACHE_IP=$HOST_IP lancachenet/lancache-dns:latest
 docker run --restart unless-stopped --name lancache --detach -v /cache/data:/data/cache -v /cache/logs:/data/logs -p 80:80 -p 443:443 lancachenet/monolithic:latest
 echo Please configure your router/dhcp server to serve dns as $HOST_IP
+
+docker run -d
+–name=lancache-dns
+–restart unless-stopped
+–detach -p FIRST_IP:53:53/udp -e USE_GENERIC_CACHE=true -e LANCACHE_IP=FIRST_IP
+-e UPSTREAM_DNS=PIHOLE_IP -e TZ=America/New_York
+lancachenet/lancache-dns:latest &&
+
+docker run -d
+–restart unless-stopped
+–name lancache
+–detach -v /lancache:/data/cache -v /docker/lancache/logs:/data/logs
+-p FIRST_IP:80:80 -p _FIRST_IP:443:443
+-e CACHE_INDEX_SIZE=250m -e CACHE_MAX_AGE=3650d -e CACHE_DISK_SIZE=100000m -e CACHE_SLICE_SIZE=8m -e TZ=America/New_York
+lancachenet/monolithic:latest
