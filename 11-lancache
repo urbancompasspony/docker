@@ -3,12 +3,15 @@
 # Global config for replication:
 export NOMECONTAINER="lancache"
 
-# IP FIX DOS CONTAINERS LANCACHE
+# IP FIXO DO CONTAINER LANCACHE-DNS
 export var1
+# IP FIXO DO CONTAINER LANCACHE
+export var2
 # IP do DNS alvo na rede
-export var1
-# DIRETÓRIO DO CACHE
 export var3
+# DIRETÓRIO DO CACHE
+export var4
+
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -18,7 +21,7 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2; export var3
+  export var1; export var2; export var3; export var4
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
@@ -28,9 +31,11 @@ function checkB {
         var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
         var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
         var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+        var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
         
-        [ $(docker stop "$NOMECONTAINER") ] && {
+        [ $(docker stop "$NOMECONTAINER") ] || [ $(docker stop "$NOMECONTAINER-dns") ] && {
           docker rm "$NOMECONTAINER"
+          docker rm "$NOMECONTAINER-dns"
 
           create
         } || {
@@ -39,7 +44,9 @@ function checkB {
         
       } || {
         docker stop "$NOMECONTAINER"
+        docker stop "$NOMECONTAINER-dns"
         docker rm "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER-dns"
         
         datetime=$(date +"%d-%m %H-%M")
         mkdir -p /srv/containers/.backupcnt
@@ -59,22 +66,24 @@ function checkB {
 }
 
 function menu {
-  export var1; export var2; export var3
+  export var1; export var2; export var3; export var4
 
-  VALUE1=""; VALUE2=""; VALUE3="/srv/containers/$NOMECONTAINER"
+  VALUE1=""; VALUE2=""; VALUE3=""; VALUE4="/srv/containers/$NOMECONTAINER"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Containers: $NOMECONTAINER & $NOMECONTAINER-dns" 10 40 0 \
-"Cache IP:" 1 1 "$VALUE1" 1 10 20 0 \
-"LocalDNS:" 2 1 "$VALUE2" 2 10 20 0 \
-"Cch PATH:" 3 1 "$VALUE3" 3 10 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Containers: $NOMECONTAINER & $NOMECONTAINER-dns" 11 40 0 \
+"CacheIPA:" 1 1 "$VALUE1" 1 10 20 0 \
+"CacheIPB:" 2 1 "$VALUE2" 2 10 20 0 \
+"LAN DNS :" 3 1 "$VALUE3" 3 10 20 0 \
+"Cch PATH:" 4 1 "$VALUE4" 4 10 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
   var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
   
-  [ -z "$var1" ] || [ -z "$var2" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ]&& {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -90,6 +99,7 @@ function create {
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
   
   docker run -d \
 --name="$NOMECONTAINER-dns" \
@@ -101,7 +111,7 @@ function create {
 -p 53:53/udp \
 -e USE_GENERIC_CACHE=true \
 -e LANCACHE_IP=$var1 \
--e UPSTREAM_DNS=$var2 \
+-e UPSTREAM_DNS=$var3 \
 -v /etc/localtime:/etc/localtime:ro \
 lancachenet/lancache-dns:latest
 
@@ -109,7 +119,7 @@ lancachenet/lancache-dns:latest
 --name=$NOMECONTAINER \
 --hostname="$NOMECONTAINER" \
 --network macvlan \
---ip=$var1 \
+--ip=$var2 \
 --no-healthcheck \
 --restart unless-stopped \
 -p 80:80 \
@@ -119,7 +129,7 @@ lancachenet/lancache-dns:latest
 -e CACHE_DISK_SIZE=10000m \
 -e CACHE_SLICE_SIZE=8m \
 -v /etc/localtime:/etc/localtime:ro \
--v "$var3"/data:/data/cache \
+-v "$var4"/data:/data/cache \
 -v /srv/containers/"$NOMECONTAINER"/logs:/data/logs \
 lancachenet/monolithic:latest
 }
@@ -127,6 +137,8 @@ lancachenet/monolithic:latest
 function clean {
   unset var1
   unset var2
+  unset var3
+  unset var4
 }
 
 # Start
