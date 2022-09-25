@@ -136,7 +136,6 @@ function clean {
   unset var3
   unset var4
   unset var5
-  unset var6
 }
 
 # Start
@@ -149,5 +148,8 @@ docker network connect bridge mysql
 echo "Finalizado!"
 echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
 echo "Localização do banco de dados definida em: $var6"
+
+# Unset the last var:
+unset var6
 
 exit
