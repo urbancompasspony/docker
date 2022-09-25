@@ -15,6 +15,8 @@ export var3
 export var4
 # SENHA DO BANCO DE DADOS
 export var5
+# CAMINHO DO BANCO DE DADOS
+export var6
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -24,7 +26,7 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2
+  export var1; export var2; export var3; export var4; export var5; export var6
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
@@ -36,6 +38,7 @@ function checkB {
         var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
         var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
         var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
+        var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
         
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
@@ -67,16 +70,17 @@ function checkB {
 }
 
 function menu {
-  export var1; export var2
+  export var1; export var2; export var3; export var4; export var5; export var6
 
-  VALUE1=""; VALUE2=""; VALUE3="nextcloud"; VALUE4="nextcloud"; VALUE5=""
+  VALUE1=""; VALUE2=""; VALUE3="nextcloud"; VALUE4="nextcloud"; VALUE5=""; VALUE6="/srv/containers/$NOMECONTAINER"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 13 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 14 40 0 \
 "Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
 "MySQL PW:" 2 1 "$VALUE2" 2 10 20 0 \
 "DataBase:" 3 1 "$VALUE3" 3 10 20 0 \
 "DB User :" 4 1 "$VALUE4" 4 10 20 0 \
 "DB Pass :" 5 1 "$VALUE5" 5 10 20 0 \
+"DB PATH :" 6 1 "$VALUE5" 6 10 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
@@ -85,8 +89,9 @@ function menu {
   var3=$(echo "$VALUE0" | sed -n 3p)
   var4=$(echo "$VALUE0" | sed -n 4p)
   var5=$(echo "$VALUE0" | sed -n 5p)
-  
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] && {
+  var6=$(echo "$VALUE0" | sed -n 6p)
+
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -95,7 +100,7 @@ function menu {
 }
 
 function create {
-  export var1; export var2; export var3; export var4; export var5
+  export var1; export var2; export var3; export var4; export var5; export var6
   
   mkdir -p /srv/containers/"$NOMECONTAINER"
   touch /srv/containers/"$NOMECONTAINER"/Information
@@ -104,7 +109,8 @@ function create {
   echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
-
+  echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
+  
   docker run -d \
   --name mysql \
   --ip=$var1 \
@@ -116,6 +122,7 @@ function create {
   --no-healthcheck \
   -p 80:80 \
   -v /etc/localtime:/etc/localtime:ro \
+  -v "$var6"/mysql:/var/lib/mysql \
   -e MYSQL_ROOT_PASSWORD="$var2" \
   -e MYSQL_DATABASE="$var3" \
   -e MYSQL_USER="$var4" \
@@ -129,6 +136,7 @@ function clean {
   unset var3
   unset var4
   unset var5
+  unset var6
 }
 
 # Start
@@ -140,6 +148,6 @@ docker network connect bridge mysql
 
 echo "Finalizado!"
 echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
-echo "Localização padrão em: /var/lib/mysql"
+echo "Localização do banco de dados definida em: $var6"
 
 exit
