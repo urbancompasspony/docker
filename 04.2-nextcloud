@@ -94,6 +94,8 @@ docker run -d \
 --hostname=next.cloud \
 --restart=unless-stopped \
 --no-healthcheck \
+-p 80:80 \
+-p 443:443 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/nextcloud:/var/www/html \
 -v /srv/containers/"$NOMECONTAINER"/apps:/var/www/html/custom_apps \
