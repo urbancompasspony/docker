@@ -7,6 +7,8 @@ export NOMECONTAINER="lancache"
 export var1
 # IP do DNS alvo na rede
 export var1
+# DIRETÓRIO DO CACHE
+export var3
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -16,7 +18,7 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2
+  export var1; export var2; export var3
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
@@ -25,6 +27,7 @@ function checkB {
       [ $? = 0 ] && {
         var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
         var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+        var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
         
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
@@ -56,18 +59,20 @@ function checkB {
 }
 
 function menu {
-  export var1; export var2
+  export var1; export var2; export var3
 
-  VALUE1=""; VALUE2=""
+  VALUE1=""; VALUE2=""; VALUE3="/srv/containers/$NOMECONTAINER"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Containers: $NOMECONTAINER & $NOMECONTAINER-dns" 10 40 0 \
 "Cache IP:" 1 1 "$VALUE1" 1 10 20 0 \
 "LocalDNS:" 2 1 "$VALUE2" 2 10 20 0 \
+"Cch PATH:" 3 1 "$VALUE3" 3 10 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
   
   [ -z "$var1" ] || [ -z "$var2" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
@@ -84,28 +89,29 @@ function create {
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
   
   docker run -d \
 --name="$NOMECONTAINER-dns" \
+--hostname="$NOMECONTAINER-dns" \
 --network macvlan \
 --ip=$var1 \
---hostname="$NOMECONTAINER-dns"
+--no-healthcheck \
+--restart unless-stopped \
 -p 53:53/udp \
 -e USE_GENERIC_CACHE=true \
 -e LANCACHE_IP=$var1 \
 -e UPSTREAM_DNS=$var2 \
 -v /etc/localtime:/etc/localtime:ro \
---no-healthcheck \
---restart unless-stopped \
 lancachenet/lancache-dns:latest
 
   docker run -d \
 --name=$NOMECONTAINER \
+--hostname="$NOMECONTAINER" \
 --network macvlan \
 --ip=$var1 \
---hostname="$NOMECONTAINER"
--v /srv/containers/"$NOMECONTAINER"/data:/data/cache \
--v /srv/containers/"$NOMECONTAINER"/logs:/data/logs \
+--no-healthcheck \
+--restart unless-stopped \
 -p 80:80 \
 -p 443:443 \
 -e CACHE_INDEX_SIZE=512m \
@@ -113,8 +119,8 @@ lancachenet/lancache-dns:latest
 -e CACHE_DISK_SIZE=10000m \
 -e CACHE_SLICE_SIZE=8m \
 -v /etc/localtime:/etc/localtime:ro \
---no-healthcheck \
---restart unless-stopped \
+-v "$var3"/data:/data/cache \
+-v /srv/containers/"$NOMECONTAINER"/logs:/data/logs \
 lancachenet/monolithic:latest
 }
 
