@@ -1,3 +1,5 @@
+WIP
+
 git clone https://github.com/cuducos/minha-receita.git
 RENAME .env.sample to .env
 
@@ -5,7 +7,8 @@ docker pull ghcr.io/cuducos/minha-receita:main
 
 docker-compose up -d postgres
 
-docker-compose run --rm minha-receita download --directory /mnt/data/
+# THIS TAKES ETERNITY, HOLY F*
+docker-compose run --rm minha-receita download --directory /mnt/data/ --skip
 
 docker-compose up
 
