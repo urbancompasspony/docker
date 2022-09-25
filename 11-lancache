@@ -1,19 +1,131 @@
-export HOST_IP=`hostname -I | cut -d' ' -f1`
-docker run --restart unless-stopped --name lancache-dns --detach -p 53:53/udp -e USE_GENERIC_CACHE=true -e LANCACHE_IP=$HOST_IP lancachenet/lancache-dns:latest
-docker run --restart unless-stopped --name lancache --detach -v /cache/data:/data/cache -v /cache/logs:/data/logs -p 80:80 -p 443:443 lancachenet/monolithic:latest
-echo Please configure your router/dhcp server to serve dns as $HOST_IP
+#!/bin/bash
 
-docker run -d
-–name=lancache-dns
-–restart unless-stopped
-–detach -p FIRST_IP:53:53/udp -e USE_GENERIC_CACHE=true -e LANCACHE_IP=FIRST_IP
--e UPSTREAM_DNS=PIHOLE_IP -e TZ=America/New_York
-lancachenet/lancache-dns:latest &&
+# Global config for replication:
+export NOMECONTAINER="lancache"
 
-docker run -d
-–restart unless-stopped
-–name lancache
-–detach -v /lancache:/data/cache -v /docker/lancache/logs:/data/logs
--p FIRST_IP:80:80 -p _FIRST_IP:443:443
--e CACHE_INDEX_SIZE=250m -e CACHE_MAX_AGE=3650d -e CACHE_DISK_SIZE=100000m -e CACHE_SLICE_SIZE=8m -e TZ=America/New_York
+# IP FIX DOS CONTAINERS LANCACHE
+export var1
+# IP do DNS alvo na rede
+export var1
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function checkB {
+  export var1; export var2
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+        
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+
+          create
+        } || {
+          create
+        }
+        
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        
+        datetime=$(date +"%d-%m %H-%M")
+        mkdir -p /srv/containers/.backupcnt
+        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
+        
+        rm -R /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1; export var2
+
+  VALUE1=""; VALUE2=""
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"Cache IP:" 1 1 "$VALUE1" 1 10 20 0 \
+"LocalDNS:" 2 1 "$VALUE2" 2 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  
+  [ -z "$var1" ] || [ -z "$var2" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    create
+    }
+}
+
+function create {
+  export var1; export var2
+  
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+  
+  docker run -d \
+--name="$NOMECONTAINER-dns" \
+--network macvlan \
+--ip=$var1 \
+--hostname="$NOMECONTAINER-dns"
+-p 53:53/udp \
+-e USE_GENERIC_CACHE=true \
+-e LANCACHE_IP=$var1 \
+-e UPSTREAM_DNS=$var2 \
+-v /etc/localtime:/etc/localtime:ro \
+--no-healthcheck \
+--restart unless-stopped \
+lancachenet/lancache-dns:latest
+
+  docker run -d \
+--name=$NOMECONTAINER \
+--network macvlan \
+--ip=$var1 \
+--hostname="$NOMECONTAINER"
+-v /srv/containers/"$NOMECONTAINER"/data:/data/cache \
+-v /srv/containers/"$NOMECONTAINER"/logs:/data/logs \
+-p 80:80 \
+-p 443:443 \
+-e CACHE_INDEX_SIZE=512m \
+-e CACHE_MAX_AGE=7d \
+-e CACHE_DISK_SIZE=10000m \
+-e CACHE_SLICE_SIZE=8m \
+-v /etc/localtime:/etc/localtime:ro \
+--no-healthcheck \
+--restart unless-stopped \
 lancachenet/monolithic:latest
+}
+
+function clean {
+  unset var1
+  unset var2
+}
+
+# Start
+checkA
+checkB
+clean
+
+exit
