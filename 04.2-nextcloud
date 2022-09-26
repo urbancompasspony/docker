@@ -91,7 +91,7 @@ docker run -d \
 --ip=$var1 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
---hostname=next.cloud \
+--hostname=nextcloud \
 --restart=unless-stopped \
 --no-healthcheck \
 -p 80:80 \
