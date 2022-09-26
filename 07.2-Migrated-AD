@@ -33,4 +33,11 @@ docker run -d \
 -v /mnt:/mnt \
 urbancompasspony/migrate-domain:latest
 
+# ADD MENU DOMINIO!
+#docker exec ACTIVE_DIRECTORY bash -c "apt update"
+#docker exec ACTIVE_DIRECTORY bash -c "apt install curl dialog"
+#docker exec ACTIVE_DIRECTORY bash -c "wget https://raw.githubusercontent.com/urbancompasspony/domain/main/domain -O /root/.init"
+#docker exec ACTIVE_DIRECTORY bash -c "echo '/root/.init' >> /root/.bashrc"
+#docker exec ACTIVE_DIRECTORY bash -c "chmod +x /root/.init"
+
 #-v $(pwd)/FOLDER:/mnt \
