@@ -14,8 +14,6 @@ export var2
 # PLACA DE REDE A SER USADA
 NETWORKLAN="macvlan"
 
-
-
 function menu {
   export var1; export var2
 
