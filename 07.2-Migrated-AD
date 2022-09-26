@@ -30,4 +30,7 @@ docker run -d \
 -v /mnt:/mnt \
 urbancompasspony/migrate-domain:latest
 
+sudo chmod 777 -R /srv/containers/ACTIVE_DIRECTORY/log/
+sudo chmod 0700 -R /srv/containers/ACTIVE_DIRECTORY/log/samba/cores
+
 #-v $(pwd)/FOLDER:/mnt \
