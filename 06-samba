@@ -131,12 +131,12 @@ menu
 clean
 
 sudo chmod 777 -R /srv/containers/"$var2"/log/
-sudo docker exec samba chmod 777 -R /var/log
+sudo docker exec $var2 chmod 777 -R /var/log
 
-docker exec samba mkdir /mnt/shared
-docker exec samba bash -c 'echo -ne 'ubuntu\nubuntu\n' | smbpasswd -a ubuntu 1> /dev/null 2> /dev/null'
+docker exec $var2 mkdir /mnt/shared
+docker exec $var2 bash -c 'echo -ne 'ubuntu\nubuntu\n' | smbpasswd -a ubuntu 1> /dev/null 2> /dev/null'
 
-docker restart samba
+docker restart $var2
 
 echo " "
 echo "Samba Default Share on '$var1'/shared with user and password ubuntu!"
