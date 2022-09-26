@@ -120,7 +120,6 @@ function create {
   --hostname=mysql \
   --restart=unless-stopped \
   --no-healthcheck \
-  -p 80:80 \
   -v /etc/localtime:/etc/localtime:ro \
   -v "$var6"/mysql:/var/lib/mysql \
   -e MYSQL_ROOT_PASSWORD="$var2" \
