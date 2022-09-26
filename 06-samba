@@ -131,6 +131,7 @@ menu
 clean
 
 sudo chmod 777 -R /srv/containers/"$var2"/log/
+sudo chmod 0700 -R /srv/containers/"$var2"/log/samba/cores
 sudo docker exec $var2 chmod 777 -R /var/log
 
 docker exec $var2 mkdir /mnt/shared
