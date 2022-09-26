@@ -174,10 +174,12 @@ sudo chmod 0700 -R /srv/containers/"$NOMECONTAINER"/log/samba/cores
 #sudo docker exec $var2 chmod 777 -R /var/log
 
 # ADD MENU DOMINIO!
-#docker exec $var2 bash -c "apt update"
-#docker exec $var2 bash -c "apt install curl dialog"
-#docker exec $var2 bash -c "wget https://raw.githubusercontent.com/urbancompasspony/domain/main/domain -O /root/.init"
-#docker exec $var2 bash -c "echo '/root/.init' >> /root/.bashrc"
-#docker exec $var2 bash -c "chmod +x /root/.init"
+#docker exec $NOMECONTAINER bash -c "apt update"
+#docker exec $NOMECONTAINER bash -c "apt install curl dialog"
+#docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/domain/main/domain -O /root/.init"
+#docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
+#docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
+
+docker restart $NOMECONTAINER
 
 exit
