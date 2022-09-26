@@ -146,6 +146,7 @@ docker run -d \
         -p $var2:1024-1044:1024-1044 \
         -p $var2:3268-3269:3268-3269 \
         -v /etc/localtime:/etc/localtime:ro \
+        -v /srv/containers/"$NOMECONTAINER"/log:/log \
         -v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
         -v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
         -v /mnt:/mnt \
@@ -168,8 +169,8 @@ checkB
 clean
 
 # LOGs
-#sudo chmod 777 -R /srv/containers/"$var2"/log/
-#sudo chmod 0700 -R /srv/containers/"$var2"/log/samba/cores
+sudo chmod 777 -R /srv/containers/"$NOMECONTAINER"/log
+sudo chmod 0700 -R /srv/containers/"$NOMECONTAINER"/log/samba/cores
 #sudo docker exec $var2 chmod 777 -R /var/log
 
 # ADD MENU DOMINIO!
