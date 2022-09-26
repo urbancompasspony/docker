@@ -134,6 +134,7 @@ sudo chmod 777 -R /srv/containers/"$var2"/log/
 sudo docker exec $var2 chmod 777 -R /var/log
 
 docker exec $var2 mkdir /mnt/shared
+docker exec $var2 useradd ubuntu
 docker exec $var2 bash -c 'echo -ne 'ubuntu\nubuntu\n' | smbpasswd -a ubuntu 1> /dev/null 2> /dev/null'
 
 docker restart $var2
