@@ -167,4 +167,11 @@ checkA
 checkB
 clean
 
+# ADD MENU DOMINIO!
+#docker exec $var2 bash -c "apt update"
+#docker exec $var2 bash -c "apt install curl dialog"
+#docker exec $var2 bash -c "wget PATHDOMAINGITHUB -O /root/.init"
+#docker exec $var2 bash -c "echo '/root/.init' >> /root/.bashrc"
+#docker exec $var2 bash -c "chmod +x /root/.init"
+
 exit
