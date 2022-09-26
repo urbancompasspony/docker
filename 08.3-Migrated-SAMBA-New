@@ -2,17 +2,16 @@
 
 # IP FIXO DO NOVO CONTAINER
 LOCALIP="$1"
-# HOSTNAME DO CONTAINER
-HOSTNAME="$2"
-# USUARIO DO HOST
-USERNAME="$3"
-# NOME DO CONTAINER
-NAME="samba"
+# NOME DO CONTAINER e DO COMPARTILHAMENTO
+NAME="SAMBA_SHARE"
 # PLACA DE REDE A SER USADA
 NETWORKLAN="macvlan"
 
+sudo chmod 777 -R /srv/containers/$NAME/log/
+sudo chmod 0700 -R /srv/containers/$NAME/log/samba/cores
+
 docker run -d \
--h $HOSTNAME \
+-h $NAME \
 --ip $LOCALIP \
 --name $NAME \
 --privileged \
@@ -22,12 +21,12 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
 --no-healthcheck \
--v /srv/containers/SAMBA_SHARE/cache/samba:/var/cache/samba \
--v /srv/containers/SAMBA_SHARE/lib/samba:/var/lib/samba \
--v /srv/containers/SAMBA_SHARE/log:/var/log \
--v /srv/containers/SAMBA_SHARE/run/samba:/run/samba \
--v /srv/containers/SAMBA_SHARE/etc:/etc \
+-v /srv/containers/$NAME/cache/samba:/var/cache/samba \
+-v /srv/containers/$NAME/lib/samba:/var/lib/samba \
+-v /srv/containers/$NAME/log:/var/log \
+-v /srv/containers/$NAME/run/samba:/run/samba \
+-v /srv/containers/$NAME/etc:/etc \
 -v /mnt:/mnt \
-urbancompasspony/migrate-samba:latest
+urbancompasspony/migrate-samba
 
-#-v $(pwd)/FOLDER:/mnt \
+sudo docker exec $NAME chmod 777 -R /var/log
