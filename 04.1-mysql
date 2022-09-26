@@ -80,7 +80,7 @@ function menu {
 "DataBase:" 3 1 "$VALUE3" 3 10 20 0 \
 "DB User :" 4 1 "$VALUE4" 4 10 20 0 \
 "DB Pass :" 5 1 "$VALUE5" 5 10 20 0 \
-"DB PATH :" 6 1 "$VALUE5" 6 10 40 0 \
+"DB PATH :" 6 1 "$VALUE6" 6 10 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
