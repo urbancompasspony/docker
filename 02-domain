@@ -167,6 +167,11 @@ checkA
 checkB
 clean
 
+# LOGs
+#sudo chmod 777 -R /srv/containers/"$var2"/log/
+#sudo chmod 0700 -R /srv/containers/"$var2"/log/samba/cores
+#sudo docker exec $var2 chmod 777 -R /var/log
+
 # ADD MENU DOMINIO!
 #docker exec $var2 bash -c "apt update"
 #docker exec $var2 bash -c "apt install curl dialog"
