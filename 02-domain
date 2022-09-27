@@ -112,45 +112,45 @@ function create {
   echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
 
 docker run -d \
-        --name $NOMECONTAINER \
-        --dns-search $var1 \
-        --dns $var2 \
-        --dns $var4 \
-        --add-host "$var5"."$var1":"$var2" \
-        --privileged \
-        --network $var6 \
-        --ip=$var2 \
-        --restart=unless-stopped \
-        --no-healthcheck \
-        -h $var5 \
-        -e "DOMAIN=$var1" \
-        -e "DOMAINPASS=$var3" \
-        -e "DNSFORWARDER=$var4" \
-        -e "HOSTIP=$var2" \
-        -p $var2:53:53 \
-        -p $var2:53:53/udp \
-        -p $var2:88:88 \
-        -p $var2:88:88/udp \
-        -p $var2:135:135 \
-        -p $var2:137:137 \
-        -p $var2:137:137/udp \
-        -p $var2:138:138 \
-        -p $var2:138:138/udp \
-        -p $var2:139:139 \
-        -p $var2:389:389 \
-        -p $var2:389:389/udp \
-        -p $var2:445:445 \
-        -p $var2:464:464 \
-        -p $var2:464:464/udp \
-        -p $var2:636:636 \
-        -p $var2:1024-1044:1024-1044 \
-        -p $var2:3268-3269:3268-3269 \
-        -v /etc/localtime:/etc/localtime:ro \
-        -v /srv/containers/"$NOMECONTAINER"/log:/log \
-        -v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
-        -v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
-        -v /mnt:/mnt \
-        $REPOSITORY
+--name $NOMECONTAINER \
+--dns-search $var1 \
+--dns $var2 \
+--dns $var4 \
+--add-host "$var5"."$var1":"$var2" \
+--privileged \
+--network $var6 \
+--ip=$var2 \
+--restart=unless-stopped \
+--no-healthcheck \
+-h $var5 \
+-e "DOMAIN=$var1" \
+-e "DOMAINPASS=$var3" \
+-e "DNSFORWARDER=$var4" \
+-e "HOSTIP=$var2" \
+-p $var2:53:53 \
+-p $var2:53:53/udp \
+-p $var2:88:88 \
+-p $var2:88:88/udp \
+-p $var2:135:135 \
+-p $var2:137:137 \
+-p $var2:137:137/udp \
+-p $var2:138:138 \
+-p $var2:138:138/udp \
+-p $var2:139:139 \
+-p $var2:389:389 \
+-p $var2:389:389/udp \
+-p $var2:445:445 \
+-p $var2:464:464 \
+-p $var2:464:464/udp \
+-p $var2:636:636 \
+-p $var2:1024-1044:1024-1044 \
+-p $var2:3268-3269:3268-3269 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/log:/log \
+-v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
+-v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
+-v /mnt:/mnt \
+$REPOSITORY
 }
 #        -v /srv/containers/"$NOMECONTAINER"/var:/var \
 
