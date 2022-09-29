@@ -4,11 +4,9 @@
 LOCALIP="$1"
 # HOSTNAME DO CONTAINER - Mesmo hostname usado no Dominio anterior!
 HOSTNAME="$2"
-# USUARIO DO HOST
-USERNAME="$3"
 # NOME DO CONTAINER
 NAME="dominio"
-# PLACA DE REDE A SER USADA
+# REDE A SER USADA
 NETWORKLAN="macvlan"
 
   mkdir -p /srv/containers/"$NOMECONTAINER"/log
