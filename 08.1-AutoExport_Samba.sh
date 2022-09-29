@@ -16,8 +16,8 @@ mkdir -p /srv/containers/SAMBA_SHARE/run
 mkdir -p /srv/containers/SAMBA_SHARE/etc
 
 # Backup Folders:
-rsync -vah /var/cache/samba /srv/containers/SAMBA_SHARE/cache/
-rsync -vah /var/lib/samba /srv/containers/SAMBA_SHARE/lib/
-rsync -vah /var/log/samba /srv/containers/SAMBA_SHARE/log/
-rsync -vah /run/samba /srv/containers/SAMBA_SHARE/run/
-rsync -vah /etc /srv/containers/SAMBA_SHARE/
+rsync -vahH /var/cache/samba /srv/containers/SAMBA_SHARE/cache/
+rsync -vahH /var/lib/samba /srv/containers/SAMBA_SHARE/lib/
+rsync -vahH /var/log/samba /srv/containers/SAMBA_SHARE/log/
+rsync -vahH /run/samba /srv/containers/SAMBA_SHARE/run/
+rsync -vahH /etc /srv/containers/SAMBA_SHARE/
