@@ -18,8 +18,8 @@ mkdir -p /srv/containers/ACTIVE_DIRECTORY/run
 mkdir -p /srv/containers/ACTIVE_DIRECTORY/etc
 
 # Backup Folders:
-rsync -vah /var/cache/samba /srv/containers/ACTIVE_DIRECTORY/cache/
-rsync -vah /var/lib/samba /srv/containers/ACTIVE_DIRECTORY/lib/
-rsync -vah /var/log/samba /srv/containers/ACTIVE_DIRECTORY/log/
-rsync -vah /run/samba /srv/containers/ACTIVE_DIRECTORY/run/
-rsync -vah /etc /srv/containers/ACTIVE_DIRECTORY/
+rsync -vahH /var/cache/samba /srv/containers/ACTIVE_DIRECTORY/cache/
+rsync -vahH /var/lib/samba /srv/containers/ACTIVE_DIRECTORY/lib/
+rsync -vahH /var/log/samba /srv/containers/ACTIVE_DIRECTORY/log/
+rsync -vahH /run/samba /srv/containers/ACTIVE_DIRECTORY/run/
+rsync -vahH /etc /srv/containers/ACTIVE_DIRECTORY/
