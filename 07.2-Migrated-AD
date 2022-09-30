@@ -11,6 +11,12 @@ NETWORKLAN="macvlan"
 
   mkdir -p /srv/containers/ACTIVE_DIRECTORY/log
   touch /srv/containers/ACTIVE_DIRECTORY/log/syslog
+  
+  sudo chmod 0777 -R /srv/containers/ACTIVE_DIRECTORY
+  sudo chmod 777 /srv/containers/ACTIVE_DIRECTORY/log/syslog
+  sudo chmod 0700 -R /srv/containers/ACTIVE_DIRECTORY/log/samba
+  sudo chmod 0600 -R /srv/containers/ACTIVE_DIRECTORY/run/samba
+  sudo chmod 0600 -R /srv/containers/ACTIVE_DIRECTORY/lib/samba
 
   docker run -d \
 -h $HOSTNAME \
@@ -25,22 +31,19 @@ NETWORKLAN="macvlan"
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/ACTIVE_DIRECTORY/cache/samba:/var/cache/samba \
 -v /srv/containers/ACTIVE_DIRECTORY/lib/samba:/var/lib/samba \
--v /srv/containers/ACTIVE_DIRECTORY/log:/var/log \
 -v /srv/containers/ACTIVE_DIRECTORY/run/samba:/run/samba \
+-v /srv/containers/ACTIVE_DIRECTORY/log:/var/log \
 -v /srv/containers/ACTIVE_DIRECTORY/etc:/etc \
 -v /mnt:/mnt \
 urbancompasspony/migrate-domain:latest
 
-# LOGs!
-sudo docker exec ACTIVE_DIRECTORY chmod 777 -R /var/log/syslog
-
 # ADD MENU DOMINIO!
-docker exec ACTIVE_DIRECTORY bash -c "apt update"
-docker exec ACTIVE_DIRECTORY bash -c "apt install curl dialog -y"
-docker exec ACTIVE_DIRECTORY bash -c "wget https://raw.githubusercontent.com/urbancompasspony/domain/main/domain -O /root/.init"
+#docker exec ACTIVE_DIRECTORY bash -c "apt update"
+#docker exec ACTIVE_DIRECTORY bash -c "apt install curl dialog -y"
+#docker exec ACTIVE_DIRECTORY bash -c "wget https://raw.githubusercontent.com/urbancompasspony/domain/main/domain -O /root/.init"
 #docker exec ACTIVE_DIRECTORY bash -c "echo '/root/.init' >> /root/.bashrc"
 #docker exec ACTIVE_DIRECTORY bash -c "chmod +x /root/.init"
 
-docker restart ACTIVE_DIRECTORY
+#docker restart ACTIVE_DIRECTORY
 
 exit
