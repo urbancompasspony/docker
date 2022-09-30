@@ -1,26 +1,20 @@
 #!/bin/bash
 
-# To backup everything:
-for i in /srv/; do sudo zip -r "/home/administrador/${i%/}.zip" "$i"; done
-Or:
-sudo zip -r archive.zip folder/to/backup
+Using TAR to keep ownership, groups, permissions and other metadata!
 
-With TAR:
-sudo tar -cvf archive.tar /path/to/source
+# To backup everything under /srv:
+sudo tar -cvf archive.tar /srv/containers/CONTAINER_NAME
 
-# To restore everything:
-sudo unzip -d / srv.zip
+# To restore everything over /srv/:
 
-With TAR:
-sudo tar -xvf archive.tar -C /path/to/destiny
+sudo tar -xvf archive.tar -C /
 
-TO BACKUP:
+TO BACKUP entire container:
 
 docker save urbancompasspony/razera > razera.tar
 
-TO RESTORE:
+TO RESTORE entire container:
 
 docker load < razera.tar
 
 Then run the container with common parameters
-
