@@ -9,8 +9,8 @@ NAME="dominio"
 # REDE A SER USADA
 NETWORKLAN="macvlan"
 
-  mkdir -p /srv/containers/"$NOMECONTAINER"/log
-  touch /srv/containers/"$NOMECONTAINER"/log/syslog
+  mkdir -p /srv/containers/ACTIVE_DIRECTORY/log
+  touch /srv/containers/ACTIVE_DIRECTORY/log/syslog
 
   docker run -d \
 -h $HOSTNAME \
@@ -20,9 +20,9 @@ NETWORKLAN="macvlan"
 --privileged \
 --ip $LOCALIP \
 --restart=unless-stopped \
--v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
 --no-healthcheck \
+-v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/ACTIVE_DIRECTORY/cache/samba:/var/cache/samba \
 -v /srv/containers/ACTIVE_DIRECTORY/lib/samba:/var/lib/samba \
 -v /srv/containers/ACTIVE_DIRECTORY/log:/var/log \
@@ -32,7 +32,7 @@ NETWORKLAN="macvlan"
 urbancompasspony/migrate-domain:latest
 
 # LOGs!
-sudo docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
+sudo docker exec ACTIVE_DIRECTORY chmod 777 -R /var/log/syslog
 
 # ADD MENU DOMINIO!
 docker exec ACTIVE_DIRECTORY bash -c "apt update"
@@ -41,6 +41,6 @@ docker exec ACTIVE_DIRECTORY bash -c "wget https://raw.githubusercontent.com/urb
 #docker exec ACTIVE_DIRECTORY bash -c "echo '/root/.init' >> /root/.bashrc"
 #docker exec ACTIVE_DIRECTORY bash -c "chmod +x /root/.init"
 
-docker restart $NOMECONTAINER
+docker restart ACTIVE_DIRECTORY
 
 exit
