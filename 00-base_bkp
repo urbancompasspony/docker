@@ -2,6 +2,8 @@
 
 # To backup everything:
 for i in /srv/; do sudo zip -r "/home/administrador/${i%/}.zip" "$i"; done
+Or:
+sudo zip -r archive.zip folder/to/backup
 
 # To restore everything:
 sudo unzip -d / srv.zip
@@ -15,3 +17,4 @@ TO RESTORE:
 docker load < razera.tar
 
 Then run the container with common parameters
+
