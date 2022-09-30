@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Using TAR to keep ownership, groups, permissions and other metadata!
+Using TAR to keep ownership, groups, permissions and other metadata! Run as root.
 With these examples archive.tar will be stored under working directory.
 
 # To backup everything under /srv:
