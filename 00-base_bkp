@@ -1,6 +1,7 @@
 #!/bin/bash
 
 Using TAR to keep ownership, groups, permissions and other metadata!
+With these examples archive.tar will be stored under working directory.
 
 # To backup everything under /srv:
 sudo tar -cvf archive.tar /srv/containers/CONTAINER_NAME
