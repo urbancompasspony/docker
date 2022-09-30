@@ -7,7 +7,6 @@ With these examples archive.tar will be stored under working directory.
 sudo tar -cvf archive.tar /srv/containers/CONTAINER_NAME
 
 # To restore everything over /srv/:
-
 sudo tar -xvf archive.tar -C /
 
 TO BACKUP entire container:
