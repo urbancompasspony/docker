@@ -5,8 +5,14 @@ for i in /srv/; do sudo zip -r "/home/administrador/${i%/}.zip" "$i"; done
 Or:
 sudo zip -r archive.zip folder/to/backup
 
+With TAR:
+sudo tar -cvf archive.tar /path/to/source
+
 # To restore everything:
 sudo unzip -d / srv.zip
+
+With TAR:
+sudo tar -xvf archive.tar -C /path/to/destiny
 
 TO BACKUP:
 
