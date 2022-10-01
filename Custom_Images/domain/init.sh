@@ -42,7 +42,7 @@ appSetup () {
 	echo "    default_realm = ${UDOMAIN}" >> /etc/krb5.conf
 	# If the finished file isn't there, this is brand new, we're not just moving to a new container
 	
-	# Let's use the native configured krb5!
+	# Let's use the native configured krb5! (Problems on RPi)
 	#mv /etc/krb5.conf /etc/krb5.conf.orig
 	
 	if [[ ! -f /etc/samba/external/smb.conf ]]; then
