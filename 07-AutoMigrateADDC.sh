@@ -70,7 +70,8 @@ echo "#################################"
 echo "# SYSTEM MIGRATED SUCCESSFULLY! ######################################################"
 echo "# SHUTDOWN and change IP LAN $LocalIp of this system to not conflict with container! #"
 echo "######################################################################################"
-
+echo " "
+echo "Press Enter to Exit."
 read
 
 exit 0
