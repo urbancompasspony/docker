@@ -6,8 +6,14 @@ With these examples archive.tar will be stored under working directory.
 # To backup everything under /srv:
 sudo tar -cvf archive.tar /srv/containers/CONTAINER_NAME
 
+# To backup everything under /home/nathandrake/my_files/omg/ and send the tar file to /home/urbancompasspony/:
+sudo tar -cvf /home/urbancompasspony/archive.tar -C /home/nathandrake/my_files/omg/ .
+
 # To restore everything over /srv/:
 sudo tar -xvf archive.tar -C /
+
+# To restore everything that is on /home/nathandrake/archive.tar over /home/nathandrake/my_files/omg/:
+sudo tar -xvf /home/urbancompasspony/archive.tar -C /home/urbancompasspony/my_files/omg/
 
 TO BACKUP entire container:
 
