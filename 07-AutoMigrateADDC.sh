@@ -61,6 +61,9 @@ rsync -vaAxhHt /etc/krb5.conf /srv/containers/$migration_name/data/private/
 echo "TARing $migration_name.tar inside /srv/containers"
 tar -cvf /srv/containers/$migration_name.tar -C /srv/containers/$migration_name .
 
+echo "Simple backup for new config for new container"
+rsync -va /srv/containers/$migration_name /srv/containers/BKP-$migration_name
+
 nano /srv/containers/$migration_name/Information
 
 echo "#################################"
