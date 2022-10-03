@@ -11,7 +11,5 @@ docker-compose up -d postgres
 docker-compose run --rm minha-receita download --directory /mnt/data/ --skip
 
 docker-compose up
-
-docker-compose run --rm minha-receita drop  # caso necessário
 docker-compose run --rm minha-receita create
 docker-compose run --rm minha-receita transform --no-privacy -d /mnt/data/
