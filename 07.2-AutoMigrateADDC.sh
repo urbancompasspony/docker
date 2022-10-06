@@ -49,7 +49,7 @@ echo "TARing $migration_name.tar inside /srv/containers"
 tar -cvf /srv/exported/$migration_name.tar -C /srv/exported/$migration_name .
 
 echo "Remove temp dir"
-#rm -R /srv/exported/$migration_name
+rm -R /srv/exported/$migration_name
 
 echo "#################################"
 echo "# SYSTEM MIGRATED SUCCESSFULLY! #"
