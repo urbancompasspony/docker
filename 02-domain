@@ -170,17 +170,25 @@ checkA
 checkB
 clean
 
-# LOGs
-sudo docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
+# Some adjusts after install:
 
-# ADD MENU DOMINIO!
-docker exec $NOMECONTAINER bash -c "apt update"
-docker exec $NOMECONTAINER bash -c "apt install curl less dialog -y"
-docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/domain/main/docker-domain -O /root/.init"
-docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
-docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
+# Remove loop network from smb.conf:
 docker exec $NOMECONTAINER bash -c "sed '/127.0.0.1/d' /etc/samba/smb.conf"
 
+# Adjusting /syslog permissions:
+docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
+
+# Installing curl less and dialog:
+docker exec $NOMECONTAINER bash -c "apt update"
+docker exec $NOMECONTAINER bash -c "apt install curl less dialog -y"
+
+# Getting MENU for samba-tools:
+docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/domain/main/docker-domain -O /root/.init"
+docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
+docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
+docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
+
+# Finish
 docker restart $NOMECONTAINER
 
 exit
