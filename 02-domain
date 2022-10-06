@@ -176,9 +176,9 @@ sudo docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
 # ADD MENU DOMINIO!
 docker exec $NOMECONTAINER bash -c "apt update"
 docker exec $NOMECONTAINER bash -c "apt install curl dialog -y"
-docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/domain/main/domain -O /root/.init"
-#docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
-#docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
+docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/domain/main/docker-domain -O /root/.init"
+docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
+docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
 
 docker restart $NOMECONTAINER
 
