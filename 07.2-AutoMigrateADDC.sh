@@ -40,14 +40,14 @@ rsync -vaAxhHt /var/lib/samba/ /srv/exported/$migration_name/data/
 rsync -vaAxhHt /etc/samba/smb.conf /srv/exported/$migration_name/config/
 rsync -vaAxhHt /etc/krb5.conf /srv/exported/$migration_name/data/private/
 
+echo "Stopping SAMBA-AD-DC"
+systemctl start samba-ad-dc
+
 echo "TARing $migration_name.tar inside /srv/containers"
 tar -cvf /srv/exported/$migration_name.tar -C /srv/exported/$migration_name .
 
 echo "Remove temp dir"
 rm -R /srv/exported/$migration_name
-
-echo "Stopping SAMBA-AD-DC"
-systemctl start samba-ad-dc
 
 nano /srv/exported/$migration_name/Information
 
