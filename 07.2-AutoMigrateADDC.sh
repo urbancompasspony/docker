@@ -38,7 +38,7 @@ echo "macvlan" >> /srv/exported/$migration_name/Information
 echo "BackingUp samba folder and smb.conf & krb5.conf files"
 rsync -vaAxhHt /var/lib/samba/ /srv/exported/$migration_name/data/
 rsync -vaAxhHt /etc/samba/smb.conf /srv/exported/$migration_name/config/
-rsync -vaAxhHt /etc/krb5.conf /srv/exported/$migration_name/data/private/
+#rsync -vaAxhHt /etc/krb5.conf /srv/exported/$migration_name/data/private/ (/var/lib/samba/private/krb5.conf)
 
 echo "Stopping SAMBA-AD-DC"
 systemctl start samba-ad-dc
