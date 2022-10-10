@@ -17,3 +17,5 @@ docker run -d \
   -v /path/to/watch/folder:/watch \
   --restart unless-stopped \
   lscr.io/linuxserver/transmission:latest
+
+http://server-ip-or-hostname:9091
