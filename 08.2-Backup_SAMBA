@@ -1,32 +1,67 @@
 #!/bin/bash
 
-# IP FIXO DO NOVO CONTAINER
-LOCALIP="$1"
-# NOME DO CONTAINER e DO COMPARTILHAMENTO
-NAME="SAMBA_SHARE"
-# PLACA DE REDE A SER USADA
-NETWORKLAN="macvlan"
+[ "$EUID" -ne 0 ] && {
+  echo "Run this script as Root!"
+  exit
+  }
 
-sudo chmod 777 -R /srv/containers/$NAME/log/
-sudo chmod 0700 -R /srv/containers/$NAME/log/samba/cores
+migration_name="SAMBA_SHARE"
 
-docker run -d \
--h $NAME \
---ip $LOCALIP \
---name $NAME \
---privileged \
---dns=1.1.1.1 \
---dns=127.0.0.1 \
---restart=unless-stopped \
--v /etc/localtime:/etc/localtime:ro \
---network $NETWORKLAN \
---no-healthcheck \
--v /srv/containers/$NAME/cache/samba:/var/cache/samba \
--v /srv/containers/$NAME/lib/samba:/var/lib/samba \
--v /srv/containers/$NAME/log:/var/log \
--v /srv/containers/$NAME/run/samba:/run/samba \
--v /srv/containers/$NAME/etc:/etc \
--v /mnt:/mnt \
-urbancompasspony/migrate-samba
+echo "Seting Migration Name: $migration_name"
+datetime=$(date +"%d-%m-%H-%M")
+LocalIp=$(hostname -I | awk '{print $1}')
+echo "LocalIp detected: $LocalIp"
 
-#sudo docker exec $NAME chmod 777 -R /var/log
+echo "Stopping SAMBA"
+systemctl stop smbd; systemctl stop nmbd
+
+echo "Checking if ethernet connection is Ok"
+sleep 1
+apt update
+
+mkdir -p /srv/containers/$migration_name
+
+mkdir -p /srv/containers/$migration_name/cache
+mkdir -p /srv/containers/$migration_name/lib
+mkdir -p /srv/containers/$migration_name/log
+mkdir -p /srv/containers/$migration_name/run
+mkdir -p /srv/containers/$migration_name/etc
+
+echo "Creating syslog and Information files"
+touch /srv/containers/$migration_name/log/syslog && chmod 777 /srv/containers/$migration_name/log/syslog
+touch /srv/containers/$migration_name/Information
+
+echo "Populating Information file"
+echo "CHECK EVERYTHING - REMOVE THIS LINE TO CHECK IF YOU UNDERTOOD!" > /srv/containers/$migration_name/Information
+echo "$LocalIp" >> /srv/containers/$migration_name/Information
+echo "$HOSTNAME" >> /srv/containers/$migration_name/Information
+
+# Backup Folders:
+
+echo "BackingUp samba folder and smb.conf & krb5.conf files"
+rsync -vaAxhHt /var/cache/samba /srv/containers/$migration_name/cache/
+rsync -vaAxhHt /var/lib/samba /srv/containers/$migration_name/lib/
+rsync -vaAxhHt /var/log/samba /srv/containers/$migration_name/log/
+rsync -vaAxhHt /run/samba /srv/containers/$migration_name/run/
+rsync -vaAxhHt /etc /srv/containers/$migration_name/
+
+echo "Starting SAMBA"
+systemctl start smbd; systemctl start nmbd
+
+echo "TARing $migration_name.tar inside /srv/containers"
+tar -cvf /srv/containers/$migration_name.tar -C /srv/containers/$migration_name .
+
+echo "Simple backup for new config for new container"
+rsync -va /srv/containers/$migration_name /srv/containers/BKP-$migration_name
+
+nano /srv/containers/$migration_name/Information
+
+echo "#################################"
+echo "# SYSTEM MIGRATED SUCCESSFULLY! ######################################################"
+echo "# SHUTDOWN and change IP LAN $LocalIp of this system to not conflict with container! #"
+echo "######################################################################################"
+echo " "
+echo "Press Enter to Exit."
+read
+
+exit 0
