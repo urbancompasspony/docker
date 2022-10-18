@@ -183,7 +183,7 @@ docker exec $NOMECONTAINER bash -c "apt update"
 docker exec $NOMECONTAINER bash -c "apt install curl less dialog -y"
 
 # Getting MENU for samba-tools:
-docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/domain/main/docker-domain -O /root/.init"
+docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init"
 docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
