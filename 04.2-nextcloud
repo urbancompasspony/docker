@@ -130,3 +130,7 @@ docker restart nextcloud
 docker network connect bridge nextcloud
 
 exit
+
+# Model for Certbot Renew:
+# docker exec nextcloud apt install certbot python3-certbot-apache -y
+# docker exec nextcloud apt install cron --no-install-recommends -y
