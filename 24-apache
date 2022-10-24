@@ -90,7 +90,6 @@ function create {
 --no-healthcheck \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/Data/:/usr/local/apache2/htdocs/ \
--p 8080:80 \
 --restart=unless-stopped \
 httpd:2.4
 }
