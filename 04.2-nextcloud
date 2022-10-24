@@ -123,13 +123,17 @@ clean
 # Some scripts to run after installation
 docker exec nextcloud apt update
 docker exec nextcloud apt install smbclient nano -y
-docker exec nextcloud apt install certbot python3-certbot-apache -y
-docker exec nextcloud apt install cron --no-install-recommends -y
 docker restart nextcloud
 
 docker network connect bridge nextcloud
 
 exit
 
+# DEPRECATED
 # For Cron:
+# docker exec nextcloud apt install certbot python3-certbot-apache -y
+# docker exec nextcloud apt install cron --no-install-recommends -y
 # 00 00 01 * * certbot renew
+
+# Use something out! Like this on host:
+# */5  *  *  *  * docker exec -i nextcloud sudo -u abc php -f /config/www/nextcloud/cron.php
