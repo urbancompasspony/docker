@@ -104,4 +104,7 @@ checkA
 checkB
 clean
 
+# Set what will run!
+curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/lucs -O /srv/containers/"$NOMECONTAINER"/Data/index.html
+
 exit
