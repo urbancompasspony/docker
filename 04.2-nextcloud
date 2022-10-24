@@ -132,4 +132,4 @@ docker network connect bridge nextcloud
 exit
 
 # For Cron:
-# * * 01 * * certbot renew
+# 00 00 01 * * certbot renew
