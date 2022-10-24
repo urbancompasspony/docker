@@ -96,8 +96,6 @@ docker run -d \
 --name=$NOMECONTAINER \
 --network macvlan \
 --ip=$var1 \
--p 80:80 \
--p 443:443 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
 --hostname=nextcloud \
@@ -134,4 +132,4 @@ docker network connect bridge nextcloud
 exit
 
 # For Cron:
-# 
+# * * 01 * * certbot renew
