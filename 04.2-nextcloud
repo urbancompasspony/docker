@@ -105,8 +105,8 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/nextcloud:/var/www/html \
 -v /srv/containers/"$NOMECONTAINER"/apps:/var/www/html/custom_apps \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
--v "$var2"/data:/var/www/html/data \
 -v /srv/containers/"$NOMECONTAINER"/mysql:/var/lib/mysql \
+-v "$var2"/data:/var/www/html/data \
 nextcloud
 }
 
@@ -123,17 +123,15 @@ clean
 # Some scripts to run after installation
 docker exec nextcloud apt update
 docker exec nextcloud apt install smbclient nano -y
+docker exec nextcloud apt install certbot python3-certbot-apache -y
 docker restart nextcloud
 
 docker network connect bridge nextcloud
 
+echo "Configure o Let's Encrypt dentro do Container!"
+
 exit
 
-# DEPRECATED
-# For Cron:
-# docker exec nextcloud apt install certbot python3-certbot-apache -y
-# docker exec nextcloud apt install cron --no-install-recommends -y
-# 00 00 01 * * certbot renew
-
-# Use something out! Like this on host:
-# */5  *  *  *  * docker exec -i nextcloud sudo -u abc php -f /config/www/nextcloud/cron.php
+# Set this on Cron's Host:
+# 00 00 01 * * docker exec nextcloud certbot renew
+# Will auto renew once a month.
