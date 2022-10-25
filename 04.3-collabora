@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# Global config for replication:
+export NOMECONTAINER="collabora"
+
+# IP FIXO DO NOVO CONTAINER
+export var1
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function checkB {
+  export var1; export var2
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+          create
+        } || {
+          create
+        }
+
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+
+        datetime=$(date +"%d-%m %H-%M")
+        mkdir -p /srv/containers/.backupcnt
+        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
+
+        rm -R /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1
+
+  VALUE1=""
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Não apontar diretamente /data! Aponte um diretório acima." 11 40 0 \
+"Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  [ -z "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    create
+    }
+}
+
+function create {
+  export var1
+
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+
+docker run -d \
+--name=$NOMECONTAINER \
+--network macvlan \
+--ip=$var1 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=nextcloud \
+--restart=unless-stopped \
+--no-healthcheck \
+-e username="admin" \
+-e password="P4ssw0rd" \
+-p 9980:9980 \
+-v /etc/localtime:/etc/localtime:ro \
+collabora/code
+}
+
+function clean {
+  unset var1
+}
+
+# Start
+checkA
+checkB
+clean
+
+docker network connect bridge nextcloud
+
+exit
+
+#-e "aliasgroup1=https://<domain1>:443,https://<your-dot-escaped-aliasname1>|<your-dot-escaped-aliasname2>:443" 
+#-e "aliasgroup2=https://<domain2>:443"
