@@ -4,6 +4,10 @@
 export var1
 # NOME DO COMPARTILHAMENTO E DO CONTAINER!
 export var2
+# CAMINHO DO DIRETÓRIO DE COMPARTILHAMENTO
+export var3
+# PLACA DE REDE A SER USADA
+NETWORKLAN="macvlan"
 
 [ $(arch) = "x86_64" ] && {
   REPOSITORY="urbancompasspony/migrate-samba"
@@ -11,24 +15,23 @@ export var2
   REPOSITORY="urbancompasspony/migrate-samba-arm"
 }
 
-# PLACA DE REDE A SER USADA
-NETWORKLAN="macvlan"
-
 function menu {
-  export var1; export var2
+  export var1; export var2; export var3
 
-  VALUE1=""; VALUE2="samba"
+  VALUE1=""; VALUE2="samba"; VALUE3="/mnt"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "New Samba Share" 10 40 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
 "Shr Name:" 2 1 "$VALUE2" 2 10 20 0 \
+"MNT Path:" 3 1 "$VALUE3" 3 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
   
-  [ -z "$var1" ] || [ -z "$var2" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -44,7 +47,7 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2
+  export var1; export var2; export var3
 
   [ -f "/srv/containers/$var2/Information" ] && {
     dialog --title "Dados de $var2 encontrados!" --yesno "Deseja refazer o container?" 6 40
@@ -53,6 +56,7 @@ function checkB {
       [ $? = 0 ] && {
         var1=$(sed -n '1p' /srv/containers/$var2/Information)
         var2=$(sed -n '2p' /srv/containers/$var2/Information)
+        var3=$(sed -n '3p' /srv/containers/$var2/Information)
         
         [ $(docker stop "$var2") ] && {
           docker rm "$var2"
@@ -93,7 +97,7 @@ function configfiles {
 }
 
 function create {
-  export var1; export var2
+  export var1; export var2; export var3
   
   mkdir -p /srv/containers/"$var2"
   touch /srv/containers/"$var2"/Information
@@ -116,13 +120,14 @@ docker run -d \
 -v /srv/containers/"$var2"/lib/samba:/var/lib/samba \
 -v /srv/containers/"$var2"/log/samba:/var/log/samba \
 -v /srv/containers/"$var2"/run/samba:/run/samba \
--v /mnt:/mnt \
+-v "$var3":/mnt \
 $REPOSITORY
 }
 
 function clean {
   unset var1
   unset var2
+  unset var3
 }
 
 # Start
