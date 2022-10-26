@@ -85,12 +85,13 @@ docker run -d \
 --ip=$var1 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
---hostname=nextcloud \
+--hostname=$NOMECONTAINER \
 --restart=unless-stopped \
 --no-healthcheck \
+-p 9980:9980 \
 -e username="admin" \
 -e password="P4ssw0rd" \
--p 9980:9980 \
+-e extra_params="--o:ssl.enable=false" \
 -v /etc/localtime:/etc/localtime:ro \
 collabora/code
 }
@@ -106,7 +107,7 @@ clean
 
 docker network connect bridge nextcloud
 
-exit
+echo "Test from: http://172.20.0.38:9980"
+read
 
-#-e "aliasgroup1=https://<domain1>:443,https://<your-dot-escaped-aliasname1>|<your-dot-escaped-aliasname2>:443" 
-#-e "aliasgroup2=https://<domain2>:443"
+exit
