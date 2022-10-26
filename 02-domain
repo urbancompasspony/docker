@@ -15,6 +15,8 @@ export var4
 export var5
 # PLACA DE REDE A SER USADA - Normalmente não muda.
 export var6
+# CAMINHO DO PONTO DE MONTAGEM BASE
+export var7
 
 [ $(arch) = "x86_64" ] && {
   REPOSITORY="urbancompasspony/domain"
@@ -30,7 +32,7 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2; export var3; export var4; export var5; export var6
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7
 
   [ -f "/srv/containers/"$NOMECONTAINER"/Information" ] && {
     dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja refazer o container?" 6 40
@@ -43,6 +45,7 @@ function checkB {
         var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
         var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
         var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
+        var7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
 
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
@@ -69,9 +72,9 @@ function checkB {
 }
 
 function menu {
-  export var1; export var2; export var3; export var4; export var5; export var6
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7
 
-  VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5="$HOSTNAME"; VALUE6="macvlan"
+  VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5="$HOSTNAME"; VALUE6="macvlan"; VALUE7="/mnt"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
 "F.Q.D.N.: " 1 1 "$VALUE1" 1 10 34 0 \
@@ -80,6 +83,7 @@ function menu {
 "LAN DNS :" 4 1 "$VALUE4" 4 10 34 0 \
 "Hostname:" 5 1 "$VALUE5" 5 10 34 0 \
 "NetLAN  :" 6 1 "$VALUE6" 6 10 34 0 \
+"MNT Path:" 7 1 "$VALUE7" 7 10 34 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
@@ -90,8 +94,9 @@ function menu {
   var4=$(echo "$VALUE0" | sed -n 4p)
   var5=$(echo "$VALUE0" | sed -n 5p)
   var6=$(echo "$VALUE0" | sed -n 6p)
+  var7=$(echo "$VALUE0" | sed -n 7p)
   
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -100,7 +105,7 @@ function menu {
 }
 
 function create {
-  export var1; export var2; export var3; export var4; export var5; export var6
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7
   
   mkdir -p /srv/containers/"$NOMECONTAINER"/log
   
@@ -111,6 +116,7 @@ function create {
   echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
 
   touch /srv/containers/"$NOMECONTAINER"/log/syslog
 
@@ -152,7 +158,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/log/syslog:/var/log/syslog \
 -v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
 -v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
--v /mnt:/mnt \
+-v "$var7":/mnt \
 $REPOSITORY
 }
 
@@ -163,6 +169,7 @@ function clean {
   unset var4
   unset var5
   unset var6
+  unset var7
 }
 
 # Start
@@ -173,7 +180,7 @@ clean
 # Some adjusts after install:
 
 # Remove loop network from smb.conf:
-docker exec $NOMECONTAINER bash -c "sed '/127.0.0.1/d' /etc/samba/smb.conf"
+docker exec $NOMECONTAINER bash -c "sed '/127.0.0/d' /etc/samba/smb.conf"
 
 # Adjusting /syslog permissions:
 docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
