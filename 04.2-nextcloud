@@ -27,6 +27,7 @@
 
 # Inside container:
 # Creating a Let's Encrypt SSL:
+# docker exec -it nextcloud bash
 # certbot --apache -d seu-site.com
 
 # Outside container:
