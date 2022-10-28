@@ -32,8 +32,9 @@
 
 # Outside container:
 # Set this on Cron's Host:
+# */5 * * * * docker exec -t -u www-data nextcloud php -f /var/www/html/cron.php
 # 00 00 01 * * docker exec nextcloud certbot --apache renew
-# Will auto renew once a month.
+# Will auto renew SSL once a month and run cron.php when needed.
 
 # The End!
 
