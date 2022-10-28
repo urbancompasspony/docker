@@ -8,6 +8,12 @@
 # find /mnt/temp/data -type f -print0 | xargs -0 chmod 0640
 # find /mnt/temp/data -type d -print0 | xargs -0 chmod 0750
 
+# Do it too after migrating:
+# docker exec -u www-data -it nextcloud bash
+# SET MAINTENANCE OFF!
+# docker exec -u www-data -it nextcloud bash php occ files:scan --all
+# php occ files:scan --all
+
 # Global config for replication:
 export NOMECONTAINER="nextcloud"
 
