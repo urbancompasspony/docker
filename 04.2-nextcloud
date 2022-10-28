@@ -1,18 +1,31 @@
 #!/bin/bash
 
+#############################################################################################################
+
+# Some notes:
+
 # DOES NOT PUT ANY PORTS ON -p FLAG FOR THIS CONTAINER!
 # IF YOU DO SO, WILL CONFLICT WITH MYSQL CONTAINER THROUGH BRIDGE NETWORK.
 
-# Change /data permissions set as root user: sudo -i
-# chown www-data:www-data
-# find /mnt/temp/data -type f -print0 | xargs -0 chmod 0640
-# find /mnt/temp/data -type d -print0 | xargs -0 chmod 0750
-
 # Do it too after migrating:
+
+# Change /data permissions set as root user: sudo -i
+# chown www-data:www-data -R /mnt/data
+
+# find /mnt/data -type f -print0 | xargs -0 chmod 0640
+# find /mnt/data -type d -print0 | xargs -0 chmod 0750
+
+# Inside Container:
+
 # docker exec -it nextcloud bash
 # SET MAINTENANCE OFF!
+
 # docker exec -u www-data -it nextcloud bash
 # php occ files:scan --all
+
+# The End!
+
+#############################################################################################################
 
 # Global config for replication:
 export NOMECONTAINER="nextcloud"
