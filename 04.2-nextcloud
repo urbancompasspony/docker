@@ -23,6 +23,17 @@
 # docker exec -u www-data -it nextcloud bash
 # php occ files:scan --all
 
+# SSL:
+
+# Inside container:
+# Creating a Let's Encrypt SSL:
+# certbot --apache -d seu-site.com
+
+# Outside container:
+# Set this on Cron's Host:
+# 00 00 01 * * docker exec nextcloud certbot --apache renew
+# Will auto renew once a month.
+
 # The End!
 
 #############################################################################################################
@@ -150,7 +161,3 @@ docker network connect bridge nextcloud
 echo "Configure o Let's Encrypt dentro do Container!"
 
 exit
-
-# Set this on Cron's Host:
-# 00 00 01 * * docker exec nextcloud certbot renew
-# Will auto renew once a month.
