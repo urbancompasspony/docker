@@ -2,6 +2,8 @@
 
 # Reset database SYS and SYSTEM passwords:
 # docker exec <container name|id> resetPassword <your password>
+# Check Status:
+# docker exec oracleXE bash service oracle-xe-21c status
 
 # Global config for replication:
 export NOMECONTAINER="oracleXE"
