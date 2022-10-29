@@ -1,3 +1,5 @@
+https://github.com/gvenzl/oci-oracle-xe
+
 #!/bin/bash
 
 # Reset database SYS and SYSTEM passwords:
