@@ -75,7 +75,11 @@ function menu {
 function create {
   export var1
   
-  mkdir -p /srv/containers/"$NOMECONTAINER"
+  mkdir -p /srv/containers/"$NOMECONTAINER"/etc/
+  mkdir -p /srv/containers/"$NOMECONTAINER"/var/
+  mkdir -p /srv/containers/"$NOMECONTAINER"/usr/
+  mkdir -p /srv/containers/"$NOMECONTAINER"/default/
+
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
 
@@ -85,12 +89,14 @@ function create {
 --ip=$var1 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
---hostname=openfire \
+--hostname=$NOMECONTAINER \
 --no-healthcheck \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/Config/:/etc/openfire/ \
--v /srv/containers/"$NOMECONTAINER"/DataBase/:/var/lib/openfire/ \
--v /srv/containers/"$NOMECONTAINER"/Share/:/usr/share/openfire \
+-v /srv/containers/"$NOMECONTAINER"/etc/:/etc/openfire/ \
+-v /srv/containers/"$NOMECONTAINER"/var/:/var/lib/openfire/ \
+-v /srv/containers/"$NOMECONTAINER"/usr/:/usr/share/openfire/ \
+-v /srv/containers/"$NOMECONTAINER"/default/:/etc/default/openfire/ \
+-p 9090:9090 \
 -p 7777:7777 \
 -p 7443:7443 \
 -p 7070:7070 \
@@ -114,11 +120,14 @@ checkA
 checkB
 clean
 
-docker network connect bridge mysql
+docker network connect bridge $NOMECONTAINER
 
 # Instalation and Config. of OpenFire Server!
 docker exec $NOMECONTAINER bash -c "wget https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire_4.7.3_all.deb -O openfire.deb"
 docker exec $NOMECONTAINER bash -c "dpkg -i openfire.deb"
+
+echo "Edite o arquivo openfire.xml para o local do banco de dados do outro container!"
+
 docker restart $NOMECONTAINER
 
 exit 1
