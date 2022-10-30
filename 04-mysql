@@ -117,19 +117,19 @@ function create {
 
   docker run -d \
   --name $NOMECONTAINER \
-  --ip=$var1 \
+  --ip=$var2 \
   --dns=1.1.1.1  \
   --dns=127.0.0.1 \
   --network macvlan \
-  --hostname=$NOMECONTAINER \
+  --hostname=$var1 \
   --restart=unless-stopped \
   --no-healthcheck \
   -v /etc/localtime:/etc/localtime:ro \
   -v "$var7"/mysql:/var/lib/mysql \
-  -e MYSQL_ROOT_PASSWORD="$var2" \
-  -e MYSQL_DATABASE="$var3" \
-  -e MYSQL_USER="$var4" \
-  -e MYSQL_PASSWORD="$var5" \
+  -e MYSQL_ROOT_PASSWORD="$var3" \
+  -e MYSQL_DATABASE="$var4" \
+  -e MYSQL_USER="$var5" \
+  -e MYSQL_PASSWORD="$var6" \
   mysql:8
 }
 
