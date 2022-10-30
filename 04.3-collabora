@@ -105,9 +105,7 @@ checkA
 checkB
 clean
 
-docker network connect bridge nextcloud
-
-echo "Test from: http://172.20.0.38:9980"
+echo "Test from: http://$var1:9980"
 read
 
 exit
