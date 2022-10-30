@@ -7,7 +7,7 @@ export NOMECONTAINER="mariadb"
 export var1
 # IP FIXO DO NOVO CONTAINER
 export var2
-# NOVA SENHA DO ROOT MYSQL
+# NOVA SENHA DO ROOT MARIADB
 export var3
 # NOVO BANCO DE DADOS
 export var4
@@ -117,19 +117,19 @@ function create {
 
   docker run -d \
   --name $NOMECONTAINER \
-  --ip=$var1 \
+  --ip=$var2 \
   --dns=1.1.1.1  \
   --dns=127.0.0.1 \
   --network macvlan \
-  --hostname=$NOMECONTAINER \
+  --hostname=$var1 \
   --restart=unless-stopped \
   --no-healthcheck \
   -v /etc/localtime:/etc/localtime:ro \
   -v "$var7"/mysql:/var/lib/mysql \
-  -e MARIADB_ROOT_PASSWORD="$var2" \
-  -e MARIADB_DATABASE="$var3" \
-  -e MARIADB_USER="$var4" \
-  -e MARIADB_PASSWORD="$var5" \
+  -e MARIADB_ROOT_PASSWORD="$var3" \
+  -e MARIADB_DATABASE="$var4" \
+  -e MARIADB_USER="$var5" \
+  -e MARIADB_PASSWORD="$var6" \
   mariadb:latest
 }
 
