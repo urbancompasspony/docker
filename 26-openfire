@@ -1,0 +1,122 @@
+#!/bin/bash
+
+# Global config for replication:
+export NOMECONTAINER="openfire"
+
+# IP FIXO DO NOVO CONTAINER
+export var1
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function checkB {
+  export var1
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+
+          create
+        } || {
+          create
+        }
+        
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        
+        datetime=$(date +"%d-%m %H-%M")
+        mkdir -p /srv/containers/.backupcnt
+        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
+        
+        rm -R /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1
+
+  VALUE1=""
+  
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  [ -z "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    create
+    }
+}
+
+function create {
+  export var1
+  
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+
+  docker run -d \
+--name=$NOMECONTAINER \
+--network macvlan \
+--ip=$var1 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=openfire \
+--no-healthcheck \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/Config/:/etc/openfire/ \
+-v /srv/containers/"$NOMECONTAINER"/DataBase/:/var/lib/openfire/ \
+-v /srv/containers/"$NOMECONTAINER"/Share/:/usr/share/openfire \
+-p 7777:7777 \
+-p 7443:7443 \
+-p 7070:7070 \
+-p 5269:5269 \
+-p 5223:5223 \
+-p 5222:5222 \
+-p 1935:1935 \
+-p 3478-3479:3478-3479 \
+-p 3000-3039:3000-3039 \
+-p 5060-5099:5060-5099 \
+--restart=unless-stopped \
+urbancompasspony/openfire:latest
+}
+
+function clean {
+  unset var1
+}
+
+# Start
+checkA
+checkB
+clean
+
+# Instalation and Config. of OpenFire Server!
+docker exec $NOMECONTAINER bash -c "wget https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire_4.7.3_all.deb -O openfire.deb"
+docker exec $NOMECONTAINER bash -c "dpkg -i openfire.deb"
+docker restart $NOMECONTAINER
+
+exit 1
