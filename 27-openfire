@@ -81,6 +81,7 @@ function create {
   mkdir -p /srv/containers/"$NOMECONTAINER"/default/
 
   touch /srv/containers/"$NOMECONTAINER"/Information
+  touch /srv/containers/"$NOMECONTAINER"/default/openfire
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
 
   docker run -d \
@@ -95,7 +96,7 @@ function create {
 -v /srv/containers/"$NOMECONTAINER"/etc/:/etc/openfire/ \
 -v /srv/containers/"$NOMECONTAINER"/var/:/var/lib/openfire/ \
 -v /srv/containers/"$NOMECONTAINER"/usr/:/usr/share/openfire/ \
--v /srv/containers/"$NOMECONTAINER"/default/:/etc/default/openfire/ \
+-v /srv/containers/"$NOMECONTAINER"/default/openfire:/etc/default/openfire \
 -p 9090:9090 \
 -p 7777:7777 \
 -p 7443:7443 \
