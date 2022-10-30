@@ -137,7 +137,6 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/nextcloud:/var/www/html \
 -v /srv/containers/"$NOMECONTAINER"/apps:/var/www/html/custom_apps \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
--v /srv/containers/"$NOMECONTAINER"/mysql:/var/lib/mysql \
 -v "$var2"/data:/var/www/html/data \
 nextcloud
 }
