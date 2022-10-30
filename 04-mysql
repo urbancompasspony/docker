@@ -139,6 +139,8 @@ function clean {
   unset var3
   unset var4
   unset var5
+  unset var6
+  unset var7
 }
 
 # Start
@@ -150,7 +152,7 @@ docker network connect bridge $NOMECONTAINER
 
 echo "Finalizado!"
 echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
-echo "Localização do banco de dados definida em: $var6"
+echo "Localização do banco de dados definida em: $var7"
 
 # Unset vars:
 unset var1
