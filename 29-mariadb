@@ -121,7 +121,7 @@ function create {
   --dns=1.1.1.1  \
   --dns=127.0.0.1 \
   --network macvlan \
-  --hostname=$var1 \
+  --hostname=$NOMECONTAINER \
   --restart=unless-stopped \
   --no-healthcheck \
   -v /etc/localtime:/etc/localtime:ro \
