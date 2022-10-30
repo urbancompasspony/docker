@@ -114,6 +114,8 @@ checkA
 checkB
 clean
 
+docker network connect bridge mysql
+
 # Instalation and Config. of OpenFire Server!
 docker exec $NOMECONTAINER bash -c "wget https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire_4.7.3_all.deb -O openfire.deb"
 docker exec $NOMECONTAINER bash -c "dpkg -i openfire.deb"
