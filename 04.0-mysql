@@ -146,7 +146,7 @@ checkA
 checkB
 clean
 
-docker network connect bridge mysql
+docker network connect bridge $NOMECONTAINER
 
 echo "Finalizado!"
 echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
