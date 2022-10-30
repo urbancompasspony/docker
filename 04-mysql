@@ -95,7 +95,7 @@ VALUE1="$NOMECONTAINER"; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5=""; VALUE6=""; 
   var7=$(echo "$VALUE0" | sed -n 7p)
 
   [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var7" ] && {
-    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    dialog --title "ERRO" --msgbox "Não deixe vazios os campos 1, 2 e 7!" 8 40
     menu
   } || {
     create
