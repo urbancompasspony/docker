@@ -151,13 +151,13 @@ checkA
 checkB
 clean
 
+docker network connect bridge $NOMECONTAINER
+
 # Some scripts to run after installation
 docker exec nextcloud apt update
 docker exec nextcloud apt install smbclient nano -y
 docker exec nextcloud apt install certbot python3-certbot-apache -y
 docker restart nextcloud
-
-docker network connect bridge nextcloud
 
 echo "Configure o Let's Encrypt dentro do Container!"
 
