@@ -78,10 +78,10 @@ VALUE1="$NOMECONTAINER"; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5=""; VALUE6=""; 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 14 40 0 \
 "NameCont:" 1 1 "$VALUE1" 1 10 20 0 \
 "Local IP:" 2 1 "$VALUE2" 2 10 20 0 \
-"MySQL PW:" 3 1 "$VALUE3" 3 10 20 0 \
-"DataBase:" 4 1 "$VALUE4" 4 10 20 0 \
-"DB User :" 5 1 "$VALUE5" 5 10 20 0 \
-"DB Pass :" 6 1 "$VALUE6" 6 10 20 0 \
+"MySQL PW" 3 1 "$VALUE3" 3 10 20 0 \
+"DataBase" 4 1 "$VALUE4" 4 10 20 0 \
+"DB User " 5 1 "$VALUE5" 5 10 20 0 \
+"DB Pass " 6 1 "$VALUE6" 6 10 20 0 \
 "DB PATH :" 7 1 "$VALUE7" 7 10 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
@@ -94,7 +94,7 @@ VALUE1="$NOMECONTAINER"; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5=""; VALUE6=""; 
   var6=$(echo "$VALUE0" | sed -n 6p)
   var7=$(echo "$VALUE0" | sed -n 7p)
 
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var7" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -121,7 +121,7 @@ function create {
   --dns=1.1.1.1  \
   --dns=127.0.0.1 \
   --network macvlan \
-  --hostname=mysql \
+  --hostname=$NOMECONTAINER \
   --restart=unless-stopped \
   --no-healthcheck \
   -v /etc/localtime:/etc/localtime:ro \
