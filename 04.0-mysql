@@ -1,22 +1,22 @@
 #!/bin/bash
 
-# TODO: HOW TO CHANGE /VAR/LIB/MYSQL TO ANOTHER DIR!
-
 # Global config for replication:
 export NOMECONTAINER="mysql"
 
-# IP FIXO DO NOVO CONTAINER
+# NOME DO BANCO DE DADOS
 export var1
-# NOVA SENHA DO ROOT MYSQL
+# IP FIXO DO NOVO CONTAINER
 export var2
-# NOVO BANCO DE DADOS
+# NOVA SENHA DO ROOT MYSQL
 export var3
-# USUARIO BANCO DE DADOS
+# NOVO BANCO DE DADOS
 export var4
-# SENHA DO BANCO DE DADOS
+# USUARIO BANCO DE DADOS
 export var5
-# CAMINHO DO BANCO DE DADOS
+# SENHA DO BANCO DE DADOS
 export var6
+# CAMINHO DO BANCO DE DADOS
+export var7
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -26,7 +26,7 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2; export var3; export var4; export var5; export var6
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
@@ -39,7 +39,8 @@ function checkB {
         var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
         var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
         var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
-        
+        var7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
+
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
 
@@ -70,17 +71,18 @@ function checkB {
 }
 
 function menu {
-  export var1; export var2; export var3; export var4; export var5; export var6
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7
 
-  VALUE1=""; VALUE2=""; VALUE3="nextcloud"; VALUE4="nextcloud"; VALUE5=""; VALUE6="/srv/containers/$NOMECONTAINER"
+VALUE1="$NOMECONTAINER"; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5=""; VALUE6=""; VALUE7="/srv/containers/$NOMECONTAINER"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 14 40 0 \
-"Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
-"MySQL PW:" 2 1 "$VALUE2" 2 10 20 0 \
-"DataBase:" 3 1 "$VALUE3" 3 10 20 0 \
-"DB User :" 4 1 "$VALUE4" 4 10 20 0 \
-"DB Pass :" 5 1 "$VALUE5" 5 10 20 0 \
-"DB PATH :" 6 1 "$VALUE6" 6 10 40 0 \
+"NameCont:" 1 1 "$VALUE1" 1 10 20 0 \
+"Local IP:" 2 1 "$VALUE2" 2 10 20 0 \
+"MySQL PW:" 3 1 "$VALUE3" 3 10 20 0 \
+"DataBase:" 4 1 "$VALUE4" 4 10 20 0 \
+"DB User :" 5 1 "$VALUE5" 5 10 20 0 \
+"DB Pass :" 6 1 "$VALUE6" 6 10 20 0 \
+"DB PATH :" 7 1 "$VALUE7" 7 10 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
@@ -90,8 +92,9 @@ function menu {
   var4=$(echo "$VALUE0" | sed -n 4p)
   var5=$(echo "$VALUE0" | sed -n 5p)
   var6=$(echo "$VALUE0" | sed -n 6p)
+  var7=$(echo "$VALUE0" | sed -n 7p)
 
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -100,8 +103,8 @@ function menu {
 }
 
 function create {
-  export var1; export var2; export var3; export var4; export var5; export var6
-  
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7
+
   mkdir -p /srv/containers/"$NOMECONTAINER"
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
@@ -110,9 +113,10 @@ function create {
   echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
-  
+  echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
+
   docker run -d \
-  --name mysql \
+  --name $NOMECONTAINER \
   --ip=$var1 \
   --dns=1.1.1.1  \
   --dns=127.0.0.1 \
@@ -121,7 +125,7 @@ function create {
   --restart=unless-stopped \
   --no-healthcheck \
   -v /etc/localtime:/etc/localtime:ro \
-  -v "$var6"/mysql:/var/lib/mysql \
+  -v "$var7"/mysql:/var/lib/mysql \
   -e MYSQL_ROOT_PASSWORD="$var2" \
   -e MYSQL_DATABASE="$var3" \
   -e MYSQL_USER="$var4" \
@@ -148,7 +152,13 @@ echo "Finalizado!"
 echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
 echo "Localização do banco de dados definida em: $var6"
 
-# Unset the last var:
+# Unset vars:
+unset var1
+unset var2
+unset var3
+unset var4
+unset var5
 unset var6
+unset var7
 
-exit
+exit 1
