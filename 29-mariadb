@@ -126,8 +126,9 @@ function create {
   --no-healthcheck \
   -v /etc/localtime:/etc/localtime:ro \
   -v "$var7"/mysql:/var/lib/mysql \
-  -e MARIADB_AUTO_UPGRADE=1
-  -e MARIADB_INITDB_SKIP_TZINFO=1
+  -e MARIADB_AUTO_UPGRADE="True" \
+  -e MARIADB_INITDB_SKIP_TZINFO="True" \
+  -e TZ="America/Bahia" \
   -e MARIADB_ROOT_PASSWORD="$var3" \
   -e MARIADB_DATABASE="$var4" \
   -e MARIADB_USER="$var5" \
