@@ -1,7 +1,14 @@
 #!/bin/bash
 
-# When updating, answer N all times to keep the files!
+# When upgrading, answer N all times to keep the files!
 # Then restart openfire service, through restarting docker; or "service restart openfire"
+
+# If needed:
+# mariadb -u root -p
+# GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+# GRANT ALL ON *.* to root@'xxx.xxx.xxx.xxx' IDENTIFIED BY 'P4ssw0rd';
+# GRANT ALL ON *.* to openfire@'xxx.xxx.xxx.xxx' IDENTIFIED BY 'P4ssw0rd';
+# FLUSH PRIVILEGES;
 
 # Global config for replication:
 export NOMECONTAINER="openfire"
