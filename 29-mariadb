@@ -126,6 +126,7 @@ function create {
   --no-healthcheck \
   -v /etc/localtime:/etc/localtime:ro \
   -v "$var7"/mysql:/var/lib/mysql \
+  -e MARIADB_AUTO_UPGRADE="True" \
   -e MARIADB_INITDB_SKIP_TZINFO="True" \
   -e TZ="America/Bahia" \
   -e MARIADB_ROOT_PASSWORD="$var3" \
@@ -155,8 +156,6 @@ docker network connect bridge $NOMECONTAINER
 echo "Finalizado!"
 echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
 echo "Localização do banco de dados definida em: $var7"
-
-# Use when needed; -e MARIADB_AUTO_UPGRADE="True" \
 
 # Unset vars:
 unset var1
