@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# If needed:
+# docker exec -it mariadb bash
+# mysql_upgrade --user=root --password=P4ssw0rd
+
 # Global config for replication:
 export NOMECONTAINER="mariadb"
 
