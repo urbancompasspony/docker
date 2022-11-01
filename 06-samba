@@ -54,9 +54,9 @@ function checkB {
     [ $? = 0 ] && {
     dialog --title "Recriando o container $var2" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
       [ $? = 0 ] && {
-        var1=$(sed -n '1p' /srv/containers/$var2/Information)
-        var2=$(sed -n '2p' /srv/containers/$var2/Information)
-        var3=$(sed -n '3p' /srv/containers/$var2/Information)
+        #var1=$(sed -n '1p' /srv/containers/$var2/Information)
+        #var2=$(sed -n '2p' /srv/containers/$var2/Information)
+        #var3=$(sed -n '3p' /srv/containers/$var2/Information)
         
         [ $(docker stop "$var2") ] && {
           docker rm "$var2"
