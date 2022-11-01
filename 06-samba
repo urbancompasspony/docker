@@ -6,6 +6,8 @@ export var1
 export var2
 # CAMINHO DO DIRETÓRIO DE COMPARTILHAMENTO
 export var3
+# CAMINHOS EXTRAS
+export var4
 # PLACA DE REDE A SER USADA
 NETWORKLAN="macvlan"
 
@@ -16,23 +18,25 @@ NETWORKLAN="macvlan"
 }
 
 function menu {
-  export var1; export var2; export var3
+  export var1; export var2; export var3; export var4
 
-  VALUE1=""; VALUE2="samba"; VALUE3="/mnt"
+  VALUE1=""; VALUE2="samba"; VALUE3="/mnt"; VALUE4="-v /mnt:/mnt"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "New Samba Share" 10 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "New Samba Share" 11 40 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
 "Shr Name:" 2 1 "$VALUE2" 2 10 20 0 \
 "MNT Path:" 3 1 "$VALUE3" 3 10 20 0 \
+"EXT Path:" 4 1 "$VALUE4" 4 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
   var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
   
   [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] && {
-    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    dialog --title "ERRO" --msgbox "Não deixe os campos 1, 2 e/ou 3 vazios!" 8 40
     menu
   } || {
     checkB
@@ -47,17 +51,18 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2; export var3
+  export var1; export var2; export var3; export var4
 
   [ -f "/srv/containers/$var2/Information" ] && {
     dialog --title "Dados de $var2 encontrados!" --yesno "Deseja refazer o container?" 6 40
     [ $? = 0 ] && {
     dialog --title "Recriando o container $var2" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
       [ $? = 0 ] && {
-        #var1=$(sed -n '1p' /srv/containers/$var2/Information)
-        #var2=$(sed -n '2p' /srv/containers/$var2/Information)
-        #var3=$(sed -n '3p' /srv/containers/$var2/Information)
-        
+        var1=$(sed -n '1p' /srv/containers/$var2/Information)
+        var2=$(sed -n '2p' /srv/containers/$var2/Information)
+        var3=$(sed -n '3p' /srv/containers/$var2/Information)
+        var4=$(sed -n '4p' /srv/containers/$var2/Information)
+
         [ $(docker stop "$var2") ] && {
           docker rm "$var2"
 
@@ -97,12 +102,14 @@ function configfiles {
 }
 
 function create {
-  export var1; export var2; export var3
+  export var1; export var2; export var3; export var4
   
   mkdir -p /srv/containers/"$var2"
   touch /srv/containers/"$var2"/Information
   echo "$var1" > /srv/containers/"$var2"/Information
   echo "$var2" >> /srv/containers/"$var2"/Information
+  echo "$var3" >> /srv/containers/"$var2"/Information
+  echo "$var4" >> /srv/containers/"$var2"/Information
 
 docker run -d \
 -h $var2 \
@@ -120,7 +127,7 @@ docker run -d \
 -v /srv/containers/"$var2"/lib/samba:/var/lib/samba \
 -v /srv/containers/"$var2"/log/samba:/var/log/samba \
 -v /srv/containers/"$var2"/run/samba:/run/samba \
--v "$var3":/mnt \
+-v "$var3":/mnt "$var4" \
 $REPOSITORY
 
 sudo chmod 777 -R /srv/containers/"$var2"/log/
@@ -132,6 +139,7 @@ function clean {
   unset var1
   unset var2
   unset var3
+  unset var4
 }
 
 # Start
