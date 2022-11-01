@@ -64,6 +64,5 @@ echo "# SHUTDOWN and change IP LAN $LocalIp of this system to not conflict with 
 echo "######################################################################################"
 echo " "
 echo "Press Enter to Exit."
-read
 
-exit 0
+exit 1
