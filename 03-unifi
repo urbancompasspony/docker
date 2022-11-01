@@ -89,7 +89,7 @@ function create {
 mkdir -p /srv/containers/"$NOMECONTAINER"
 
 docker run -d \
-  --name=unifi \
+  --name=$NOMECONTAINER \
   --network macvlan \
   --ip=$var1 \
   --dns=1.1.1.1  \
