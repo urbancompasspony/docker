@@ -38,7 +38,8 @@ touch /srv/containers/$migration_name/Information
 echo "Populating Information file"
 echo "CHECK EVERYTHING - REMOVE THIS LINE TO CHECK IF YOU UNDERTOOD!" > /srv/containers/$migration_name/Information
 echo "$LocalIp" >> /srv/containers/$migration_name/Information
-echo "$HOSTNAME" >> /srv/containers/$migration_name/Information
+echo "$migration_name" >> /srv/containers/$migration_name/Information
+echo "/mnt" >> /srv/containers/$migration_name/Information
 
 # Backup Folders:
 
