@@ -1,5 +1,3 @@
-https://github.com/gvenzl/oci-oracle-xe
-
 #!/bin/bash
 
 # Reset database SYS and SYSTEM passwords:
@@ -87,7 +85,8 @@ function menu {
 function create {
   export var1; export var2
   
-  mkdir -p /srv/containers/"$NOMECONTAINER"
+  mkdir -p /srv/containers/"$NOMECONTAINER"/Data
+  chmod 777 -R /srv/containers/"$NOMECONTAINER"/Data
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
@@ -98,11 +97,11 @@ function create {
 --ip=$var1 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
---hostname=pi.hole \
+--hostname=$NOMECONTAINER \
 --no-healthcheck \
--e ORACLE_PASSWORD="$var2"
+-e ORACLE_PASSWORD="$var2" \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/Data/:/opt/oracle/oradata \
+-v /srv/containers/$NOMECONTAINER/Data/:/opt/oracle/oradata \
 -p 1521:1521 \
 --restart=unless-stopped \
 gvenzl/oracle-xe:21-full
@@ -119,3 +118,6 @@ checkB
 clean
 
 exit
+
+# Fonts
+# https://github.com/gvenzl/oci-oracle-xe
