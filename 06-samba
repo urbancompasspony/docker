@@ -23,7 +23,7 @@ function menu {
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "New Samba Share" 10 40 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
 "Shr Name:" 2 1 "$VALUE2" 2 10 20 0 \
-"MNT Path:" 3 1 "$VALUE3" 3 10 20 0 \
+"MNT Path:" 3 1 "$VALUE3" 3 10 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
@@ -103,7 +103,8 @@ function create {
   touch /srv/containers/"$var2"/Information
   echo "$var1" > /srv/containers/"$var2"/Information
   echo "$var2" >> /srv/containers/"$var2"/Information
-
+  echo "$var3" >> /srv/containers/"$var2"/Information
+  
 docker run -d \
 -h $var2 \
 --ip $var1 \
@@ -120,7 +121,7 @@ docker run -d \
 -v /srv/containers/"$var2"/lib/samba:/var/lib/samba \
 -v /srv/containers/"$var2"/log/samba:/var/log/samba \
 -v /srv/containers/"$var2"/run/samba:/run/samba \
-"$var3" \
+$var3 \
 $REPOSITORY
 
 sudo chmod 777 -R /srv/containers/"$var2"/log/
