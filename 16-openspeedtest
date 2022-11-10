@@ -3,6 +3,22 @@
 # Global config for replication:
 export NOMECONTAINER="openspeedtest"
 
+HOST="::1"
+
+ping -c1 $HOST 1>/dev/null 2>/dev/null
+SUCCESS=$?
+
+if [ $SUCCESS -eq 0 ]
+then
+  echo "Ping IPV6 Ok!"
+else
+  echo "IPV6 disabled."
+  echo "IPV6 needed!"
+  echo "Exiting..."
+  exit
+fi
+
+
 [ $(arch) = "x86_64" ] && {
    echo "Instalando..."
 } || {
