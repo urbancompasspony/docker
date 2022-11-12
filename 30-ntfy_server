@@ -103,6 +103,7 @@ checkB
 [ -f "/srv/containers/"$NOMECONTAINER"/etc/server.yml" ] || {
   wget https://raw.githubusercontent.com/urbancompasspony/ntfy_config/main/server.yml -O /srv/containers/$NOMECONTAINER/etc/server.yml
   docker restart $NOMECONTAINER
+  echo "Create a user with: docker exec -it ntfy ntfy user add --role=admin NEWUSER"
 } && {
  echo "a" > /dev/null
 }
