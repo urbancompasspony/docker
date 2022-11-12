@@ -101,7 +101,7 @@ checkA
 checkB
 
 [ -f "/srv/containers/"$NOMECONTAINER"/etc/server.yml" ] || {
-  wget https://raw.githubusercontent.com/binwiederhier/ntfy/main/server/server.yml -O /srv/containers/$NOMECONTAINER/etc/server.yml
+  wget https://raw.githubusercontent.com/urbancompasspony/ntfy_config/main/server.yml -O /srv/containers/$NOMECONTAINER/etc/server.yml
   docker restart $NOMECONTAINER
 } && {
  echo "a" > /dev/null
