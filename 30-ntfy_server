@@ -75,7 +75,6 @@ function create {
   export var1
   
   mkdir -p /srv/containers/"$NOMECONTAINER"
-  mkdir -p /srv/containers/"$NOMECONTAINER"/attachments
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
 
