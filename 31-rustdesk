@@ -80,7 +80,8 @@ function menu {
 function create {
   export var1; export var2
   
-  mkdir -p /srv/containers/"$NOMECONTAINER"
+  mkdir -p /srv/containers/"$NOMECONTAINER"/HBBS
+  mkdir -p /srv/containers/"$NOMECONTAINER"/HBBR
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
@@ -95,7 +96,7 @@ docker run -d \
   --restart unless-stopped \
   --no-healthcheck \
   -v /etc/localtime:/etc/localtime:ro \
-  -v $(pwd):/root \
+  -v /srv/containers/"$NOMECONTAINER"/HBBS:/root \
   -p 21115:21115 \
   -p 21116:21116 \
   -p 21116:21116/udp \
@@ -113,7 +114,7 @@ docker run -d \
   --restart unless-stopped \
   --no-healthcheck \
   -v /etc/localtime:/etc/localtime:ro \
-  -v $(pwd):/root \
+  -v /srv/containers/"$NOMECONTAINER"/HBBR:/root \
   -p 21117:21117 \
   -p 21119:21119 \
   rustdesk/rustdesk-server \
@@ -123,6 +124,13 @@ docker run -d \
 # Start
 checkA
 checkB
+
+# Adjusting Keys!
+docker stop hbbs
+docker stop hbbr
+sudo rsync -a /srv/containers/"$NOMECONTAINER"/HBBS/ /srv/containers/"$NOMECONTAINER"/HBBR/
+docker start hbbr
+docker start hbbs
 
 unset var1
 unset var2
