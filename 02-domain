@@ -108,7 +108,7 @@ function create {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7
   
   mkdir -p /srv/containers/"$NOMECONTAINER"/log
-  mkdir -p /srv/containers/"$NOMECONTAINER"/config/external
+  #mkdir -p /srv/containers/"$NOMECONTAINER"/config/external
 
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
@@ -158,7 +158,7 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/log/syslog:/var/log/syslog \
 -v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
--v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba \
+-v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
 $var7 \
 $REPOSITORY
 }
