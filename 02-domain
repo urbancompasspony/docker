@@ -157,7 +157,7 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/log/syslog:/var/log/syslog \
 -v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
--v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
+-v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba \
 $var7 \
 $REPOSITORY
 }
