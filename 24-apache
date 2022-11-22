@@ -40,7 +40,7 @@ function checkB {
         mkdir -p /srv/containers/.backupcnt
         zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
         
-        rm -R /srv/containers/"$NOMECONTAINER"
+        rm -iR /srv/containers/"$NOMECONTAINER"
 
         menu
         }
