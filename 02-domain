@@ -108,8 +108,7 @@ function create {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7
   
   mkdir -p /srv/containers/"$NOMECONTAINER"/log
-  #mkdir -p /srv/containers/"$NOMECONTAINER"/config/external
-
+  
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
