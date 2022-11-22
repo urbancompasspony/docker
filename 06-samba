@@ -74,7 +74,7 @@ function checkB {
         mkdir -p /srv/containers/.backupcnt
         zip "/srv/containers/.backupcnt/$var2-$datetime.zip" -r /srv/containers/$var2
         
-        rm -R /srv/containers/"$var2"
+        rm -iR /srv/containers/"$var2"
 
         configfiles
         create
