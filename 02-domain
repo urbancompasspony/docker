@@ -48,7 +48,7 @@ function checkB {
         var7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
 
         [ $(docker stop "$NOMECONTAINER") ] && {
-          docker rm -i "$NOMECONTAINER"
+          docker rm "$NOMECONTAINER"
 
           create
         } || {
@@ -58,6 +58,7 @@ function checkB {
       } || {
         docker stop "$NOMECONTAINER"
         docker rm "$NOMECONTAINER"
+        
         rm -iR /srv/containers/"$NOMECONTAINER"
 
         menu
