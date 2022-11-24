@@ -16,3 +16,4 @@ docker run -it --rm --privileged \
 adb connect localhost:5555
 
 scrcpy -s localhost:5555
+# https://github.com/remote-android/redroid-doc
