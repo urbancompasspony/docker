@@ -1,0 +1,18 @@
+#!/bin/bash
+
+sudo apt install linux-modules-extra-$(uname -r)
+sudo apt install adb
+sudo apt install scrcpy
+
+sudo modprobe binder_linux devices="binder,hwbinder,vndbinder"
+sudo modprobe ashmem_linux
+
+docker run -it --rm --privileged \
+    --pull always \
+    -v /srv/containers/redroid:/data \
+    -p 5555:5555 \
+    redroid/redroid:13.0.0-latest
+
+adb connect localhost:5555
+
+scrcpy -s localhost:5555
