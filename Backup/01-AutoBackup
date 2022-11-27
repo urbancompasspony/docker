@@ -9,3 +9,17 @@ docker rmi $(docker images -q)
 # Delete all untagged images
 docker rmi $(docker images -q --filter "dangling=true")
 
+sudo tar -cvf /home/urbancompasspony/archive.tar -C /home/nathandrake/my_files/omg/ .
+
+???
+[ -f file 2 ] &&
+  generate a new file
+  ||
+  remove old file 2
+  
+[ -f file ] &&
+  generate a new file 2
+  ||
+  remove old file
+  
+  Backup A and B versions.
