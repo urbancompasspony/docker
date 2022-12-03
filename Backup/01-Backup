@@ -41,13 +41,13 @@ function backup {
 
 # Check if this script is running through root user
 checkA
-# Stop all containers
+# Stop all containers and wait until all are stopped
 dockerctrl stop &&
 # Check if there is some old .tar to delete first
 checkB
 # Run the backup os all containers
 backup
-# Start all containers again
+# Start all containers again and wait until all are started
 dockerctrl start &&
 
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- #
