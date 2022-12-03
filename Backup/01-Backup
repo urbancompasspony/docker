@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Set folders for backup and destiny:
+
+source="/srv/containers"
+
+destiny="/srv/backup"
+
+# --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- #
+
+cd "$source"
+
+datetime=$(date +"%d_%m_%y")
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Run this script as Root!"
+    exit
+    }
+}
+
+function checkB {
+  # Delete files older than 2 days
+  find "$destiny" -type f -mtime +2 -delete
+  # Delete folders older than 2 days
+  #find "$destiny" -type d -mtime +2 -exec rm -rf {} \;
+  # Delete empty folders
+  #find "$destiny" -type d -empty -delete
+}
+
+function dockerctrl {
+  docker "$1" $(docker ps -a -q)
+}
+
+function backup {
+  for dir in $(ls)
+    do
+      tar -cvf "$destiny"/"$dir"-"$datetime".tar "$dir"
+    done
+}
+
+# Check if this script is running through root user
+checkA
+# Stop all containers
+dockerctrl stop &&
+# Check if there is some old .tar to delete first
+checkB
+# Run the backup os all containers
+backup
+# Start all containers again
+dockerctrl start &&
+
+# --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- #
+
+exit 1
