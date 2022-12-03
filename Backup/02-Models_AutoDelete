@@ -1,0 +1,19 @@
+$folder
+
+find "$folder" -type f -mtime +15 -delete
+
+find "$folder" -type d -mtime +15 -exec rm -rf {} \;
+
+find "$folder" -type d -empty -delete
+
+#find $folder -mtime +0 # find files modified greater than 24 hours ago
+#find $folder -mtime 0 # find files modified between now and 1 day ago
+
+## (i.e., in the past 24 hours only)
+
+#find $folder -mtime -1 # find files modified less than 1 day ago (SAME AS -mtime 0)
+#find $folder -mtime 1 # find files modified between 24 and 48 hours ago
+#find $folder -mtime +1 # find files modified more than 48 hours ago
+
+#find $folder -type f -mtime +5 -delete 
+#find $folder -type d -mtime +5 -exec rm -rf {} \; 
