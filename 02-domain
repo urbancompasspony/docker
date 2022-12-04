@@ -183,8 +183,9 @@ clean
 # Remove loop network from smb.conf:
 docker exec $NOMECONTAINER bash -c "sed '/127.0.0/d' /etc/samba/smb.conf"
 
-# Adjusting /syslog permissions:
+# Adjusting /syslog and /sysvol permissions:
 docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
+docker exec $NOMECONTAINER chmod 777 -R /var/lib/samba/sysvol
 
 # Installing curl less and dialog:
 docker exec $NOMECONTAINER bash -c "apt update"
