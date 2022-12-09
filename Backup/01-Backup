@@ -47,6 +47,4 @@ backup
 # Start all containers again and wait until all are started
 dockerctrl start &&
 
-# --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- #
-
 exit 1
