@@ -2,9 +2,11 @@
 
 # Set folders for backup and destiny:
 
-source="/srv/containers"
+#source="/srv/containers"
+source=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
 
-destiny="/srv/backup"
+#destiny="/srv/backup"
+destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
 
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- #
 
