@@ -36,6 +36,9 @@ function backup {
     done
 }
 
+# Apply some permissions!
+chmod 777 -R "$destiny"
+
 # Check if this script is running through root user
 checkA
 # Stop all containers and wait until all are stopped
