@@ -91,10 +91,12 @@ docker run -d \
 -p 9980:9980 \
 -e username="admin" \
 -e password="P4ssw0rd" \
--e extra_params="--o:ssl.enable=false" \
 -v /etc/localtime:/etc/localtime:ro \
 collabora/code
 }
+
+# IF NOT USING SSL!
+# -e extra_params="--o:ssl.enable=false" \
 
 function clean {
   unset var1
@@ -105,7 +107,6 @@ checkA
 checkB
 clean
 
-echo "Test from: http://$var1:9980"
-read
+echo "Test from: http:// $var1 :9980"
 
 exit
