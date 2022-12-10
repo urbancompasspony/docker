@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Nextcloud Version!
+nv="25"
+
 #############################################################################################################
 
 # Some notes:
@@ -138,7 +141,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/apps:/var/www/html/custom_apps \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
 -v "$var2"/data:/var/www/html/data \
-nextcloud
+nextcloud:"$nv"
 }
 
 function clean {
