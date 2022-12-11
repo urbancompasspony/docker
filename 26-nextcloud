@@ -138,8 +138,6 @@ docker run -d \
 --restart=unless-stopped \
 --no-healthcheck \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/nextcloud:/var/www/html \
--v /srv/containers/"$NOMECONTAINER"/apps:/var/www/html/custom_apps \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
 -v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt \
 -v "$var2"/data:/var/www/html/data \
@@ -166,5 +164,9 @@ docker restart nextcloud
 
 echo "Configure o Let's Encrypt dentro do Container!"
 sleep 3
+
+# For Troubleshooting Only:
+#-v /srv/containers/"$NOMECONTAINER"/nextcloud:/var/www/html \
+#-v /srv/containers/"$NOMECONTAINER"/apps:/var/www/html/apps \
 
 exit
