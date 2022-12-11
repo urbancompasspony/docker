@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# NOT SET, ERROR AH00170: caught SIGWINCH, shutting down gracefully ?
 # Nextcloud Version!
 nv="25"
 
@@ -21,6 +22,7 @@ nv="25"
 # Inside Container:
 
 # docker exec -it nextcloud bash
+# php occ maintenance:theme:update
 # SET MAINTENANCE OFF!
 
 # docker exec -u www-data -it nextcloud bash
@@ -140,6 +142,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/nextcloud:/var/www/html \
 -v /srv/containers/"$NOMECONTAINER"/apps:/var/www/html/custom_apps \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
+-v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt \
 -v "$var2"/data:/var/www/html/data \
 nextcloud
 }
