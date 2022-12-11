@@ -107,6 +107,6 @@ checkA
 checkB
 clean
 
-echo "Test from: http:// $var1 :9980"
+echo "Try accessing Web through port :9980"
 
 exit
