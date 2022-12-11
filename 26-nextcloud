@@ -163,5 +163,6 @@ docker exec nextcloud apt install certbot python3-certbot-apache -y
 docker restart nextcloud
 
 echo "Configure o Let's Encrypt dentro do Container!"
+sleep 3
 
 exit
