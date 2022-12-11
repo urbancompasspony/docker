@@ -105,8 +105,10 @@ function clean {
 # Start
 checkA
 checkB
-clean
 
-echo "Try accessing Web through port :9980"
+echo "Try accessing Web through https://$var1:9980"
+sleep 3
+
+clean
 
 exit
