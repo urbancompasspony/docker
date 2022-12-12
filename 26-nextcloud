@@ -100,7 +100,7 @@ function menu {
   VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Cuidado: var2 /data! Aponte um diretório acima." 12 40 0 \
 "Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
 "Nxt Data:" 2 1 "$VALUE2" 2 10 40 0 \
-"URL WAN :" 3 1 "$VALUE3" 3 15 40 0 \
+"URL WAN :" 3 1 "$VALUE3" 3 10 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
