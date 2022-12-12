@@ -169,6 +169,13 @@ docker exec -it nextcloud bash certbot --apache -d "$var3" -m josehumbertoferrei
 
 docker restart nextcloud
 
+# AutoSet Crontab:
+sudo crontab -l > /tmp/crontab
+echo "# AutoRenew and Nextcloud Maintenance" | sudo tee -a /tmp/crontab
+echo "*/5 * * * * docker exec -t -u www-data nextcloud php -f /var/www/html/cron.php" | sudo tee -a /tmp/crontab
+echo "00 01 01 * * docker exec nextcloud certbot --apache renew" | sudo tee -a /tmp/crontab
+sudo crontab /tmp/crontab
+
 clean
 
 exit
