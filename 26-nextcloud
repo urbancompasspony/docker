@@ -139,6 +139,7 @@ docker run -d \
 --no-healthcheck \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
+-v /srv/containers/"$NOMECONTAINER"/app:/var/www/html/app \
 -v "$var2"/data:/var/www/html/data \
 nextcloud:"$nv"
 }
