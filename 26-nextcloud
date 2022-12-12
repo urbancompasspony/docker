@@ -95,7 +95,7 @@ function checkB {
 function menu {
   export var1; export var2; export var3
 
-  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"
+  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3=""
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Cuidado: var2 /data! Aponte um diretório acima." 12 40 0 \
 "Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
