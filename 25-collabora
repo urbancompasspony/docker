@@ -109,9 +109,11 @@ checkB
 sleep 5
 
 echo "Testing Server Connection:"
-curl -k http://$var1:9980
-curl -k https://$var1:9980
-
+echo " "
+docker exec $NOMECONTAINER curl -k http://$var1:9980
+echo " "
+docker exec $NOMECONTAINER curl -k https://$var1:9980
+echo " "
 sleep 3
 
 clean
