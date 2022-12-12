@@ -95,9 +95,9 @@ function checkB {
 function menu {
   export var1; export var2; export var3
 
-  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3=""
+  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="cloud.my-website.com"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Cuidado: var2 /data! Aponte um diretório acima." 12 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Em NxtData: VAR/data! Defina 1 diretório abaixo sem /." 12 40 0 \
 "Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
 "Nxt Data:" 2 1 "$VALUE2" 2 10 40 0 \
 "URL WAN :" 3 1 "$VALUE3" 3 10 50 0 \
@@ -168,13 +168,6 @@ docker exec -it nextcloud bash certbot --apache -d "$var3" -m josehumbertoferrei
 # certbot --apache -d seu-site.com
 
 docker restart nextcloud
-
-echo "Configure o Let's Encrypt dentro do Container!"
-sleep 3
-
-# For Troubleshooting Only:
-#-v /srv/containers/"$NOMECONTAINER"/nextcloud:/var/www/html \
-#-v /srv/containers/"$NOMECONTAINER"/apps:/var/www/html/apps \
 
 clean
 
