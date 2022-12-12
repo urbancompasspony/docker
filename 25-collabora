@@ -108,13 +108,16 @@ checkB
 
 sleep 5
 
-echo "Testing Server Connection:"
-echo " "
+echo "============================"
+echo "# # # Testing HTTP :80 # # #"
+echo "============================"
 docker exec $NOMECONTAINER curl -k http://$var1:9980
 echo " "
+echo "=============================="
+echo "# # # Testing HTTPS :443 # # #"
+echo "============================="
 docker exec $NOMECONTAINER curl -k https://$var1:9980
 echo " "
-sleep 3
 
 clean
 
