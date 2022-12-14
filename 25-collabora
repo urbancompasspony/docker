@@ -91,6 +91,7 @@ docker run -d \
 -p 9980:9980 \
 -e username="admin" \
 -e password="P4ssw0rd" \
+-e "extra_params=--o:ssl.enable=false --o:ssl.termination=false" \
 -v /etc/localtime:/etc/localtime:ro \
 collabora/code
 }
