@@ -1,0 +1,21 @@
+#!/bin/bash
+
+docker run -d \
+-h samba02 \
+--ip 172.20.0.2 \
+--name samba02 \
+--privileged \
+--dns 127.0.0.1 \
+--dns 1.1.1.1 \
+--restart=unless-stopped \
+--no-healthcheck \
+-v /etc/localtime:/etc/localtime:ro \
+--network macvlan \
+-v /srv/containers/samba02/etc:/etc \
+-v /srv/containers/samba02/cache/samba:/var/cache/samba \
+-v /srv/containers/samba02/lib/samba:/var/lib/samba \
+-v /srv/containers/samba02/log:/var/log \
+-v /srv/containers/samba02/run/samba:/run/samba \
+-v /mnt/disk03:/mnt/disk03 \
+-v /mnt/disk06:/mnt/disk06 \
+urbancompasspony/migrate-samba
