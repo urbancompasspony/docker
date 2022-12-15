@@ -159,15 +159,18 @@ docker exec nextcloud apt update
 docker exec nextcloud apt install smbclient nano -y
 docker exec nextcloud apt install certbot python3-certbot-apache -y
 
-# Generate a new SSL certificate!
-docker exec -it nextcloud bash certbot --apache -d "$var3" -m josehumbertoferreirajunior@gmail.com --agree-tos
-
 # Manually:
 # Inside container creating a Let's Encrypt SSL:
 # docker exec -it nextcloud bash
 # certbot --apache -d seu-site.com
 
 docker restart nextcloud
+
+echo "Copy and Run this:"
+echo " "
+echo "docker exec -it nextcloud bash certbot --apache -d $var3 -m josehumbertoferreirajunior@gmail.com --agree-tos"
+echo " "
+sleep 10
 
 # AutoSet Crontab:
 sudo crontab -l > /tmp/crontab
