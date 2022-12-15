@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# To use on Website directly!
+
+# To use inside Nextcloud, do not use this container;
+# Instead, install "onlyoffice connector" and "community office server" apps.
