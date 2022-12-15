@@ -140,8 +140,4 @@ checkA
 menu
 clean
 
-echo " "
-echo "Samba Default Share on $var1/shared with user and password ubuntu!"
-echo " "
-
-exit
+exit 1
