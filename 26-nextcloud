@@ -21,7 +21,7 @@ nv="25"
 # Inside Container:
 
 # docker exec -it nextcloud bash
-# php occ maintenance:theme:update
+# php occ maintenance:theme:update ((???))
 
 # SET MAINTENANCE OFF!
 
