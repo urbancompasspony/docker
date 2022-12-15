@@ -116,7 +116,7 @@ docker run -d \
 --no-healthcheck \
 -v /etc/localtime:/etc/localtime:ro \
 --network $NETWORKLAN \
--v /srv/containers/"$var2"/etc/samba:/etc/samba \
+-v /srv/containers/"$var2"/etc/:/etc/ \
 -v /srv/containers/"$var2"/cache/samba:/var/cache/samba \
 -v /srv/containers/"$var2"/lib/samba:/var/lib/samba \
 -v /srv/containers/"$var2"/log/samba:/var/log/samba \
