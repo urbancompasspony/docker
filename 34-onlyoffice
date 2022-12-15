@@ -5,8 +5,6 @@
 # To use inside Nextcloud, do not use this container;
 # Instead, install "onlyoffice connector" and "community office server" apps.
 
-#!/bin/bash
-
 # Global config for replication:
 export NOMECONTAINER="onlyoffice"
 
