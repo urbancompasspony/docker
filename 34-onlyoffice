@@ -101,13 +101,13 @@ onlyoffice/documentserver
 }
 
 # Get Random Secret:
-# sudo docker exec 613dfd491844 /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string'
+# sudo docker exec onlyoffice /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string'
 
 # Test integrated editor:
-# sudo docker exec 613dfd491844 sudo supervisorctl start ds:example
+# sudo docker exec onlyoffice sudo supervisorctl start ds:example
 
 # AutoStart:
-# sudo docker exec 613dfd491844 sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisor/conf.d/ds-example.conf
+# sudo docker exec onlyoffice sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisor/conf.d/ds-example.conf
 
 function clean {
   unset var1
