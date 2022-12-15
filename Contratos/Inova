@@ -1,0 +1,18 @@
+docker run -d \
+-h inova \
+--ip 172.20.0.32 \
+--name inova \
+--privileged \
+--dns=1.1.1.1 \
+--dns=127.0.0.1 \
+--restart=unless-stopped \
+-v /etc/localtime:/etc/localtime:ro \
+--network macvlan \
+--no-healthcheck \
+-v /srv/containers/inova/cache/samba:/var/cache/samba \
+-v /srv/containers/inova/lib/samba:/var/lib/samba \
+-v /srv/containers/inova/log:/var/log \
+-v /srv/containers/inova/run/samba:/run/samba \
+-v /srv/containers/inova/etc:/etc \
+-v /mnt/disk051:/mnt/disk051 \
+urbancompasspony/migrate-samba
