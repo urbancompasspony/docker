@@ -73,7 +73,7 @@ function menu {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
-    create
+    checkC
     }
 }
 
@@ -81,7 +81,7 @@ function checkC {
   #IPMachine=$(hostname -I | awk '{print $1}')
   MyIP=$(cat /srv/containers/Scripts/MyIP)
   [ "$MyIP" = "$var1" ||  ] && {
-    dialog --title "ERRO" --msgbox "Conflito com o IP local! \nMude para outro IP." 6 40
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
     menu
   } || {
     create
@@ -136,4 +136,4 @@ checkA
 checkB
 clean
 
-exit
+exit 1
