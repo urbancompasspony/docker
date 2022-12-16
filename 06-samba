@@ -61,9 +61,9 @@ function checkB {
         [ $(docker stop "$var2") ] && {
           docker rm "$var2"
 
-          create
+          checkC
         } || {
-          create
+          checkC
         }
         
       } || {
