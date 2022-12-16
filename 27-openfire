@@ -36,9 +36,9 @@ function checkB {
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
 
-          create
+          checkC
         } || {
-          create
+          checkC
         }
         
       } || {
