@@ -77,6 +77,17 @@ function menu {
     }
 }
 
+function checkC {
+  #IPMachine=$(hostname -I | awk '{print $1}')
+  MyIP=$(cat /srv/containers/Scripts/MyIP)
+  [ "$MyIP" = "$var1" ||  ] && {
+    dialog --title "ERRO" --msgbox "Conflito com o IP local! \nMude para outro IP." 6 40
+    menu
+  } || {
+    create
+  }
+}
+
 function create {
   export var1; export var2
   
