@@ -143,6 +143,14 @@ lancachenet/lancache-dns:latest
 -v "$var4"/data:/data/cache \
 -v /srv/containers/"$NOMECONTAINER"/logs:/data/logs \
 lancachenet/monolithic:latest
+
+# docker run -d \
+# --name=sniproxy \
+# --no-healthcheck \
+# --restart unless-stopped \
+# -p 443:443 \
+# lancachenet/sniproxy:latest
+
 }
 
 function clean {
