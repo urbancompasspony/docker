@@ -157,4 +157,4 @@ checkA
 checkB
 clean
 
-exit
+exit 1
