@@ -111,10 +111,14 @@ function create {
   export var1; export var2; export var3
   
   mkdir -p /srv/containers/"$var2"
+  mkdir -p /srv/containers/"$NOMECONTAINER"/log
+  
   touch /srv/containers/"$var2"/Information
   echo "$var1" > /srv/containers/"$var2"/Information
   echo "$var2" >> /srv/containers/"$var2"/Information
   echo "$var3" >> /srv/containers/"$var2"/Information
+  
+  touch /srv/containers/"$NOMECONTAINER"/log/syslog
   
 docker run -d \
 -h $var2 \
@@ -132,6 +136,7 @@ docker run -d \
 -v /srv/containers/"$var2"/lib/samba:/var/lib/samba \
 -v /srv/containers/"$var2"/log/samba:/var/log/samba \
 -v /srv/containers/"$var2"/run/samba:/run/samba \
+-v /srv/containers/"$NOMECONTAINER"/log/syslog:/var/log/syslog \
 $var3 \
 $REPOSITORY
 
