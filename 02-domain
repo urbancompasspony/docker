@@ -192,11 +192,7 @@ clean
 # Some adjusts after install:
 
 # Remove loop network from smb.conf:
-docker exec $NOMECONTAINER bash -c "sed '/127.0.0/d' /etc/samba/smb.conf"
-
-# Adjusting /syslog and /sysvol permissions:
-docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
-docker exec $NOMECONTAINER chmod 777 -R /var/lib/samba/sysvol
+#docker exec $NOMECONTAINER bash -c "sed '/127.0.0/d' /etc/samba/smb.conf"
 
 # Installing curl less and dialog:
 docker exec $NOMECONTAINER bash -c "apt update"
@@ -207,6 +203,12 @@ docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urban
 docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
+
+docker restart $NOMECONTAINER
+
+# Adjusting /syslog and /sysvol permissions:
+docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
+docker exec $NOMECONTAINER chmod 777 -R /var/lib/samba/sysvol
 
 # Finish
 docker restart $NOMECONTAINER
