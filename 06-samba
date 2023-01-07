@@ -21,14 +21,14 @@ function menu {
   VALUE1=""; VALUE2="samba"; VALUE3="-v /mnt:/mnt"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "New Samba Share" 10 40 0 \
-"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
-"Shr Name:" 2 1 "$VALUE2" 2 10 20 0 \
+"Shr Name:" 1 1 "$VALUE2" 1 10 20 0 \
+"Local IP: " 2 1 "$VALUE1" 2 10 20 0 \
 "MNT Path:" 3 1 "$VALUE3" 3 10 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
-  var1=$(echo "$VALUE0" | sed -n 1p)
-  var2=$(echo "$VALUE0" | sed -n 2p)
+  var1=$(echo "$VALUE0" | sed -n 2p)
+  var2=$(echo "$VALUE0" | sed -n 1p)
   var3=$(echo "$VALUE0" | sed -n 3p)
   
   [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] && {
@@ -111,14 +111,14 @@ function create {
   export var1; export var2; export var3
   
   mkdir -p /srv/containers/"$var2"
-  mkdir -p /srv/containers/"$NOMECONTAINER"/log
+  mkdir -p /srv/containers/"$var2"/log
   
   touch /srv/containers/"$var2"/Information
   echo "$var1" > /srv/containers/"$var2"/Information
   echo "$var2" >> /srv/containers/"$var2"/Information
   echo "$var3" >> /srv/containers/"$var2"/Information
   
-  touch /srv/containers/"$NOMECONTAINER"/log/syslog
+  touch /srv/containers/"$var2"/log/syslog
   
 docker run -d \
 -h $var2 \
@@ -136,7 +136,7 @@ docker run -d \
 -v /srv/containers/"$var2"/lib/samba:/var/lib/samba \
 -v /srv/containers/"$var2"/log/samba:/var/log/samba \
 -v /srv/containers/"$var2"/run/samba:/run/samba \
--v /srv/containers/"$NOMECONTAINER"/log/syslog:/var/log/syslog \
+-v /srv/containers/"$var2"/log/syslog:/var/log/syslog \
 $var3 \
 $REPOSITORY
 
