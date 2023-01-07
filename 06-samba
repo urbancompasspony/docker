@@ -18,7 +18,7 @@ NETWORKLAN="macvlan"
 function menu {
   export var1; export var2; export var3
 
-  VALUE1=""; VALUE2="samba"; VALUE3="-v /mnt:/mnt"
+  VALUE2="samba-share"; VALUE1="0.0.0.0"; VALUE3="-v /mnt:/mnt"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "New Samba Share" 10 40 0 \
 "Shr Name:" 1 1 "$VALUE2" 1 10 20 0 \
