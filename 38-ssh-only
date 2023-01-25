@@ -104,7 +104,7 @@ docker run -d \
   --add-host=host.docker.internal:host-gateway \
   -v /etc/localtime:/etc/localtime:ro \
   ubuntu:22.04 \
-    tail -f /dev/null; service ssh start
+    tail -f /dev/null && service ssh start &
 
   docker exec "$NOMECONTAINER" bash -c "apt update"
   docker exec "$NOMECONTAINER" bash -c "apt install openssh-server --no-install-recommends -y"
@@ -121,7 +121,5 @@ function clean {
 checkA
 checkB
 clean
-
-docker exec 
 
 exit 1
