@@ -102,11 +102,12 @@ function checkB {
 function menu {
   export var1; export var2; export var3; export var4; export checkversion
 
-  [ -f "/srv/containers/$NOMECONTAINER/Information" ] &&
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
     VALUE2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
     VALUE3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
     VALUE4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+    
     checkversion="$VALUE4"
   } || {
     VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="cloud.my-website.com"; VALUE4="latest"
@@ -178,6 +179,7 @@ function clean {
   unset var2
   unset var3
   unset var4
+  unset checkversion
 }
 
 # Start
