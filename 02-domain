@@ -75,7 +75,17 @@ function checkB {
 function menu {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7
 
-  VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5="$HOSTNAME"; VALUE6="macvlan"; VALUE7="-v /mnt:/mnt"
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
+  } || {
+    VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5="$HOSTNAME"; VALUE6="macvlan"; VALUE7="-v /mnt:/mnt"
+  }
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
 "F.Q.D.N.: " 1 1 "$VALUE1" 1 10 34 0 \
