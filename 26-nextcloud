@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Nextcloud Version!
+export var4
+var4="25"
+
 #############################################################################################################
 
 # Some notes:
@@ -47,9 +51,6 @@ export var2
 
 # URL
 export var3
-
-# Nextcloud Version!
-export var4
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -110,7 +111,7 @@ function menu {
     
     checkversion="$VALUE4"
   } || {
-    VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="cloud.my-website.com"; VALUE4="latest"
+    VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="cloud.my-website.com"; VALUE4="$var4"
   }
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Campo NxtData: VAR/data autopreenchido! \nDefina 1 diretório abaixo e sem /." 13 40 0 \
@@ -147,9 +148,7 @@ function checkC {
 
 function create {
   export var1; export var2; export var3
-  
-  docker pull nextcloud:"$var4"
-  
+   
   mkdir -p /srv/containers/"$NOMECONTAINER"
   mkdir -p "$var2"
 
@@ -185,8 +184,6 @@ function clean {
 # Start
 checkA
 checkB
-
-docker image rm "$checkversion"
 
 docker network connect bridge $NOMECONTAINER
 
