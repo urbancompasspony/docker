@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Nextcloud Version!
-nv="25"
-
 #############################################################################################################
 
 # Some notes:
@@ -43,7 +40,16 @@ nv="25"
 export NOMECONTAINER="nextcloud"
 
 # IP FIXO DO NOVO CONTAINER
-export var1; export var2; export var3
+export var1
+
+# LOCAL DATA
+export var2
+
+# URL
+export var3
+
+# Nextcloud Version!
+export var4
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -53,7 +59,7 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2; export var3
+  export var1; export var2; export var3; export var4
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
@@ -63,6 +69,7 @@ function checkB {
         var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
         var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
         var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+        var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
 
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
@@ -93,22 +100,32 @@ function checkB {
 }
 
 function menu {
-  export var1; export var2; export var3
+  export var1; export var2; export var3; export var4; export checkversion
 
-  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="cloud.my-website.com"
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] &&
+    VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+    checkversion="$VALUE4"
+  } || {
+    VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="cloud.my-website.com"; VALUE4="latest"
+  }
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Campo NxtData: VAR/data autopreenchido! \nDefina 1 diretório abaixo e sem /." 12 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Campo NxtData: VAR/data autopreenchido! \nDefina 1 diretório abaixo e sem /." 13 40 0 \
 "Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
 "Nxt Data:" 2 1 "$VALUE2" 2 10 40 0 \
 "URL WAN :" 3 1 "$VALUE3" 3 10 50 0 \
+"Version :" 4 1 "$VALUE4" 4 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
   var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
 
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -129,7 +146,9 @@ function checkC {
 
 function create {
   export var1; export var2; export var3
-
+  
+  docker pull nextcloud:"$var4"
+  
   mkdir -p /srv/containers/"$NOMECONTAINER"
   mkdir -p "$var2"
 
@@ -137,6 +156,7 @@ function create {
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
 
 docker run -d \
 --name=$NOMECONTAINER \
@@ -150,18 +170,21 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
 -v "$var2"/data:/var/www/html/data \
-nextcloud:"$nv"
+nextcloud:"$var4"
 }
 
 function clean {
   unset var1
   unset var2
   unset var3
+  unset var4
 }
 
 # Start
 checkA
 checkB
+
+docker image rm "$checkversion"
 
 docker network connect bridge $NOMECONTAINER
 
