@@ -59,7 +59,11 @@ function checkB {
 function menu {
   export var1
 
-  VALUE1=""
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+  } || {
+    VALUE1=""
+  }
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "" 8 40 0 \
 "Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
