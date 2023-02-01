@@ -12,9 +12,6 @@ function checkA {
     exit
     }
 }
-   create
-    }
-}
 
 function checkB {
   export var1; export var2
