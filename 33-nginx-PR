@@ -5,8 +5,6 @@ export NOMECONTAINER="nginx-rproxy"
 
 # IP FIXO DO NOVO CONTAINER
 export var1
-# SENHA PARA O PIHOLE
-export var2
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -16,7 +14,7 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2
+  export var1
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
@@ -24,7 +22,6 @@ function checkB {
     dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
       [ $? = 0 ] && {
         var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
         
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
@@ -56,25 +53,22 @@ function checkB {
 }
 
 function menu {
-  export var1; export var2
+  export var1
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-    VALUE2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
   } || {
-    VALUE1=""; VALUE2=""
+    VALUE1=""
   }
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
-"Web Pass:" 2 1 "$VALUE2" 2 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
   var1=$(echo "$VALUE0" | sed -n 1p)
-  var2=$(echo "$VALUE0" | sed -n 2p)
   
-  [ -z "$var1" ] || [ -z "$var2" ] && {
+  [ -z "$var1" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -94,46 +88,30 @@ function checkC {
 }
 
 function create {
-  export var1; export var2
+  export var1
   
   mkdir -p /srv/containers/"$NOMECONTAINER"
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
 
-  docker run -d \
---name=$NOMECONTAINER \
---network macvlan \
---ip=$var1 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=pi.hole \
---no-healthcheck \
--e SERVERIP=$var1 \
--e WEBPASSWORD=$var2 \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
--v /srv/containers/"$NOMECONTAINER"/dnsmasq.d/:/etc/dnsmasq.d \
--p 80:80 \
--p 443:443 \
--p 67:67/tcp \
--p 67:67/udp \
--p 53:53/tcp \
--p 53:53/udp \
---restart=unless-stopped \
-pihole/pihole:latest
+mkdir -p /srv/containers/"$NOMECONTAINER"
 
-  docker start "$NOMECONTAINER"
-  docker exec "$NOMECONTAINER" rm /etc/pihole/pihole-FTL.conf
-  docker exec "$NOMECONTAINER" touch /etc/pihole/pihole-FTL.conf
-  docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
-  docker exec "$NOMECONTAINER" bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
-  docker restart "$NOMECONTAINER"
-}
+docker run -d \
+  --name=$NOMECONTAINER \
+  --network macvlan \
+  --ip=$var1 \
+  --dns=1.1.1.1  \
+  --dns=127.0.0.1 \
+  --no-healthcheck \
+  --restart unless-stopped \
+  -p 80:80 \
+  -v /etc/localtime:/etc/localtime:ro \
+  -v /var/run/docker.sock:/tmp/docker.sock:ro \
+  jwilder/nginx-proxy
+  }
 
 function clean {
   unset var1
-  unset var2
 }
 
 # Start
