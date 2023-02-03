@@ -201,4 +201,4 @@ sudo crontab /tmp/crontab
 
 clean
 
-exit
+exit 1
