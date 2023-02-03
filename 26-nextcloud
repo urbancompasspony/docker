@@ -149,6 +149,8 @@ docker run -d \
 --hostname=nextcloud \
 --restart=unless-stopped \
 --no-healthcheck \
+-p 80:80 \
+-p 443:443 \
 -e VIRTUAL_HOST="$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
