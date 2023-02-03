@@ -105,6 +105,7 @@ docker run -d \
   --no-healthcheck \
   --restart unless-stopped \
   -p 80:80 \
+  -p 443:443 \
   -v /etc/localtime:/etc/localtime:ro \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
   jwilder/nginx-proxy
