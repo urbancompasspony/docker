@@ -74,7 +74,7 @@ function menu {
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 13 40 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
 "Cont. N.: " 2 1 "$VALUE2" 2 10 20 0 \
-"DynDNS  : " 3 1 "$VALUE3" 3 15 20 0 \
+"DynDNS  : " 3 1 "$VALUE3" 3 10 20 0 \
 "Port    : " 4 1 "$VALUE4" 4 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
