@@ -136,6 +136,8 @@ function clean {
   unset var4
 }
 
+#docker network connect bridge $NOMECONTAINER
+
 # Start
 checkA
 checkB
