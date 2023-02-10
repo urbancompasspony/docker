@@ -113,7 +113,7 @@ docker run -d \
   -p 21116:21116/udp \
   -p 21118:21118 \
   rustdesk/rustdesk-server \
-  hbbs -r "$var2"
+  hbbs -r "$var2" -k _
 
 docker run -d \
   --name="hbbr" \
@@ -129,7 +129,7 @@ docker run -d \
   -p 21117:21117 \
   -p 21119:21119 \
   rustdesk/rustdesk-server \
-  hbbr
+  hbbr -k _
   }
 
 # Start
