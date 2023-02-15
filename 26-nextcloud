@@ -184,7 +184,8 @@ docker exec nextcloud apt install certbot python3-certbot-apache -y
 
 docker restart nextcloud
 
-echo "Copy and Run this line per line:"
+echo " "
+echo "If you are NOT over a Proxy or Reverse Proxy, run this line by line:"
 echo " "
 echo "docker exec -it nextcloud bash"
 echo "certbot --apache -d $var3 -m josehumbertoferreirajunior@gmail.com --agree-tos"
