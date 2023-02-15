@@ -66,7 +66,7 @@ function menu {
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
 "HBBS IP: " 1 1 "$VALUE1" 1 10 20 0 \
 "HBBR IP: " 2 1 "$VALUE2" 2 10 20 0 \
-"Dyn DNS: " 3 1 "$VALUE3" 3 50 20 0 \
+"Dyn DNS: " 3 1 "$VALUE3" 3 10 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
