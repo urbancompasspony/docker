@@ -6,6 +6,8 @@ NOMECONTAINER="RustDesk"
 export var1
 # IP FIXO DO hbbr
 export var2
+# Endereço Web do Servidor
+export var3
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -15,7 +17,7 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2
+  export var1; export var2; export var3
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer os containers?" 6 40
@@ -24,6 +26,7 @@ function checkB {
       [ $? = 0 ] && {
           var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
           var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+          var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
 
           docker stop hbbs
           docker stop hbbr
@@ -56,20 +59,22 @@ function checkB {
 }
 
 function menu {
-  export var1; export var2
+  export var1; export var2; export var3
 
-  VALUE1=""; VALUE2=""
+  VALUE1=""; VALUE2=""; VALUE3=""
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
 "HBBS IP: " 1 1 "$VALUE1" 1 10 20 0 \
 "HBBR IP: " 2 1 "$VALUE2" 2 10 20 0 \
+"Dyn DNS: " 3 1 "$VALUE3" 3 50 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
   
-  [ -z "$var1" ] || [ -z "$var2" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -89,13 +94,14 @@ function checkC {
 }
 
 function create {
-  export var1; export var2
+  export var1; export var2; export var3
   
   mkdir -p /srv/containers/"$NOMECONTAINER"/HBBS
   mkdir -p /srv/containers/"$NOMECONTAINER"/HBBR
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
   
 docker run -d \
   --name="hbbs" \
@@ -113,7 +119,7 @@ docker run -d \
   -p 21116:21116/udp \
   -p 21118:21118 \
   rustdesk/rustdesk-server \
-  hbbs -r "$var2" -k _
+  hbbs -r "$var3" -k _
 
 docker run -d \
   --name="hbbr" \
@@ -139,11 +145,14 @@ checkB
 # Adjusting Keys!
 docker stop hbbs
 docker stop hbbr
+
 sudo rsync -a /srv/containers/"$NOMECONTAINER"/HBBS/ /srv/containers/"$NOMECONTAINER"/HBBR/
+
 docker start hbbr
 docker start hbbs
 
 unset var1
 unset var2
+unset var3
 
 exit 1
