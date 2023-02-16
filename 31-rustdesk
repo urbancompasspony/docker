@@ -139,7 +139,9 @@ checkB
 # Adjusting Keys!
 docker stop hbbs
 docker stop hbbr
+
 sudo rsync -a /srv/containers/"$NOMECONTAINER"/HBBS/ /srv/containers/"$NOMECONTAINER"/HBBR/
+
 docker start hbbr
 docker start hbbs
 
