@@ -130,6 +130,7 @@ function create {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7
   
   mkdir -p /srv/containers/"$NOMECONTAINER"/log
+  mkdir -p /srv/containers/"$NOMECONTAINER"/etc
   
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
@@ -141,6 +142,10 @@ function create {
   echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
 
   touch /srv/containers/"$NOMECONTAINER"/log/syslog
+  touch /srv/containers/"$NOMECONTAINER"/etc/chrony.conf
+  
+  echo "ntpsigndsocket /var/lib/samba/ntp_signd" | tee -a /srv/containers/"$NOMECONTAINER"/etc/chrony.conf
+  echo "restrict default mssntp" | tee -a /srv/containers/"$NOMECONTAINER"/etc/chrony.conf
 
 docker run -d \
 --name $NOMECONTAINER \
@@ -214,7 +219,11 @@ docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
 
+docker exec $NOMECONTAINER bash -c "chgrp ntp /var/lib/samba/ntp_signd"
+
 docker restart $NOMECONTAINER
+
+docker exec $NOMECONTAINER bash -c "ntpdate -bu pool.ntp.org"
 
 # Adjusting /syslog and /sysvol permissions:
 docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
