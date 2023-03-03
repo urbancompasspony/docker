@@ -28,7 +28,7 @@
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 
 	RewriteEngine on
-	RewriteCond %{SERVER_NAME} =www.cooperpago.com.br
+	RewriteCond %{SERVER_NAME} =www.WEBSITEHERE
 	RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 
 	ProxyPreserveHost On
