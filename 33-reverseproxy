@@ -124,7 +124,7 @@ checkB
 clean
 
 echo " "
-echo "Re-deploy existent certificates if re-running this script:"
+echo "Re-deploy ALL existent certificates if re-running this script:"
 echo "docker exec reverseproxy certbot install --cert-name myweb-site.com"
 echo " "
 echo "To generate NEW certificates:"
