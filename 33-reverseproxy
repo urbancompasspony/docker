@@ -124,14 +124,22 @@ checkB
 clean
 
 echo " "
-echo "Run this line by line:"
-echo " "
-echo "docker exec -it reverseproxy bash"
-echo "certbot --apache --non-interactive -m myemail@myprovider.com --agree-tos --domain myweb-site.com"
+echo "Re-deploy existent certificates if re-running this script:"
 echo "docker exec reverseproxy certbot install --cert-name myweb-site.com"
 echo " "
-echo "Get a Model here:"
-echo "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/model > model.conf"
+echo "To generate NEW certificates:"
+echo "docker exec reverseproxy certbot --apache --non-interactive -m myemail@myprovider.com --agree-tos --domain myweb-site.com"
+echo "docker exec reverseproxy certbot install --cert-name myweb-site.com"
 echo " "
+echo "Get a Model.conf for Proxy here:"
+echo "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/model > model.conf"
+echo "Use NANO inside container to set /sites-available/ and create a link to /sites-enabled/"
+echo "docker exec -it reverseproxy bash"
+echo "Restart container to validate"
+echo " "
+echo "Force Renew:"
+echo "certbot --apache renew"
+echo "Container has his own renew script, but use this crontab on Host if needed:"
+echo "* * 01 * * docker exec reverseproxy certbot --apache renew"
 
 exit 1
