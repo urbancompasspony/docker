@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Global config for replication:
-export NOMECONTAINER="nginx-rproxy"
+export NOMECONTAINER="reverseproxy"
 
 # IP FIXO DO NOVO CONTAINER
 export var1
@@ -90,12 +90,11 @@ function checkC {
 function create {
   export var1
   
-  mkdir -p /srv/containers/"$NOMECONTAINER"/nginx
+  mkdir -p /srv/containers/"$NOMECONTAINER"/apache2
+  mkdir -p /srv/containers/"$NOMECONTAINER"/certbot
   
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-
-mkdir -p /srv/containers/"$NOMECONTAINER"
 
 docker run -d \
   --name=$NOMECONTAINER \
@@ -108,15 +107,15 @@ docker run -d \
   -p 80:80 \
   -p 443:443 \
   -v /etc/localtime:/etc/localtime:ro \
-  -v /var/run/docker.sock:/tmp/docker.sock:ro \
-  jwilder/nginx-proxy
+  -v /srv/containers/"$NOMECONTAINER"/apache2:/etc/apache2/sites-available \
+  -v /srv/containers/"$NOMECONTAINER"/apache2:/etc/apache2/sites-enabled \
+  -v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt/keys \
+  urbancompasspony/reverseproxy:latest
   }
 
 function clean {
   unset var1
 }
-
-#docker network connect bridge $NOMECONTAINER
 
 # Start
 checkA
