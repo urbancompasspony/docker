@@ -90,7 +90,8 @@ function checkC {
 function create {
   export var1
   
-  mkdir -p /srv/containers/"$NOMECONTAINER"/apache2
+  mkdir -p /srv/containers/"$NOMECONTAINER"/apache2/sites-available
+  mkdir -p /srv/containers/"$NOMECONTAINER"/apache2/sites-enabled
   mkdir -p /srv/containers/"$NOMECONTAINER"/certbot
   
   touch /srv/containers/"$NOMECONTAINER"/Information
@@ -107,8 +108,8 @@ docker run -d \
   -p 80:80 \
   -p 443:443 \
   -v /etc/localtime:/etc/localtime:ro \
-  -v /srv/containers/"$NOMECONTAINER"/apache2:/etc/apache2/sites-available \
-  -v /srv/containers/"$NOMECONTAINER"/apache2:/etc/apache2/sites-enabled \
+  -v /srv/containers/"$NOMECONTAINER"/apache2/sites-available:/etc/apache2/sites-available \
+  -v /srv/containers/"$NOMECONTAINER"/apache2/sites-enabled:/etc/apache2/sites-enabled \
   -v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt/keys \
   urbancompasspony/reverseproxy:latest
   }
