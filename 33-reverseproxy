@@ -123,4 +123,15 @@ checkA
 checkB
 clean
 
+echo " "
+echo "Run this line by line:"
+echo " "
+echo "docker exec -it reverseproxy bash"
+echo "certbot --apache --non-interactive -m myemail@myprovider.com --agree-tos --domain myweb-site.com"
+echo "docker exec reverseproxy certbot install --cert-name myweb-site.com"
+echo " "
+echo "Get a Model here:"
+echo "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/model > model.conf"
+echo " "
+
 exit 1
