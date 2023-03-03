@@ -1,0 +1,81 @@
+<VirtualHost *:80>
+	ServerName WEBSITEHERE
+
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/html
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	RewriteEngine on
+	RewriteCond %{SERVER_NAME} =WEBSITEHERE
+	RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+
+	ProxyPreserveHost On
+	ProxyPass / http://LOCALIP/ timeout=1800
+	ProxyPassReverse / http://LOCALIP/ timeout=1800
+
+  ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
+</VirtualHost>
+
+<VirtualHost *:80>
+	ServerName www.WEBSITEHERE
+
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/html
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	RewriteEngine on
+	RewriteCond %{SERVER_NAME} =www.cooperpago.com.br
+	RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+
+	ProxyPreserveHost On
+	ProxyPass / http://LOCALIP/ timeout=1800
+	ProxyPassReverse / http://LOCALIP/ timeout=1800
+
+	ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
+</VirtualHost>
+
+<IfModule mod_ssl.c>
+    <VirtualHost *:443>
+	ServerName WEBSITEHERE
+
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/html
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	Include /etc/letsencrypt/options-ssl-apache.conf
+	SSLCertificateFile /etc/letsencrypt/live/WEBSITEHERE/fullchain.pem
+	SSLCertificateKeyFile /etc/letsencrypt/live/WEBSITEHERE/privkey.pem
+
+	ProxyPreserveHost On
+	ProxyPass / http://LOCALIP/ timeout=1800
+	ProxyPassReverse / http://LOCALIP/ timeout=1800
+
+	ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
+    </VirtualHost>
+
+    <VirtualHost *:443>
+	ServerName www.WEBSITEHERE
+
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/html
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	Include /etc/letsencrypt/options-ssl-apache.conf
+	SSLCertificateFile /etc/letsencrypt/live/www.WEBSITEHERE/fullchain.pem
+	SSLCertificateKeyFile /etc/letsencrypt/live/www.WEBSITEHERE/privkey.pem
+
+	ProxyPreserveHost On
+	ProxyPass / http://LOCALIP/ timeout=1800
+	ProxyPassReverse / http://LOCALIP/ timeout=1800
+
+	ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
+    </VirtualHost>
+</IfModule>
