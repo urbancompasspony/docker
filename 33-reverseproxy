@@ -110,7 +110,7 @@ docker run -d \
   -v /etc/localtime:/etc/localtime:ro \
   -v /srv/containers/"$NOMECONTAINER"/apache2/sites-available:/etc/apache2/sites-available \
   -v /srv/containers/"$NOMECONTAINER"/apache2/sites-enabled:/etc/apache2/sites-enabled \
-  -v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt/keys \
+  -v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt/live \
   urbancompasspony/reverseproxy:latest
   }
 
