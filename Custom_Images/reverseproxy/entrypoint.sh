@@ -11,5 +11,8 @@ cron -f
 # Apache2
 /usr/sbin/apache2ctl start &
 
-# Block containers exit
+# CustomScript
+/script.sh &
+
+# Block from exit
 tail -f /dev/null
