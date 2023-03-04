@@ -124,7 +124,7 @@ checkB
 clean
 
 # Aways get a new Model.conf file for using on sites-available!
-curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/model | sudo tee /srv/containers/$NOMECONTAINER/apache2/sites-available/Model.conf
+curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/model | sudo tee /srv/containers/$NOMECONTAINER/apache2/sites-available/mysite.com.br.conf
 
 echo " "
 echo "To generate NEW certificates, first edit everything under sites-available then create a link to sites-enabled. So run:"
