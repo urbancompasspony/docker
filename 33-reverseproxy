@@ -128,7 +128,8 @@ curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_
 
 # Re-deploying all pre-configured certs:
 docker exec $NOMECONTAINER bash -c "ls /etc/letsencrypt/live/ > /tmp/listofkeys"
-docker exec $NOMECONTAINER bash -c "for i in $(cat /tmp/listofkeys); do certbot install --cert-name $i; done"
+command='bash -c "for i in $(cat /tmp/listofkeys); do certbot install --cert-name $i; done"'
+docker exec $NOMECONTAINER $command
 
 echo " "
 echo "To generate NEW certificates, first edit everything under sites-available then create a link to sites-enabled. So run:"
