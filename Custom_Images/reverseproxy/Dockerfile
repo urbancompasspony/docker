@@ -17,6 +17,7 @@ ENV APACHE_LOG_DIR="/var/log/apache2"
 # ADD BLOCK ####################################################################
 
 ADD entrypoint.sh /entrypoint.sh
+ADD script.sh /script.sh
 
 ################################################################################
 
@@ -44,11 +45,15 @@ RUN a2enmod proxy_html
 RUN chmod +x /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
+RUN chmod +x /script.sh
+RUN chmod 755 /script.sh
+
 ################################################################################
 
 # CMD BLOCK ####################################################################
 
+ENTRYPOINT ["/entrypoint.sh"]
+
 CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
-ENTRYPOINT /entrypoint.sh
 
 # End
