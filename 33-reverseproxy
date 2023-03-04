@@ -123,23 +123,26 @@ checkA
 checkB
 clean
 
-echo " "
-echo "Re-deploy ALL existent certificates if re-running this script:"
-echo "docker exec reverseproxy certbot install --cert-name myweb-site.com"
+# Aways get a new Model.conf file for sites-available!
+curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/model | sudo tee /srv/containers/$NOMECONTAINER/apache2/sites-available/Model.conf
+
+# Re-deploy all pre-configured certs:
+#docker exec $NOMECONTAINER bash -c "ls /etc/letsencrypt/live/ > /tmp/listofkeys"
+#docker exec $NOMECONTAINER bash -c "certbot install --cert-name $(for i in /tmp/listofkeys; do)"
+
 echo " "
 echo "To generate NEW certificates:"
-echo "docker exec reverseproxy certbot --apache --non-interactive -m myemail@myprovider.com --agree-tos --domain myweb-site.com"
-echo "docker exec reverseproxy certbot install --cert-name myweb-site.com"
+echo "docker exec $NOMECONTAINER certbot --apache --non-interactive -m myemail@myprovider.com --agree-tos --domain mywebsite.com"
+echo "docker exec $NOMECONTAINER certbot install --cert-name myweb-site.com"
+echo "If needed create another SSL for www. too!"
 echo " "
-echo "Get a Model.conf for Proxy here:"
-echo "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/model > model.conf"
 echo "Use NANO inside container to set /sites-available/ and create a link to /sites-enabled/"
-echo "docker exec -it reverseproxy bash"
-echo "Restart container to validate"
+echo "docker exec -it $NOMECONTAINER bash"
+echo "Restart container to validate if needed!"
 echo " "
-echo "Force Renew:"
-echo "certbot --apache renew"
-echo "Container has his own renew script, but use this crontab on Host if needed:"
-echo "* * 01 * * docker exec reverseproxy certbot --apache renew"
+echo "Manually Force Renew ALL:"
+echo "docker exec -it $NOMECONTAINER certbot --apache renew"
+echo "Container has auto renew script, but use this crontab on Host if needed:"
+echo "* * 01 * * docker exec $NOMECONTAINER certbot --apache renew"
 
 exit 1
