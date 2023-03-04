@@ -9,7 +9,7 @@ crontab scheduler.txt
 cron -f
 
 # Apache2
-/usr/sbin/apache2ctl start &
+/usr/sbin/apachectl start &
 
 # CustomScript
 /script.sh &
