@@ -8,8 +8,8 @@ crontab scheduler.txt
 # Cron as a service
 cron -f
 
-# Apache2 (DEPRECATED)
-#/etc/init.d/apache2 start
+# Apache2
+/usr/sbin/apache2ctl start &
 
 # Block containers exit
 tail -f /dev/null
