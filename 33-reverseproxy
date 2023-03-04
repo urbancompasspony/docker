@@ -126,9 +126,6 @@ clean
 # Aways get a new Model.conf file for using on sites-available!
 curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/model | sudo tee /srv/containers/$NOMECONTAINER/apache2/sites-available/mysite.com.br.conf
 
-# Re deploy all certs
-docker exec $NOMECONTAINER bash -c "/script.sh"
-
 echo " "
 echo "To generate NEW certificates, first edit everything under sites-available then create a link to sites-enabled. So run:"
 echo "docker exec $NOMECONTAINER certbot --apache --non-interactive -m myemail@myprovider.com --agree-tos --domain mywebsite.com"
