@@ -54,6 +54,6 @@ RUN chmod 755 /script.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
 
 # End
