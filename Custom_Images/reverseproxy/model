@@ -49,7 +49,15 @@
 	# do not cache requests to the REST API
 	#<LocationMatch "^/api/v1/$">
 	#  CacheDisable on
-	#</LocationMatch>  
+	#</LocationMatch>
+	
+	<Location />
+		CacheEnable disk
+		CacheHeader on
+		CacheDefaultExpire 600
+		CacheMaxExpire 86400
+		CacheLastModifiedFactor 0.5
+	</Location>
 </VirtualHost>
 
 <VirtualHost *:80>
