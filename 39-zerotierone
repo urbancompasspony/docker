@@ -1,2 +1,0 @@
-
-docker run --name zerotierone --rm --cap-add NET_ADMIN --device /dev/net/tun zerotier/zerotier:latest mynetwork.local
