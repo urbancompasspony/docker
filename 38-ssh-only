@@ -1,3 +1,8 @@
+
+# CHECK HOW REVERSEPROXY CUSTOM IMAGE CONTAINER WAS MADE!
+# DO THE SAME HERE
+# WIP
+
 #!/bin/bash
 
 # Global config for replication:
