@@ -104,7 +104,9 @@ function configfiles {
   wget https://codeload.github.com/urbancompasspony/samba/zip/refs/heads/main -P /srv/containers/
   unzip -d /srv/containers/ /srv/containers/main
   rm /srv/containers/main
-  mv /srv/containers/samba-main /srv/containers/"$var2"
+  mv /srv/containers/samba-main /srv/containers/"$var2" &&
+  
+  rsync -va --ignore-existing /etc/ /srv/containers/"$var2"/etc/
 }
 
 function create {
