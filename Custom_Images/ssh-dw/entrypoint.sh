@@ -2,6 +2,8 @@
 
 # DWService
 /bin/sh /usr/share/dwagent/dw/native/dwagsvc run &
+sleep 10
+/bin/sh /usr/share/dwagent/dw/native/dwagsvc run
 
 # AutoMount
 /script.sh &
