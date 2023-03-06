@@ -1,8 +1,3 @@
-
-# CHECK HOW REVERSEPROXY CUSTOM IMAGE CONTAINER WAS MADE!
-# DO THE SAME HERE
-# WIP
-
 #!/bin/bash
 
 # Global config for replication:
@@ -110,40 +105,12 @@ docker run -d \
   --hostname=$NOMECONTAINER \
   --add-host=host.docker.internal:host-gateway \
   -v /etc/localtime:/etc/localtime:ro \
-  ubuntu:22.04 \
-    tail -f /dev/null
+  urbancompasspony/ssh-only:latest
 
-  docker exec "$NOMECONTAINER" bash -c "apt update"
-  docker exec "$NOMECONTAINER" bash -c "apt install openssh-server --no-install-recommends -y"
   docker exec "$NOMECONTAINER" bash -c "useradd ubuntu"
   docker exec "$NOMECONTAINER" bash -c "echo -ne 'ubuntu\nubuntu\n' | passwd ubuntu 1> /dev/null 2> /dev/null"
   docker exec "$NOMECONTAINER" bash -c "service ssh start"
-  
-  # container ssh-only will be image ssh-only!
-  docker rmi $NOMECONTAINER:latest
-  docker commit $NOMECONTAINER $NOMECONTAINER
-   
-  # now can remove container ssh-only
-  docker stop $NOMECONTAINER
-  docker rm $NOMECONTAINER
-  
-  # lets create a new container ssh-only from image ssh-only
-docker run -d --entrypoint /bin/bash \
-  --name=$NOMECONTAINER \
-  --network macvlan \
-  --ip=$var1 \
-  --dns=1.1.1.1  \
-  --dns=127.0.0.1 \
-  --no-healthcheck \
-  --restart unless-stopped \
-  --hostname=$NOMECONTAINER \
-  --add-host=host.docker.internal:host-gateway \
-  -v /etc/localtime:/etc/localtime:ro \
-  ssh-only \
-    service ssh start && sleep 14400
-  }
-  
-  # Will sleep for 4h!
+
 
 function clean {
   unset var1
