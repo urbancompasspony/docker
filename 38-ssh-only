@@ -109,8 +109,6 @@ docker run -d \
 
   docker exec "$NOMECONTAINER" bash -c "useradd ubuntu"
   docker exec "$NOMECONTAINER" bash -c "echo -ne 'ubuntu\nubuntu\n' | passwd ubuntu 1> /dev/null 2> /dev/null"
-  docker exec "$NOMECONTAINER" bash -c "service ssh start"
-
 
 function clean {
   unset var1
