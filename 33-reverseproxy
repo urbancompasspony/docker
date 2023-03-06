@@ -96,6 +96,14 @@ function create {
   mkdir -p /srv/containers/"$NOMECONTAINER"/cache
   
   touch /srv/containers/"$NOMECONTAINER"/Information
+  
+  [ -f "/srv/containers/"$NOMECONTAINER"/apache2/apache2.conf" ] && {
+    echo "An apache2.conf was found! Skipping download..."
+  } || {
+    echo "An apache2.conf was not found! Downloading a new one..."
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/apache2.conf | sudo tee /srv/containers/"$NOMECONTAINER"/apache2/apache2.conf
+  }
+  
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
 
 docker run -d \
@@ -109,6 +117,7 @@ docker run -d \
   -p 80:80 \
   -p 443:443 \
   -v /etc/localtime:/etc/localtime:ro \
+  -v /srv/containers/"$NOMECONTAINER"/apache2/apache2.conf:/etc/apache2/apache2.conf \
   -v /srv/containers/"$NOMECONTAINER"/apache2/sites-available:/etc/apache2/sites-available \
   -v /srv/containers/"$NOMECONTAINER"/apache2/sites-enabled:/etc/apache2/sites-enabled \
   -v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt \
