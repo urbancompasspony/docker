@@ -108,6 +108,7 @@ function create {
 
 docker run -d \
   --name=$NOMECONTAINER \
+  --hostname=$NOMECONTAINER \
   --network macvlan \
   --ip=$var1 \
   --dns=1.1.1.1  \
