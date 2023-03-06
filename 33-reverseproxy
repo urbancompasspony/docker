@@ -103,12 +103,25 @@ function create {
     echo "An apache2.conf was not found! Downloading a new one..."
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/apache2.conf | sudo tee /srv/containers/"$NOMECONTAINER"/apache2/apache2.conf
   }
-  
+
+  [ -f "/srv/containers/"$NOMECONTAINER"/apache2/mpm_event.conf" ] && {
+    echo "An mpm_event.conf was found! Skipping download..."
+  } || {
+    echo "An mpm_event.conf was not found! Downloading a new one..."
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/mpm_event.conf | sudo tee /srv/containers/"$NOMECONTAINER"/apache2/mpm_event.conf
+  }
+
+  [ -f "/srv/containers/"$NOMECONTAINER"/apache2/mpm_worker.conf" ] && {
+    echo "An mpm_worker.conf was found! Skipping download..."
+  } || {
+    echo "An mpm_worker.conf was not found! Downloading a new one..."
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/mpm_worker.conf | sudo tee /srv/containers/"$NOMECONTAINER"/apache2/mpm_worker.conf
+  }
+
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
 
 docker run -d \
   --name=$NOMECONTAINER \
-  --hostname=$NOMECONTAINER \
   --network macvlan \
   --ip=$var1 \
   --dns=1.1.1.1  \
@@ -118,6 +131,8 @@ docker run -d \
   -p 80:80 \
   -p 443:443 \
   -v /etc/localtime:/etc/localtime:ro \
+  -v /srv/containers/"$NOMECONTAINER"/apache2/mpm_event.conf:/etc/apache2/mods-available/mpm_event.conf \
+  -v /srv/containers/"$NOMECONTAINER"/apache2/mpm_worker.conf:/etc/apache2/mods-available/mpm_worker.conf \
   -v /srv/containers/"$NOMECONTAINER"/apache2/apache2.conf:/etc/apache2/apache2.conf \
   -v /srv/containers/"$NOMECONTAINER"/apache2/sites-available:/etc/apache2/sites-available \
   -v /srv/containers/"$NOMECONTAINER"/apache2/sites-enabled:/etc/apache2/sites-enabled \
