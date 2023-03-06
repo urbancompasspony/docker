@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ADD dwagent.sh /dwagent.sh
 ADD entrypoint.sh /entrypoint.sh
-ADD MountModel.sh /MountModel.sh
+ADD script.sh /script.sh
 
 ################################################################################
 # RUN BLOCK ####################################################################
@@ -31,6 +31,12 @@ RUN service ssh start
 
 RUN chmod +x /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
+
+RUN chmod +x /script.sh
+RUN chmod 755 /script.sh
+
+################################################################################
+# PORT BLOCK ###################################################################
 
 EXPOSE 22
 
