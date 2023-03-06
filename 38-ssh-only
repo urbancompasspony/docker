@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Global config for replication:
-export NOMECONTAINER="ssh-only"
-
-# IP FIXO DO NOVO CONTAINER
-export var1
+# NOME DO NOVO CONTAINER
+export NOMECONTAINER
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -14,14 +11,14 @@ function checkA {
 }
 
 function checkB {
-  export var1
+  export NOMECONTAINER
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
     [ $? = 0 ] && {
     dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
       [ $? = 0 ] && {
-        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        NOMECONTAINER=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
         
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
@@ -43,80 +40,74 @@ function checkB {
         
         rm -iR /srv/containers/"$NOMECONTAINER"
 
-        menu
+        create
         }
     } || {
       echo "A instalação local será mantida! Saindo..."
       exit
     }
   } || {
-    menu
+    create
     }
 }
 
 function menu {
-  export var1
+  export NOMECONTAINER
 
-  VALUE1=""
+  VALUE1="ssh-dw"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
-"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+"Set Name: " 1 1 "$VALUE1" 1 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
-  var1=$(echo "$VALUE0" | sed -n 1p)
+  NOMECONTAINER=$(echo "$VALUE0" | sed -n 1p)
   
-  [ -z "$var1" ] && {
+  [ -z "$NOMECONTAINER" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
-    checkC
+    create
     }
 }
 
-function checkC {
-  #IPMachine=$(hostname -I | awk '{print $1}')
-  MyIP=$(cat /srv/containers/scripts/myip)
-  [ "$MyIP" = "$var1" ] && {
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
-    menu
-  } || {
-    create
-  }
-}
-
 function create {
-  export var1
+  export NOMECONTAINER
   
-  mkdir -p /srv/containers/"$NOMECONTAINER"
+  mkdir -p /srv/containers/"$NOMECONTAINER"/dws
   touch /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$NOMECONTAINER" > /srv/containers/"$NOMECONTAINER"/Information
 
 mkdir -p /srv/containers/"$NOMECONTAINER"
 
 docker run -d \
   --name=$NOMECONTAINER \
-  --network macvlan \
-  --ip=$var1 \
-  --dns=1.1.1.1  \
-  --dns=127.0.0.1 \
+  --network host \
   --no-healthcheck \
   --restart unless-stopped \
   --hostname=$NOMECONTAINER \
   --add-host=host.docker.internal:host-gateway \
   -v /etc/localtime:/etc/localtime:ro \
-  urbancompasspony/ssh-only:latest
+  -v /srv/containers/"$NOMECONTAINER"/dwservice:/usr/share/dwagent \
+  urbancompasspony/ssh-dw:latest
+}
 
-  docker exec "$NOMECONTAINER" bash -c "useradd ubuntu"
-  docker exec "$NOMECONTAINER" bash -c "echo -ne 'ubuntu\nubuntu\n' | passwd ubuntu 1> /dev/null 2> /dev/null"
+docker exec $NOMECONTAINER bash -c "mkdir /run/sshd"
+docker restart $NOMECONTAINER
+docker exec $NOMECONTAINER bash -c "useradd ubuntu"
+docker exec $NOMECONTAINER bash -c "echo -ne 'ubuntu\nubuntu\n' | passwd ubuntu 1> /dev/null 2> /dev/null"
 
 function clean {
-  unset var1
+  unset NOMECONTAINER
 }
 
 # Start
 checkA
 checkB
 clean
+
+echo " "
+echo "When running DWService.sh for the first time, set destination dir on /usr/share/dwagent/dw!"
+echo " "
 
 exit 1
