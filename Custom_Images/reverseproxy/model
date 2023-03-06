@@ -15,7 +15,41 @@
 	ProxyPass / http://LOCALIP/ timeout=1800
 	ProxyPassReverse / http://LOCALIP/ timeout=1800
 
-  ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
+	ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
+
+	# Cache Options #
+
+	# enable caching for all requests; cache content on local disk
+	#CacheEnable disk /
+	#CacheRoot /var/cache/apache2/mod_cache_disk/routing
+
+	# common caching directives
+	#CacheQuickHandler off
+	#CacheLock on
+	#CacheLockPath /tmp/mod_cache-lock
+	#CacheLockMaxAge 5
+	#CacheHeader On
+	
+ 	# cache control 
+	# These are used by browsers to force a content refresh (e.g. when developer tools are open).
+	#CacheIgnoreNoLastMod Off
+	#CacheIgnoreCacheControl Off
+	
+	# unset headers from upstream server
+	#Header unset Expires
+	#Header unset Cache-Control
+	#Header unset Pragma
+   
+	# set expiration headers for static content
+	#ExpiresActive On
+	#ExpiresByType text/html "access plus 1 years"
+	#ExpiresByType image/png "access plus 1 years"
+	#ExpiresByType application/javascript "access plus 1 years"
+    
+	# do not cache requests to the REST API
+	#<LocationMatch "^/api/v1/$">
+	#  CacheDisable on
+	#</LocationMatch>  
 </VirtualHost>
 
 <VirtualHost *:80>
@@ -36,6 +70,40 @@
 	ProxyPassReverse / http://LOCALIP/ timeout=1800
 
 	ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
+	
+	# Cache Options #
+
+	# enable caching for all requests; cache content on local disk
+	#CacheEnable disk /
+	#CacheRoot /var/cache/apache2/mod_cache_disk/routing
+
+	# common caching directives
+	#CacheQuickHandler off
+	#CacheLock on
+	#CacheLockPath /tmp/mod_cache-lock
+	#CacheLockMaxAge 5
+	#CacheHeader On
+	
+ 	# cache control 
+	# These are used by browsers to force a content refresh (e.g. when developer tools are open).
+	#CacheIgnoreNoLastMod Off
+	#CacheIgnoreCacheControl Off
+	
+	# unset headers from upstream server
+	#Header unset Expires
+	#Header unset Cache-Control
+	#Header unset Pragma
+   
+	# set expiration headers for static content
+	#ExpiresActive On
+	#ExpiresByType text/html "access plus 1 years"
+	#ExpiresByType image/png "access plus 1 years"
+	#ExpiresByType application/javascript "access plus 1 years"
+    
+	# do not cache requests to the REST API
+	#<LocationMatch "^/api/v1/$">
+	#  CacheDisable on
+	#</LocationMatch>  
 </VirtualHost>
 
 <IfModule mod_ssl.c>
@@ -57,6 +125,40 @@
 	ProxyPassReverse / http://LOCALIP/ timeout=1800
 
 	ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
+	
+	# Cache Options #
+
+	# enable caching for all requests; cache content on local disk
+	#CacheEnable disk /
+	#CacheRoot /var/cache/apache2/mod_cache_disk/routing
+
+	# common caching directives
+	#CacheQuickHandler off
+	#CacheLock on
+	#CacheLockPath /tmp/mod_cache-lock
+	#CacheLockMaxAge 5
+	#CacheHeader On
+	
+ 	# cache control 
+	# These are used by browsers to force a content refresh (e.g. when developer tools are open).
+	#CacheIgnoreNoLastMod Off
+	#CacheIgnoreCacheControl Off
+	
+	# unset headers from upstream server
+	#Header unset Expires
+	#Header unset Cache-Control
+	#Header unset Pragma
+   
+	# set expiration headers for static content
+	#ExpiresActive On
+	#ExpiresByType text/html "access plus 1 years"
+	#ExpiresByType image/png "access plus 1 years"
+	#ExpiresByType application/javascript "access plus 1 years"
+    
+	# do not cache requests to the REST API
+	#<LocationMatch "^/api/v1/$">
+	#  CacheDisable on
+	#</LocationMatch>  
     </VirtualHost>
 
     <VirtualHost *:443>
@@ -77,5 +179,39 @@
 	ProxyPassReverse / http://LOCALIP/ timeout=1800
 
 	ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
+	
+	# Cache Options #
+
+	# enable caching for all requests; cache content on local disk
+	#CacheEnable disk /
+	#CacheRoot /var/cache/apache2/mod_cache_disk/routing
+
+	# common caching directives
+	#CacheQuickHandler off
+	#CacheLock on
+	#CacheLockPath /tmp/mod_cache-lock
+	#CacheLockMaxAge 5
+	#CacheHeader On
+	
+ 	# cache control 
+	# These are used by browsers to force a content refresh (e.g. when developer tools are open).
+	#CacheIgnoreNoLastMod Off
+	#CacheIgnoreCacheControl Off
+	
+	# unset headers from upstream server
+	#Header unset Expires
+	#Header unset Cache-Control
+	#Header unset Pragma
+   
+	# set expiration headers for static content
+	#ExpiresActive On
+	#ExpiresByType text/html "access plus 1 years"
+	#ExpiresByType image/png "access plus 1 years"
+	#ExpiresByType application/javascript "access plus 1 years"
+    
+	# do not cache requests to the REST API
+	#<LocationMatch "^/api/v1/$">
+	#  CacheDisable on
+	#</LocationMatch>  
     </VirtualHost>
 </IfModule>
