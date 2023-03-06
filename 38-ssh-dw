@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # NOME DO NOVO CONTAINER
-export NOMECONTAINER
+export NOMECONTAINER="ssh-dw"
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -22,7 +22,6 @@ function checkB {
         
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
-          docker rmi ssh-only:latest
 
           create
         } || {
@@ -32,7 +31,6 @@ function checkB {
       } || {
         docker stop "$NOMECONTAINER"
         docker rm "$NOMECONTAINER"
-        docker rmi ssh-only:latest
         
         datetime=$(date +"%d-%m %H-%M")
         mkdir -p /srv/containers/.backupcnt
@@ -56,7 +54,7 @@ function menu {
 
   VALUE1="ssh-dw"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 8 30 0 \
 "Set Name: " 1 1 "$VALUE1" 1 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
@@ -67,20 +65,18 @@ function menu {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
-    create
+    checkB
     }
 }
 
 function create {
   export NOMECONTAINER
-  
+
   mkdir -p /srv/containers/"$NOMECONTAINER"/dws
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$NOMECONTAINER" > /srv/containers/"$NOMECONTAINER"/Information
 
-mkdir -p /srv/containers/"$NOMECONTAINER"
-
-docker run -d \
+docker run -d --privileged \
   --name=$NOMECONTAINER \
   --network host \
   --no-healthcheck \
@@ -92,18 +88,13 @@ docker run -d \
   urbancompasspony/ssh-dw:latest
 }
 
-docker exec $NOMECONTAINER bash -c "mkdir /run/sshd"
-docker restart $NOMECONTAINER
-docker exec $NOMECONTAINER bash -c "useradd ubuntu"
-docker exec $NOMECONTAINER bash -c "echo -ne 'ubuntu\nubuntu\n' | passwd ubuntu 1> /dev/null 2> /dev/null"
-
 function clean {
   unset NOMECONTAINER
 }
 
 # Start
 checkA
-checkB
+menu
 clean
 
 echo " "
