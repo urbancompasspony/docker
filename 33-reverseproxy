@@ -93,6 +93,7 @@ function create {
   mkdir -p /srv/containers/"$NOMECONTAINER"/apache2/sites-available
   mkdir -p /srv/containers/"$NOMECONTAINER"/apache2/sites-enabled
   mkdir -p /srv/containers/"$NOMECONTAINER"/certbot
+  mkdir -p /srv/containers/"$NOMECONTAINER"/cache
   
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
@@ -111,6 +112,7 @@ docker run -d \
   -v /srv/containers/"$NOMECONTAINER"/apache2/sites-available:/etc/apache2/sites-available \
   -v /srv/containers/"$NOMECONTAINER"/apache2/sites-enabled:/etc/apache2/sites-enabled \
   -v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt \
+  -v /srv/containers/"$NOMECONTAINER"/cache:/var/cache/apache2/mod_cache_disk/routing \
   urbancompasspony/reverseproxy:latest
   }
 
@@ -125,6 +127,10 @@ clean
 
 # Aways get a new Model.conf file for using on sites-available!
 curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/model | sudo tee /srv/containers/$NOMECONTAINER/apache2/sites-available/mysite.com.br.conf
+
+docker exec $NOMECONTAINER chown root:www-data -R /var/cache/apache2/mod_cache_disk/routing
+docker exec $NOMECONTAINER chmod 775 -R /var/cache/apache2/mod_cache_disk/routing
+docker restart $NOMECONTAINER
 
 echo " "
 echo "To generate NEW certificates, first edit everything under sites-available then create a link to sites-enabled. So run:"
