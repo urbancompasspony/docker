@@ -10,4 +10,4 @@ sshfs -o allow_other,default_permissions sammy@your_other_server:~/ /mnt/droplet
 #sshfs -o allow_other,default_permissions sammy@your_other_server:~/ /mnt/droplet
 #sshfs -o allow_other,default_permissions sammy@your_other_server:~/ /mnt/droplet
 
-exit 0
+exit 1
