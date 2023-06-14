@@ -19,3 +19,6 @@ COPY metasploit-framework /metasploit-framework
 RUN cd metasploit-framework; bundle install
 
 ENTRYPOINT tail -f /dev/null
+
+# TO RUN
+# docker run --rm -it urbancompasspony/metasploit-arm ./metasploit-framework/msfconsole
