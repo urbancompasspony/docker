@@ -9,7 +9,7 @@ RUN apt install -y inetutils-ping nano curl wget rbenv git ruby rubygems ruby-pg
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-#RUN git clone https://github.com/rapid7/metasploit-framework
+RUN git clone https://github.com/rapid7/metasploit-framework
 
 RUN rbenv rehash
 RUN gem install bundler
