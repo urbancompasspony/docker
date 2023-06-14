@@ -11,6 +11,8 @@ RUN apt install -y inetutils-ping nano curl wget rbenv git ruby rubygems ruby-pg
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN git clone https://github.com/rapid7/metasploit-framework
+
 RUN rbenv rehash
 RUN gem install bundler
 
@@ -20,4 +22,3 @@ RUN cd metasploit-framework; bundle install
 
 ENTRYPOINT tail -f /dev/null
 
-#RUN git clone https://github.com/rapid7/metasploit-framework
