@@ -12,3 +12,6 @@ Not adding yourself to Docker group
 sudo chmod 666 /dev/kvm
 Using sudo docker run..., which means you need to use DISPLAY=:0 or DISPLAY=:0.0 or whatever your currently display.
 add yourself to the Docker group and use docker run
+
+Based on:
+https://github.com/sickcodes/Docker-OSX
