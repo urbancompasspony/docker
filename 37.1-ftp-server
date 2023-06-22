@@ -16,7 +16,7 @@ NETWORKLAN="macvlan"
 function menu {
   export var1; export var2; export var3; export var4; export var5
 
-  VALUE1="Localhost!"; VALUE2="ftp-server"; VALUE3="-v /mnt:/home/vsftpd"; VALUE4="admin"; VALUE5="admin"
+  VALUE1="Localhost!"; VALUE2="ftp-localhost"; VALUE3="-v /mnt:/home/vsftpd"; VALUE4="admin"; VALUE5="admin"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "New FTP Share" 12 35 0 \
 "Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
