@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Global config for replication:
-export NOMECONTAINER="mysql"
-
 # NOME DO BANCO DE DADOS
 export var1
 # IP FIXO DO NOVO CONTAINER
@@ -17,6 +14,9 @@ export var5
 export var6
 # CAMINHO DO BANCO DE DADOS
 export var7
+
+# Global config for replication:
+export NOMECONTAINER="mysql-algo"
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -73,7 +73,7 @@ function checkB {
 function menu {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7
 
-VALUE1="$NOMECONTAINER"; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5=""; VALUE6=""; VALUE7="/srv/containers/$NOMECONTAINER"
+VALUE1="mysql-algo"; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5=""; VALUE6=""; VALUE7="/srv/containers/mysql-algo"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 14 40 0 \
 "NameCont:" 1 1 "$VALUE1" 1 10 20 0 \
@@ -127,7 +127,7 @@ function create {
   echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
 
   docker run -d \
-  --name $NOMECONTAINER \
+  --name $var1 \
   --ip=$var2 \
   --dns=1.1.1.1  \
   --dns=127.0.0.1 \
@@ -144,22 +144,11 @@ function create {
   mysql:8
 }
 
-function clean {
-  unset var1
-  unset var2
-  unset var3
-  unset var4
-  unset var5
-  unset var6
-  unset var7
-}
-
 # Start
 checkA
 checkB
-clean
 
-docker network connect bridge $NOMECONTAINER
+docker network connect bridge $var1
 
 echo "Finalizado!"
 echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
