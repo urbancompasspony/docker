@@ -1,38 +1,131 @@
-docker run -d --name='mariadb' \
-     --hostname='mariadb' \
-     -e MARIADB_ROOT_PASSWORD='senhaderootmariadb' \
-     -e MARIADB_DATABASE='glpi' \
-     -e MARIADB_USER='glpi' \
-     -e MARIADB_PASSWORD='senhadousuarioglpi' \
-     -v /srv/mariadb:/var/lib/mysql \
---restart=always mariadb:latest
+#!/bin/bash
 
-MARIADB_ROOT_PASSWORD	Define a senha de root do MySQL
-MARIADB_DATABASE	Cria o banco de dados para o GLPI
-MARIADB_USER	Cria o usuário do banco de dados do GLPI
-MARIADB_PASSWORD	Cria a senha para o banco de dados do GLPI
+# Global config for replication:
+export NOMECONTAINER="glpi"
 
-docker run -d --name='glpi' \
-     --hostname='glpi' \
-     --link='mariadb:mariadb' \
-     -e TIMEZONE='America/Sao_Paulo' \
-     -e VERSION='10.0.2' \
-     -v /srv/glpi:/var/www/html \
-     -p 80:80 \
---restart=always aprendendolinux/glpi:latest
+# IP FIXO DO NOVO glpi
+export var1
 
-http://127.0.0.1/ ou http://ip-do-servidor/
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
 
-Quando chegar na tela de configuração do banco de dados, entre com essas informações:
+function checkB {
+  export var1
 
-Endereço do Servidor SQL: mariadb
-Usuário SQL: glpi
-Senha SQL: senhadousuarioglpi
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
 
-Usuário	Senha	Função
-glpi	glpi	Super Administrador
-tech	tech	Conta do Técnico
-normal	normal	Conta do Usuário
-post-only	postonly	Conta somente para postar
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
 
-https://hub.docker.com/r/diouxx/glpi
+          create
+        } || {
+          create
+        }
+        
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        
+        datetime=$(date +"%d-%m %H-%M")
+        mkdir -p /srv/containers/.backupcnt
+        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
+        
+        rm -iR /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+  } || {
+    VALUE1=""
+  }
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  [ -z "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    checkC
+    }
+}
+
+function checkC {
+  #IPMachine=$(hostname -I | awk '{print $1}')
+  MyIP=$(cat /srv/containers/scripts/myip)
+  [ "$MyIP" = "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
+    menu
+  } || {
+    create
+  }
+}
+
+function create {
+  export var1
+  
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+
+docker run -d \
+--name $NOMECONTAINER \
+--network macvlan \
+--ip=$var1 \
+--dns=1.1.1.1 \
+--dns=127.0.0.1 \
+--hostname=$NOMECONTAINER \
+--no-healthcheck \
+--restart=unless-stopped \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/glpi:/var/www/html/glpi \
+-p 80:80 \
+diouxx/glpi
+
+echo " "
+echo "GLPI configurado com sucesso! Credenciais:"
+echo " "
+echo "glpi,glpi: SuperAdmin" 
+echo "tech,tech: Técnico"
+echo "normal,normal: Usuário"
+echo "post-only,postonly: Só Publicar"
+echo " "
+sleep 5
+}
+
+function clean {
+  unset var1
+}
+
+# Start
+checkA
+checkB
+clean
+
+exit 1
