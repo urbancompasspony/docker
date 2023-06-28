@@ -9,6 +9,7 @@ export NOMECONTAINER="A-CONT-NAME-A"
 var_cont="1"
 
 function custom_names {
+#12345678
 $CustmN1=""
 $CustmN2=""
 $CustmN3=""
