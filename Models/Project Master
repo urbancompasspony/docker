@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # =============================================================================
-# #############################################################################
+# ### C O N T R O L ### P A N E L ########################################### #
 # =============================================================================
 
-export NOMECONTAINER="NOIP-Custom"
+export NOMECONTAINER="A-CUSTOM-A"
 
-var_cont="1"
+var_cont="2"
 
+# MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
-CustmN1="Container"
-CustmN2="."
+CustmN2="Local IP"
 CustmN3="."
 CustmN4="."
 CustmN5="."
@@ -19,28 +19,37 @@ CustmN7="."
 CustmN8="."
 CustmN9="."
 CustmN10="."
-} # 123456789 or # ABCDEFGHI
 
-function custom_values {
-VALUE1="$NOMECONTAINER"
-VALUE2="# # # # # # # # # # # #"
-VALUE3="# # # # # # # # # # # #"
-VALUE4="# # # # # # # # # # # #"
-VALUE5="# # # # # # # # # # # #"
-VALUE6="# # # # # # # # # # # #"
-VALUE7="# # # # # # # # # # # #"
-VALUE8="# # # # # # # # # # # #"
-VALUE9="# # # # # # # # # # # #"
-VALUE10="# # # # # # # # # # # #"
+# Static Name!
+CustmN1="Container"
 }
 
-docker_repo="coppit/no-ip"
+# MENU DEFAULT VALUES
+function custom_values {
+VALUE2="0.0.0.0"
+VALUE3="0"
+VALUE4="0"
+VALUE5="0"
+VALUE6="0"
+VALUE7="0"
+VALUE8="0"
+VALUE9="0"
+VALUE10="0"
+
+# Static Value!
+VALUE1="$NOMECONTAINER"
+}
+
+docker_repo="CUSTOM/DOCKER:latest"
 
 function docker_custom {
 docker run -d \
---name=$NOMECONTAINER \
---network host \
---hostname=$NOMECONTAINER \
+--name=$var1 \
+--network macvlan \
+--ip=$var2 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
@@ -49,16 +58,24 @@ $docker_repo
 }
 
 function docker_extras {
-# IF NEEDED:
-#docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
+# USE IT ONLY IF NEEDED:
+
+#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
 #docker restart "$NOMECONTAINER"
 
 echo "0" > /dev/null
 }
 
 # =============================================================================
-# #############################################################################
+# ########################################################################### #
 # =============================================================================
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root! Saindo..."
+    exit
+    }
+}
 
 function export_all {
   export var1; export var2; export var3; export var4; export var5
@@ -112,7 +129,7 @@ function docker_stop_rm {
   [ $(docker stop "$NOMECONTAINER") ] && {
     docker rm "$NOMECONTAINER"
   } || {
-    echo "O container não existia. Continuando..."
+    echo "O container $NOMECONTAINER não existe. Continuando..."
   }
 }
 
@@ -125,15 +142,10 @@ function bkp_and_rm_data {
   rm -iR /srv/containers/"$NOMECONTAINER"
 }
 
-function checkA {
-  [ "$EUID" -ne 0 ] && {
-    echo "Execute esse script como Root! Saindo..."
-    exit
-    }
-}
-
 function checkB {
   export_all
+
+  NOMECONTAINER=$var1
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "$NOMECONTAINER já existente!" --yesno "Deseja refazê-lo?" 6 40
@@ -167,7 +179,7 @@ function checkB {
       exit
     }
   } || {
-    menu
+    create
   }
 
 }
@@ -177,16 +189,14 @@ function menu {
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     custom_values
+    custom_names
     var_read
   } || {
+    custom_names
     custom_values
     }
 
-  custom_names
-
-  NOMECONTAINER=$var1
-
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 17 40 0 \
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 17 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
 "$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
@@ -198,105 +208,31 @@ function menu {
 "$CustmN5: " 9 1 "$VALUE9" 9 11 30 0 \
 "$CustmN5: " 10 1 "$VALUE10" 10 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+var7=$(echo "$VALUE0" | sed -n 7p)
+var8=$(echo "$VALUE0" | sed -n 8p)
+var9=$(echo "$VALUE0" | sed -n 9p)
+var10=$(echo "$VALUE0" | sed -n 10p)
 
-  [ $? -ne 0 ] && exit
-  var1=$(echo "$VALUE0" | sed -n 1p)
-  var2=$(echo "$VALUE0" | sed -n 2p)
-  var3=$(echo "$VALUE0" | sed -n 3p)
-  var4=$(echo "$VALUE0" | sed -n 4p)
-  var5=$(echo "$VALUE0" | sed -n 5p)
-  var6=$(echo "$VALUE0" | sed -n 6p)
-  var7=$(echo "$VALUE0" | sed -n 7p)
-  var8=$(echo "$VALUE0" | sed -n 8p)
-  var9=$(echo "$VALUE0" | sed -n 9p)
-  var10=$(echo "$VALUE0" | sed -n 10p)
-
-  [ $var_cont -eq "1" ] && {
-    [ -z "$var1" ] || {
+  # Check if any empty
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] || [ -z "$var8" ] || [ -z "$var9" ] || [ -z "$var10" ] && {
       error
     } || {
-      checkC
+      checkB
       }
-    }
-
-  [ $var_cont -eq "2" ] && {
-    [ -z "$var1" ] || [ -z "$var2" ] && {
-      error
-    } || {
-      checkC
-      }
-    }
-
-  [ $var_cont -eq "3" ] && {
-    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] && {
-      error
-    } || {
-      checkC
-      }
-    }
-
-  [ $var_cont -eq "4" ] && {
-    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] && {
-      error
-    } || {
-      checkC
-      }
-    }
-
-  [ $var_cont -eq "5" ] && {
-    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] && {
-      error
-    } || {
-      checkC
-      }
-    }
-
-  [ $var_cont -eq "6" ] && {
-    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] && {
-      error
-    } || {
-      checkC
-      }
-    }
-
-  [ $var_cont -eq "7" ] && {
-    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] && {
-      error
-    } || {
-      checkC
-      }
-    }
-
-  [ $var_cont -eq "8" ] && {
-    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] || [ -z "$var8" ] && {
-      error
-    } || {
-      checkC
-      }
-    }
-
-  [ $var_cont -eq "9" ] && {
-    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] || [ -z "$var8" ] || [ -z "$var9" ] && {
-      error
-    } || {
-      checkC
-      }
-    }
-
-  [ $var_cont -eq "10" ] && {
-    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] || [ -z "$var8" ] || [ -z "$var9" ] || [ -z "$var10" ] && {
-      error
-    } || {
-      checkC
-      }
-    }
 
 }
 
 function checkC {
   #IPMachine=$(hostname -I | awk '{print $1}')
   MyIP=$(cat /srv/containers/scripts/myip)
-  [ "$MyIP" = "$var1" ] && {
+  [ "$MyIP" = "$myip" ] && {
     dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
     menu
   } || {
@@ -311,10 +247,15 @@ function create {
   docker_extras
 }
 
+################################################################################
+
 # Start
 checkA
-checkB
+menu
 
+################################################################################
+
+#Ending
 unset var1
 unset var2
 unset var3
