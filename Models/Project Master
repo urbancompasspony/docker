@@ -4,29 +4,29 @@
 # #############################################################################
 # =============================================================================
 
-export NOMECONTAINER="NOIP"
+export NOMECONTAINER="A-CUSTOM-A"
 
-var_cont="3"
+var_cont="1"
 
 echo "DEBUG A"
 
 function custom_names {
-CustmN1="UserName"
-CustmN2="Password"
-CustmN3="Domains "
+CustmN1="."
+CustmN2="."
+CustmN3=". "
 CustmN4="."
 CustmN5="."
-} #12345678 or #ABCDEFGH
+} # 12345678 or # ABCDEFGH
 
 function custom_values {
-VALUE1=""
-VALUE2=""
-VALUE3=""
+VALUE1="0"
+VALUE2="0"
+VALUE3="0"
 VALUE4="0"
 VALUE5="0"
 }
 
-docker_repo="coppit/no-ip"
+docker_repo="CUSTOM/DOCKER:latest"
 
 function docker_custom {
 docker run -d \
@@ -38,10 +38,6 @@ docker run -d \
 --hostname=$NOMECONTAINER \
 --no-healthcheck \
 --restart=unless-stopped \
--e USERNAME="$var2" \
--e PASSWORD="$var3" \
--e DOMAINS="$var4" \
--e INTERVAL=10 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/Config:/config \
 $docker_repo
@@ -49,7 +45,7 @@ $docker_repo
 
 function docker_extras {
 # IF NEEDED:
-docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
+docker exec "$NOMECONTAINER" bash -c "echo 'alguma=coisa' >> /caminho/script.conf"
 docker restart "$NOMECONTAINER"
 }
 
@@ -58,86 +54,30 @@ docker restart "$NOMECONTAINER"
 # =============================================================================
 
 function export_all {
-  export var1
-  export var2
-  export var3
-  export var4
-  export var5
+  export var1; export var2; export var3; export var4; export var5
 }
 
 export_all
 
 function var_read {
-  [ var_cont = 1 ] && {
-    var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-    VALUE1=$var1
-  }
-
-  [ var_cont = 2 ] && {
-    var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-    var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
-    VALUE1=$var1; VALUE2=$var2
-  }
-
-  [ var_cont = 3 ] && {
-    var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-    var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
-    var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
-    VALUE1=$var1; VALUE2=$var2; VALUE3=$var3
-  }
-
-  [ var_cont = 4 ] && {
-    var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-    var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
-    var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
-    var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
-    VALUE1=$var1; VALUE2=$var2; VALUE3=$var3; VALUE4=$var4
-  }
-
-  [ var_cont = 5 ] && {
-    var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-    var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
-    var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
-    var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
-    var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
-    VALUE1=$var1; VALUE2=$var2; VALUE3=$var3; VALUE4=$var4; VALUE5=$var5
-  }
+  var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+  var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+  var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+  var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+  var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
+    
+  VALUE1=$var1; VALUE2=$var2; VALUE3=$var3; VALUE4=$var4; VALUE5=$var5
 }
 
 function burn_var {
   mkdir -p /srv/containers/"$NOMECONTAINER"
   touch /srv/containers/"$NOMECONTAINER"/Information
 
-  [ var_cont = 1 ] && {
-    echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-  }
-
-  [ var_cont = 2 ] && {
-    echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-    echo "$var2" > /srv/containers/"$NOMECONTAINER"/Information
-  }
-
-  [ var_cont = 3 ] && {
-    echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-    echo "$var2" > /srv/containers/"$NOMECONTAINER"/Information
-    echo "$var3" > /srv/containers/"$NOMECONTAINER"/Information
-  }
-
-  [ var_cont = 4 ] && {
-
-    echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-    echo "$var2" > /srv/containers/"$NOMECONTAINER"/Information
-    echo "$var3" > /srv/containers/"$NOMECONTAINER"/Information
-    echo "$var4" > /srv/containers/"$NOMECONTAINER"/Information
-  }
-
-  [ var_cont = 5 ] && {
-    echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-    echo "$var2" > /srv/containers/"$NOMECONTAINER"/Information
-    echo "$var3" > /srv/containers/"$NOMECONTAINER"/Information
-    echo "$var4" > /srv/containers/"$NOMECONTAINER"/Information
-    echo "$var5" > /srv/containers/"$NOMECONTAINER"/Information
-  }
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var3" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var4" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var5" > /srv/containers/"$NOMECONTAINER"/Information
 }
 
 function error {
@@ -148,12 +88,11 @@ function error {
 function docker_stop_rm {
   [ $(docker stop "$NOMECONTAINER") ] && {
     docker rm "$NOMECONTAINER"
-  }
 }
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
-    echo "Execute esse script como Root!"
+    echo "Execute esse script como Root! Saindo..."
     exit
     }
 }
@@ -164,33 +103,24 @@ function checkB {
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
     [ $? = 0 ] && {
-    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
-      [ $? = 0 ] && {
+      dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+        [ $? = 0 ] && {
           var_read
           docker_stop_rm
           create
         } || {
+          docker_stop_rm
           create
-        }
-        
-      } || {
-        docker_stop_rm
-        
-        datetime=$(date +"%d-%m %H-%M")
-        mkdir -p /srv/containers/.backupcnt
-        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
-        
-        rm -iR /srv/containers/"$NOMECONTAINER"
-
-        menu
-        }
+          }
     } || {
       echo "A instalação local será mantida! Saindo..."
       exit
-    }
+      }
   } || {
     menu
     }
+
+}
 
 function menu {
   export_all
@@ -199,7 +129,7 @@ function menu {
     var_read
   } || {
     custom_values
-  }
+    }
 
   custom_names
 
@@ -223,40 +153,40 @@ function menu {
       error
     } || {
       checkC
+      }
     }
-  }
 
   [ $var_cont -eq "2" ] && {
     [ -z "$var1" ] || [ -z "$var2" ] && {
       error
     } || {
       checkC
+      }
     }
-  }
 
   [ $var_cont -eq "3" ] && {
     [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] && {
       error
     } || {
       checkC
+      }
     }
-  }
 
   [ $var_cont -eq "4" ] && {
     [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] && {
       error
     } || {
       checkC
+      }
     }
-  }
 
   [ var_cont -eq "5" ] && {
     [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] && {
       error
     } || {
       checkC
+      }
     }
-  }
 
 }
 
@@ -268,16 +198,13 @@ function checkC {
     menu
   } || {
     create
-  }
+    }
 }
 
 function create {
   export_all
-
   burn_var
-
   docker_custom
-
   docker_extras
 }
 
