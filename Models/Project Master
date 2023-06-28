@@ -6,30 +6,29 @@
 
 export NOMECONTAINER="NOIP"
 
-var_cont="1"
+var_cont="3"
+
+echo "DEBUG A"
 
 function custom_names {
-#12345678
-#ABCDEFGH
-CustmN1="Local IP"
-CustmN2="."
-CustmN3="."
+CustmN1="UserName"
+CustmN2="Password"
+CustmN3="Domains "
 CustmN4="."
 CustmN5="."
-}
+} #12345678 or #ABCDEFGH
 
 function custom_values {
-VALUE1="0"
-VALUE2="0"
-VALUE3="0"
+VALUE1=""
+VALUE2=""
+VALUE3=""
 VALUE4="0"
 VALUE5="0"
 }
 
-docker_repo="CUSTOM/HERE"
+docker_repo="coppit/no-ip"
 
 function docker_custom {
-
 docker run -d \
 --name=$NOMECONTAINER \
 --network macvlan \
@@ -39,10 +38,13 @@ docker run -d \
 --hostname=$NOMECONTAINER \
 --no-healthcheck \
 --restart=unless-stopped \
+-e USERNAME="$var2" \
+-e PASSWORD="$var3" \
+-e DOMAINS="$var4" \
+-e INTERVAL=10 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/Config:/config \
 $docker_repo
-
 }
 
 function docker_extras {
@@ -56,31 +58,11 @@ docker restart "$NOMECONTAINER"
 # =============================================================================
 
 function export_all {
-  [ var_cont = 1 ] && {
-    export var1
-  }
-  [ var_cont = 2 ] && {
-    export var1
-    export var2
-  }
-  [ var_cont = 3 ] && {
-    export var1
-    export var2
-    export var3
-  }
-  [ var_cont = 4 ] && {
-    export var1
-    export var2
-    export var3
-    export var4
-  }
-  [ var_cont = 5 ] && {
-    export var1
-    export var2
-    export var3
-    export var4
-    export var5
-  }
+  export var1
+  export var2
+  export var3
+  export var4
+  export var5
 }
 
 export_all
@@ -123,6 +105,9 @@ function var_read {
 }
 
 function burn_var {
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+
   [ var_cont = 1 ] && {
     echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   }
@@ -160,6 +145,12 @@ function error {
   menu
 }
 
+function docker_stop_rm {
+  [ $(docker stop "$NOMECONTAINER") ] && {
+    docker rm "$NOMECONTAINER"
+  }
+}
+
 function checkA {
   [ "$EUID" -ne 0 ] && {
     echo "Execute esse script como Root!"
@@ -176,18 +167,14 @@ function checkB {
     dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
       [ $? = 0 ] && {
           var_read
-
-        [ $(docker stop "$NOMECONTAINER") ] && {
-          docker rm "$NOMECONTAINER"
-
+          docker_stop_rm
           create
         } || {
           create
         }
         
       } || {
-        docker stop "$NOMECONTAINER"
-        docker rm "$NOMECONTAINER"
+        docker_stop_rm
         
         datetime=$(date +"%d-%m %H-%M")
         mkdir -p /srv/containers/.backupcnt
@@ -204,7 +191,6 @@ function checkB {
   } || {
     menu
     }
-}
 
 function menu {
   export_all
@@ -219,10 +205,10 @@ function menu {
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 12 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 10 20 0 \
-"$CustmN2: " 2 1 "$VALUE1" 2 10 20 0 \
-"$CustmN3: " 3 1 "$VALUE1" 3 10 20 0 \
-"$CustmN4: " 4 1 "$VALUE1" 4 10 20 0 \
-"$CustmN5: " 5 1 "$VALUE1" 5 10 20 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 10 20 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 10 20 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 10 20 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 10 20 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
@@ -232,15 +218,15 @@ function menu {
   var4=$(echo "$VALUE0" | sed -n 4p)
   var5=$(echo "$VALUE0" | sed -n 5p)
 
-  [ var_cont = 1 ] && {
-    [ -z "$var1" ] && {
+  [ $var_cont -eq "1" ] && {
+    [ -z "$var1" ] || {
       error
     } || {
       checkC
     }
   }
 
-  [ var_cont = 2 ] && {
+  [ $var_cont -eq "2" ] && {
     [ -z "$var1" ] || [ -z "$var2" ] && {
       error
     } || {
@@ -248,7 +234,7 @@ function menu {
     }
   }
 
-  [ var_cont = 3 ] && {
+  [ $var_cont -eq "3" ] && {
     [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] && {
       error
     } || {
@@ -256,7 +242,7 @@ function menu {
     }
   }
 
-  [ var_cont = 4 ] && {
+  [ $var_cont -eq "4" ] && {
     [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] && {
       error
     } || {
@@ -264,7 +250,7 @@ function menu {
     }
   }
 
-  [ var_cont = 5 ] && {
+  [ var_cont -eq "5" ] && {
     [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] && {
       error
     } || {
@@ -287,9 +273,6 @@ function checkC {
 
 function create {
   export_all
-  
-  mkdir -p /srv/containers/"$NOMECONTAINER"
-  touch /srv/containers/"$NOMECONTAINER"/Information
 
   burn_var
 
@@ -298,17 +281,14 @@ function create {
   docker_extras
 }
 
-function clean {
-  unset var1
-  unset var2
-  unset var3
-  unset var4
-  unset var5
-}
-
 # Start
 checkA
 checkB
-clean
+
+unset var1
+unset var2
+unset var3
+unset var4
+unset var5
 
 exit 1
