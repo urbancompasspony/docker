@@ -64,7 +64,7 @@ function menu {
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
     VALUE2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
-    VALUE3=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
   } || {
     VALUE1=""
   }
