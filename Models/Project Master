@@ -10,6 +10,9 @@ var_cont="2"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
+# Static Name!
+CustmN1="Container"
+
 CustmN2="Local IP"
 CustmN3="."
 CustmN4="."
@@ -19,13 +22,13 @@ CustmN7="."
 CustmN8="."
 CustmN9="."
 CustmN10="."
-
-# Static Name!
-CustmN1="Container"
 }
 
 # MENU DEFAULT VALUES
 function custom_values {
+# Static Value!
+VALUE1="$NOMECONTAINER"
+
 VALUE2="0.0.0.0"
 VALUE3="0"
 VALUE4="0"
@@ -35,9 +38,6 @@ VALUE7="0"
 VALUE8="0"
 VALUE9="0"
 VALUE10="0"
-
-# Static Value!
-VALUE1="$NOMECONTAINER"
 }
 
 docker_repo="CUSTOM/DOCKER:latest"
