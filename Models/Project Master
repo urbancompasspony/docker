@@ -4,8 +4,10 @@
 # ### C O N T R O L ### P A N E L ########################################### #
 # =============================================================================
 
+# Set container name and hostname here.
 export NOMECONTAINER="A-CUSTOM-A"
 
+# From 1 to 10!
 var_cont="2"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
@@ -40,8 +42,10 @@ VALUE9="0"
 VALUE10="0"
 }
 
-docker_repo="CUSTOM/DOCKER:latest"
+# Set repository here!
+docker_repo="CUSTOM/DOCKER:LATEST"
 
+# Adjust if needed
 function docker_custom {
 docker run -d \
 --name=$var1 \
@@ -57,18 +61,17 @@ docker run -d \
 $docker_repo
 }
 
-function docker_extras {
 # USE IT ONLY IF NEEDED:
-
+function docker_extras {
 #docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
 #docker restart "$NOMECONTAINER"
-
-echo "0" > /dev/null
-}
 
 # =============================================================================
 # ########################################################################### #
 # =============================================================================
+
+echo "0" > /dev/null
+}
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
@@ -196,6 +199,158 @@ function menu {
     custom_values
     }
 
+[ $var_cont -le "0" ] && {
+  clear
+  echo "Incorrect value of var_cont: $var_cont."
+  echo "Exiting..."
+  exit
+}
+
+[ $var_cont -eq "1" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 8 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+}
+
+[ $var_cont -eq "2" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 9 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+}
+
+[ $var_cont -eq "3" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+}
+
+[ $var_cont -eq "4" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 11 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+}
+
+[ $var_cont -eq "5" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 12 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+}
+
+[ $var_cont -eq "6" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 13 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+}
+
+[ $var_cont -eq "7" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 14 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
+"$CustmN7: " 7 1 "$VALUE7" 7 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+var7=$(echo "$VALUE0" | sed -n 7p)
+}
+
+[ $var_cont -eq "8" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 15 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
+"$CustmN7: " 7 1 "$VALUE7" 7 11 30 0 \
+"$CustmN8: " 8 1 "$VALUE8" 8 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+var7=$(echo "$VALUE0" | sed -n 7p)
+var8=$(echo "$VALUE0" | sed -n 8p)
+}
+
+[ $var_cont -eq "9" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 16 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
+"$CustmN7: " 7 1 "$VALUE7" 7 11 30 0 \
+"$CustmN8: " 8 1 "$VALUE8" 8 11 30 0 \
+"$CustmN9: " 9 1 "$VALUE9" 9 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+var7=$(echo "$VALUE0" | sed -n 7p)
+var8=$(echo "$VALUE0" | sed -n 8p)
+var9=$(echo "$VALUE0" | sed -n 9p)
+}
+
+[ $var_cont -eq "10" ] && {
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 17 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
@@ -219,13 +374,16 @@ var7=$(echo "$VALUE0" | sed -n 7p)
 var8=$(echo "$VALUE0" | sed -n 8p)
 var9=$(echo "$VALUE0" | sed -n 9p)
 var10=$(echo "$VALUE0" | sed -n 10p)
+}
 
-  # Check if any empty
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] || [ -z "$var8" ] || [ -z "$var9" ] || [ -z "$var10" ] && {
-      error
-    } || {
-      checkB
-      }
+[ $var_cont -ge "11" ] && {
+  clear
+  echo "Incorrect value of var_cont: $var_cont."
+  echo "Exiting..."
+  exit
+}
+
+checkB
 
 }
 
