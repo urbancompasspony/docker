@@ -4,17 +4,18 @@
 # #############################################################################
 # =============================================================================
 
-export NOMECONTAINER="A-CONT-NAME-A"
+export NOMECONTAINER="NOIP"
 
 var_cont="1"
 
 function custom_names {
 #12345678
-$CustmN1=""
-$CustmN2=""
-$CustmN3=""
-$CustmN4=""
-$CustmN5=""
+#ABCDEFGH
+CustmN1="Local IP"
+CustmN2="."
+CustmN3="."
+CustmN4="."
+CustmN5="."
 }
 
 function custom_values {
@@ -25,7 +26,7 @@ VALUE4=""
 VALUE5=""
 }
 
-docker_repo="urbancompasspony/docker-container:latest"
+docker_repo="CUSTOM/HERE"
 
 function docker_custom {
 
@@ -38,7 +39,7 @@ docker run -d \
 --hostname=$NOMECONTAINER \
 --no-healthcheck \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/:/
+-v /srv/containers/"$NOMECONTAINER"/Config:/config \
 --restart=unless-stopped \
 $docker_repo
 
@@ -46,8 +47,8 @@ $docker_repo
 
 function docker_extras {
 # IF NEEDED:
-#docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
-#docker restart "$NOMECONTAINER"
+docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
+docker restart "$NOMECONTAINER"
 }
 
 # =============================================================================
@@ -154,6 +155,11 @@ function burn_var {
   }
 }
 
+function error {
+  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+  menu
+}
+
 function checkA {
   [ "$EUID" -ne 0 ] && {
     echo "Execute esse script como Root!"
@@ -211,7 +217,7 @@ function menu {
 
   custom_names
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 12 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 10 20 0 \
 "$CustmN2: " 2 1 "$VALUE1" 2 10 20 0 \
 "$CustmN3: " 3 1 "$VALUE1" 3 10 20 0 \
@@ -226,12 +232,46 @@ function menu {
   var4=$(echo "$VALUE0" | sed -n 4p)
   var5=$(echo "$VALUE0" | sed -n 5p)
 
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] && {
-    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-    menu
-  } || {
-    checkC
+  [ var_cont = 1 ] && {
+    [ -z "$var1" ] && {
+      error
+    } || {
+      checkC
     }
+  }
+
+  [ var_cont = 2 ] && {
+    [ -z "$var1" ] || [ -z "$var2" ] && {
+      error
+    } || {
+      checkC
+    }
+  }
+
+  [ var_cont = 3 ] && {
+    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] && {
+      error
+    } || {
+      checkC
+    }
+  }
+
+  [ var_cont = 4 ] && {
+    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] && {
+      error
+    } || {
+      checkC
+    }
+  }
+
+  [ var_cont = 5 ] && {
+    [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] && {
+      error
+    } || {
+      checkC
+    }
+  }
+
 }
 
 function checkC {
