@@ -19,11 +19,11 @@ CustmN5="."
 }
 
 function custom_values {
-VALUE1=""
-VALUE2=""
-VALUE3=""
-VALUE4=""
-VALUE5=""
+VALUE1="0"
+VALUE2="0"
+VALUE3="0"
+VALUE4="0"
+VALUE5="0"
 }
 
 docker_repo="CUSTOM/HERE"
@@ -38,9 +38,9 @@ docker run -d \
 --dns=127.0.0.1 \
 --hostname=$NOMECONTAINER \
 --no-healthcheck \
+--restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/Config:/config \
---restart=unless-stopped \
 $docker_repo
 
 }
