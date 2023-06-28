@@ -1,0 +1,148 @@
+#!/bin/bash
+
+# Global config for replication:
+export NOMECONTAINER="CONT-NAME"
+
+# 
+export var1
+# 
+export var2
+# 
+export var3
+# 
+export var4
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function checkB {
+  export var1; export var2; export var3; export var4
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+        var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+        var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+
+          create
+        } || {
+          create
+        }
+        
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+        
+        datetime=$(date +"%d-%m %H-%M")
+        mkdir -p /srv/containers/.backupcnt
+        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
+        
+        rm -iR /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1; export var2; export var3; export var4
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+  } || {
+    VALUE1=""
+  }
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
+"Local I2: " 2 1 "$VALUE1" 2 10 20 0 \
+"Local I2: " 3 1 "$VALUE1" 3 10 20 0 \
+"Local I2: " 4 1 "$VALUE1" 4 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
+
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    checkC
+    }
+}
+
+function checkC {
+  #IPMachine=$(hostname -I | awk '{print $1}')
+  MyIP=$(cat /srv/containers/scripts/myip)
+  [ "$MyIP" = "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
+    menu
+  } || {
+    create
+  }
+}
+
+function create {
+  export var1; export var2; export var3; export var4
+  
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var3" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var4" > /srv/containers/"$NOMECONTAINER"/Information
+
+  docker run -d \
+--name=$NOMECONTAINER \
+--network macvlan \
+--ip=$var1 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=pi.hole \
+--no-healthcheck \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/:/
+--restart=unless-stopped \
+DOCKERCONTAINERHERE:latest
+
+# IF NEEDED:
+  docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
+  docker restart "$NOMECONTAINER"
+}
+
+function clean {
+  unset var1
+  unset var2
+  unset var3
+  unset var4
+}
+
+# Start
+checkA
+checkB
+clean
+
+exit 1
