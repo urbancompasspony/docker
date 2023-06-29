@@ -58,11 +58,12 @@ docker run -d \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
+-v /srv/containers/"$NOMECONTAINER"/data:/data \
 $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/config
+  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
 }
 
 # USE IT ONLY IF NEEDED:
