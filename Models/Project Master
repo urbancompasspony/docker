@@ -61,6 +61,10 @@ docker run -d \
 $docker_repo
 }
 
+function makedir {
+  mkdir -p /srv/containers/"$NOMECONTAINER"/config
+}
+
 # USE IT ONLY IF NEEDED:
 function docker_extras {
 #docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
@@ -106,9 +110,9 @@ function var_read {
 function burn_var {
   export_all
 
-  mkdir -p /srv/containers/"$NOMECONTAINER"/config
-  chmod 777 -R /srv/containers/"$NOMECONTAINER"
+  makedir
 
+  chmod 777 -R /srv/containers/"$NOMECONTAINER"
   touch /srv/containers/"$NOMECONTAINER"/Information
 
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
