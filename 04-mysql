@@ -15,9 +15,6 @@ export var6
 # CAMINHO DO BANCO DE DADOS
 export var7
 
-# Global config for replication:
-export NOMECONTAINER="mysql-algo"
-
 function checkA {
   [ "$EUID" -ne 0 ] && {
     echo "Execute esse script como Root!"
@@ -27,6 +24,8 @@ function checkA {
 
 function checkB {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7
+
+  export NOMECONTAINER="$var1"
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
@@ -41,17 +40,20 @@ function checkB {
         var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
         var7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
 
+        export NOMECONTAINER="$var1"
+
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
 
-          create
+          checkC
         } || {
-          create
+          checkC
         }
         
       } || {
-        docker stop "$NOMECONTAINER"
-        docker rm "$NOMECONTAINER"
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+          }
         
         datetime=$(date +"%d-%m %H-%M")
         mkdir -p /srv/containers/.backupcnt
@@ -59,23 +61,23 @@ function checkB {
         
         rm -iR /srv/containers/"$NOMECONTAINER"
 
-        menu
+        checkC
         }
     } || {
       echo "A instalação local será mantida! Saindo..."
       exit
     }
   } || {
-    menu
+    checkC
     }
 }
 
 function menu {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7
 
-VALUE1="$NOMECONTAINER"; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5=""; VALUE6=""; VALUE7="/srv/containers/$NOMECONTAINER"
+VALUE1="mysql-custom"; VALUE2=""; VALUE3="0"; VALUE4="0"; VALUE5="0"; VALUE6="0"; VALUE7="/srv/containers/$NOMECONTAINER"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 14 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: MySQL" 14 40 0 \
 "NameCont:" 1 1 "$VALUE1" 1 10 20 0 \
 "Local IP:" 2 1 "$VALUE2" 2 10 20 0 \
 "MySQL PW" 3 1 "$VALUE3" 3 10 20 0 \
@@ -84,21 +86,20 @@ VALUE1="$NOMECONTAINER"; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5=""; VALUE6=""; 
 "DB Pass " 6 1 "$VALUE6" 6 10 20 0 \
 "DB PATH :" 7 1 "$VALUE7" 7 10 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-  [ $? -ne 0 ] && exit
-  var1=$(echo "$VALUE0" | sed -n 1p)
-  var2=$(echo "$VALUE0" | sed -n 2p)
-  var3=$(echo "$VALUE0" | sed -n 3p)
-  var4=$(echo "$VALUE0" | sed -n 4p)
-  var5=$(echo "$VALUE0" | sed -n 5p)
-  var6=$(echo "$VALUE0" | sed -n 6p)
-  var7=$(echo "$VALUE0" | sed -n 7p)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+var7=$(echo "$VALUE0" | sed -n 7p)
 
   [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var7" ] && {
     dialog --title "ERRO" --msgbox "Não deixe vazios os campos 1, 2 e 7!" 8 40
     menu
   } || {
-    checkC
+    checkB
     }
 }
 
@@ -115,8 +116,6 @@ function checkC {
 
 function create {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7
-
-  export NOMECONTAINER="$var1"
 
   mkdir -p /srv/containers/"$NOMECONTAINER"
   touch /srv/containers/"$NOMECONTAINER"/Information
@@ -148,7 +147,7 @@ function create {
 
 # Start
 checkA
-checkB
+menu
 
 docker network connect bridge $var1
 
