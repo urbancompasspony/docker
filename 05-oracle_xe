@@ -74,6 +74,7 @@ docker run -d \
 -e "NLS_CHARACTERSET=$var5" \
 -e "DB_DOMAIN=$var6" \
 -e "SKIP_VALIDATIONS=true" \
+-e "EM_EXPRESS_PORT=5500" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/$NOMECONTAINER/oradata/:/opt/oracle/oradata \
 $docker_repo
