@@ -20,7 +20,7 @@
 export NOMECONTAINER="oracleXE21C"
 
 # From 1 to 10!
-var_cont="5"
+var_cont="6"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -29,9 +29,9 @@ CustmN1="Container"
 
 CustmN2="Local IP"
 CustmN3="Password"
-CustmN4="DBdomain"
+CustmN4="DATABASE"
 CustmN5="Charset "
-CustmN6="."
+CustmN6="DBDomain"
 CustmN7="."
 CustmN8="."
 CustmN9="."
@@ -45,9 +45,9 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="#A1234abc"
-VALUE4="ftagricola"
+VALUE4="XEPDB1"
 VALUE5="AL32UTF8 or WE8MSWIN1252"
-VALUE6="0"
+VALUE6="ftagricola"
 VALUE7="0"
 VALUE8="0"
 VALUE9="0"
@@ -72,6 +72,7 @@ docker run -d \
 -e "ORACLE_PASSWORD=$var3" \
 -e "ORACLE_DATABASE=$var4" \
 -e "NLS_CHARACTERSET=$var5" \
+-e "DB_DOMAIN=$var6" \
 -e "SKIP_VALIDATIONS=true" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/$NOMECONTAINER/oradata/:/opt/oracle/oradata \
