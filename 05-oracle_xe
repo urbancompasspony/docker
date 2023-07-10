@@ -20,7 +20,7 @@
 export NOMECONTAINER="oracleXE21C"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="8"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -44,9 +44,9 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="abc"
+VALUE3="0"
 VALUE4="0"
-VALUE5="0"
+VALUE5="AL32UTF8"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -68,16 +68,14 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-e "" \
+-e "" \
+-e "" \
+-e "" \
+-e "" \
+-e "NLS_CHARACTERSET=$var5" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/$NOMECONTAINER/oradata/:/opt/oracle/oradata \
--v /srv/containers/$NOMECONTAINER/admin/:/opt/oracle/admin \
--v /srv/containers/$NOMECONTAINER/audit/:/opt/oracle/audit \
--v /srv/containers/$NOMECONTAINER/cfgtoollogs/:/opt/oracle/cfgtoollogs \
--v /srv/containers/$NOMECONTAINER/dbs/:/opt/oracle/dbs \
--v /srv/containers/$NOMECONTAINER/diag/:/opt/oracle/diag \
--v /srv/containers/$NOMECONTAINER/homes/:/opt/oracle/homes \
--v /srv/containers/$NOMECONTAINER/oraInventory/:/opt/oracle/oraInventory \
--v /srv/containers/$NOMECONTAINER/product/:/opt/oracle/product \
 -p 1521:1521 \
 $docker_repo
 }
