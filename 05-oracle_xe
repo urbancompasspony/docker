@@ -20,7 +20,7 @@
 export NOMECONTAINER="oracleXE21C"
 
 # From 1 to 10!
-var_cont="8"
+var_cont="5"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -31,8 +31,8 @@ CustmN2="Local IP"
 CustmN3="Password"
 CustmN4="DBdomain"
 CustmN5="Charset "
-CustmN6="Listener"
-CustmN7="SID     "
+CustmN6="."
+CustmN7="."
 CustmN8="."
 CustmN9="."
 CustmN10="."
@@ -44,9 +44,9 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
-VALUE5="AL32UTF8"
+VALUE3="#A1234abc"
+VALUE4="ftagricola"
+VALUE5="AL32UTF8 or WE8MSWIN1252"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -61,27 +61,25 @@ docker_repo="gvenzl/oracle-xe:21-full"
 function docker_custom {
 docker run -d \
 --name=$var1 \
---network macvlan \
 --ip=$var2 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
+--network macvlan \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
--e "" \
--e "" \
--e "" \
--e "" \
--e "" \
+-p 1521:1521 \
+-e "ORACLE_PASSWORD=$var3" \
+-e "ORACLE_DATABASE=$var4" \
 -e "NLS_CHARACTERSET=$var5" \
+-e "SKIP_VALIDATIONS=true" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/$NOMECONTAINER/oradata/:/opt/oracle/oradata \
--p 1521:1521 \
 $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{oradata,admin,audit,cfgtoollogs,dbs,diag,homes,oraInventory,product}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/oradata
 }
 
 # USE IT ONLY IF NEEDED:
