@@ -2,12 +2,11 @@
 
 # ATENTION:
 
-# When migratin a already running database, stop everything and copy /opt/oracle,
+# When migratin a already running database, stop everything and copy /opt/oracle/oradata,
 # moving folders accordingly respective inside /srv/containers/oracleXE21C
 
-# If creating a NEW container, remove the extra lines, keeping only oradata!
-
 # Reset database SYS and SYSTEM passwords:
+
 # docker exec <container name|id> resetPassword <your password>
 # Check Status:
 # docker exec oracleXE bash service oracle-xe-21c status
