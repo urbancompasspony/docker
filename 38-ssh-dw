@@ -72,7 +72,8 @@ function menu {
 function create {
   export NOMECONTAINER
 
-  mkdir -p /srv/containers/"$NOMECONTAINER"/dws
+  mkdir -p /srv/containers/"$NOMECONTAINER"/dwservice
+
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$NOMECONTAINER" > /srv/containers/"$NOMECONTAINER"/Information
 
