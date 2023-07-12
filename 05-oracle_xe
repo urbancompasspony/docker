@@ -8,7 +8,7 @@
 export NOMECONTAINER="oraclexe21c"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,7 +16,7 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
+CustmN3="OraclePW"
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
+VALUE3="#A1234abc"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -70,9 +70,18 @@ function makedir {
   touch /srv/containers/"$NOMECONTAINER"/root/.bashrc
 }
 
-# USE IT ONLY IF NEEDED:
 function docker_extras {
-docker exec -it "$NOMECONTAINER" bash
+  export var1 var3
+
+  mv /srv/containers/"$NOMECONTAINER"/oradata /srv/containers/"$NOMECONTAINER"/oradataBKP
+
+  docker exec "$var1" bash -c "(echo '$var3'; echo '$var3';) | /etc/init.d/oracle-xe-21c configure"
+  docker stop "$var1"
+
+  rm -R "/srv/containers/"$NOMECONTAINER"/oradata"
+  mv /srv/containers/"$NOMECONTAINER"/oradataBKP /srv/containers/"$NOMECONTAINER"/oradata
+
+  docker start "$var1"
 
 # =============================================================================
 # ########################################################################### #
@@ -192,7 +201,24 @@ function checkB {
   } || {
     create
   }
+}
 
+function checkC {
+  #IPMachine=$(hostname -I | awk '{print $1}')
+  MyIP=$(cat /srv/containers/scripts/myip)
+  [ "$MyIP" = "$myip" ] && {
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
+    menu
+  } || {
+    create
+    }
+}
+
+function create {
+  export_all
+  burn_var
+  docker_custom
+  docker_extras
 }
 
 function menu {
@@ -392,25 +418,6 @@ var10=$(echo "$VALUE0" | sed -n 10p)
 }
 
 checkB
-
-}
-
-function checkC {
-  #IPMachine=$(hostname -I | awk '{print $1}')
-  MyIP=$(cat /srv/containers/scripts/myip)
-  [ "$MyIP" = "$myip" ] && {
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
-    menu
-  } || {
-    create
-    }
-}
-
-function create {
-  export_all
-  burn_var
-  docker_custom
-  docker_extras
 }
 
 ################################################################################
