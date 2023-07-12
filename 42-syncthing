@@ -64,7 +64,7 @@ docker run -d \
 $docker_repo
 
 echo ""
-echo "Acess through $var2:8384"
+echo "Access through $var2:8384"
 sleep 5
 }
 
