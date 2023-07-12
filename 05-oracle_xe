@@ -43,7 +43,7 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="centosoracle:latest"
+docker_repo="urbancompasspony/centosoracle:latest"
 
 # Adjust if needed
 function docker_custom {
