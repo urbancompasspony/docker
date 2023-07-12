@@ -69,7 +69,7 @@ sleep 5
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/data
+  echo "nothing to make!"
 }
 
 # USE IT ONLY IF NEEDED:
