@@ -60,16 +60,17 @@ docker run -d \
 -p 21027:21027/udp \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/config:/var/syncthing/config \
 -v "$var3":/var/syncthing \
 $docker_repo
 
 echo ""
-echo "Access through $var2:8384"
+echo "Acess through $var2:8384"
 sleep 5
 }
 
 function makedir {
-  echo "nothing to make!"
+  mkdir -p /srv/containers/"$NOMECONTAINER"/config
 }
 
 # USE IT ONLY IF NEEDED:
