@@ -435,7 +435,3 @@ unset var9
 unset var10
 
 exit 1
-
-
-mkdir -p /your/home/certs
-chown -R 1000:1000 /your/home/certs
