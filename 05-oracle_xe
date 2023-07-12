@@ -1,25 +1,14 @@
 #!/bin/bash
 
-# ATENTION:
-
-# When migratin a already running database, stop everything and copy /opt/oracle/oradata,
-# moving folders accordingly respective inside /srv/containers/oracleXE21C
-
-# Reset database SYS and SYSTEM passwords:
-
-# docker exec <container name|id> resetPassword <your password>
-# Check Status:
-# docker exec oracleXE bash service oracle-xe-21c status
-
 # =============================================================================
 # ### C O N T R O L ### P A N E L ########################################### #
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="oracleXE21C"
+export NOMECONTAINER="oraclexe21c"
 
 # From 1 to 10!
-var_cont="6"
+var_cont="2"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -27,10 +16,10 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="Password"
-CustmN4="DATABASE"
-CustmN5="Charset "
-CustmN6="DBDomain"
+CustmN3="."
+CustmN4="."
+CustmN5="."
+CustmN6="."
 CustmN7="."
 CustmN8="."
 CustmN9="."
@@ -43,10 +32,10 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="#A1234abc"
-VALUE4="XEPDB1"
-VALUE5="AL32UTF8 or WE8MSWIN1252"
-VALUE6="ftagricola"
+VALUE3="0"
+VALUE4="0"
+VALUE5="0"
+VALUE6="0"
 VALUE7="0"
 VALUE8="0"
 VALUE9="0"
@@ -54,39 +43,36 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="gvenzl/oracle-xe:21-full"
+docker_repo="centosoracle:latest"
 
 # Adjust if needed
 function docker_custom {
 docker run -d \
 --name=$var1 \
+--network macvlan \
 --ip=$var2 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
---network macvlan \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
--p 1521:1521 \
--e "ORACLE_PASSWORD=$var3" \
--e "ORACLE_DATABASE=$var4" \
--e "NLS_CHARACTERSET=$var5" \
--e "DB_DOMAIN=$var6" \
--e "SKIP_VALIDATIONS=true" \
--e "EM_EXPRESS_PORT=5500" \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/$NOMECONTAINER/oradata/:/opt/oracle/oradata \
+-v /srv/containers/"$NOMECONTAINER"/root/.bashrc:/root/.bashrc \
+-v /srv/containers/"$NOMECONTAINER"/oradata:/opt/oracle/oradata \
+-v /srv/containers/"$NOMECONTAINER"/netadmin:/opt/oracle/homes/OraDBHome21cXE/network/admin \
+-v /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf:/etc/sysconfig/oracle-xe-21c.conf \
 $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/oradata
+  mkdir -p /srv/containers/"$NOMECONTAINER"/{sysconfig,oradata,netadmin,root}
+  touch /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
+  touch /srv/containers/"$NOMECONTAINER"/root/.bashrc
 }
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+docker exec -it "$NOMECONTAINER" bash
 
 # =============================================================================
 # ########################################################################### #
