@@ -45,7 +45,7 @@ VALUE10="0"
 # Set repository here!
 docker_repo="t4skforce/syncthing-relay:latest"
 
-mkdir -p /srv/containers/"$NOMECONTAINER"/certs
+makedir
 chown -R 1000:1000 /srv/containers/"$NOMECONTAINER"/certs
 
 # Adjust if needed
@@ -61,13 +61,12 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/home/relaysrv/certs \
+-v /srv/containers/"$NOMECONTAINER"/certs:/home/relaysrv/certs \
 $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/certs
 }
 
 # USE IT ONLY IF NEEDED:
