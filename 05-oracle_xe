@@ -60,28 +60,114 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/root/.bashrc:/root/.bashrc \
 -v /srv/containers/"$NOMECONTAINER"/oradata:/opt/oracle/oradata \
 -v /srv/containers/"$NOMECONTAINER"/netadmin:/opt/oracle/homes/OraDBHome21cXE/network/admin \
--v /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf:/etc/sysconfig/oracle-xe-21c.conf \
+-v /srv/containers/"$NOMECONTAINER"/sysconfig:/etc/sysconfig \
 $docker_repo
 }
 
 function makedir {
   mkdir -p /srv/containers/"$NOMECONTAINER"/{sysconfig,oradata,netadmin,root}
-  touch /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
   touch /srv/containers/"$NOMECONTAINER"/root/.bashrc
 }
 
 function docker_extras {
   export var1 var3
 
-  mv /srv/containers/"$NOMECONTAINER"/oradata /srv/containers/"$NOMECONTAINER"/oradataBKP
+  [ -f /srv/containers/"$var1"/sysconfig/oracle-xe-21c.conf ] && {
+    mv /srv/containers/"$NOMECONTAINER"/oradata /srv/containers/"$NOMECONTAINER"/oradataBKP
+    docker exec "$var1" bash -c "(echo '$var3'; echo '$var3';) | /etc/init.d/oracle-xe-21c configure"
+    docker stop "$var1"
+    rm -R "/srv/containers/"$NOMECONTAINER"/oradata"
+    mv /srv/containers/"$NOMECONTAINER"/oradataBKP /srv/containers/"$NOMECONTAINER"/oradata
+    docker start "$var1"
+  } || {
+    touch /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
 
-  docker exec "$var1" bash -c "(echo '$var3'; echo '$var3';) | /etc/init.d/oracle-xe-21c configure"
-  docker stop "$var1"
+	VALUE1="1521"; VALUE2="AL32UTF8 / WE8MSWIN1252"; VALUE3="ftagricola"
 
-  rm -R "/srv/containers/"$NOMECONTAINER"/oradata"
-  mv /srv/containers/"$NOMECONTAINER"/oradataBKP /srv/containers/"$NOMECONTAINER"/oradata
+    VALUE_DB=$(dialog --ok-label "Definir" --title "OracleDB" --form "Versão XE 21 C" 11 40 0 \
+"LstnPort: " 1 1 "$VALUE1" 1 11 30 0 \
+"Char Set: " 2 1 "$VALUE2" 2 11 30 0 \
+"DBDomain: " 3 1 "$VALUE3" 3 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+portexp=$(echo "$VALUE_DB" | sed -n 1p)
+CHARSETDB=$(echo "$VALUE_DB" | sed -n 2p)
+DEDM=$(echo "$VALUE_DB" | sed -n 3p)
 
-  docker start "$var1"
+    echo -e "LISTENER_PORT=$portexp
+EM_EXPRESS_PORT=5500
+CHARSET=$CHARSETDB
+DBFILE_DEST=
+DB_DOMAIN=$DEDM
+SKIP_VALIDATIONS=true" >> /srv/containers/"$var1"/sysconfig/oracle-xe-21c.conf
+
+    touch /srv/containers/"$var1"/root/.bashrc
+
+echo -e "
+# User specific aliases and functions for Oracle!
+umask 022
+ORACLE_SID=XE
+ORAENV_ASK=NO
+ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
+PATH=$PATH:$ORACLE_HOME/bin
+. /opt/oracle/product/21c/dbhomeXE/bin/oraenv" >> /srv/containers/"$var1"/root/.bashrc
+
+    docker_extras_2
+
+    docker exec "$var1" bash -c "(echo '$var3'; echo '$var3';) | /etc/init.d/oracle-xe-21c configure"
+  }
+}
+
+function docker_extras_2 {
+
+  [ "$DEDM" = "ftagricola" ] && {
+
+  touch /srv/containers/"$var1"/netadmin/listener.ora
+
+echo -e "DEFAULT_SERVICE_LISTENER = XE
+LISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
+    )
+  )" >> /srv/containers/"$var1"/netadmin/listener.ora
+
+  touch /srv/containers/"$var1"/netadmin/sqlnet.ora
+
+echo -e "NAMES.DIRECTORY_PATH= (TNSNAMES, EZCONNECT)
+SQLNET.ALLOWED_LOGON_VERSION=10
+SQLNET.ALLOWED_LOGON_VERSION_CLIENT=10
+SQLNET.ALLOWED_LOGON_VERSION_SERVER=10" >> /srv/containers/"$var1"/netadmin/sqlnet.ora
+
+  touch /srv/containers/"$var1"/netadmin/tnsnames.ora
+
+echo -e "XE =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = XE.ftagricola)
+    )
+  )
+
+LISTENER_XE =
+  (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
+
+ORACLR_CONNECTION_DATA =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
+    )
+    (CONNECT_DATA =
+      (SID = CLRExtProc)
+      (PRESENTATION = RO)
+    )
+  )" >> /srv/containers/"$var1"/netadmin/tnsnames.ora
+
+  } || {
+    echo "Nothing to do!" >> /dev/null
+  }
 
 # =============================================================================
 # ########################################################################### #
