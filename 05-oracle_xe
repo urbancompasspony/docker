@@ -73,7 +73,9 @@ function docker_extras {
   export var1 var3
 
   [ -f /srv/containers/"$var1"/sysconfig/oracle-xe-21c.conf ] && {
+    docker stop "$var1"
     mv /srv/containers/"$NOMECONTAINER"/oradata /srv/containers/"$NOMECONTAINER"/oradataBKP
+    docker start "$var1"
     docker exec "$var1" bash -c "(echo '$var3'; echo '$var3';) | /etc/init.d/oracle-xe-21c configure"
     docker stop "$var1"
     rm -R "/srv/containers/"$NOMECONTAINER"/oradata"
