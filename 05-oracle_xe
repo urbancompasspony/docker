@@ -114,6 +114,11 @@ echo 'listener: alias to check listener and oracle process status!'
 echo 'lservice: alias to check listener and oracle process status!'
 echo 'sqlplus: alias to check OracleDB status!'
 echo ' '
+echo 'Show Tables: SELECT USERNAME FROM ALL_USERS ORDER BY USERNAME; '
+echo 'Show Tablespaces: SELECT TABLESPACE_NAME FROM USER_TABLESPACES; '
+echo 'Show PDB: SELECT PDB_ID, PDB_NAME, STATUS FROM DBA_PDBS ORDER BY PDB_ID; '
+echo 'Show All Tables: SELECT table_name, owner, tablespace_name FROM all_tables; '
+echo ' '
 " >> /srv/containers/"$var1"/root/.bashrc
 
   docker_extras_2
