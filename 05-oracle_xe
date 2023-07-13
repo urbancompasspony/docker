@@ -70,23 +70,13 @@ function makedir {
 }
 
 function docker_extras {
-  export var1 var3
+  export_all
 
-  [ -f /srv/containers/"$var1"/sysconfig/oracle-xe-21c.conf ] && {
-    docker stop "$var1"
-    mv /srv/containers/"$NOMECONTAINER"/oradata /srv/containers/"$NOMECONTAINER"/oradataBKP
-    docker start "$var1"
-    docker exec "$var1" bash -c "(echo '$var3'; echo '$var3';) | /etc/init.d/oracle-xe-21c configure"
-    docker stop "$var1"
-    rm -R "/srv/containers/"$NOMECONTAINER"/oradata"
-    mv /srv/containers/"$NOMECONTAINER"/oradataBKP /srv/containers/"$NOMECONTAINER"/oradata
-    docker start "$var1"
-  } || {
-    touch /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
+  touch /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
 
-	VALUE1="1521"; VALUE2="AL32UTF8 / WE8MSWIN1252"; VALUE3="ftagricola"
+  VALUE1="1521"; VALUE2="AL32UTF8 / WE8MSWIN1252"; VALUE3="ftagricola"
 
-    VALUE_DB=$(dialog --ok-label "Definir" --title "OracleDB" --form "Versão XE 21 C" 11 40 0 \
+  VALUE_DB=$(dialog --ok-label "Definir" --title "OracleDB" --form "Escolha 1 Charset abaixo!" 11 40 0 \
 "LstnPort: " 1 1 "$VALUE1" 1 11 30 0 \
 "Char Set: " 2 1 "$VALUE2" 2 11 30 0 \
 "DBDomain: " 3 1 "$VALUE3" 3 11 30 0 \
@@ -96,37 +86,44 @@ portexp=$(echo "$VALUE_DB" | sed -n 1p)
 CHARSETDB=$(echo "$VALUE_DB" | sed -n 2p)
 DEDM=$(echo "$VALUE_DB" | sed -n 3p)
 
-    echo -e "LISTENER_PORT=$portexp
+  echo -e "LISTENER_PORT=$portexp
 EM_EXPRESS_PORT=5500
 CHARSET=$CHARSETDB
 DBFILE_DEST=
 DB_DOMAIN=$DEDM
 SKIP_VALIDATIONS=true" >> /srv/containers/"$var1"/sysconfig/oracle-xe-21c.conf
 
-    touch /srv/containers/"$var1"/root/.bashrc
+  touch /srv/containers/"$var1"/root/.bashrc
 
-echo -e "
+  echo -e "
 # User specific aliases and functions for Oracle!
 umask 022
 ORACLE_SID=XE
 ORAENV_ASK=NO
 ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
 PATH=$PATH:$ORACLE_HOME/bin
-. /opt/oracle/product/21c/dbhomeXE/bin/oraenv" >> /srv/containers/"$var1"/root/.bashrc
+. /opt/oracle/product/21c/dbhomeXE/bin/oraenv
 
-    docker_extras_2
+alias listener='lsnrctl status'
+alias sqlplus='sqlplus system/$var3@localhost:$portexp/XE.$DEDM'
 
-    docker exec "$var1" bash -c "(echo '$var3'; echo '$var3';) | /etc/init.d/oracle-xe-21c configure"
-  }
+echo ' '
+echo 'listener: alias to check listener and oracle process status!'
+echo 'sqlplus: alias to check OracleDB status!'
+echo ' '
+" >> /srv/containers/"$var1"/root/.bashrc
+
+  docker_extras_2
+
+  docker exec "$var1" bash -c "(echo '$var3'; echo '$var3';) | /etc/init.d/oracle-xe-21c configure"
 }
 
 function docker_extras_2 {
-
   [ "$DEDM" = "ftagricola" ] && {
 
   touch /srv/containers/"$var1"/netadmin/listener.ora
 
-echo -e "DEFAULT_SERVICE_LISTENER = XE
+  echo -e "DEFAULT_SERVICE_LISTENER = XE
 LISTENER =
   (DESCRIPTION_LIST =
     (DESCRIPTION =
@@ -137,14 +134,14 @@ LISTENER =
 
   touch /srv/containers/"$var1"/netadmin/sqlnet.ora
 
-echo -e "NAMES.DIRECTORY_PATH= (TNSNAMES, EZCONNECT)
+  echo -e "NAMES.DIRECTORY_PATH= (TNSNAMES, EZCONNECT)
 SQLNET.ALLOWED_LOGON_VERSION=10
 SQLNET.ALLOWED_LOGON_VERSION_CLIENT=10
 SQLNET.ALLOWED_LOGON_VERSION_SERVER=10" >> /srv/containers/"$var1"/netadmin/sqlnet.ora
 
   touch /srv/containers/"$var1"/netadmin/tnsnames.ora
 
-echo -e "XE =
+  echo -e "XE =
   (DESCRIPTION =
     (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
     (CONNECT_DATA =
@@ -233,73 +230,37 @@ function error {
   menu
 }
 
-function docker_stop_rm {
-  [ $(docker stop "$NOMECONTAINER") ] && {
-    docker rm "$NOMECONTAINER"
-  } || {
-    echo "O container $NOMECONTAINER não existe. Continuando..."
-  }
-}
-
-function bkp_and_rm_data {
-  datetime=$(date +"%d-%m %H-%M")
-  echo "Fazendo backup de $NOMECONTAINER:"
-  mkdir -p /srv/containers/.backupcnt
-  zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
-  echo "Removendo a pasta de dados de $NOMECONTAINER:"
-  rm -iR /srv/containers/"$NOMECONTAINER"
-}
-
 function checkB {
   export_all
 
   NOMECONTAINER=$var1
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
-    dialog --title "$NOMECONTAINER já existente!" --yesno "Deseja refazê-lo?" 6 40
-    [ $? = 0 ] && {
-      dialog --title "Recriando o container:" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
-      [ $? = 0 ] && {
-        var_read
-        docker_stop_rm
-        create
-      } || {
-        dialog --title "Recriando o container:" --yesno "Fazer backup e remover a pasta /srv/containers/$NOMECONTAINER?" 6 40
-        [ $? = 0 ] && {
-          docker_stop_rm
-          bkp_and_rm_data
-          menu
-        } || {
-          dialog --title "Recriando o container:" --yesno "Fazer REMOVER a pasta /srv/containers/$NOMECONTAINER?" 6 40
-          [ $? = 0 ] && {
-            docker_stop_rm
-            echo "Removendo o diretório /srv/containers/$NOMECONTAINER"
-            rm -R /srv/containers/"$NOMECONTAINER"
-            menu
-          } || {
-            docker_stop_rm
-            create
-          }
-        }
-      }
-    } || {
-      echo "A instalação local será mantida! Saindo..."
-      exit
-    }
+    clear
+    echo "###################################################################"
+    echo "Instalação do container $NOMECONTAINER detectado!"
+    echo " "
+    echo "Se desejar e/ou precisar refazer este container, pare-o, remova-o," 
+    echo "faça um backup de /srv/containers/$NOMECONTAINER,"
+    echo "limpe o diretório /srv/containers/$NOMECONTAINER"
+    echo "e re-execute este script instalador para refazer tudo!"
+    echo " "
+    echo "Após isso, remova o novo banco de dados e restaure o backup."
+    echo "Sugestão: restaurar apenas 'oradata' primeiro."
+    echo " "
+    echo "Comandos sugeridos:"
+    echo " "
+    echo "$ docker stop $NOMECONTAINER"
+    echo "$ docker rm $NOMECONTAINER"
+    echo "$ sudo rsync -va /srv/containers/$NOMECONTAINER /mnt/DESTINY"
+    echo "$ sudo rm -Rf /srv/containers/CUIDADO!$NOMECONTAINER"
+    echo " "
+    echo "Saindo..."
+    echo "###################################################################"
+    exit
   } || {
     create
   }
-}
-
-function checkC {
-  #IPMachine=$(hostname -I | awk '{print $1}')
-  MyIP=$(cat /srv/containers/scripts/myip)
-  [ "$MyIP" = "$myip" ] && {
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
-    menu
-  } || {
-    create
-    }
 }
 
 function create {
