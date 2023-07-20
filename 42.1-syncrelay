@@ -8,7 +8,7 @@
 export NOMECONTAINER="syncthing-relay"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,7 +16,7 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
+CustmN3="Speed"
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
+VALUE3="5000000"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -61,8 +61,8 @@ docker run -d \
 --restart=unless-stopped \
 -p 22067:22067 \
 -e POOLS="" \
--e RATE_SESSION=5000000 \
--e RATE_GLOBAL=5000000 \
+-e RATE_SESSION=$var3 \
+-e RATE_GLOBAL=$var3 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/certs:/home/relaysrv/certs \
 $docker_repo
@@ -70,8 +70,8 @@ $docker_repo
 
 # DESCRIPTION:
 # POOLS: Empty to private relay!
-# RATE_SESSION = 5.000.000 = 5 Mbps!
-# RATE_GLOBAL = 5.000.000 = 5 Mbps!
+# RATE_SESSION = Default = 5.000.000 = 5 Mbps!
+# RATE_GLOBAL = Default = 5.000.000 = 5 Mbps!
 
 function makedir {
   mkdir -p /srv/containers/"$NOMECONTAINER"/certs
