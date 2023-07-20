@@ -5,10 +5,10 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="A-CUSTOM-A"
+export NOMECONTAINER="UbuntuDesktop2304-A"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="5"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,9 +16,9 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
-CustmN5="."
+CustmN3="Port    "
+CustmN4="Child   "
+CustmN5="Password"
 CustmN6="."
 CustmN7="."
 CustmN8="."
@@ -32,9 +32,9 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
-VALUE5="0"
+VALUE3="9876"
+VALUE4="mate-terminal"
+VALUE5="P4ss0rd"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -58,14 +58,23 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-e "PORTS=$var4" \
+-e "CHILD=$var5" \
+-e "passw0rd=$var5" \
 -p 9876:9876 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/data:/home/user \
+-v /srv/containers/"$NOMECONTAINER"/home:/home/user \
 $docker_repo
+
+echo "Access: http://$var2:9876"
+sleep 5
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/home
+
+  touch /srv/containers/"$NOMECONTAINER"/home/.passwordfile
+  echo "$var5" > /srv/containers/"$NOMECONTAINER"/home/.passwordfile
 }
 
 # USE IT ONLY IF NEEDED:
