@@ -66,6 +66,9 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/certs:/home/relaysrv/certs \
 $docker_repo
+
+echo "Open these ports on Firewall: 22000, 22067, 22070"
+sleep 10
 }
 
 # DESCRIPTION:
