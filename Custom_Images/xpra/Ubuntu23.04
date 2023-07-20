@@ -10,15 +10,11 @@ RUN apt update && \
     apt clean && \ 
     rm -rf /var/lib/apt/lists/*
    
-# Add sudo to user
-#RUN adduser --disabled-password --gecos "user" --uid 1000 user
-#RUN apt update && apt install -y sudo
-#RUN usermod -aG sudo user
-#RUN echo 'ALL ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-#RUN apt update && apt install -y sudo
-#RUN usermod -aG sudo user
-#RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN adduser --disabled-password --gecos "user" --uid 1000 user
+RUN apt update && apt install -y sudo
+RUN usermod -aG sudo user
+RUN echo 'ALL ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 RUN apt update && \
     DEBIAN_FRONTEND=noninteractive && \
@@ -27,40 +23,40 @@ RUN apt update && \
 
 RUN apt update && apt install -y apt-utils \
     build-essential \
-    firefox \
-    gdm3 \
+    libreoffice \
+    htop \
+    epiphany-browser \
     glances \
     glmark2 \
-    mate-session \
     mate-terminal \
-    htop \
+    terminator \
 	btop \
     libqt5x11extras5 \
     software-properties-common \
-    tasksel
+    tasksel && \
+    apt clean && \ 
+    rm -rf /var/lib/apt/lists/*
+
+# DESKTOP ENVIRONMENT!
+RUN apt update && apt install -y \
+    mate-common \
+    mate-desktop \
+    lightdm && \
+    apt clean && \ 
+    rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /run/user/1000/xpra
 RUN mkdir -p /run/xpra
 
 RUN chown user:user /run/user/1000/xpra
 RUN chown user:user /run/xpra
-RUN echo "LANG=pt_BR.UTF-8" >> /etc/locale.conf
 
-RUN apt install -y language-pack-en-base && \ 
-    locale-gen pt_BR.UTF-8 && \ 
-    update-locale LANG=pt_BR.UTF-8
-
-RUN echo LANG="pt_BR.UTF-8" > /etc/default/locale
-RUN echo pt_BR.UTF-8 UTF-8 >> /etc/locale.gen && locale-gen
-
-ENV LANG=C.UTF-8 
-ENV LC_ALL "pt_BR.UTF-8"
-
-ENV DISPLAY=:100
+ENV DISPLAY=":100"
+ENV PORTS="9876"
+ENV CHILD="mate-terminal"
+ENV passw0rd="P4ss0rd"
 
 USER user
 WORKDIR /home/user
 
-EXPOSE 9876
-
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=gnome-terminal --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
+CMD xpra start --bind-tcp=0.0.0.0:$PORTS,auth=file:filename=/home/user/.passwordfile --html=on --start-child=$CHILD --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no $DISPLAY
