@@ -3,18 +3,18 @@ FROM ubuntu:23.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && \
-    apt install -y xpra wget curl grep sed dpkg \
+    apt install -y wget curl grep sed dpkg \
     xvfb \
     xterm \
     sshfs && \
     apt clean && \ 
     rm -rf /var/lib/apt/lists/*
    
-RUN adduser --disabled-password --gecos "user" --uid 1000 user
-RUN apt update && apt install -y sudo
-RUN usermod -aG sudo user
-RUN echo 'ALL ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+#RUN adduser --disabled-password --gecos "user" --uid 1000 user
+#RUN apt update && apt install -y sudo
+#RUN usermod -aG sudo user
+#RUN echo 'ALL ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+#RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 RUN apt update && apt install -y apt-utils \
     build-essential \
@@ -40,6 +40,16 @@ RUN apt update && apt install -y \
     apt clean && \ 
     rm -rf /var/lib/apt/lists/*
 
+# XPRA
+RUN mkdir /xpra \
+    && wget -nv --no-check-certificate https://github.com/Xpra-org/xpra/archive/refs/tags/v4.4.6.zip \
+    && unzip v4.4.6.zip -C /XPra \
+    && rm v4.4.6.zip \
+    && cd /XPra \
+    && ./configure \
+    && make \
+    && make install
+
 RUN mkdir -p /run/user/1000/xpra
 RUN mkdir -p /run/xpra
 
@@ -51,7 +61,7 @@ ENV DISPLAY=":100"
 ENV CHILD="mate-terminal"
 ENV passw0rd="P4ss0rd"
 
-USER user
+#USER user
 WORKDIR /home/user
 
 CMD xpra start --bind-tcp=0.0.0.0:$PORTS,auth=password:value=$passw0rd --html=on --start-child=$CHILD --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no $DISPLAY
