@@ -8,7 +8,7 @@
 export NOMECONTAINER="ubuntuddesk2304-A"
 
 # From 1 to 10!
-var_cont="5"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,9 +16,9 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="Port    "
-CustmN4="Child   "
-CustmN5="Password"
+CustmN3="Child   "
+CustmN4="Password"
+CustmN5="."
 CustmN6="."
 CustmN7="."
 CustmN8="."
@@ -32,9 +32,9 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="9876"
-VALUE4="mate-terminal"
-VALUE5="P4ss0rd"
+VALUE3="mate-terminal"
+VALUE4="P4ss0rd"
+VALUE5="0"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -59,13 +59,11 @@ docker run -d \
 -e PORTS=$var3 \
 -e CHILD=$var4 \
 -e passw0rd=$var5 \
--p 9876:9876 \
+-p $var3:$var3 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/home:/home/user \
 $docker_repo
 
-echo $var4
-echo $var5
 echo "Access: http://$var2:$var3"
 sleep 5
 }
