@@ -58,9 +58,9 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-e "passw0rd=$var3" \
 -e "PORTS=$var4" \
 -e "CHILD=$var5" \
--e "passw0rd=$var5" \
 -p 9876:9876 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/home:/home/user \
