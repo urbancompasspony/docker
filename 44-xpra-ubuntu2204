@@ -5,7 +5,7 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="UbuntuDesktop2304-A"
+export NOMECONTAINER="ubuntuddesk2304-A"
 
 # From 1 to 10!
 var_cont="5"
@@ -45,8 +45,6 @@ VALUE10="0"
 # Set repository here!
 docker_repo="xpra"
 
-docker run -it 
-
 # Adjust if needed
 function docker_custom {
 docker run -d \
@@ -58,15 +56,17 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
--e "PORTS=$var3" \
--e "CHILD=$var4" \
--e "passw0rd=$var5" \
+-e PORTS=$var3 \
+-e CHILD=$var4 \
+-e passw0rd=$var5 \
 -p 9876:9876 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/home:/home/user \
 $docker_repo
 
-echo "Access: http://$var2:9876"
+echo $var4
+echo $var5
+echo "Access: http://$var2:$var3"
 sleep 5
 }
 
