@@ -3,7 +3,7 @@ FROM ubuntu:23.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && \
-    apt install -y wget curl grep sed dpkg \
+    apt install -y wget curl grep sed dpkg unzip \
     xvfb \
     xterm \
     sshfs && \
