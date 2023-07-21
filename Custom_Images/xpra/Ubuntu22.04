@@ -16,11 +16,6 @@ RUN usermod -aG sudo user
 RUN echo 'ALL ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-RUN apt update && \
-    DEBIAN_FRONTEND=noninteractive && \
-    apt clean && \ 
-    rm -rf /var/lib/apt/lists/*
-
 RUN apt update && apt install -y apt-utils \
     build-essential \
     libreoffice \
@@ -30,7 +25,7 @@ RUN apt update && apt install -y apt-utils \
     glmark2 \
     mate-terminal \
     terminator \
-	btop \
+    btop \
     libqt5x11extras5 \
     software-properties-common \
     tasksel && \
@@ -52,11 +47,10 @@ RUN chown user:user /run/user/1000/xpra
 RUN chown user:user /run/xpra
 
 ENV DISPLAY=":100"
-ENV PORTS="9876"
 ENV CHILD="mate-terminal"
 ENV passw0rd="P4ss0rd"
 
 USER user
 WORKDIR /home/user
 
-CMD xpra start --bind-tcp=0.0.0.0:$PORTS,auth=file:filename=/home/user/.passwordfile --html=on --start-child=$CHILD --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no $DISPLAY
+CMD xpra start --bind-tcp=0.0.0.0:9876,auth=file:filename=/home/user/.passwordfile --html=on --start-child=$CHILD --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no $DISPLAY
