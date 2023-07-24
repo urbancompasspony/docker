@@ -1,67 +1,134 @@
-FROM ubuntu:22.04
+# Dockerfile modified from https://github.com/lanrat/docker-xpra-html5
+# Using NVIDIA OpenGL base image for Ubuntu 22.04 
+# This image does not have CUDA pre-installed
+FROM ubuntu:2204
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && \
-    apt install -y wget curl grep sed dpkg unzip \
-    xvfb \
-    xterm \
-    sshfs && \
-    apt clean && \ 
-    rm -rf /var/lib/apt/lists/*
-   
-#RUN adduser --disabled-password --gecos "user" --uid 1000 user
-#RUN apt update && apt install -y sudo
-#RUN usermod -aG sudo user
-#RUN echo 'ALL ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-#RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-RUN apt update && apt install -y apt-utils \
-    build-essential \
-    libreoffice \
-    htop \
-    epiphany-browser \
+# Install basics, gnome desktop, benchmarks
+RUN apt-get update
+RUN apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    dpkg \
+    figlet \
+    gcc \
+    gdm3 \    
+    git \
     glances \
     glmark2 \
-    mate-terminal \
-    terminator \
-    btop \
-    libqt5x11extras5 \
+    sed \
     software-properties-common \
-    tasksel && \
-    apt clean && \ 
+    sudo \
+    wget \
+    xterm \
+    xvfb 
+
+RUN apt-get install -y \
+    gnome-shell \ 
+    gnome-session \ 
+    gnome-terminal \
+    gpgv \
+    grep \
+    htop \
+    less \
+    libfuse2 \
+    libglib2.0-0 \
+    libxext6 \
+    libsm6 \
+    libxrender1 \
+    lolcat \
+    lsb-release \
+    mercurial \
+    mesa-utils \
+    nautilus \
+    nautilus-admin \
+    neofetch \
+    nodejs \
+    seahorse-nautilus \
+    subversion \
+    tasksel \
+    thunar \
+    tmux \
+    zsh \
+    && \
+    apt-get clean && \ 
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
 
-# DESKTOP ENVIRONMENT!
-RUN apt update && apt install -y \
-    mate-common \
-    mate-desktop \
-    lightdm && \
-    apt clean && \ 
-    rm -rf /var/lib/apt/lists/*
+# install XPRA: https://github.com/Xpra-org/xpra/wiki/Download#-linux
+RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
+    echo "deb https://xpra.org/ jammy main" >> /etc/apt/sources.list.d/xpra.list && \
+    apt update && \
+    apt install xpra -y
 
-# XPRA
-RUN mkdir /xpra \
-    && wget -nv --no-check-certificate https://github.com/Xpra-org/xpra/archive/refs/tags/v4.4.6.zip \
-    && unzip v4.4.6.zip -C /XPra \
-    && rm v4.4.6.zip \
-    && cd /XPra \
-    && ./configure \
-    && make \
-    && make install
+# Create XAuthority configurations
+#RUN export XAUTHORITY=~/.Xauthority && \
+#    sed -i -e "s/console/anybody/" /etc/X11/Xwrapper.config && \
+#    nvidia-xconfig -a --allow-empty-initial-configuration --enable-all-gpus --use-display-device=none --virtual=1920x1080 -o /etc/X11/xorg.conf --busid=0:6:0 && \
+#    wget https://gist.githubusercontent.com/tyson-swetnam/3490dc02476818a67a3bcdcba3017678/raw/66885bbfa54a406ce486484a79ece237028c5ee7/xorg.conf -O /etc/X11/xorg.conf
+   
+# define username as ubuntu and limit its ownership
+ARG LOCAL_USER=user
 
-RUN mkdir -p /run/user/1000/xpra
-RUN mkdir -p /run/xpra
+ARG PRIV_CMDS='/bin/ch*,/bin/cat,/bin/gunzip,/bin/tar,/bin/mkdir,/bin/ps,/bin/mv,/bin/cp,/usr/bin/apt*,/usr/bin/pip*,/bin/yum,/bin/snap,/bin/curl,/bin/tee'
 
-RUN chown user:user /run/user/1000/xpra
-RUN chown user:user /run/xpra
+RUN adduser --disabled-password --gecos "ubuntu" --uid 1000 ${LOCAL_USER}  && \
+    usermod -aG sudo ${LOCAL_USER} && \
+    echo "$LOCAL_USER ALL=NOPASSWD: $PRIV_CMDS" >> /etc/sudoers
 
-ENV PORTS="9876"
-ENV DISPLAY=":100"
-ENV CHILD="mate-terminal"
-ENV passw0rd="P4ss0rd"
+# Create user space for xpra
+RUN mkdir -p /run/xpra/1000 && \
+    chown -R ${LOCAL_USER}:${LOCAL_USER} /run/xpra && \
+    mkdir -p /run/${LOCAL_USER}/1000 && \
+    chown -R ${LOCAL_USER}:${LOCAL_USER} /run/${LOCAL_USER}
 
-#USER user
-WORKDIR /home/user
+# install ttyd
+RUN curl -L "https://github.com/tsl0922/ttyd/releases/download/1.7.3/ttyd.x86_64" > ttyd && \
+    chmod a+x ttyd && \
+    mv ttyd /usr/local/bin/ttyd
 
-CMD xpra start --bind-tcp=0.0.0.0:$PORTS,auth=password:value=$passw0rd --html=on --start-child=$CHILD --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no $DISPLAY
+# getting a locales error
+RUN apt-get clean && \
+    apt-get install locales -y && \
+    locale-gen pt_BR.UTF-8
+
+# Remove the Firefox Snap
+RUN sudo apt-get remove -y firefox
+
+# Add the Mozilla team PPA to your list of software sources
+RUN sudo add-apt-repository -y ppa:mozillateam/ppa
+
+# Alter the Firefox package priority to ensure the PPA/deb/apt version of Firefox is preferred
+RUN echo '\n\
+Package: *\n\
+Pin: release o=LP-PPA-mozillateam\n\
+Pin-Priority: 1001\n\
+' | sudo tee /etc/apt/preferences.d/mozilla-firefox
+
+# Ensure future Firefox upgrades will be installed automatically
+RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:${distro_codename}";' | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
+
+# Finally, install Firefox via apt
+RUN sudo apt-get update && sudo apt-get install -y firefox
+
+# Switch back to dialog for any ad-hoc use of apt-get
+#ENV DEBIAN_FRONTEND=dialog
+
+# ready to set user 
+USER ${LOCAL_USER}
+
+# set shell as bash
+ENV SHELL=bash
+ENV TERM=linux
+ENV DISPLAY=:100
+
+WORKDIR /home/${LOCAL_USER}
+
+# expose port 9876 for Xpra
+EXPOSE 9876
+
+# RUN
+CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no
