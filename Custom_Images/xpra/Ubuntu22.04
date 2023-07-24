@@ -1,6 +1,6 @@
 # Dockerfile modified from https://github.com/lanrat/docker-xpra-html5
-# Using NVIDIA OpenGL base image for Ubuntu 22.04 
-# This image does not have CUDA pre-installed
+# Based on: https://github.com/cyverse-vice/xpra/blob/main/desktop/22.04/Dockerfile
+
 FROM ubuntu:2204
 
 ENV DEBIAN_FRONTEND=noninteractive
