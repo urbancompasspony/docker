@@ -43,7 +43,7 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="xpra"
+docker_repo="urbancompasspony/xpra-ubuntu:latest"
 
 # Adjust if needed
 function docker_custom {
