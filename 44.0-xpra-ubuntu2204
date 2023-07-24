@@ -64,6 +64,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/home:/home/user \
 $docker_repo
 
+echo ""
 echo "Access: http://$var2:$var3"
 sleep 5
 }
