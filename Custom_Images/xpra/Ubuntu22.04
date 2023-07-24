@@ -1,9 +1,13 @@
+# Dockerfile modified from https://github.com/lanrat/docker-xpra-html5
+# Using NVIDIA OpenGL base image for Ubuntu 22.04 
+# This image does not have CUDA pre-installed
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install basics, gnome desktop, benchmarks
 RUN apt-get update
+
 RUN apt-get install -y \
     apt-transport-https \
     ca-certificates \
@@ -60,13 +64,7 @@ RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
     echo "deb https://xpra.org/ jammy main" >> /etc/apt/sources.list.d/xpra.list && \
     apt update && \
     apt install xpra -y
-
-# Create XAuthority configurations
-#RUN export XAUTHORITY=~/.Xauthority && \
-#    sed -i -e "s/console/anybody/" /etc/X11/Xwrapper.config && \
-#    nvidia-xconfig -a --allow-empty-initial-configuration --enable-all-gpus --use-display-device=none --virtual=1920x1080 -o /etc/X11/xorg.conf --busid=0:6:0 && \
-#    wget https://gist.githubusercontent.com/tyson-swetnam/3490dc02476818a67a3bcdcba3017678/raw/66885bbfa54a406ce486484a79ece237028c5ee7/xorg.conf -O /etc/X11/xorg.conf
-   
+  
 # define username as ubuntu and limit its ownership
 ARG LOCAL_USER=user
 
@@ -87,7 +85,7 @@ RUN curl -L "https://github.com/tsl0922/ttyd/releases/download/1.7.3/ttyd.x86_64
     chmod a+x ttyd && \
     mv ttyd /usr/local/bin/ttyd
 
-# getting a locales error
+# if getting a locales error
 RUN apt-get clean && \
     apt-get install locales -y && \
     locale-gen pt_BR.UTF-8
@@ -111,9 +109,6 @@ RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:${distro_cod
 # Finally, install Firefox via apt
 RUN sudo apt-get update && sudo apt-get install -y firefox
 
-# Switch back to dialog for any ad-hoc use of apt-get
-#ENV DEBIAN_FRONTEND=dialog
-
 # ready to set user 
 USER ${LOCAL_USER}
 
@@ -124,8 +119,10 @@ ENV DISPLAY=:100
 
 WORKDIR /home/${LOCAL_USER}
 
-# expose port 9876 for Xpra
-EXPOSE 9876
+ENV PORTS="9876"
+ENV DISPLAY=":100"
+ENV CHILD="mate-terminal"
+ENV passw0rd="P4ss0rd"
 
 # RUN
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=yes --notifications=no --bell=no
+CMD xpra start --bind-tcp=0.0.0.0:$PORTS,auth=password:value=$passw0rd --html=on --start-child=$CHILD --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=yes --notifications=no --bell=no $DISPLAY
