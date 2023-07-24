@@ -2,6 +2,7 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# SYSTEM
 RUN apt-get update && \
     apt-get install -y \
     software-properties-common \
@@ -9,13 +10,23 @@ RUN apt-get update && \
     ca-certificates \
     curl \
     dpkg \
-    figlet \
     gcc \
-    git \
     sed \
     sudo \
+    grep \
     wget \
     xterm \
+    less \
+    gpgv \
+    libfuse2 \
+    libglib2.0-0 \
+    libxext6 \
+    libsm6 \
+    libxrender1 \
+    lsb-release \
+    mesa-utils \
+    tasksel \
+    tmux \
     xvfb
 
 # install XPRA: https://github.com/Xpra-org/xpra/wiki/Download#-linux
@@ -25,37 +36,24 @@ RUN apt-get install -y wget && \
     echo "deb https://xpra.org/ jammy main" >> /etc/apt/sources.list.d/xpra.list && \
     apt-get update
 
+# Desktop Environment
 RUN apt-get install -y \
-    lightdm \
-    mate-session-manager \ 
-    mate-desktop \ 
-    mate-common \
+    mate-desktop \
     caja \
-    caja-image-converter \
-    terminator
+    mate-icon-theme \
+    pluma \
+    mate-terminal
+#    lightdm \
 
+# Extra packages
 RUN apt-get install -y \
-    gpgv \
-    grep \
     htop \
     btop \
     glances \
-    less \
-    libfuse2 \
-    libglib2.0-0 \
-    libxext6 \
-    libsm6 \
-    libxrender1 \
-    lolcat \
-    lsb-release \
-    mercurial \
-    mesa-utils \
-    subversion \
-    tasksel \
-    tmux \
-    zsh \
     gimp \
-    xpra
+    xpra \
+    terminator \
+    libreoffice
   
 # define username as ubuntu and limit its ownership
 ARG LOCAL_USER=user
@@ -103,10 +101,8 @@ RUN apt-get clean && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
 
-# ready to set user 
 USER ${LOCAL_USER}
 
-# set shell as bash
 ENV SHELL=bash
 ENV TERM=linux
 ENV DISPLAY=:100
@@ -115,7 +111,7 @@ WORKDIR /home/${LOCAL_USER}
 
 ENV PORTS="9876"
 ENV DISPLAY=":100"
-ENV CHILD="mate-terminal"
+ENV CHILD="xterm"
 ENV passw0rd="P4ss0rd"
 
 # RUN
