@@ -33,7 +33,7 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="9876"
-VALUE4="mate-terminal"
+VALUE4="terminator"
 VALUE5="P4ssw0rd"
 VALUE6="0"
 VALUE7="0"
