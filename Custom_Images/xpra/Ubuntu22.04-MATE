@@ -2,10 +2,9 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install basics, desktop, benchmarks
-RUN apt-get update
-
-RUN apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
+    software-properties-common \
     apt-transport-https \
     ca-certificates \
     curl \
@@ -13,18 +12,18 @@ RUN apt-get install -y \
     figlet \
     gcc \
     git \
-    glances \
-    glmark2 \
     sed \
-    software-properties-common \
     sudo \
     wget \
     xterm \
     xvfb
 
 # install XPRA: https://github.com/Xpra-org/xpra/wiki/Download#-linux
-RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
-    echo "deb https://xpra.org/ jammy main" >> /etc/apt/sources.list.d/xpra.list
+RUN apt-get install -y wget && \
+    sudo add-apt-repository -y ppa:mozillateam/ppa && \
+    wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
+    echo "deb https://xpra.org/ jammy main" >> /etc/apt/sources.list.d/xpra.list && \
+    apt-get update
 
 RUN apt-get install -y \
     lightdm \
@@ -40,8 +39,8 @@ RUN apt-get install -y \
     grep \
     htop \
     btop \
+    glances \
     less \
-    tail \
     libfuse2 \
     libglib2.0-0 \
     libxext6 \
@@ -84,9 +83,6 @@ RUN apt-get install locales -y && \
 
 # Remove the Firefox Snap
 RUN sudo apt-get remove -y firefox
-
-# Add the Mozilla team PPA to your list of software sources
-RUN sudo add-apt-repository -y ppa:mozillateam/ppa
 
 # Alter the Firefox package priority to ensure the PPA/deb/apt version of Firefox is preferred
 RUN echo '\n\
