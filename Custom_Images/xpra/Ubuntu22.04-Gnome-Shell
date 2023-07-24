@@ -1,69 +1,60 @@
-# Dockerfile modified from https://github.com/lanrat/docker-xpra-html5
-# Using NVIDIA OpenGL base image for Ubuntu 22.04 
-# This image does not have CUDA pre-installed
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install basics, gnome desktop, benchmarks
-RUN apt-get update
-
-RUN apt-get install -y \
+# SYSTEM
+RUN apt-get update && \
+    apt-get install -y \
+    software-properties-common \
     apt-transport-https \
     ca-certificates \
     curl \
     dpkg \
-    figlet \
     gcc \
-    gdm3 \    
-    git \
-    glances \
-    glmark2 \
     sed \
-    software-properties-common \
     sudo \
+    grep \
     wget \
     xterm \
-    xvfb 
-
-RUN apt-get install -y \
-    gnome-shell \ 
-    gnome-session \ 
-    gnome-terminal \
-    gpgv \
-    grep \
-    htop \
     less \
+    gpgv \
     libfuse2 \
     libglib2.0-0 \
     libxext6 \
     libsm6 \
     libxrender1 \
-    lolcat \
     lsb-release \
-    mercurial \
     mesa-utils \
-    nautilus \
-    nautilus-admin \
-    neofetch \
-    nodejs \
-    seahorse-nautilus \
-    subversion \
     tasksel \
-    thunar \
     tmux \
-    zsh \
-    && \
-    apt-get clean && \ 
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean && \ 
-    rm -rf /var/lib/apt/lists/*
+    xvfb
 
 # install XPRA: https://github.com/Xpra-org/xpra/wiki/Download#-linux
-RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
+RUN apt-get install -y wget && \
+    sudo add-apt-repository -y ppa:mozillateam/ppa && \
+    wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
     echo "deb https://xpra.org/ jammy main" >> /etc/apt/sources.list.d/xpra.list && \
-    apt update && \
-    apt install xpra -y
+    apt-get update
+
+# Desktop Environment
+RUN apt-get install -y \
+    gnome-shell \ 
+    gnome-session \ 
+    gnome-terminal \
+    nautilus \
+    nautilus-admin \
+    seahorse-nautilus \
+    thunar
+
+# Extra packages
+RUN apt-get install -y \
+    htop \
+    btop \
+    glances \
+    gimp \
+    xpra \
+    terminator \
+    libreoffice
   
 # define username as ubuntu and limit its ownership
 ARG LOCAL_USER=user
@@ -86,15 +77,11 @@ RUN curl -L "https://github.com/tsl0922/ttyd/releases/download/1.7.3/ttyd.x86_64
     mv ttyd /usr/local/bin/ttyd
 
 # if getting a locales error
-RUN apt-get clean && \
-    apt-get install locales -y && \
+RUN apt-get install locales -y && \
     locale-gen pt_BR.UTF-8
 
 # Remove the Firefox Snap
 RUN sudo apt-get remove -y firefox
-
-# Add the Mozilla team PPA to your list of software sources
-RUN sudo add-apt-repository -y ppa:mozillateam/ppa
 
 # Alter the Firefox package priority to ensure the PPA/deb/apt version of Firefox is preferred
 RUN echo '\n\
@@ -107,12 +94,16 @@ Pin-Priority: 1001\n\
 RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:${distro_codename}";' | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
 
 # Finally, install Firefox via apt
-RUN sudo apt-get update && sudo apt-get install -y firefox
+RUN sudo apt-get install -y firefox
 
-# ready to set user 
+# The End of apt commands
+RUN apt-get clean && \ 
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean && \ 
+    rm -rf /var/lib/apt/lists/*
+
 USER ${LOCAL_USER}
 
-# set shell as bash
 ENV SHELL=bash
 ENV TERM=linux
 ENV DISPLAY=:100
@@ -121,7 +112,7 @@ WORKDIR /home/${LOCAL_USER}
 
 ENV PORTS="9876"
 ENV DISPLAY=":100"
-ENV CHILD="mate-terminal"
+ENV CHILD="terminator"
 ENV passw0rd="P4ss0rd"
 
 # RUN
