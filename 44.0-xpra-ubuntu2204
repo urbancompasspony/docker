@@ -5,7 +5,7 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="ubuntu2304-A"
+export NOMECONTAINER="ubuntu2204-A"
 
 # From 1 to 10!
 var_cont="5"
