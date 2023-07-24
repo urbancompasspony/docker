@@ -125,4 +125,4 @@ ENV CHILD="mate-terminal"
 ENV passw0rd="P4ss0rd"
 
 # RUN
-CMD xpra start --bind-tcp=0.0.0.0:$PORTS,auth=password:value=$passw0rd --html=on --start-child=$CHILD --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no $DISPLAY
+CMD xpra start --bind-tcp=0.0.0.0:$PORTS,auth=password:value=$passw0rd --html=on --start-child=$CHILD --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=yes --notifications=no --bell=no $DISPLAY
