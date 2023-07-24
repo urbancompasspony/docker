@@ -1,7 +1,4 @@
-# Dockerfile modified from https://github.com/lanrat/docker-xpra-html5
-# Based on: https://github.com/cyverse-vice/xpra/blob/main/desktop/22.04/Dockerfile
-
-FROM ubuntu:2204
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -131,4 +128,4 @@ WORKDIR /home/${LOCAL_USER}
 EXPOSE 9876
 
 # RUN
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no
+CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1360x768x24+32 -nolisten tcp -noreset" --pulseaudio=yes --notifications=no --bell=no
