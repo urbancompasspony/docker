@@ -68,7 +68,8 @@ $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
+  echo "Nothing to create."
+  #mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
 }
 
 # USE IT ONLY IF NEEDED:
