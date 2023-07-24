@@ -58,7 +58,6 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 --device /dev/kvm:/dev/kvm \
--p 8185:80 \
 -e DARK_MODE=true \
 -e "['qemu:///system']" \
 -v /etc/localtime:/etc/localtime:ro \
@@ -66,6 +65,8 @@ docker run -d \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 $docker_repo
 }
+
+#-p 8185:80 \
 
 function makedir {
   echo "Nothing to create."
