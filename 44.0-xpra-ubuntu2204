@@ -8,7 +8,7 @@
 export NOMECONTAINER="ubuntu2204-A"
 
 # From 1 to 10!
-var_cont="5"
+var_cont="7"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -19,8 +19,8 @@ CustmN2="Local IP"
 CustmN3="Ports   "
 CustmN4="Child   "
 CustmN5="Password"
-CustmN6="."
-CustmN7="."
+CustmN6="Memory  "
+CustmN7="CPUs    "
 CustmN8="."
 CustmN9="."
 CustmN10="."
@@ -35,8 +35,8 @@ VALUE2="0.0.0.0"
 VALUE3="9876"
 VALUE4="terminator"
 VALUE5="P4ssw0rd"
-VALUE6="0"
-VALUE7="0"
+VALUE6="2048m"
+VALUE7="1"
 VALUE8="0"
 VALUE9="0"
 VALUE10="0"
@@ -56,6 +56,8 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+--memory="$var6" \
+--cpus="$var7" \
 -e PORTS=$var3 \
 -e CHILD=$var4 \
 -e passw0rd=$var5 \
