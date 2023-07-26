@@ -58,7 +58,6 @@ docker run -d \
 -e PORTS=$var2 \
 -e CHILD=$var3 \
 -e passw0rd=$var4 \
--p $var3:$var3 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/home:/home/user \
 $docker_repo
