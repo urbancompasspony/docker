@@ -8,7 +8,7 @@
 export NOMECONTAINER="ubuntu2204-A"
 
 # From 1 to 10!
-var_cont="6"
+var_cont="7"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -20,7 +20,7 @@ CustmN3="Child   "
 CustmN4="Password"
 CustmN5="Memory  "
 CustmN6="CPUs    "
-CustmN7="."
+CustmN7="Display "
 CustmN8="."
 CustmN9="."
 CustmN10="."
@@ -36,7 +36,7 @@ VALUE3="terminator"
 VALUE4="P4ssw0rd"
 VALUE5="2048m"
 VALUE6="1"
-VALUE7="0"
+VALUE7=":100"
 VALUE8="0"
 VALUE9="0"
 VALUE10="0"
@@ -58,6 +58,7 @@ docker run -d \
 -e PORTS=$var2 \
 -e CHILD=$var3 \
 -e passw0rd=$var4 \
+-e DISPLAY=$var7 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/home:/home/user \
 $docker_repo
