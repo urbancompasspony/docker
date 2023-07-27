@@ -101,6 +101,9 @@ function create {
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
 
+# Force get new version!
+docker pull pihole/pihole:latest
+
   docker run -d \
 --name=$NOMECONTAINER \
 --network host \
