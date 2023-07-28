@@ -6,9 +6,9 @@
 pathto="/srv/containers/dominio/log/"
 logname="syslog"
 
-datetime=$(date +"%d_%m_%y")
+scale="50000000"
 
-control="0"
+datetime=$(date +"%H_%M_%S_-_%d_%m_%y")
 
 function check_root {
   [ "$EUID" -ne 0 ] && {
@@ -18,13 +18,13 @@ function check_root {
 }
 
 function check_size {
-  size=$(du --apparent-size --block-size=1 "$pathto$logname")
-  [ "$size" -ge "50000000" ] && {
+  size=$(du --apparent-size --block-size=1 $pathto$logname | awk {print'$1'})
+  [ "$size" -ge "$scale" ] && {
     sudo mv "$pathto$logname" "$pathto$logname-$datetime.bkp"
-    sudo touch $pathto$logname
-    sudo chmod 777 -R $pathto$logname
+    sudo touch "$pathto$logname"
+    sudo chmod 777 -R "$pathto$logname"
   } || {
-    echo "0" > /dev/null
+    echo "Small log file. Exiting" > /dev/null
   }
 }
 
