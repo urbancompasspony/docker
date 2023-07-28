@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# To run 23:00 everyday!
+# 00 23 * * * bash /path/to/autolog
+
+pathto="/srv/containers/dominio/log/"
+logname="syslog"
+
+datetime=$(date +"%d_%m_%y")
+
+control="0"
+
+function check_root {
+  [ "$EUID" -ne 0 ] && {
+    echo "Run this script as Root! Exiting..."
+    exit
+    }
+}
+
+function check_size {
+  size=$(du --apparent-size --block-size=1 "$pathto$logname")
+  [ "$size" -ge "50000000" ] && {
+    sudo mv "$pathto$logname" "$pathto$logname-$datetime.bkp"
+    sudo touch $pathto$logname
+    sudo chmod 777 -R $pathto$logname
+  } || {
+    echo "0" > /dev/null
+  }
+}
+
+# Start Here!
+check_root
+check_size
+
+exit 1
