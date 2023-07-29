@@ -30,7 +30,8 @@ function dockerctrl {
 }
 
 function backup {
-  for dir in $(ls)
+  #for dir in $(ls)
+  for dir in $(find ./* -maxdepth 0 ! -path "*oraclexe21c*")
     do
       tar -cvf "$destiny"/"$dir"-"$datetime".tar "$dir"
     done
