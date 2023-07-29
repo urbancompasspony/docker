@@ -1,0 +1,50 @@
+#!/bin/bash
+
+source=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
+
+destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
+
+cd "$source"
+
+datetime=$(date +"%d_%m_%y")
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Run this script as Root!"
+    exit
+    }
+}
+
+function checkB {
+# Does not forget about the SLASH!
+  # Delete files older than 3 days
+  find "$destiny"/ -type f -mtime +3 -delete
+  # Delete folders older than 3 days
+  #find "$destiny"/ -type d -mtime +3 -exec rm -rf {} \;
+  # Delete empty folders
+  #find "$destiny"/ -type d -empty -delete
+}
+
+function dockerctrl {
+  docker "$1" $(docker ps -a -q)
+}
+
+function backup {
+  for dir in $(ls)
+    do
+      tar -cvf "$destiny"/"$dir"-"$datetime".tar "$dir"
+    done
+}
+
+# Check if this script is running through root user
+checkA
+# Stop all containers and wait until all are stopped
+dockerctrl stop &&
+# Check if there is some old .tar to delete first
+checkB
+# Run the backup os all containers
+backup
+# Start all containers again and wait until all are started
+dockerctrl start &&
+
+exit 1
