@@ -1,1 +1,23 @@
+#!/bin/bash
 
+source="/srv/containers/oraclexe21c"
+destiny="/home/administrador/Shared"
+
+cd "$source"
+
+datetime=$(date +"%d_%m_%y")
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Run this script as Root!"
+    exit
+    }
+}
+
+checkA
+docker stop oraclexe21c &&
+find "$destiny"/ -type f -mtime +3 -delete
+tar -cvf "$destiny"/oraclexe21c-"$datetime".tar "oraclexe21c"
+docker start oraclexe21c &&
+
+exit 1
