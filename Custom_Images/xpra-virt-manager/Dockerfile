@@ -67,9 +67,9 @@ ENV TERM=linux
 
 WORKDIR /home/${LOCAL_USER}
 
+ENV HOSTS="[]"
 ENV PORTS="9876"
 ENV passw0rd="P4ss0rd"
-ENV HOSTS="[]"
 ENV resolution="800x600"
 
 COPY startapp.sh /startapp.sh
