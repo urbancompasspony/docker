@@ -1,6 +1,11 @@
 FROM ubuntu:22.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update
+
+RUN apt-get install locales -y && \
+    locale-gen pt_BR.UTF-8
 
 RUN apt-get install -y \
     software-properties-common \
@@ -23,8 +28,6 @@ RUN apt-get install -y \
     libxrender1 \
     lsb-release \
     mesa-utils \
-    tasksel \
-    tmux \
     xvfb
 
 RUN apt-get install -y wget && \
@@ -38,7 +41,6 @@ RUN apt-get install -y --no-install-recommends \
     dbus-x11 \
     libglib2.0-bin \
     gir1.2-spiceclientgtk-3.0
-#    at-spi2-core
 
 RUN apt-get clean && \
     apt-get autoclean && \
@@ -68,8 +70,8 @@ WORKDIR /home/${LOCAL_USER}
 ENV PORTS="9876"
 ENV passw0rd="P4ss0rd"
 ENV HOSTS="[]"
+ENV resolution="800x600"
 
 COPY startapp.sh /startapp.sh
 
-# RUN
 CMD /startapp.sh
