@@ -61,6 +61,7 @@ docker run -d \
 -e resolution="$var3" \
 -e PORTS="$var4" \
 -v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/$NOMECONTAINER/ISO:/ISO \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /srv/containers/$NOMECONTAINER/config:/etc/libvirt \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
@@ -68,11 +69,14 @@ $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/
+  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,ISO}
 }
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
+
+sudo chmod 777 /var/run/libvirt/libvirt-sock
+
 #docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
 #docker restart "$NOMECONTAINER"
 
