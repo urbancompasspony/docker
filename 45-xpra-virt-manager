@@ -45,8 +45,8 @@ VALUE10="0"
 # Set repository here!
 docker_repo="urbancompasspony/xpra-virt-manager:latest"
 
-[ "$var5" = "Host" ] && {
-  function docker_custom {
+function docker_custom {
+  [ "$var5" = "Host" ] && {
     docker run -d \
 --privileged \
 --name=$var1 \
