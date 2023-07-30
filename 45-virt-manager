@@ -5,19 +5,19 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="virt-manager"
+export NOMECONTAINER="xpra-virt-manager"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
 # Static Name!
 CustmN1="Container"
 
-CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
+CustmN2="Password"
+CustmN3="Disp.Res"
+CustmN4="Port    "
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -31,9 +31,9 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
+VALUE2="P4ssw0rd"
+VALUE3="800x600"
+VALUE4="9876"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -43,24 +43,23 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="mber5/virt-manager:latest"
+docker_repo="urbancompasspony/xpra-virt-manager:latest"
 
 # Adjust if needed
 function docker_custom {
 docker run -d \
 --privileged \
 --name=$var1 \
---network macvlan \
---ip=$var2 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
+--network host \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
 --device /dev/kvm:/dev/kvm \
--p 8185:80 \
 -e DARK_MODE=true \
--e "['qemu:///system']" \
+-e HOSTS="['qemu:///system']" \
+-e passw0rd="$var2" \
+-e resolution="$var3" \
+-e PORTS="$var4" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /srv/containers/$NOMECONTAINER/config:/etc/libvirt \
@@ -69,7 +68,7 @@ $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/config
+  mkdir -p /srv/containers/"$NOMECONTAINER"/
 }
 
 # USE IT ONLY IF NEEDED:
