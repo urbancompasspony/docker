@@ -8,7 +8,7 @@
 export NOMECONTAINER="xpra-virt-manager"
 
 # From 1 to 10!
-var_cont="4"
+var_cont="5"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -18,7 +18,7 @@ CustmN1="Container"
 CustmN2="Password"
 CustmN3="Disp.Res"
 CustmN4="Port    "
-CustmN5="."
+CustmN5="Local IP"
 CustmN6="."
 CustmN7="."
 CustmN8="."
@@ -34,7 +34,7 @@ VALUE1="$NOMECONTAINER"
 VALUE2="P4ssw0rd"
 VALUE3="800x600"
 VALUE4="9876"
-VALUE5="0"
+VALUE5="Host"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -45,9 +45,9 @@ VALUE10="0"
 # Set repository here!
 docker_repo="urbancompasspony/xpra-virt-manager:latest"
 
-# Adjust if needed
-function docker_custom {
-docker run -d \
+[ "$var5" = "Host" ] && {
+  function docker_custom {
+    docker run -d \
 --privileged \
 --name=$var1 \
 --network host \
@@ -65,6 +65,29 @@ docker run -d \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
 $docker_repo
+  } || {
+    docker run -d \
+--privileged \
+--name=$var1 \
+--network macvlan \
+--ip="$var5" \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+--device /dev/kvm:/dev/kvm \
+-e DARK_MODE=true \
+-e HOSTS="['qemu:///system']" \
+-e passw0rd="$var2" \
+-e resolution="$var3" \
+-e PORTS="$var4" \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/$NOMECONTAINER/ISO:/ISO \
+-v /var/lib/libvirt/images:/var/lib/libvirt/images \
+-v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
+$docker_repo
+  }
 }
 
 function makedir {
