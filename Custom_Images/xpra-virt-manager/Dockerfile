@@ -72,6 +72,6 @@ ENV PORTS="9876"
 ENV passw0rd="P4ss0rd"
 ENV resolution="800x600"
 
-COPY startapp.sh /startapp.sh
+COPY start.sh /start.sh
 
-CMD /startapp.sh
+CMD /start.sh
