@@ -130,7 +130,7 @@ lancachenet/lancache-dns:latest
 --name=$NOMECONTAINER \
 --hostname="$NOMECONTAINER" \
 --network macvlan \
---ip=$var2 \
+--ip=$var1 \
 --no-healthcheck \
 --restart unless-stopped \
 -p 80:80 \
