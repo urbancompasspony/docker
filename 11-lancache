@@ -65,7 +65,7 @@ lancachenet/lancache-dns:latest
 --hostname="$NOMECONTAINER" \
 --network macvlan \
 --ip="$var2" \
---dns=1.1.1.1  \
+--dns=1.0.0.1  \
 --dns=127.0.0.1 \
 --hostname="$NOMECONTAINER" \
 --no-healthcheck \
