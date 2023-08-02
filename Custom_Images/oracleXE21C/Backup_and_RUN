@@ -1,0 +1,19 @@
+docker export oraclexe21c > oracle.tar
+scp oracle.tar administrador@HOSTNAME:~
+cat oracle.tar | docker import - oracle:latest
+
+docker run -d \
+--name=oraclexe21c \
+--network macvlan \
+--ip=172.20.0.4 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=oraclexe21c \
+--no-healthcheck \
+--restart=unless-stopped \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/oraclexe21c/sysconfig:/etc/sysconfig \
+-v /srv/containers/oraclexe21c/root/.bashrc:/root/.bashrc \
+-v /srv/containers/oraclexe21c/oradata:/opt/oracle/oradata \
+-v /srv/containers/oraclexe21c/netadmin:/opt/oracle/homes/OraDBHome21cXE/network/admin \
+oracle:latest /usr/local/bin/startoracle.sh
