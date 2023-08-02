@@ -76,4 +76,6 @@ ENV resolution="800x600"
 
 COPY start.sh /start.sh
 
-CMD /start.sh
+CMD ["/usr/sbin/sshd","-D"]
+
+ENTRYPOINT /start.sh
