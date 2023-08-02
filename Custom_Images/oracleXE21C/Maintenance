@@ -1,0 +1,11 @@
+$ docker exec -it oraclexe21c bash
+# rman target sys/PASSWORD_HERE@localhost:1521/XE.domai_here
+
+VALIDATE DATABASE;
+VALIDATE CHECK LOGICAL DATABASE;
+
+BACKUP VALIDATE DATABASE ARCHIVELOG ALL;
+BACKUP VALIDATE CHECK LOGICAL DATABASE ARCHIVELOG ALL;
+
+MORE
+https://oracle-base.com/articles/misc/detect-and-correct-corruption#RMAN-VALIDATE
