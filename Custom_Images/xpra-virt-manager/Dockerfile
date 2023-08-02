@@ -29,6 +29,9 @@ RUN apt-get install -y \
     lsb-release \
     mesa-utils \
     xvfb
+    
+    #openssh \
+    #ssh-askpass
 
 RUN apt-get install -y wget && \
     wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
