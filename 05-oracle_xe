@@ -261,6 +261,7 @@ function checkB {
     echo " "
     echo "Saindo..."
     echo "###################################################################"
+    sleep 5
     exit
   } || {
     create
