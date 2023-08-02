@@ -62,6 +62,7 @@ function docker_custom {
 -e PORTS="$var4" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/$NOMECONTAINER/ISO:/ISO \
+-v /srv/containers/$NOMECONTAINER/home:/home \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
 $docker_repo
@@ -84,6 +85,7 @@ $docker_repo
 -e PORTS="$var4" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/$NOMECONTAINER/ISO:/ISO \
+-v /srv/containers/$NOMECONTAINER/home:/home \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
 $docker_repo
