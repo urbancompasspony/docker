@@ -28,10 +28,9 @@ RUN apt-get install -y \
     libxrender1 \
     lsb-release \
     mesa-utils \
-    xvfb
-    
-    #openssh \
-    #ssh-askpass
+    xvfb \
+    openssh \
+    ssh-askpass
 
 RUN apt-get install -y wget && \
     wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
