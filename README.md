@@ -123,6 +123,24 @@ docker run -t -i -d \
   	--name samba \
 	my-backup
 
+## Backup of Running Image
+
+On the source host:
+
+$ docker export my_container > my_container.tar
+
+Copy the tar archive to the target host using scp:
+
+$ scp my_container.tar user@target_host:~
+
+On the target host:
+
+$ cat my_container.tar | docker import - my_container:latest
+
+Create a new container from the image:
+
+$ docker run -d --name my_new_container my_container:latest
+
 ## Samba Domain
 
 Credits:
