@@ -15,7 +15,7 @@ HOSTNAME2="cluster-02"
 
 IP3="172.20.0.1" # Local Gateway Server
 
-volumepath="/mnt/volume01"
+volumepaths="/srv/containers /mnt/volume01 /mnt/volume02 /mnt/volume03 /mnt/volume04 /mnt/volume5"
 
 lognull="/dev/null"
 logpath="/var/log/gluster"
@@ -54,8 +54,17 @@ function gluster00 {
 # 01 - Check if the Volume in /srv/containers is mounted
 function gluster01 {
   # Gluster is the only one that creates localhost lines on mtab
-  cat /etc/mtab | grep localhost 1>$lognull 2>$lognull && {
+  for dir in $(echo $volumepaths)
+    do
+      aptab=""
+      aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull)
+      aptab+=" "
+    done
+
+    
     cluster00
+
+
   } || {
     echo "$data Volume not found. Trying mount..." >> $logpath
     mount -a
