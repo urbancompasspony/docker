@@ -65,7 +65,9 @@ function gluster00 {
         echo "Silence! Or I kill you!" > $lognull
       }
 
-      dockerctrl stop && 1>$lognull 2>$lognull 
+      dockerctrl stop && 1>$lognull 2>$lognull
+      vmctrl "running" "shutdown" && 1>$lognull 2>$lognull
+
       setpid "0" 1>$lognull 2>$lognull 
     }
   }
@@ -95,7 +97,8 @@ function gluster01 {
       echo "Silence! Or I kill you!" > $lognull
     }
 
-    dockerctrl stop && 1>$lognull 2>$lognull 
+    dockerctrl stop && 1>$lognull 2>$lognull
+    vmctrl "running" "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
   } || {
     cluster00
@@ -108,7 +111,7 @@ function cluster00 {
     cluster01
   else
     echo "$data ERROR: Gateway not found" >> $logpath
-    echo "$data ERROR: Shutting down all containers!" >> $logpath
+    echo "$data ERROR: Shutting down all containers and VMs!" >> $logpath
 
     [ "$beepsound" -ge "0" ] && [ "$beepsound" -le "6" ] && {
       modprobe pcspkr
@@ -119,7 +122,8 @@ function cluster00 {
       echo "Silence! Or I kill you!" > $lognull
     }
 
-    dockerctrl stop && 1>$lognull 2>$lognull 
+    dockerctrl stop && 1>$lognull 2>$lognull
+    vmctrl "running" "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
   fi
 }
@@ -132,9 +136,10 @@ function cluster01 {
     cluster02
   else
     echo "$data ERROR: The other node doesn't respond." >> $logpath
-    echo "$data ERROR: Starting containers myself!" >> $logpath
+    echo "$data ERROR: Starting containers and VMs myself!" >> $logpath
 
-    dockerctrl start && 1>$lognull 2>$lognull 
+    dockerctrl start && 1>$lognull 2>$lognull
+    vmctrl "shut off" "start" && 1>$lognull 2>$lognull
     setpid "1" 1>$lognull 2>$lognull 
   fi
 }
@@ -149,7 +154,8 @@ function cluster02 {
     echo "$data ERROR: The other gluster volume doesn't respond." >> $logpath
     echo "$data ERROR: Shutting down all containers!" >> $logpath
 
-    dockerctrl stop && 1>$lognull 2>$lognull 
+    dockerctrl stop && 1>$lognull 2>$lognull
+    vmctrl "running" "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
   fi
 }
@@ -169,17 +175,25 @@ function cluster04 {
   [ "$checking" = "1" ] && {
     setpid "0" 1>$lognull 2>$lognull
     dockerctrl stop && 1>$lognull 2>$lognull
-    echo "$data Containers are Stopped!" >> $logpath
+    vmctrl "running" "shutdown" && 1>$lognull 2>$lognull
+    echo "$data Containers and VMS are Stopped!" >> $logpath
   } || {
     setpid "1" 1>$lognull 2>$lognull
     sleep 20
     dockerctrl start && 1>$lognull 2>$lognull
-    echo "$data Containers are Running!" >> $logpath
+    vmctrl "shut off" "start" && 1>$lognull 2>$lognull
+    echo "$data Containers and VMs are Running!" >> $logpath
   }
 }
 
 function dockerctrl {
   docker "$1" $(docker ps -a -q) 1>$lognull 2>$lognull
+}
+
+function vmctrl {
+  for i in $(virsh list --all | grep "$1" | awk '{print $2}'); do 
+    virsh $2 $i
+  done
 }
 
 function setpid {
