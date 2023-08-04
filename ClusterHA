@@ -28,9 +28,10 @@ logpath="/var/log/gluster"
 rm -rf $logpath
 touch $logpath
 
+# Beep 7 times, because 0 and 6!
+beepsound="0"
+
 echo "Welcome to High Availability Cluster Server for Docker!" >> $logpath
-data=$(date +"%H:%M %d.%m.%Y")
-echo "Script started on $data" >> $logpath
 
 eval $(ssh-agent) 1>$lognull 2>$lognull
 ssh-add /home/$USERNAME/.ssh/id_rsa 1>$lognull 2>$lognull
@@ -44,28 +45,35 @@ done
 
 # 00 - Check if GlusterFS service is Running
 function gluster00 {
-  echo "$data Checking if glusterd.service is running" >> $logpath
   systemctl is-active --quiet glusterd && {
     gluster01
   } || {
-    echo "$data Glusterd.service not found. Trying start..." >> $logpath
     systemctl start glusterd.service
     systemctl is-active --quiet glusterd && {
-    echo "$data Glusterd started!" >> $logpath
+    echo "$data Glusterd started manually, it was stopped!" >> $logpath
       gluster01
     } || {
       echo "$data ERROR: Glusterd not running!" >> $logpath
+      echo "$data ERROR: Shutting down all containers!" >> $logpath
+
       # Higher Beep
-      modprobe pcspkr
-      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 2000 -l 200 -r 1
-      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 2000 -l 200 -r 1
+      [ "$beepsound" -ge "0" ] && [ "$beepsound" -le "6" ] && {
+        modprobe pcspkr
+        env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 2000 -l 200 -r 1
+        env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 2000 -l 200 -r 1
+        beepsound=$(($beepsound+1))
+      } || {
+        echo "Silence! Or I kill you!" > $lognull
+      }
+
+      dockerctrl stop && 1>$lognull 2>$lognull 
+      setpid "0" 1>$lognull 2>$lognull 
     }
   }
 }
 
 # 01 - Check if there is any volume
 function gluster01 {
-  echo "$data Reading mtab file" >> $logpath
   aptab="0"
   for dir in $(echo $volumepaths); do
     aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull && echo " yes" || echo " no")
@@ -76,13 +84,21 @@ function gluster01 {
 
   [ "$checkdir" = "0" ] && {
     echo "$data ERROR: Not a single default volume was found!" >> $logpath
+    echo "$data ERROR: Shutting down all containers!" >> $logpath
 
     # Lower Beep
-    modprobe pcspkr
-    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
-    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1   
+    [ "$beepsound" -ge "0" ] && [ "$beepsound" -le "6" ] && {
+      modprobe pcspkr
+      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
+      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
+      beepsound=$(($beepsound+1))
+    } || {
+      echo "Silence! Or I kill you!" > $lognull
+    }
+
+    dockerctrl stop && 1>$lognull 2>$lognull 
+    setpid "0" 1>$lognull 2>$lognull 
   } || {
-    echo "$data $checkdir Volume(s) found!" >> $logpath
     cluster00
   }
 }
@@ -93,18 +109,32 @@ function cluster00 {
     cluster01
   else
     echo "$data ERROR: Gateway not found" >> $logpath
-    modprobe pcspkr
-    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 2000 -l 200 -r 1
-    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
+    echo "$data ERROR: Shutting down all containers!" >> $logpath
+
+    [ "$beepsound" -ge "0" ] && [ "$beepsound" -le "6" ] && {
+      modprobe pcspkr
+      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 2000 -l 200 -r 1
+      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
+      beepsound=$(($beepsound+1))
+    } || {
+      echo "Silence! Or I kill you!" > $lognull
+    }
+
+    dockerctrl stop && 1>$lognull 2>$lognull 
+    setpid "0" 1>$lognull 2>$lognull 
   fi
 }
 
 # 03 - Ping the other node.
 function cluster01 {
+  beepsound="0"
+
   if ping -c 1 $IP1 &> $lognull && ping -c 1 $IP2 &> $lognull; then
     cluster02
   else
-    echo "$data ERROR: The other node does not ping. Starting as MASTER." >> $logpath
+    echo "$data ERROR: The other node doesn't respond." >> $logpath
+    echo "$data ERROR: Starting containers myself!" >> $logpath
+
     dockerctrl start && 1>$lognull 2>$lognull 
     setpid "1" 1>$lognull 2>$lognull 
   fi
@@ -114,23 +144,23 @@ function cluster01 {
 function cluster02 {
   [ "$HOSTNAME" = "$HOSTNAME1" ] && {
     checking=$(ssh $USERNAME@$HOSTNAME2 "cat /home/$USERNAME/.lockha") &&
-    lockha
+    cluster03
   } || {
     checking=$(ssh $USERNAME@$HOSTNAME1 "cat /home/$USERNAME/.lockha") &&
-    lockha
+    cluster03
   }
 }
 
-function lockha {
+function cluster03 {
   [ "$checking" = "1" ] && {
     setpid "0" 1>$lognull 2>$lognull
     dockerctrl stop && 1>$lognull 2>$lognull
-    echo "$data Containers Stopped!" >> $logpath
+    echo "$data Containers are Stopped!" >> $logpath
   } || {
     setpid "1" 1>$lognull 2>$lognull
     sleep 20
     dockerctrl start && 1>$lognull 2>$lognull
-    echo "$data Containers Started!" >> $logpath
+    echo "$data Containers are Running!" >> $logpath
   }
 }
 
@@ -139,6 +169,9 @@ function dockerctrl {
 }
 
 function setpid {
+  # This random ensures that we don't fall on a ping-pong situation,
+  # with the machines getting the same number for .lockha file!
+  sleep $((RANDOM%5))
   echo "$1" > /home/$USERNAME/.lockha
 }
 
