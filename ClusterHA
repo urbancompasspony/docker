@@ -150,7 +150,7 @@ function cluster02 {
   if ping -c 1 $HOSTNAME1 &> $lognull && ping -c 1 $HOSTNAME2 &> $lognull; then
     cluster03
   else
-    echo "$data ERROR: The other gluster volume doesn't respond." >> $logpath
+    echo "$data ERROR: All Ok but can't connect Reserved NIC!" >> $logpath
     echo "$data ERROR: Shutting down all containers!" >> $logpath
 
     dockerctrl stop && 1>$lognull 2>$lognull
