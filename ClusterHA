@@ -24,10 +24,11 @@ logpath="/var/log/gluster"
 
 # ============================================================================ #
 
+rm -rf $logpath
 touch $logpath
 
-eval $(ssh-agent) >> $logpath
-ssh-add /home/$USERNAME/.ssh/id_rsa >> $logpath
+eval $(ssh-agent) 1>$lognull 2>$lognull
+ssh-add /home/$USERNAME/.ssh/id_rsa 1>$lognull 2>$lognull
 
 while true; do
   data=$(date +".%H.%M.:.%d.%m.%Y.")
@@ -58,6 +59,7 @@ function gluster00 {
 
 # 01 - Check if there is any volume
 function gluster01 {
+  aptab="0"
   for dir in $(echo $volumepaths); do
     aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull && echo " yes" || echo " no")
   done
@@ -98,39 +100,40 @@ function cluster01 {
     cluster02
   else
     echo "$data ERROR: The other node does not ping. Starting as MASTER." >> $logpath
-    dockerctrl start &&
-    setpid "1"
+    dockerctrl start && 1>$lognull 2>$lognull 
+    setpid "1" 1>$lognull 2>$lognull 
   fi
 }
 
 # 04 - Checking for PIDFile on the other node.
 function cluster02 {
   [ "$HOSTNAME" = "$HOSTNAME1" ] && {
-    checking=$(ssh $USERNAME@$HOSTNAME2 "cat ~/.lockha")
+    checking=$(ssh $USERNAME@$HOSTNAME2 "cat /home/$USERNAME/.lockha") &&
     lockha
   } || {
-    checking=$(ssh $USERNAME@$HOSTNAME1 "cat ~/.lockha")
+    checking=$(ssh $USERNAME@$HOSTNAME1 "cat /home/$USERNAME/.lockha") &&
     lockha
   }
 }
 
 function lockha {
   [ "$checking" = "1" ] && {
-      dockerctrl stop &&
-      echo "0" | tee ~/.lockha
+      dockerctrl stop && 1>$lognull 2>$lognull
+      setpid "0" 1>$lognull 2>$lognull 
+      echo "$data Containers Stopped!" >> $logpath
     } || {
-      dockerctrl start &&
-      echo "1" | tee ~/.lockha
+      dockerctrl start && 1>$lognull 2>$lognull
+      setpid "1" 1>$lognull 2>$lognull
+      echo "$data Containers Started!" >> $logpath
     }
 }
 
 function dockerctrl {
-  docker "$1" $(docker ps -a -q)
+  docker "$1" $(docker ps -a -q) 1>$lognull 2>$lognull
 }
 
 function setpid {
-  touch ~/.lockha
-  echo "$1" | tee ~/.lockha
+  echo "$1" > /home/$USERNAME/.lockha
 }
 
 init
