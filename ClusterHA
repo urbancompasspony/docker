@@ -66,8 +66,7 @@ function gluster00 {
       }
 
       dockerctrl stop && 1>$lognull 2>$lognull
-      vmctrl "running" "shutdown" && 1>$lognull 2>$lognull
-
+      vmctrlrun "shutdown" && 1>$lognull 2>$lognull
       setpid "0" 1>$lognull 2>$lognull 
     }
   }
@@ -98,7 +97,7 @@ function gluster01 {
     }
 
     dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrl "running" "shutdown" && 1>$lognull 2>$lognull
+    vmctrlrun "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
   } || {
     cluster00
@@ -123,7 +122,7 @@ function cluster00 {
     }
 
     dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrl "running" "shutdown" && 1>$lognull 2>$lognull
+    vmctrlrun "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
   fi
 }
@@ -139,7 +138,7 @@ function cluster01 {
     echo "$data ERROR: Starting containers and VMs myself!" >> $logpath
 
     dockerctrl start && 1>$lognull 2>$lognull
-    vmctrl "shut off" "start" && 1>$lognull 2>$lognull
+    vmctrlshut "start" && 1>$lognull 2>$lognull
     setpid "1" 1>$lognull 2>$lognull 
   fi
 }
@@ -155,7 +154,7 @@ function cluster02 {
     echo "$data ERROR: Shutting down all containers!" >> $logpath
 
     dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrl "running" "shutdown" && 1>$lognull 2>$lognull
+    vmctrlrun "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
   fi
 }
@@ -181,7 +180,7 @@ function cluster04 {
     setpid "1" 1>$lognull 2>$lognull
     sleep 20
     dockerctrl start && 1>$lognull 2>$lognull
-    vmctrl "shut off" "start" && 1>$lognull 2>$lognull
+    vmctrlshut "start" && 1>$lognull 2>$lognull
     echo "$data Containers and VMs are Running!" >> $logpath
   }
 }
@@ -190,9 +189,15 @@ function dockerctrl {
   docker "$1" $(docker ps -a -q) 1>$lognull 2>$lognull
 }
 
-function vmctrl {
-  for i in $(virsh list --all | grep "$1" | awk '{print $2}'); do 
-    virsh $2 $i
+function vmctrlrun {
+  for i in $(virsh list --all --state-running | awk '{print $2}'); do
+    virsh $1 $i
+  done
+}
+
+function vmctrlshut {
+  for i in $(virsh list --all --state-shutoff | awk '{print $2}'); do
+    virsh $1 $i
   done
 }
 
