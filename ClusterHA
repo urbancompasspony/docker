@@ -15,7 +15,7 @@ HOSTNAME2="cluster-02"
 
 IP3="172.20.0.1" # Local Gateway Server
 
-volumepaths="/srv/containers /mnt/volume01 /mnt/volume02 /mnt/volume03 /mnt/volume04 /mnt/volume5"
+volumepaths="/srv/containers /mnt/pool01 /mnt/pool02 /mnt/pool03 /mnt/volume01 /mnt/volume02 /mnt/volume03"
 
 lognull="/dev/null"
 logpath="/var/log/gluster"
@@ -51,33 +51,23 @@ function gluster00 {
   }
 }
 
-# 01 - Check if the Volume in /srv/containers is mounted
+# 01 - Check if there is any volume
 function gluster01 {
-  # Gluster is the only one that creates localhost lines on mtab
-  for dir in $(echo $volumepaths)
-    do
-      aptab=""
-      aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull)
-      aptab+=" "
-    done
+  for dir in $(echo $volumepaths); do
+    aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull && echo " yes" || echo " no")
+  done
 
-    
-    cluster00
+  checkdir=$(grep -o 'yes' <<<"$aptab" | wc -l)
+  [ "$checkdir" = "0" ] && {
+    echo "$data ERROR: Not a single volume was found!" >> $logpath
 
-
+    # Lower Beep
+    modprobe pcspkr
+    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
+    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1   
   } || {
-    echo "$data Volume not found. Trying mount..." >> $logpath
-    mount -a
-    cat /etc/mtab | grep volume 1>$lognull 2>$lognull && {
-      echo "$data Volume mounted!" >> $logpath
-      cluster00
-    } || {
-      echo "$data ERROR: Volume not found!" >> $logpath
-      # Lower Beep
-      modprobe pcspkr
-      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
-      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
-    }
+    echo "$data $checkdir Volume(s) found!" >> $logpath
+    cluster00
   }
 }
 
