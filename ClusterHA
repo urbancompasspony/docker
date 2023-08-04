@@ -4,6 +4,7 @@ function init {
 # ============================================================================ #
 
 # SUDO Cron: "@reboot sleep 15; bash /home/ubuntu/Script/Cluster"
+# Run every 5s, if stopping containers, will wait 20s to stop all before start.
 
 # Control Panel #
 
@@ -27,18 +28,23 @@ logpath="/var/log/gluster"
 rm -rf $logpath
 touch $logpath
 
+echo "Welcome to High Availability Cluster Server for Docker!" >> $logpath
+data=$(date +"%H:%M %d.%m.%Y")
+echo "Script started on $data" >> $logpath
+
 eval $(ssh-agent) 1>$lognull 2>$lognull
 ssh-add /home/$USERNAME/.ssh/id_rsa 1>$lognull 2>$lognull
 
 while true; do
-  data=$(date +".%H.%M.:.%d.%m.%Y.")
-  sleep 5;
+  data=$(date +"%H:%M %d.%m.%Y")
+  sleep 5
   gluster00
 done
 }
 
 # 00 - Check if GlusterFS service is Running
 function gluster00 {
+  echo "$data Checking if glusterd.service is running" >> $logpath
   systemctl is-active --quiet glusterd && {
     gluster01
   } || {
@@ -59,6 +65,7 @@ function gluster00 {
 
 # 01 - Check if there is any volume
 function gluster01 {
+  echo "$data Reading mtab file" >> $logpath
   aptab="0"
   for dir in $(echo $volumepaths); do
     aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull && echo " yes" || echo " no")
@@ -68,7 +75,7 @@ function gluster01 {
   checkdir=$(grep -o 'yes' <<<"$aptab" | wc -l)
 
   [ "$checkdir" = "0" ] && {
-    echo "$data ERROR: Not a single volume was found!" >> $logpath
+    echo "$data ERROR: Not a single default volume was found!" >> $logpath
 
     # Lower Beep
     modprobe pcspkr
@@ -83,8 +90,6 @@ function gluster01 {
 # 02- Ping if there is connection to Gateway route.
 function cluster00 {
   if ping -c 1 $IP3 &> $lognull; then
-    echo "." >> $lognull
-    sleep 1;
     cluster01
   else
     echo "$data ERROR: Gateway not found" >> $logpath
@@ -118,14 +123,15 @@ function cluster02 {
 
 function lockha {
   [ "$checking" = "1" ] && {
-      dockerctrl stop && 1>$lognull 2>$lognull
-      setpid "0" 1>$lognull 2>$lognull 
-      echo "$data Containers Stopped!" >> $logpath
-    } || {
-      dockerctrl start && 1>$lognull 2>$lognull
-      setpid "1" 1>$lognull 2>$lognull
-      echo "$data Containers Started!" >> $logpath
-    }
+    setpid "0" 1>$lognull 2>$lognull
+    dockerctrl stop && 1>$lognull 2>$lognull
+    echo "$data Containers Stopped!" >> $logpath
+  } || {
+    setpid "1" 1>$lognull 2>$lognull
+    sleep 20
+    dockerctrl start && 1>$lognull 2>$lognull
+    echo "$data Containers Started!" >> $logpath
+  }
 }
 
 function dockerctrl {
