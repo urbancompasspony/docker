@@ -8,13 +8,12 @@ function init {
 
 # Control Panel #
 
-IP1="172.20.0.10"
-HOSTNAME1="cluster-01"
+IP1="172.20.0.10" # LAN1
+HOSTNAME1="cluster-01" # Reserved NIC 1
+IP2="172.20.0.11" # LAN2
+HOSTNAME2="cluster-02" # Reserved NIC 2
 
-IP2="172.20.0.11"
-HOSTNAME2="cluster-02"
-
-IP3="172.20.0.1"
+IP3="172.20.0.1" # Gateway
 
 USERNAME="administrador"
 
@@ -125,7 +124,7 @@ function cluster00 {
   fi
 }
 
-# 03 - Ping the other node.
+# 03 - Ping the other node through LAN
 function cluster01 {
   beepsound="0"
 
@@ -140,18 +139,33 @@ function cluster01 {
   fi
 }
 
-# 04 - Checking for PIDFile on the other node.
+# 03 - Ping the other node through reserved NIC
 function cluster02 {
+  beepsound="0"
+
+  if ping -c 1 $HOSTNAME1 &> $lognull && ping -c 1 $HOSTNAME2 &> $lognull; then
+    cluster03
+  else
+    echo "$data ERROR: The other gluster volume doesn't respond." >> $logpath
+    echo "$data ERROR: Shutting down all containers!" >> $logpath
+
+    dockerctrl stop && 1>$lognull 2>$lognull 
+    setpid "0" 1>$lognull 2>$lognull 
+  fi
+}
+
+# 04 - Checking for PIDFile on the other node.
+function cluster03 {
   [ "$HOSTNAME" = "$HOSTNAME1" ] && {
     checking=$(ssh $USERNAME@$HOSTNAME2 "cat /home/$USERNAME/.lockha") &&
-    cluster03
+    cluster04
   } || {
     checking=$(ssh $USERNAME@$HOSTNAME1 "cat /home/$USERNAME/.lockha") &&
     cluster03
   }
 }
 
-function cluster03 {
+function cluster04 {
   [ "$checking" = "1" ] && {
     setpid "0" 1>$lognull 2>$lognull
     dockerctrl stop && 1>$lognull 2>$lognull
