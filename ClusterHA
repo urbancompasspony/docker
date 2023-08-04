@@ -7,13 +7,15 @@ function init {
 
 # Control Panel #
 
-IP1="172.20.0.10" # Primary Node
+IP1="172.20.0.10"
 HOSTNAME1="cluster-01"
 
-IP2="172.20.0.11" # Secondary Node
+IP2="172.20.0.11"
 HOSTNAME2="cluster-02"
 
-IP3="172.20.0.1" # Local Gateway Server
+IP3="172.20.0.1"
+
+USERNAME="administrador"
 
 volumepaths="/srv/containers /mnt/pool01 /mnt/pool02 /mnt/pool03 /mnt/volume01 /mnt/volume02 /mnt/volume03"
 
@@ -23,6 +25,9 @@ logpath="/var/log/gluster"
 # ============================================================================ #
 
 touch $logpath
+
+eval $(ssh-agent) >> $logpath
+ssh-add /home/$USERNAME/.ssh/id_rsa >> $logpath
 
 while true; do
   data=$(date +".%H.%M.:.%d.%m.%Y.")
@@ -57,7 +62,9 @@ function gluster01 {
     aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull && echo " yes" || echo " no")
   done
 
+  checkdir="0"
   checkdir=$(grep -o 'yes' <<<"$aptab" | wc -l)
+
   [ "$checkdir" = "0" ] && {
     echo "$data ERROR: Not a single volume was found!" >> $logpath
 
@@ -98,11 +105,11 @@ function cluster01 {
 
 # 04 - Checking for PIDFile on the other node.
 function cluster02 {
-  [ "$HOSTNAME" = "$HOSTNAME1" ] &&
-    checking=$(ssh $HOSTNAME2 "cat ~/.lockha")
+  [ "$HOSTNAME" = "$HOSTNAME1" ] && {
+    checking=$(ssh $USERNAME@$HOSTNAME2 "cat ~/.lockha")
     lockha
   } || {
-    checking=$(ssh $HOSTNAME1 "cat ~/.lockha")
+    checking=$(ssh $USERNAME@$HOSTNAME1 "cat ~/.lockha")
     lockha
   }
 }
