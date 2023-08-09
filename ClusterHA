@@ -229,6 +229,10 @@ function beeps {
   }
 }
 
+# There is no need of ethernet connection!
+
+# ============================================================================ #
+
 # Let's Get Started!
 init
 
