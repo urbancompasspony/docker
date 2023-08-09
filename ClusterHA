@@ -16,35 +16,35 @@ function init {
 #################
 
 # Local Gateway
-IP3="172.20.0.1"
+export IP3="172.20.0.1"
 
 # LAN 01
-IP1="172.20.0.10"
+export IP1="172.20.0.10"
 # Reserved NIC 01
-HOSTNAME1="cluster-01"
+export HOSTNAME1="cluster-01"
 
 # LAN 02
-IP2="172.20.0.11"
+export IP2="172.20.0.11"
 # Reserved NIC 02
-HOSTNAME2="cluster-02"
+export HOSTNAME2="cluster-02"
 
 # There is no need of ethernet connection!
 
 # ============================================================================ #
 
 # If not setting this, will run as root...
-USERNAME="administrador"
+export USERNAME="administrador"
 
 # Volume /srv/containers is the only one that is a MUST!
-volumepaths="/srv/containers /mnt/pool01 /mnt/pool02 /mnt/pool03 /mnt/volume01 /mnt/volume02 /mnt/volume03"
+export volumepaths="/srv/containers /mnt/pool01 /mnt/pool02 /mnt/pool03 /mnt/volume01 /mnt/volume02 /mnt/volume03"
 
 # All logs that are saved or discarded goes here
-lognull="/dev/null"
-logpath="/var/log/gluster"
+export lognull="/dev/null"
+export logpath="/var/log/gluster"
 
 # Will beep 7 times if beeplow=0 and beephigh=6!
-beeplow="0"
-beephigh="6"
+export beeplow="0"
+export beephigh="6"
 
 # ============================================================================ #
 ################################################################################
@@ -54,7 +54,7 @@ rm -rf $logpath
 touch $logpath
 
 # Resetting beep on first run!
-beepsound="0"
+export beepsound="0"
 
 echo "Starting High Availability Cluster Server for Docker and Virtual Machines!" >> $logpath
 
@@ -64,7 +64,7 @@ ssh-add /home/$USERNAME/.ssh/id_rsa 1>$lognull 2>$lognull
 
 # This will keep this script running like a daemon!
 while true; do
-  data=$(date +"%H:%M %d.%m.%Y")
+  export data=$(date +"%H:%M %d.%m.%Y")
   sleep 5
   gluster00
 done
@@ -82,7 +82,7 @@ function gluster00 {
     systemctl start glusterd.service
     systemctl is-active --quiet glusterd && {
     echo "$data Glusterd started manually, it was stopped!" >> $logpath
-      beepsound="0"
+      export beepsound="0"
       gluster01
     } || {
       echo "$data ERROR: Glusterd not running!" >> $logpath
@@ -97,19 +97,19 @@ function gluster00 {
 
 # 01 - Check how much volumes are mounted
 function gluster01 {
-  aptab="0"
+  export aptab="0"
   for dir in $(echo $volumepaths); do
-    aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull && echo " yes" || echo " no")
+    export aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull && echo " yes" || echo " no")
   done
-  checkdir="0"
-  checkdir=$(grep -o 'yes' <<<"$aptab" | wc -l)
+  export checkdir="0"
+  export checkdir=$(grep -o 'yes' <<<"$aptab" | wc -l)
   gluster02
 }
 
 # 02 - Check if there is at least one mounted volume
 function gluster02 {
   [ "$checkdir" = "0" ] || {
-    beepsound="0"
+    export beepsound="0"
     cluster00
   } && {
     echo "$data ERROR: Not a single default volume was found!" >> $logpath
@@ -124,7 +124,7 @@ function gluster02 {
 # 03 - Ping if there is connection to Gateway route
 function cluster00 {
   if ping -c 1 $IP3 &> $lognull; then
-    beepsound="0"
+    export beepsound="0"
     cluster01
   else
     echo "$data ERROR: Gateway not found" >> $logpath
@@ -139,7 +139,7 @@ function cluster00 {
 # 04 - Ping the other node through LAN
 function cluster01 {
   if ping -c 1 $IP1 &> $lognull && ping -c 1 $IP2 &> $lognull; then
-    beepsound="0"
+    export beepsound="0"
     cluster02
   else
     echo "$data ERROR: The other node doesn't respond." >> $logpath
@@ -153,7 +153,7 @@ function cluster01 {
 # 05 - Ping the other node through reserved NIC
 function cluster02 {
   if ping -c 1 "$HOSTNAME1" &> "$lognull" && ping -c 1 "$HOSTNAME2" &> "$lognull"; then
-    beepsound="0"
+    export beepsound="0"
     cluster03
   else
     echo "$data ERROR: All Ok but can't connect Reserved NIC!" >> $logpath
@@ -223,7 +223,7 @@ function beeps {
     modprobe pcspkr
     env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$1" -l 200 -r 1
     env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$2" -l 200 -r 1
-    beepsound=$(($beepsound+1))
+    export beepsound=$(($beepsound+1))
   } || {
     echo "Silence! Or I kill you!" > $lognull
   }
