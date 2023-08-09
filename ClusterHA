@@ -53,7 +53,7 @@ beephigh="6"
 rm -rf $logpath
 touch $logpath
 
-# Resetting beep!
+# Resetting beep on first run!
 beepsound="0"
 
 echo "Starting High Availability Cluster Server for Docker and Virtual Machines!" >> $logpath
@@ -82,6 +82,7 @@ function gluster00 {
     systemctl start glusterd.service
     systemctl is-active --quiet glusterd && {
     echo "$data Glusterd started manually, it was stopped!" >> $logpath
+      beepsound="0"
       gluster01
     } || {
       echo "$data ERROR: Glusterd not running!" >> $logpath
@@ -97,34 +98,33 @@ function gluster00 {
 # 01 - Check how much volumes are mounted
 function gluster01 {
   aptab="0"
-
   for dir in $(echo $volumepaths); do
     aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull && echo " yes" || echo " no")
   done
-
   checkdir="0"
   checkdir=$(grep -o 'yes' <<<"$aptab" | wc -l)
-
   gluster02
 }
 
 # 02 - Check if there is at least one mounted volume
 function gluster02 {
-  [ "$checkdir" = "0" ] && {
+  [ "$checkdir" = "0" ] || {
+    beepsound="0"
+    cluster00
+  } && {
     echo "$data ERROR: Not a single default volume was found!" >> $logpath
     echo "$data ERROR: Shutting down all containers!" >> $logpath
     beeps "1000" "1000"
     dockerctrl stop && 1>$lognull 2>$lognull
     vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
-  } || {
-    cluster00
   }
 }
 
 # 03 - Ping if there is connection to Gateway route
 function cluster00 {
   if ping -c 1 $IP3 &> $lognull; then
+    beepsound="0"
     cluster01
   else
     echo "$data ERROR: Gateway not found" >> $logpath
@@ -138,10 +138,8 @@ function cluster00 {
 
 # 04 - Ping the other node through LAN
 function cluster01 {
-  # Reseting beep, again!
-  beepsound="0"
-
   if ping -c 1 $IP1 &> $lognull && ping -c 1 $IP2 &> $lognull; then
+    beepsound="0"
     cluster02
   else
     echo "$data ERROR: The other node doesn't respond." >> $logpath
@@ -154,13 +152,13 @@ function cluster01 {
 
 # 05 - Ping the other node through reserved NIC
 function cluster02 {
-  beepsound="0"
-
   if ping -c 1 "$HOSTNAME1" &> "$lognull" && ping -c 1 "$HOSTNAME2" &> "$lognull"; then
+    beepsound="0"
     cluster03
   else
     echo "$data ERROR: All Ok but can't connect Reserved NIC!" >> $logpath
     echo "$data ERROR: Shutting down all containers!" >> $logpath
+    beeps "1000" "2000"
     dockerctrl stop && 1>$lognull 2>$lognull
     vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
