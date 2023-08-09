@@ -8,33 +8,45 @@ function init {
 
 # Control Panel #
 
-IP1="172.20.0.10" # LAN1
-HOSTNAME1="cluster-01" # Reserved NIC 1
-IP2="172.20.0.11" # LAN2
-HOSTNAME2="cluster-02" # Reserved NIC 2
+# LAN1
+IP1="172.20.0.10"
+# Reserved NIC 1
+HOSTNAME1="cluster-01"
+# LAN2
+IP2="172.20.0.11"
+# Reserved NIC 2
+HOSTNAME2="cluster-02"
 
-IP3="172.20.0.1" # Gateway
+# Gateway
+IP3="172.20.0.1"
 
+# If not set this, will run as root...
 USERNAME="administrador"
 
 volumepaths="/srv/containers /mnt/pool01 /mnt/pool02 /mnt/pool03 /mnt/volume01 /mnt/volume02 /mnt/volume03"
 
+# All logs that are saved or discarded
 lognull="/dev/null"
 logpath="/var/log/gluster"
 
+# Beep 7 times, because 0 and 6!
+
 # ============================================================================ #
 
+# Setting how many times will beep at start
+beepsound="0"
+
+# Preparing Log files
 rm -rf $logpath
 touch $logpath
 
-# Beep 7 times, because 0 and 6!
-beepsound="0"
+echo "Starting High Availability Cluster Server for Docker and Virtual Machines!" >> $logpath
 
-echo "Welcome to High Availability Cluster Server for Docker!" >> $logpath
-
+# Check if everything if Ok with SSH to connect to another node
 eval $(ssh-agent) 1>$lognull 2>$lognull
 ssh-add /home/$USERNAME/.ssh/id_rsa 1>$lognull 2>$lognull
 
+# This will keep this script running like a daemon!
 while true; do
   data=$(date +"%H:%M %d.%m.%Y")
   sleep 5
@@ -54,25 +66,15 @@ function gluster00 {
     } || {
       echo "$data ERROR: Glusterd not running!" >> $logpath
       echo "$data ERROR: Shutting down all containers!" >> $logpath
-
-      # Higher Beep
-      [ "$beepsound" -ge "0" ] && [ "$beepsound" -le "6" ] && {
-        modprobe pcspkr
-        env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 2000 -l 200 -r 1
-        env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 2000 -l 200 -r 1
-        beepsound=$(($beepsound+1))
-      } || {
-        echo "Silence! Or I kill you!" > $lognull
-      }
-
+      beeps "2000" "2000"
       dockerctrl stop && 1>$lognull 2>$lognull
-      vmctrlrun "shutdown" && 1>$lognull 2>$lognull
+      vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
       setpid "0" 1>$lognull 2>$lognull 
     }
   }
 }
 
-# 01 - Check if there is any volume
+# 01 - Check if there is at least one mounted volume
 function gluster01 {
   aptab="0"
   for dir in $(echo $volumepaths); do
@@ -85,44 +87,25 @@ function gluster01 {
   [ "$checkdir" = "0" ] && {
     echo "$data ERROR: Not a single default volume was found!" >> $logpath
     echo "$data ERROR: Shutting down all containers!" >> $logpath
-
-    # Lower Beep
-    [ "$beepsound" -ge "0" ] && [ "$beepsound" -le "6" ] && {
-      modprobe pcspkr
-      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
-      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
-      beepsound=$(($beepsound+1))
-    } || {
-      echo "Silence! Or I kill you!" > $lognull
-    }
-
+    beeps "1000" "1000"
     dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrlrun "shutdown" && 1>$lognull 2>$lognull
+    vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
   } || {
     cluster00
   }
 }
 
-# 02- Ping if there is connection to Gateway route.
+# 02- Ping if there is connection to Gateway route
 function cluster00 {
   if ping -c 1 $IP3 &> $lognull; then
     cluster01
   else
     echo "$data ERROR: Gateway not found" >> $logpath
     echo "$data ERROR: Shutting down all containers and VMs!" >> $logpath
-
-    [ "$beepsound" -ge "0" ] && [ "$beepsound" -le "6" ] && {
-      modprobe pcspkr
-      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 2000 -l 200 -r 1
-      env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f 1000 -l 200 -r 1
-      beepsound=$(($beepsound+1))
-    } || {
-      echo "Silence! Or I kill you!" > $lognull
-    }
-
+    beeps "2000" "1000"
     dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrlrun "shutdown" && 1>$lognull 2>$lognull
+    vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
   fi
 }
@@ -136,9 +119,8 @@ function cluster01 {
   else
     echo "$data ERROR: The other node doesn't respond." >> $logpath
     echo "$data ERROR: Starting containers and VMs myself!" >> $logpath
-
     dockerctrl start && 1>$lognull 2>$lognull
-    vmctrlshut "start" && 1>$lognull 2>$lognull
+    vmctrl "--state-shutoff" "start" && 1>$lognull 2>$lognull
     setpid "1" 1>$lognull 2>$lognull 
   fi
 }
@@ -152,14 +134,13 @@ function cluster02 {
   else
     echo "$data ERROR: All Ok but can't connect Reserved NIC!" >> $logpath
     echo "$data ERROR: Shutting down all containers!" >> $logpath
-
     dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrlrun "shutdown" && 1>$lognull 2>$lognull
+    vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
     setpid "0" 1>$lognull 2>$lognull 
   fi
 }
 
-# 04 - Checking for PIDFile on the other node.
+# 04 - Checking for PIDFile on the other node
 function cluster03 {
   [ "$HOSTNAME" = "$HOSTNAME1" ] && {
     checking=$(ssh $USERNAME@$HOSTNAME2 "cat /home/$USERNAME/.lockha") &&
@@ -170,44 +151,55 @@ function cluster03 {
   }
 }
 
+# 05 - Starting or stopping all containers and VMs accordingly
 function cluster04 {
   [ "$checking" = "1" ] && {
     setpid "0" 1>$lognull 2>$lognull
     dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrl "running" "shutdown" && 1>$lognull 2>$lognull
-    echo "$data Containers and VMS are Stopped!" >> $logpath
+    vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
+    echo "$data Containers and VMs are Stopped!" >> $logpath
   } || {
     setpid "1" 1>$lognull 2>$lognull
     sleep 20
     dockerctrl start && 1>$lognull 2>$lognull
-    vmctrlshut "start" && 1>$lognull 2>$lognull
+    vmctrl "--state-shutoff" "start" && 1>$lognull 2>$lognull
     echo "$data Containers and VMs are Running!" >> $logpath
   }
 }
 
 function dockerctrl {
-  docker "$1" $(docker ps -a -q) 1>$lognull 2>$lognull
+# Will wait to all containers to stop or start before continuing!
+  docker "$1" $(docker ps -a -q) &&
 }
 
-function vmctrlrun {
-  for i in $(virsh list --all --state-running | awk '{print $2}'); do
-    virsh $1 $i
+function vmctrl {
+# Will wait to all VMs to stop or start before continuing!
+  for i in $(virsh list --all "$1" | awk '{print $2}' | grep -v Nome); do
+    virsh "$2" "$i" &&
   done
 }
 
-function vmctrlshut {
-  for i in $(virsh list --all --state-shutoff | awk '{print $2}'); do
-    virsh $1 $i
-  done
-}
-
+# Setting PID control file on /home/$USERNAME/.lockha
 function setpid {
-  # This random ensures that we don't fall on a ping-pong situation,
-  # with the machines getting the same number for .lockha file!
+# This randomly ensures that we don't fall on a ping-pong situation,
+# with the machine nodes getting the same number for .lockha file!
   sleep $((RANDOM%5))
   echo "$1" > /home/$USERNAME/.lockha
 }
 
+# All beep configurations are set here.
+function beeps {
+  [ "$beepsound" -ge "0" ] && [ "$beepsound" -le "6" ] && {
+    modprobe pcspkr
+    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$1" -l 200 -r 1
+    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$2" -l 200 -r 1
+    beepsound=$(($beepsound+1))
+  } || {
+    echo "Silence! Or I kill you!" > $lognull
+  }
+}
+
+# Let's Get Started!
 init
 
 exit 1
