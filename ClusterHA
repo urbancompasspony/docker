@@ -1,12 +1,15 @@
 #!/bin/bash
 
+# ONLY ON FIRST NODE!
+# sudo touch /srv/containers/scripts/cluster
+# sudo nano /srv/containers/scripts/cluster
+# sudo chmod +x /srv/containers/scripts/cluster
+# SUDO Cron: "@reboot bash /srv/containers/scripts/cluster"
+
 function init {
 
 ################################################################################
 # ============================================================================ #
-
-# sudo touch /srv/containers/scripts/cluster
-# SUDO Cron: "@reboot bash /srv/containers/scripts/Cluster"
 
 #################
 # Control Panel #
@@ -15,14 +18,14 @@ function init {
 # Local Gateway
 IP3="172.20.0.1"
 
-# LAN1
+# LAN 01
 IP1="172.20.0.10"
-# Reserved NIC 1
+# Reserved NIC 01
 HOSTNAME1="cluster-01"
 
-# LAN2
+# LAN 02
 IP2="172.20.0.11"
-# Reserved NIC 2
+# Reserved NIC 02
 HOSTNAME2="cluster-02"
 
 # There is no need of ethernet connection!
