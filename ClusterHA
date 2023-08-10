@@ -4,7 +4,7 @@
 # sudo touch /srv/containers/scripts/cluster
 # sudo nano /srv/containers/scripts/cluster
 # sudo chmod +x /srv/containers/scripts/cluster
-# SUDO Cron: "@reboot bash /srv/containers/scripts/cluster"
+# SUDO cron: "@reboot bash /srv/containers/scripts/cluster"
 
 function init {
 
@@ -35,11 +35,7 @@ export HOSTNAME2="cluster-02"
 # If not setting this, will run as root...
 export USERNAME="administrador"
 
-# Volume /srv/containers is the only one that is a MUST!
-export volumepaths="/srv/containers /mnt/pool01 /mnt/pool02 /mnt/pool03 /mnt/volume01 /mnt/volume02 /mnt/volume03"
-
 # All logs that are saved or discarded goes here
-export lognull="/dev/null"
 export logpath="/var/log/gluster"
 
 # Will beep 7 times if beeplow=0 and beephigh=6!
@@ -48,6 +44,9 @@ export beephigh="6"
 
 # ============================================================================ #
 ################################################################################
+
+# Source
+#source /srv/containers/scripts/cluster
 
 # Preparing Log files
 rm -rf $logpath
@@ -59,8 +58,8 @@ export beepsound="0"
 echo "Starting High Availability Cluster Server for Docker and Virtual Machines!" >> $logpath
 
 # Check if everything if Ok with SSH to connect to another node
-eval $(ssh-agent) 1>$lognull 2>$lognull
-ssh-add /home/$USERNAME/.ssh/id_rsa 1>$lognull 2>$lognull
+eval $(ssh-agent) >/dev/null
+ssh-add /home/$USERNAME/.ssh/id_rsa >/dev/null
 
 # This will keep this script running like a daemon!
 while true; do
@@ -88,18 +87,18 @@ function gluster00 {
       echo "$data ERROR: Glusterd not running!" >> $logpath
       echo "$data ERROR: Shutting down all containers!" >> $logpath
       beeps "2000" "2000"
-      dockerctrl stop && 1>$lognull 2>$lognull
-      vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
-      setpid "0" 1>$lognull 2>$lognull 
+      dockerctrl stop && >/dev/null
+      vmctrl "--state-running" "shutdown" && >/dev/null
+      setpid "0" >/dev/null
     }
   }
 }
 
 # 01 - Check how much volumes are mounted
-function gluster01 {
+function gluster02 {
   export aptab="0"
   for dir in $(echo $volumepaths); do
-    export aptab+=$(cat /etc/mtab | grep $dir 1>$lognull 2>$lognull && echo " yes" || echo " no")
+    export aptab+=$(cat /etc/mtab | grep $dir >/dev/null && echo " yes" || echo " no")
   done
   export checkdir="0"
   export checkdir=$(grep -o 'yes' <<<"$aptab" | wc -l)
@@ -107,61 +106,61 @@ function gluster01 {
 }
 
 # 02 - Check if there is at least one mounted volume
-function gluster02 {
-  [ "$checkdir" = "0" ] || {
+function gluster01 {
+  [ -f "/srv/containers/scripts/myip" ] && {
     export beepsound="0"
     cluster00
-  } && {
+  } || {
     echo "$data ERROR: Not a single default volume was found!" >> $logpath
     echo "$data ERROR: Shutting down all containers!" >> $logpath
     beeps "1000" "1000"
-    dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
-    setpid "0" 1>$lognull 2>$lognull 
+    dockerctrl stop && >/dev/null
+    vmctrl "--state-running" "shutdown" && >/dev/null
+    setpid "0" >/dev/null
   }
 }
 
 # 03 - Ping if there is connection to Gateway route
 function cluster00 {
-  if ping -c 1 $IP3 &> $lognull; then
+  if ping -c 1 $IP3 >/dev/null; then
     export beepsound="0"
     cluster01
   else
     echo "$data ERROR: Gateway not found" >> $logpath
     echo "$data ERROR: Shutting down all containers and VMs!" >> $logpath
     beeps "2000" "1000"
-    dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
-    setpid "0" 1>$lognull 2>$lognull 
+    dockerctrl stop && >/dev/null
+    vmctrl "--state-running" "shutdown" && >/dev/null
+    setpid "0" >/dev/null
   fi
 }
 
 # 04 - Ping the other node through LAN
 function cluster01 {
-  if ping -c 1 $IP1 &> $lognull && ping -c 1 $IP2 &> $lognull; then
+  if ping -c 1 $IP1 >/dev/null && ping -c 1 $IP2 > /dev/null; then
     export beepsound="0"
     cluster02
   else
     echo "$data ERROR: The other node doesn't respond." >> $logpath
     echo "$data ERROR: Starting containers and VMs myself!" >> $logpath
-    dockerctrl start && 1>$lognull 2>$lognull
-    vmctrl "--state-shutoff" "start" && 1>$lognull 2>$lognull
-    setpid "1" 1>$lognull 2>$lognull 
+    dockerctrl start && >/dev/null
+    vmctrl "--state-shutoff" "start" && >/dev/null
+    setpid "1" >/dev/null
   fi
 }
 
 # 05 - Ping the other node through reserved NIC
 function cluster02 {
-  if ping -c 1 "$HOSTNAME1" &> "$lognull" && ping -c 1 "$HOSTNAME2" &> "$lognull"; then
+  if ping -c 1 "$HOSTNAME1" >/dev/null && ping -c 1 "$HOSTNAME2" >/dev/null; then
     export beepsound="0"
     cluster03
   else
     echo "$data ERROR: All Ok but can't connect Reserved NIC!" >> $logpath
     echo "$data ERROR: Shutting down all containers!" >> $logpath
     beeps "1000" "2000"
-    dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
-    setpid "0" 1>$lognull 2>$lognull 
+    dockerctrl stop && >/dev/null
+    vmctrl "--state-running" "shutdown" && >/dev/null
+    setpid "0" >/dev/null
   fi
 }
 
@@ -180,15 +179,15 @@ function cluster03 {
 # If stopping, will wait 20s!
 function cluster04 {
   [ "$checking" = "1" ] && {
-    setpid "0" 1>$lognull 2>$lognull
-    dockerctrl stop && 1>$lognull 2>$lognull
-    vmctrl "--state-running" "shutdown" && 1>$lognull 2>$lognull
+    setpid "0" >/dev/null
+    dockerctrl stop && >/dev/null
+    vmctrl "--state-running" "shutdown" && >/dev/null
     echo "$data Containers and VMs are Stopped!" >> $logpath
   } || {
-    setpid "1" 1>$lognull 2>$lognull
+    setpid "1" >/dev/null
     sleep 20
-    dockerctrl start && 1>$lognull 2>$lognull
-    vmctrl "--state-shutoff" "start" && 1>$lognull 2>$lognull
+    dockerctrl start && >/dev/null
+    vmctrl "--state-shutoff" "start" && >/dev/null
     echo "$data Containers and VMs are Running!" >> $logpath
   }
 }
@@ -225,7 +224,7 @@ function beeps {
     env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$2" -l 200 -r 1
     export beepsound=$(($beepsound+1))
   } || {
-    echo "Silence! Or I kill you!" > $lognull
+    echo "Silence! Or I kill you!" >/dev/null
   }
 }
 
