@@ -38,9 +38,11 @@ export USERNAME="administrador"
 # All logs that are saved or discarded goes here
 export logpath="/var/log/gluster"
 
-# Will beep 7 times if beeplow=0 and beephigh=6!
+# Will run 7 times if 0 and 6!
 export beeplow="0"
 export beephigh="6"
+export loglow="0"
+export loghigh="6"
 
 # ============================================================================ #
 ################################################################################
@@ -54,8 +56,6 @@ touch $logpath
 
 # Resetting beep on first run!
 export beepsound="0"
-
-echo "Starting High Availability Cluster Server for Docker and Virtual Machines!" >> $logpath
 
 # Check if everything if Ok with SSH to connect to another node
 eval $(ssh-agent) >/dev/null
@@ -94,18 +94,7 @@ function gluster00 {
   }
 }
 
-# 01 - Check how much volumes are mounted
-function gluster02 {
-  export aptab="0"
-  for dir in $(echo $volumepaths); do
-    export aptab+=$(cat /etc/mtab | grep $dir >/dev/null && echo " yes" || echo " no")
-  done
-  export checkdir="0"
-  export checkdir=$(grep -o 'yes' <<<"$aptab" | wc -l)
-  gluster02
-}
-
-# 02 - Check if there is at least one mounted volume
+# 01 - Check if there is at least one mounted volume
 function gluster01 {
   [ -f "/srv/containers/scripts/myip" ] && {
     export beepsound="0"
@@ -120,7 +109,7 @@ function gluster01 {
   }
 }
 
-# 03 - Ping if there is connection to Gateway route
+# 02 - Ping if there is connection to Gateway route
 function cluster00 {
   if ping -c 1 $IP3 >/dev/null; then
     export beepsound="0"
@@ -135,7 +124,7 @@ function cluster00 {
   fi
 }
 
-# 04 - Ping the other node through LAN
+# 03 - Ping the other node through LAN
 function cluster01 {
   if ping -c 1 $IP1 >/dev/null && ping -c 1 $IP2 > /dev/null; then
     export beepsound="0"
@@ -149,13 +138,13 @@ function cluster01 {
   fi
 }
 
-# 05 - Ping the other node through reserved NIC
+# 04 - Ping the other node through reserved NIC
 function cluster02 {
   if ping -c 1 "$HOSTNAME1" >/dev/null && ping -c 1 "$HOSTNAME2" >/dev/null; then
     export beepsound="0"
     cluster03
   else
-    echo "$data ERROR: All Ok but can't connect Reserved NIC!" >> $logpath
+    echo "$data ERROR: All Ok but can't connect Reserved NIC?!" >> $logpath
     echo "$data ERROR: Shutting down all containers!" >> $logpath
     beeps "1000" "2000"
     dockerctrl stop && >/dev/null
@@ -164,7 +153,7 @@ function cluster02 {
   fi
 }
 
-# 06 - Checking for PID.File on the other node
+# 05 - Checking for PID.File on the other node
 function cluster03 {
   [ "$HOSTNAME" = "$HOSTNAME1" ] && {
     checking=$(ssh $USERNAME@$HOSTNAME2 "cat /home/$USERNAME/.lockha") &&
@@ -175,20 +164,22 @@ function cluster03 {
   }
 }
 
-# 07 - Starting or stopping all containers and VMs accordingly
+# 06 - Starting or stopping all containers and VMs accordingly
 # If stopping, will wait 20s!
 function cluster04 {
   [ "$checking" = "1" ] && {
     setpid "0" >/dev/null
     dockerctrl stop && >/dev/null
     vmctrl "--state-running" "shutdown" && >/dev/null
-    echo "$data Containers and VMs are Stopped!" >> $logpath
+    echo "$data Everything is Ok! Omitting duplicated and clearing older logs." > $logpath
+    echo "$data All containers and Virtual Machines are stopped on this node!" >> $logpath
   } || {
     setpid "1" >/dev/null
     sleep 20
     dockerctrl start && >/dev/null
     vmctrl "--state-shutoff" "start" && >/dev/null
-    echo "$data Containers and VMs are Running!" >> $logpath
+    echo "$data Everything is Ok! Omitting duplicated and clearing older logs." > $logpath
+    echo "$data All containers and Virtual Machines are running on this node!" >> $logpath
   }
 }
 
