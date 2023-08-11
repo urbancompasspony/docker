@@ -105,31 +105,34 @@ function gluster00 {
 
 # 01 - Check if there are /srv/containers volume!
 function gluster01 {
-  [ -f "/srv/containers/.contok" ] && {
-    export beepsound="0"
-    gluster02
+  [ "$mustcont" = "yes" ] && {
+    [ -f "/srv/containers/.contok" ] && {
+      export beepsound="0"
+      gluster02
+    } || {
+      textlog "ERROR: Containers volume was not found!"
+      beeps "1000" "1000"
+      dockerctrl stop && >/dev/null
+      setpid "0" >/dev/null
+    }
   } || {
-    textlog "ERROR: Containers volume was not found!"
-    textlog "ERROR: Shutting down all containers!"
-    textlog "Virtual Machines maybe are still running."
-    beeps "1000" "1000"
-    dockerctrl stop && >/dev/null
-    setpid "0" >/dev/null
+    gluster02
   }
 }
 
 # 02 - Check if there are /srv/virtualmachines volume!
 function gluster02 {
-  [ -f "/srv/virtualmachines/.vmok" ] && {
-    export beepsound="0"
-    cluster00
+  [ "$mustvm" = "yes" ] && {
+    [ -f "/srv/virtualmachines/.vmok" ] && {
+      export beepsound="0"
+      cluster00
+    } || {
+      textlog "ERROR: Virtual Machine volume was not found!"
+      beeps "1000" "1000"
+      vmctrl "--state-running" "shutdown" && >/dev/null
+      setpid "0" >/dev/null
   } || {
-    textlog "ERROR: Virtual Machine volume was not found!"
-    textlog "ERROR: Shutting down all Virtual Machines!"
-    textlog "Containers maybe are still running."
-    beeps "1000" "1000"
-    vmctrl "--state-running" "shutdown" && >/dev/null
-    setpid "0" >/dev/null
+    cluster00
   }
 }
 
@@ -140,7 +143,7 @@ function cluster00 {
     cluster01
   else
     textlog "ERROR: Gateway not found"
-    textlog "ERROR: Shutting down all containers and VMs!"
+    textlog "ERROR: Shutting down all containers and virtual machines!"
     beeps "2000" "1000"
     dockerctrl stop && >/dev/null
     vmctrl "--state-running" "shutdown" && >/dev/null
@@ -155,7 +158,7 @@ function cluster01 {
     cluster02
   else
     textlog "ERROR: The other node doesn't respond."
-    textlog "ERROR: Starting containers and VMs myself!"
+    textlog "ERROR: Starting containers and virtual machines myself!"
     dockerctrl start && >/dev/null
     vmctrl "--state-shutoff" "start" && >/dev/null
     setpid "1" >/dev/null
@@ -206,10 +209,6 @@ function cluster04 {
     textlog "All containers and Virtual Machines are running on this node!"
   }
 }
-
-##############
-# Acessories #
-##############
 
 # Will wait to all containers to stop or start before continuing!
 # Extra Security check: If "/srv/containers" doesn't exist, after all checks, stop all containers!
@@ -270,8 +269,6 @@ function beeps {
 function textlog {
   echo "$data $1" | tee -a $logpath
 }
-
-# There is no need of ethernet connection!
 
 # ============================================================================ #
 
