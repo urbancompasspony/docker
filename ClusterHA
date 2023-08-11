@@ -1,10 +1,15 @@
 #!/bin/bash
 
-# ONLY ON FIRST NODE!
-# sudo touch /srv/containers/scripts/cluster
-# sudo nano /srv/containers/scripts/cluster
-# sudo chmod +x /srv/containers/scripts/cluster
-# SUDO cron: "@reboot bash /srv/containers/scripts/cluster"
+# Tips #
+# DO ON ALL NODES!
+
+# sudo -i
+# touch /root/cluster
+# nano /root/cluster
+# sudo chmod +x /root/cluster
+# SUDO cron: "@reboot bash /root/cluster"
+
+# Remember to check if there are .contok and/or .vmok  files!
 
 function init {
 
@@ -20,17 +25,22 @@ export IP3="172.20.0.1"
 
 # LAN 01
 export IP1="172.20.0.10"
-# Reserved NIC 01
-export HOSTNAME1="cluster-01"
 
 # LAN 02
 export IP2="172.20.0.11"
-# Reserved NIC 02
-export HOSTNAME2="cluster-02"
 
-# There is no need of ethernet connection!
+# Change to Yes if this servers has VMs and/or Containers!
+export mustcont="no"
+export mustvm="no"
 
 # ============================================================================ #
+# Advanced Parameters - Doesn't change if you do not know what are you doing!  #
+
+# Reserved NIC 01
+export HOSTNAME1="cluster-01"
+
+# Reserved NIC 02
+export HOSTNAME2="cluster-02"
 
 # If not setting this, will run as root...
 export USERNAME="administrador"
@@ -41,14 +51,12 @@ export logpath="/var/log/gluster"
 # Will run 7 times if 0 and 6!
 export beeplow="0"
 export beephigh="6"
+
 export loglow="0"
 export loghigh="6"
 
 # ============================================================================ #
 ################################################################################
-
-# Source
-#source /srv/containers/scripts/cluster
 
 # Preparing Log files
 rm -rf $logpath
@@ -80,12 +88,13 @@ function gluster00 {
   } || {
     systemctl start glusterd.service
     systemctl is-active --quiet glusterd && {
-    echo "$data Glusterd started manually, it was stopped!" >> $logpath
+    textlog "Glusterd started manually, it was stopped!"
+    textlog "Proceeding anyway."
       export beepsound="0"
       gluster01
     } || {
-      echo "$data ERROR: Glusterd not running!" >> $logpath
-      echo "$data ERROR: Shutting down all containers!" >> $logpath
+      textlog "ERROR: Glusterd not running!"
+      textlog "ERROR: Shutting down all containers!"
       beeps "2000" "2000"
       dockerctrl stop && >/dev/null
       vmctrl "--state-running" "shutdown" && >/dev/null
@@ -94,29 +103,44 @@ function gluster00 {
   }
 }
 
-# 01 - Check if there is at least one mounted volume
+# 01 - Check if there are /srv/containers volume!
 function gluster01 {
-  [ -f "/srv/containers/scripts/myip" ] && {
+  [ -f "/srv/containers/.contok" ] && {
+    export beepsound="0"
+    gluster02
+  } || {
+    textlog "ERROR: Containers volume was not found!"
+    textlog "ERROR: Shutting down all containers!"
+    textlog "Virtual Machines maybe are still running."
+    beeps "1000" "1000"
+    dockerctrl stop && >/dev/null
+    setpid "0" >/dev/null
+  }
+}
+
+# 02 - Check if there are /srv/virtualmachines volume!
+function gluster02 {
+  [ -f "/srv/virtualmachines/.vmok" ] && {
     export beepsound="0"
     cluster00
   } || {
-    echo "$data ERROR: Not a single default volume was found!" >> $logpath
-    echo "$data ERROR: Shutting down all containers!" >> $logpath
+    textlog "ERROR: Virtual Machine volume was not found!"
+    textlog "ERROR: Shutting down all Virtual Machines!"
+    textlog "Containers maybe are still running."
     beeps "1000" "1000"
-    dockerctrl stop && >/dev/null
     vmctrl "--state-running" "shutdown" && >/dev/null
     setpid "0" >/dev/null
   }
 }
 
-# 02 - Ping if there is connection to Gateway route
+# 03 - Ping if there are connection to Gateway route
 function cluster00 {
   if ping -c 1 $IP3 >/dev/null; then
     export beepsound="0"
     cluster01
   else
-    echo "$data ERROR: Gateway not found" >> $logpath
-    echo "$data ERROR: Shutting down all containers and VMs!" >> $logpath
+    textlog "ERROR: Gateway not found"
+    textlog "ERROR: Shutting down all containers and VMs!"
     beeps "2000" "1000"
     dockerctrl stop && >/dev/null
     vmctrl "--state-running" "shutdown" && >/dev/null
@@ -124,28 +148,28 @@ function cluster00 {
   fi
 }
 
-# 03 - Ping the other node through LAN
+# 04 - Ping the other node through LAN
 function cluster01 {
   if ping -c 1 $IP1 >/dev/null && ping -c 1 $IP2 > /dev/null; then
     export beepsound="0"
     cluster02
   else
-    echo "$data ERROR: The other node doesn't respond." >> $logpath
-    echo "$data ERROR: Starting containers and VMs myself!" >> $logpath
+    textlog "ERROR: The other node doesn't respond."
+    textlog "ERROR: Starting containers and VMs myself!"
     dockerctrl start && >/dev/null
     vmctrl "--state-shutoff" "start" && >/dev/null
     setpid "1" >/dev/null
   fi
 }
 
-# 04 - Ping the other node through reserved NIC
+# 05 - Ping the other node through reserved NIC
 function cluster02 {
   if ping -c 1 "$HOSTNAME1" >/dev/null && ping -c 1 "$HOSTNAME2" >/dev/null; then
     export beepsound="0"
     cluster03
   else
-    echo "$data ERROR: All Ok but can't connect Reserved NIC?!" >> $logpath
-    echo "$data ERROR: Shutting down all containers!" >> $logpath
+    textlog "ERROR: All Ok but can't connect Reserved NIC?!"
+    textlog "ERROR: Shutting down all containers and virtual machines!"
     beeps "1000" "2000"
     dockerctrl stop && >/dev/null
     vmctrl "--state-running" "shutdown" && >/dev/null
@@ -153,7 +177,7 @@ function cluster02 {
   fi
 }
 
-# 05 - Checking for PID.File on the other node
+# 06 - Checking for PID.File on the other node
 function cluster03 {
   [ "$HOSTNAME" = "$HOSTNAME1" ] && {
     checking=$(ssh $USERNAME@$HOSTNAME2 "cat /home/$USERNAME/.lockha") &&
@@ -164,22 +188,22 @@ function cluster03 {
   }
 }
 
-# 06 - Starting or stopping all containers and VMs accordingly
+# 07 - Starting or stopping all containers and VMs accordingly
 # If stopping, will wait 20s!
 function cluster04 {
   [ "$checking" = "1" ] && {
     setpid "0" >/dev/null
     dockerctrl stop && >/dev/null
     vmctrl "--state-running" "shutdown" && >/dev/null
-    echo "$data Everything is Ok! Omitting duplicated and clearing older logs." > $logpath
-    echo "$data All containers and Virtual Machines are stopped on this node!" >> $logpath
+    textlog "Everything is Ok!"
+    textlog "All containers and Virtual Machines are stopped on this node!"
   } || {
     setpid "1" >/dev/null
     sleep 20
     dockerctrl start && >/dev/null
     vmctrl "--state-shutoff" "start" && >/dev/null
-    echo "$data Everything is Ok! Omitting duplicated and clearing older logs." > $logpath
-    echo "$data All containers and Virtual Machines are running on this node!" >> $logpath
+    textlog "Everything is Ok!"
+    textlog "All containers and Virtual Machines are running on this node!"
   }
 }
 
@@ -188,15 +212,39 @@ function cluster04 {
 ##############
 
 # Will wait to all containers to stop or start before continuing!
+# Extra Security check: If "/srv/containers" doesn't exist, after all checks, stop all containers!
 function dockerctrl {
-  docker "$1" $(docker ps -a -q)
+  [ -f /srv/containers/.contok ] && {
+    docker "$1" $(docker ps -a -q)
+  } || {
+    [ "$mustcont" = "yes" ] && {
+      textlog "ERROR: Containers volume was not found after all checks!"
+      textlog "ERROR: Shutting down all containers that are still alive!"
+      textlog "Virtual Machines maybe are still running."
+      docker stop $(docker ps -a -q)
+    } || {
+      echo "." >/dev/null
+    }
+  }
 }
 
-# Will wait to all VMs to stop or start before continuing!
+# Will wait all VMs to stop or start before continuing!
+# If there is no /mnt/vms, do nothing!
 function vmctrl {
-  for i in $(virsh list --all "$1" | awk '{print $2}' | grep -v Nome); do
-    virsh "$2" "$i"
-  done
+  [ -f /mnt/virtualmachines/.vmok ] && {
+    for i in $(virsh list --all "$1" | awk '{print $2}' | grep -v Nome); do
+      virsh "$2" "$i"
+    done
+  } || {
+    [ "$mustvm" = "yes" ] && {
+      textlog "Virtual Machine volume was not found after all checks!"
+      textlog "ERROR: Shutting down all virtual machines that are still alive!"
+      textlog "Containers maybe are still running."
+      vmctrl "--state-running" "shutdown" && >/dev/null
+    } || {
+      echo "." >/dev/null
+    }
+  }
 }
 
 # Setting PID control file on "/home/$USERNAME/.lockha".
@@ -217,6 +265,10 @@ function beeps {
   } || {
     echo "Silence! Or I kill you!" >/dev/null
   }
+}
+
+function textlog {
+  echo "$data $1" | tee -a $logpath
 }
 
 # There is no need of ethernet connection!
