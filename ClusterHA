@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Tips: DO ON ALL NODES!
+# Tips: DO THIS ON ALL NODES!
 
 # sudo -i
 # rm /root/cluster
 # nano /root/cluster
-# -CTRL A- -CTRL C-
-# -CTRL O- -CTRL X-
+# <-CTRL A-> <-CTRL C->
+# <-CTRL O-> <-CTRL X->
 # chmod +x /root/cluster
 # reboot
 
