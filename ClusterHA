@@ -36,9 +36,9 @@ function init {
 # LAN 02
   export IP2="172.20.0.11"
 
- # ================= #
-# Advanced Parameters #
- # ================= #
+                              # ================= #
+                             # Advanced Parameters #
+                              # ================= #
 
 # Reserved NIC 01
   export HOSTNAME1="cluster-01"
@@ -70,14 +70,6 @@ function init {
              # ======================================= #
             # Scripts to pre adjusting and controlling! #
              # ======================================= #
-
-# Removing old Log files
-  rm -rf $logpath
-  rm -rf /home/$USERNAME/.gluster_log
-
-# Creating new Log files
-  touch $logpath
-  ln -s $logpath /home/$USERNAME/.gluster_log
 
 # Resetting beep on first run!
   export beepsound="0"
@@ -223,10 +215,12 @@ function cluster08 {
                            # Control Functions #
                             # =============== #
 
+# This starts or stops all containers!
 function dockerctrl {
   docker "$1" $(docker ps -a -q)
 }
 
+# This starts or stops all virtual machines!
 function vmctrl {
   for i in $(virsh list --all "$1" | awk '{print $2}' | grep -v Nome); do
     virsh "$2" "$i"
@@ -244,6 +238,13 @@ function setpid {
 # Just some logging
 function textlog {
   echo "$data $1" | tee -a $logpath
+  sizelog=$(du --apparent-size --block-size=1 $logpath | awk {print'$1'})
+
+  [ "$sizelog" -ge "50000000" ] && {
+    logmngr
+  } || {
+    echo "." > /dev/null
+  }
 }
 
 # All beep configurations are here.
@@ -258,8 +259,23 @@ function beeps {
   }
 }
 
+function logmngr {
+  rm -rf /home/$USERNAME/.gluster_log
+  rm -rf $logpath
+
+  touch $logpath
+  ln -s $logpath /home/$USERNAME/.gluster_log
+}
+
 # ============================================================================ #
  ##############################################################################
+
+                                  #######
+                                 # Start #
+                                  #######
+
+# Prepare the Logs
+logmngr
 
 # Let's Get Started!
 init
