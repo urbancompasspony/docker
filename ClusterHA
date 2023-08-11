@@ -72,8 +72,9 @@ function init {
   export TEXT10="Or maybe I just can't found the ctrl file. Check it out!"
   export TEXT11="ERROR: Shutting down everything to prevent Split Brain!"
   export TEXT12="ERROR: Virtual Machines volume was not found!"
-  export TEXT13="Status: OK - Everything is STOPPED on this node!"
-  export TEXT14="Silence! Or I will aniquilate you!"
+  export TEXT13="Status: Everything is STOPPED on this node!"
+  export TEXT14="Status: Everything is RUNNING on this node!"
+  export TEXT15="Silence! Or I will aniquilate you!"
 
 # ============================================================================ #
  ##############################################################################
@@ -219,7 +220,7 @@ function cluster08 {
     sleep 20
     dockerctrl start && >/dev/null
     vmctrl "--state-shutoff" "start" && >/dev/null
-    textlog $TEXT13
+    textlog $TEXT14
   }
 }
 
