@@ -3,12 +3,19 @@
 # Tips: DO ON ALL NODES!
 
 # sudo -i
-# touch /root/cluster
+# rm /root/cluster
 # nano /root/cluster
-# sudo chmod +x /root/cluster
-# SUDO cron: "@reboot bash /root/cluster"
+# -CTRL A- -CTRL C-
+# chmod +x /root/cluster
+# reboot
+
+# sudo crontab -e:
+# "@reboot bash /root/cluster"
+# reboot
 
 # Remember to check if there are .contok and/or .vmok  files!
+# sudo touch /srv/containers/.contok
+# sudo touch /srv/virtualmachines/.vmok
 
 function init {
 
@@ -100,7 +107,6 @@ function cluster00 {
     systemctl is-active --quiet glusterd && {
     textlog "Glusterd started manually, it was stopped!"
     textlog "Proceeding anyway."
-      export beepsound="0"
       cluster01
     } || {
       textlog "ERROR: Glusterd not running!"
@@ -116,7 +122,6 @@ function cluster00 {
 # 01 - Ping the other node through reserved NIC
 function cluster01 {
   if ping -c 1 "$HOSTNAME1" >/dev/null && ping -c 1 "$HOSTNAME2" >/dev/null; then
-    export beepsound="0"
     cluster02
   else
     textlog "ERROR: Can't connect to Reserved NIC!"
@@ -131,7 +136,6 @@ function cluster01 {
 # 02 - Ping Gateway
 function cluster02 {
   if ping -c 1 $IP3 >/dev/null; then
-    export beepsound="0"
     cluster03
   else
     textlog "ERROR: Gateway not found"
@@ -146,7 +150,6 @@ function cluster02 {
 # 03 - Ping the other node
 function cluster03 {
   if ping -c 1 $IP1 >/dev/null && ping -c 1 $IP2 > /dev/null; then
-    export beepsound="0"
     cluster04
   else
     textlog "ERROR: The other node doesn't respond."
@@ -171,7 +174,6 @@ function cluster04 {
 # 05 - Check if there are /srv/containers volume!
 function cluster05 {
   [ -f "/srv/containers/.contok" ] && {
-    export beepsound="0"
     cluster06
   } || {
     textlog "ERROR: Containers volume was not found!"
@@ -184,7 +186,6 @@ function cluster05 {
 # 06 - Check if there are /srv/virtualmachines volume!
 function cluster06 {
   [ -f "/srv/virtualmachines/.vmok" ] && {
-    export beepsound="0"
     cluster08
   } || {
     textlog "ERROR: Virtual Machine volume was not found!"
@@ -197,6 +198,8 @@ function cluster06 {
 # 07 - Starting or stopping all containers and VMs accordingly
 # If stopping, will wait 20s!
 function cluster08 {
+  export beepsound="0"
+
   [ "$checking" = "1" ] && {
     setpid "0" >/dev/null
     dockerctrl stop && >/dev/null
@@ -226,7 +229,6 @@ function dockerctrl {
   } || {
     textlog "ERROR: Containers volume was not found after all checks!"
     textlog "ERROR: Shutting down all containers that are still alive!"
-    textlog "Virtual Machines maybe are still running."
     docker stop $(docker ps -a -q)
   }
 }
@@ -235,14 +237,13 @@ function dockerctrl {
 # Extra Security check: If "/srv/virtualmachines" doesn't exist after all checks, 
 # stop all virtual machines!
 function vmctrl {
-  [ -f /mnt/virtualmachines/.vmok ] && {
+  [ -f /srv/virtualmachines/.vmok ] && {
     for i in $(virsh list --all "$1" | awk '{print $2}' | grep -v Nome); do
       virsh "$2" "$i"
     done
   } || {
     textlog "Virtual Machine volume was not found after all checks!"
     textlog "ERROR: Shutting down all virtual machines that are still alive!"
-    textlog "Containers maybe are still running."
     vmctrl "--state-running" "shutdown" && >/dev/null
   }
 }
