@@ -6,6 +6,7 @@
 # rm /root/cluster
 # nano /root/cluster
 # -CTRL A- -CTRL C-
+# -CTRL O- -CTRL X-
 # chmod +x /root/cluster
 # reboot
 
@@ -13,7 +14,7 @@
 # "@reboot bash /root/cluster"
 # reboot
 
-# Remember to check if there are .contok and/or .vmok  files!
+# Remember to check if there are .contok and .vmok  files!
 # sudo touch /srv/containers/.contok
 # sudo touch /srv/virtualmachines/.vmok
 
@@ -225,7 +226,8 @@ function cluster08 {
 # stop all containers!
 function dockerctrl {
   [ -f /srv/containers/.contok ] && {
-    docker "$1" $(docker ps -a -q)
+    # If there is no container configured, do nothing!
+    docker "$1" $(docker ps -a -q) || echo "." >/dev/null
   } || {
     textlog "ERROR: Containers volume was not found after all checks!"
     textlog "ERROR: Shutting down all containers that are still alive!"
@@ -239,14 +241,15 @@ function dockerctrl {
 function vmctrl {
   [ -f /srv/virtualmachines/.vmok ] && {
     for i in $(virsh list --all "$1" | awk '{print $2}' | grep -v Nome); do
-      virsh "$2" "$i"
+      # If there is no VM configured, do nothing!
+      virsh "$2" "$i" || echo "." >/dev/null
     done
   } || {
     textlog "Virtual Machine volume was not found after all checks!"
     textlog "ERROR: Shutting down all virtual machines that are still alive!"
     vmctrl "--state-running" "shutdown" && >/dev/null
   }
-}
+}x
 
 # All beep configurations are here.
 function beeps {
