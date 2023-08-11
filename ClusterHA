@@ -59,6 +59,10 @@ function init {
   export loglow="0"
   export loghigh="6"
 
+# Paths:
+contpath="/srv/containers"
+vmpath="/srv/virtualmachines"
+
 # All texts and logs!
   export TEXT01="WARNING: Glusterd started manually"
   export TEXT02="Proceeding anyway."
@@ -75,6 +79,8 @@ function init {
   export TEXT13="Status: Everything is STOPPED on this node!"
   export TEXT14="Status: Everything is RUNNING on this node!"
   export TEXT15="Silence! Or I will aniquilate you!"
+  export TEXT16="WARNING: Volume containers was mounted manually."
+  export TEXT17="WARNING: Volume Virtual Machines was mounted manually."
 
 # ============================================================================ #
  ##############################################################################
@@ -84,9 +90,9 @@ function init {
  ##############################################################################
 # ============================================================================ #
 
-             # ======================================= #
-            # Scripts to pre adjusting and controlling! #
-             # ======================================= #
+                   # ========================= #
+                  # High Availability Functions #
+                   # ========================= #
 
 # Resetting beep on first run!
   export beepsound="0"
@@ -101,11 +107,6 @@ function init {
     sleep 5
     cluster00
   done
-
-                   # ========================= #
-                  # High Availability Functions #
-                   # ========================= #
-
 }
 
 # 00 - Check if GlusterFS service is Running
@@ -115,15 +116,15 @@ function cluster00 {
   } || {
     systemctl start glusterd.service
     systemctl is-active --quiet glusterd && {
-    textlog $TEXT01
-    textlog $TEXT02
+    textlog "$TEXT01"
+    textlog "$TEXT02"
       cluster01
     } || {
-      textlog $TEXT03
-      textlog $TEXT04
+      textlog "$TEXT03"
+      textlog "$TEXT04"
       beeps "2000" "2000"
       setpid "0" >/dev/null
-      cluster08
+      cluster07
     }
   }
 }
@@ -133,11 +134,11 @@ function cluster01 {
   if ping -c 1 "$HOSTNAME1" >/dev/null && ping -c 1 "$HOSTNAME2" >/dev/null; then
     cluster02
   else
-    textlog $TEXT05
-    textlog $TEXT04
+    textlog "$TEXT05"
+    textlog "$TEXT04"
     beeps "1000" "2000"
     setpid "0" >/dev/null
-    cluster08
+    cluster07
   fi
 }
 
@@ -146,11 +147,11 @@ function cluster02 {
   if ping -c 1 $IP3 >/dev/null; then
     cluster03
   else
-    textlog $TEXT06
-    textlog $TEXT04
+    textlog "$TEXT06"
+    textlog "$TEXT04"
     beeps "2000" "1000"
     setpid "0" >/dev/null
-    cluster08
+    cluster07
   fi
 }
 
@@ -159,10 +160,10 @@ function cluster03 {
   if ping -c 1 $IP1 >/dev/null && ping -c 1 $IP2 > /dev/null; then
     cluster04
   else
-    textlog $TEXT07
-    textlog $TEXT08
+    textlog "$TEXT07"
+    textlog "$TEXT08"
     setpid "1" >/dev/null
-    cluster08
+    cluster07
   fi
 }
 
@@ -177,50 +178,64 @@ function cluster04 {
   }
 }
 
-# 05 - Check if there are /srv/containers volume!
+# 05 - Checking $contpath volume!
 function cluster05 {
-  [ -f "/srv/containers/.contok" ] && {
+  [ -f "$contpath/.contok" ] && {
     cluster06
   } || {
-    textlog $TEXT09
-    textlog $TEXT10
-    textlog $TEXT11
-    beeps "1000" "1000"
-    setpid "0" >/dev/null
-    cluster08
+    trymnt "$contpath"
+    [ "$checkmnt" = "yes" ] && {
+      textlog "$TEXT16"
+      textlog "$TEXT02"
+      cluster06
+    } || {
+      textlog "$TEXT09"
+      textlog "$TEXT10"
+      textlog "$TEXT11"
+      beeps "1000" "1000"
+      setpid "0" >/dev/null
+      cluster07
+    }
   }
 }
 
-# 06 - Check if there are /srv/virtualmachines volume!
+# 06 - Checking $vmpath volume!
 function cluster06 {
-  [ -f "/srv/virtualmachines/.vmok" ] && {
-    cluster08
+  [ -f "$vmpath/.vmok" ] && {
+    cluster07
   } || {
-    textlog $TEXT12
-    textlog $TEXT10
-    textlog $TEXT11
-    beeps "1000" "1000"
-    setpid "0" >/dev/null
-    cluster08
+    trymnt "$vmpath"
+    [ "$checkmnt" = "yes" ] && {
+      textlog "$TEXT17"
+      textlog "$TEXT02"
+      cluster07
+    } || {
+      textlog "$TEXT12"
+      textlog "$TEXT10"
+      textlog "$TEXT11"
+      beeps "1000" "1000"
+      setpid "0" >/dev/null
+      cluster07
+    }
   }
 }
 
 # 07 - Starting or stopping all containers and VMs accordingly
 # If stopping, will wait 20s!
-function cluster08 {
+function cluster07 {
   export beepsound="0"
 
   [ "$checking" = "1" ] && {
     setpid "0" >/dev/null
     dockerctrl stop && >/dev/null
     vmctrl "--state-running" "shutdown" && >/dev/null
-    textlog $TEXT13
+    textlog "$TEXT13"
   } || {
     setpid "1" >/dev/null
     sleep 20
     dockerctrl start && >/dev/null
     vmctrl "--state-shutoff" "start" && >/dev/null
-    textlog $TEXT14
+    textlog "$TEXT14"
   }
 }
 
@@ -268,8 +283,14 @@ function beeps {
     env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$2" -l 200 -r 1
     export beepsound=$(($beepsound+1))
   } || {
-    textlog $TEXT14
+    textlog "$TEXT15"
   }
+}
+
+function trymnt {
+  checkmnt="0"
+  /bin/mount "$1"
+  export checkmnt=$(/etc/mtab | grep "$1" 1>/dev/null && echo yes || echo no)
 }
 
 function logmgr {
