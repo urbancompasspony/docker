@@ -59,6 +59,22 @@ function init {
   export loglow="0"
   export loghigh="6"
 
+# All texts and logs!
+  export TEXT01="WARNING: Glusterd started manually"
+  export TEXT02="Proceeding anyway."
+  export TEXT03="ERROR: Glusterd not running!"
+  export TEXT04="ERROR: Shutting down everything!"
+  export TEXT05="ERROR: Reserved NIC not responding!"
+  export TEXT06="ERROR: Gateway not found"
+  export TEXT07="ERROR: The other node doesn't respond."
+  export TEXT08="ERROR: Starting everything myself!"
+  export TEXT09="ERROR: Containers volume was not found!"
+  export TEXT10="Or maybe I just can't found the ctrl file. Check it out!"
+  export TEXT11="ERROR: Shutting down everything to prevent Split Brain!"
+  export TEXT12="ERROR: Virtual Machines volume was not found!"
+  export TEXT13="Status: OK - Everything is STOPPED on this node!"
+  export TEXT14="Silence! Or I will aniquilate you!"
+
 # ============================================================================ #
  ##############################################################################
 
@@ -98,16 +114,15 @@ function cluster00 {
   } || {
     systemctl start glusterd.service
     systemctl is-active --quiet glusterd && {
-    textlog "Glusterd started manually, it was stopped!"
-    textlog "Proceeding anyway."
+    textlog $TEXT01
+    textlog $TEXT02
       cluster01
     } || {
-      textlog "ERROR: Glusterd not running!"
-      textlog "ERROR: Shutting down all containers!"
+      textlog $TEXT03
+      textlog $TEXT04
       beeps "2000" "2000"
-      dockerctrl stop && >/dev/null
-      vmctrl "--state-running" "shutdown" && >/dev/null
       setpid "0" >/dev/null
+      cluster08
     }
   }
 }
@@ -117,12 +132,11 @@ function cluster01 {
   if ping -c 1 "$HOSTNAME1" >/dev/null && ping -c 1 "$HOSTNAME2" >/dev/null; then
     cluster02
   else
-    textlog "ERROR: Can't connect to Reserved NIC!"
-    textlog "ERROR: Shutting down all containers and virtual machines!"
+    textlog $TEXT05
+    textlog $TEXT04
     beeps "1000" "2000"
-    dockerctrl stop && >/dev/null
-    vmctrl "--state-running" "shutdown" && >/dev/null
     setpid "0" >/dev/null
+    cluster08
   fi
 }
 
@@ -131,12 +145,11 @@ function cluster02 {
   if ping -c 1 $IP3 >/dev/null; then
     cluster03
   else
-    textlog "ERROR: Gateway not found"
-    textlog "ERROR: Shutting down all containers and virtual machines!"
+    textlog $TEXT06
+    textlog $TEXT04
     beeps "2000" "1000"
-    dockerctrl stop && >/dev/null
-    vmctrl "--state-running" "shutdown" && >/dev/null
     setpid "0" >/dev/null
+    cluster08
   fi
 }
 
@@ -145,11 +158,10 @@ function cluster03 {
   if ping -c 1 $IP1 >/dev/null && ping -c 1 $IP2 > /dev/null; then
     cluster04
   else
-    textlog "ERROR: The other node doesn't respond."
-    textlog "ERROR: Starting containers and virtual machines myself!"
-    dockerctrl start && >/dev/null
-    vmctrl "--state-shutoff" "start" && >/dev/null
+    textlog $TEXT07
+    textlog $TEXT08
     setpid "1" >/dev/null
+    cluster08
   fi
 }
 
@@ -169,11 +181,12 @@ function cluster05 {
   [ -f "/srv/containers/.contok" ] && {
     cluster06
   } || {
-    textlog "ERROR: Containers volume was not found!"
-    textlog "Or maybe I just can't found .contok file. Check it out!"
+    textlog $TEXT09
+    textlog $TEXT10
+    textlog $TEXT11
     beeps "1000" "1000"
-    dockerctrl stop && >/dev/null
     setpid "0" >/dev/null
+    cluster08
   }
 }
 
@@ -182,11 +195,12 @@ function cluster06 {
   [ -f "/srv/virtualmachines/.vmok" ] && {
     cluster08
   } || {
-    textlog "ERROR: Virtual Machine volume was not found!"
-    textlog "Or maybe I just can't found .vmok file. Check it out!"
+    textlog $TEXT12
+    textlog $TEXT10
+    textlog $TEXT11
     beeps "1000" "1000"
-    vmctrl "--state-running" "shutdown" && >/dev/null
     setpid "0" >/dev/null
+    cluster08
   }
 }
 
@@ -199,15 +213,13 @@ function cluster08 {
     setpid "0" >/dev/null
     dockerctrl stop && >/dev/null
     vmctrl "--state-running" "shutdown" && >/dev/null
-    textlog "Everything is Ok!"
-    textlog "All containers and Virtual Machines are stopped on this node!"
+    textlog $TEXT13
   } || {
     setpid "1" >/dev/null
     sleep 20
     dockerctrl start && >/dev/null
     vmctrl "--state-shutoff" "start" && >/dev/null
-    textlog "Everything is Ok!"
-    textlog "All containers and Virtual Machines are running on this node!"
+    textlog $TEXT13
   }
 }
 
@@ -238,8 +250,8 @@ function setpid {
 # Just some logging
 function textlog {
   echo "$data $1" | tee -a $logpath
-  sizelog=$(du --apparent-size --block-size=1 $logpath | awk {print'$1'})
 
+  sizelog=$(du --apparent-size --block-size=1 $logpath | awk {print'$1'})
   [ "$sizelog" -ge "50000000" ] && {
     logmngr
   } || {
@@ -255,11 +267,11 @@ function beeps {
     env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$2" -l 200 -r 1
     export beepsound=$(($beepsound+1))
   } || {
-    echo "Silence! Or I kill you!" >/dev/null
+    textlog $TEXT14
   }
 }
 
-function logmngr {
+function logmgr {
   rm -rf /home/$USERNAME/.gluster_log
   rm -rf $logpath
 
@@ -275,9 +287,9 @@ function logmngr {
                                   #######
 
 # Prepare the Logs
-logmngr
+logmgr
 
-# Let's Get Started!
+# Let's get Started!
 init
 
 exit 1
