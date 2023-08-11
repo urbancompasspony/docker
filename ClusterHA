@@ -178,6 +178,7 @@ function cluster05 {
     cluster06
   } || {
     textlog "ERROR: Containers volume was not found!"
+    textlog "Or maybe I just can't found .contok file. Check it out!"
     beeps "1000" "1000"
     dockerctrl stop && >/dev/null
     setpid "0" >/dev/null
@@ -190,6 +191,7 @@ function cluster06 {
     cluster08
   } || {
     textlog "ERROR: Virtual Machine volume was not found!"
+    textlog "Or maybe I just can't found .vmok file. Check it out!"
     beeps "1000" "1000"
     vmctrl "--state-running" "shutdown" && >/dev/null
     setpid "0" >/dev/null
@@ -221,46 +223,14 @@ function cluster08 {
                            # Control Functions #
                             # =============== #
 
-# Will wait to all containers to stop or start before continuing!
-# Extra Security check: If "/srv/containers" doesn't exist after all checks, 
-# stop all containers!
 function dockerctrl {
-  [ -f /srv/containers/.contok ] && {
-    # If there is no container configured, do nothing!
-    docker "$1" $(docker ps -a -q) || echo "." >/dev/null
-  } || {
-    textlog "ERROR: Containers volume was not found after all checks!"
-    textlog "ERROR: Shutting down all containers that are still alive!"
-    docker stop $(docker ps -a -q)
-  }
+  docker "$1" $(docker ps -a -q)
 }
 
-# Will wait all VMs to stop or start before continuing!
-# Extra Security check: If "/srv/virtualmachines" doesn't exist after all checks, 
-# stop all virtual machines!
 function vmctrl {
-  [ -f /srv/virtualmachines/.vmok ] && {
-    for i in $(virsh list --all "$1" | awk '{print $2}' | grep -v Nome); do
-      # If there is no VM configured, do nothing!
-      virsh "$2" "$i" || echo "." >/dev/null
-    done
-  } || {
-    textlog "Virtual Machine volume was not found after all checks!"
-    textlog "ERROR: Shutting down all virtual machines that are still alive!"
-    vmctrl "--state-running" "shutdown" && >/dev/null
-  }
-}x
-
-# All beep configurations are here.
-function beeps {
-  [ "$beepsound" -ge "$beeplow" ] && [ "$beepsound" -le "$beephigh" ] && {
-    modprobe pcspkr
-    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$1" -l 200 -r 1
-    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$2" -l 200 -r 1
-    export beepsound=$(($beepsound+1))
-  } || {
-    echo "Silence! Or I kill you!" >/dev/null
-  }
+  for i in $(virsh list --all "$1" | awk '{print $2}' | grep -v Nome); do
+    virsh "$2" "$i"
+  done
 }
 
 # Setting PID control file on "/home/$USERNAME/.lockha".
@@ -274,6 +244,18 @@ function setpid {
 # Just some logging
 function textlog {
   echo "$data $1" | tee -a $logpath
+}
+
+# All beep configurations are here.
+function beeps {
+  [ "$beepsound" -ge "$beeplow" ] && [ "$beepsound" -le "$beephigh" ] && {
+    modprobe pcspkr
+    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$1" -l 200 -r 1
+    env -u SUDO_GID -u SUDO_COMMAND -u SUDO_USER -u SUDO_UID beep -f "$2" -l 200 -r 1
+    export beepsound=$(($beepsound+1))
+  } || {
+    echo "Silence! Or I kill you!" >/dev/null
+  }
 }
 
 # ============================================================================ #
