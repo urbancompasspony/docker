@@ -307,6 +307,10 @@ function logmgr {
 # Prepare the Logs
 logmgr
 
+# Stop everything first!
+dockerctrl stop && >/dev/null
+vmctrl "--state-running" "shutdown" && >/dev/null
+
 # Let's get Started!
 init
 
