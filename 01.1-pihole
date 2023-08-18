@@ -108,15 +108,11 @@ function create {
 --no-healthcheck \
 -e SERVERIP=$var1 \
 -e WEBPASSWORD=$var2 \
+-e DNSMASQ_USER=root \
+-e PIHOLE_UID=0 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
 -v /srv/containers/"$NOMECONTAINER"/dnsmasq.d/:/etc/dnsmasq.d \
--p 80:80 \
--p 443:443 \
--p 67:67/tcp \
--p 67:67/udp \
--p 53:53/tcp \
--p 53:53/udp \
 --restart=unless-stopped \
 pihole/pihole:latest
 
