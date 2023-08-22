@@ -106,6 +106,27 @@ function create {
 -v /srv/containers/"$NOMECONTAINER"/Data/:/usr/local/apache2/htdocs/ \
 --restart=unless-stopped \
 httpd:2.4
+
+dialog --title "Definir Usuario e Senha!" --yesno "Deseja proteger o acesso?" 6 40
+  [ $? = 0 ] && {
+    VALUE10=$(dialog --ok-label "Definir" --title "Novo Usuario e Senha" --form "Container: $NOMECONTAINER" 9 40 0 \
+"Username: " 1 1 "$VALUE1" 1 11 30 0 \
+"Password: " 2 1 "$VALUE2" 2 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+    [ $? -ne 0 ] && exit
+    username=$(echo "$VALUE10" | sed -n 1p)
+    password=$(echo "$VALUE10" | sed -n 2p)
+
+    docker exec $NOMECONTAINER apt update
+    docker exec $NOMECONTAINER apt install nano wget -y
+    docker exec $NOMECONTAINER touch .htpasswd
+    docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/docker/main/Apache2/Password/httpd.conf -O /usr/local/apache2/conf/httpd.conf"
+    docker exec $NOMECONTAINER bash -c "echo $password | tee /usr/local/apache2/webpass"
+    docker exec $NOMECONTAINER bash -c "htpasswd -c -i .htpasswd $username < /usr/local/apache2/webpass"
+    docker restart $NOMECONTAINER
+  } || {
+    echo "Tudo ok!"
+  }
 }
 
 function clean {
