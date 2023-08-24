@@ -47,7 +47,7 @@ docker_repo="pihole/pihole:latest"
 
 # Adjust if needed
 function docker_custom {
-  [ "$var1" = "Host" ] && {
+  [ "$var1" = "host" ] || [ "$var1" = "Host" ] || [ "$var1" = "HOST" ] || [ "$var1" = "hostname" ] || [ "$var1" = "localhost" ] && {
   docker run -d \
 --name=$NOMECONTAINER \
 --network host \
