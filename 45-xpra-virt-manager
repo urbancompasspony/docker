@@ -32,9 +32,9 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="P4ssw0rd"
-VALUE3="800x600"
+VALUE3="1360x768"
 VALUE4="9876"
-VALUE5="Host"
+VALUE5="0.0.0.0"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -46,8 +46,8 @@ VALUE10="0"
 docker_repo="urbancompasspony/xpra-virt-manager:latest"
 
 function docker_custom {
-  [ "$var5" = "Host" ] && {
-    docker run -d \
+  [ "$var5" = "host" ] || [ "$var5" = "Host" ] || [ "$var5" = "HOST" ] || [ "$var5" = "hostname" ] || [ "$var5" = "localhost" ] && {
+  docker run -d \
 --privileged \
 --name=$var1 \
 --network host \
@@ -98,12 +98,8 @@ function makedir {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-
-sudo chmod 777 /var/run/libvirt/libvirt-sock
-sudo chmod 777 -R /srv/containers/$NOMECONTAINER/home
-
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+  sudo chmod 777 /var/run/libvirt/libvirt-sock
+  sudo chmod 777 -R /srv/containers/$NOMECONTAINER/home
 
 # =============================================================================
 # ########################################################################### #
