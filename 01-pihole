@@ -29,7 +29,7 @@ CustmN10="."
 # MENU DEFAULT VALUES
 function custom_values {
 # Static Value!
-VALUE1="Host"
+VALUE1="0.0.0.0"
 
 VALUE2="P4ssw0rd"
 VALUE3="$NOMECONTAINER"
