@@ -100,6 +100,7 @@ function makedir {
 function docker_extras {
 
 sudo chmod 777 /var/run/libvirt/libvirt-sock
+sudo chmod 777 -R /srv/containers/$NOMECONTAINER/home
 
 #docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
 #docker restart "$NOMECONTAINER"
