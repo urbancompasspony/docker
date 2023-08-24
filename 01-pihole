@@ -8,7 +8,7 @@
 export NOMECONTAINER="pihole"
 
 # From 1 to 10!
-var_cont="4"
+var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,8 +16,8 @@ function custom_names {
 CustmN1="Local IP "
 
 CustmN2="Password "
-CustmN3="Container"
-CustmN4="IP = Host"
+CustmN3="IP = Host"
+CustmN4="."
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -32,8 +32,8 @@ function custom_values {
 VALUE1="0.0.0.0"
 
 VALUE2="P4ssw0rd"
-VALUE3="$NOMECONTAINER"
-VALUE4="0.0.0.0"
+VALUE3="0.0.0.0"
+VALUE4="0"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
