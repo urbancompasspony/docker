@@ -31,7 +31,7 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="Host"
+VALUE2="0.0.0.0"
 VALUE3="0"
 VALUE4="0"
 VALUE5="0"
@@ -47,7 +47,7 @@ docker_repo="CUSTOM/DOCKER:LATEST"
 
 # Adjust if needed
 function docker_custom {
-  [ "$var2" = "Host" ] && {
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
 docker run -d \
 --name=$var1 \
 --network host \
