@@ -17,7 +17,7 @@ CustmN1="Local IP "
 
 CustmN2="Password "
 CustmN3="IP = Host"
-CustmN4="."
+CustmN4="Container"
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -33,7 +33,7 @@ VALUE1="0.0.0.0"
 
 VALUE2="P4ssw0rd"
 VALUE3="0.0.0.0"
-VALUE4="0"
+VALUE4="pihole"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -186,7 +186,7 @@ function bkp_and_rm_data {
 function checkB {
   export_all
 
-  #NOMECONTAINER=$var1
+  NOMECONTAINER="$var4"
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "$NOMECONTAINER já existente!" --yesno "Deseja refazê-lo?" 6 40
