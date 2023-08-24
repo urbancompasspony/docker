@@ -8,7 +8,7 @@
 export NOMECONTAINER="pihole"
 
 # From 1 to 10!
-var_cont="3"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
