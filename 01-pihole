@@ -186,7 +186,7 @@ function bkp_and_rm_data {
 function checkB {
   export_all
 
-  NOMECONTAINER=$var1
+  #NOMECONTAINER=$var1
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "$NOMECONTAINER já existente!" --yesno "Deseja refazê-lo?" 6 40
