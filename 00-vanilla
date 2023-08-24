@@ -31,7 +31,7 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="0.0.0.0"
+VALUE2="Host"
 VALUE3="0"
 VALUE4="0"
 VALUE5="0"
@@ -47,6 +47,18 @@ docker_repo="CUSTOM/DOCKER:LATEST"
 
 # Adjust if needed
 function docker_custom {
+  [ "$var2" = "Host" ] && {
+docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/config:/config \
+-v /srv/containers/"$NOMECONTAINER"/data:/data \
+$docker_repo
+  } || {
 docker run -d \
 --name=$var1 \
 --network macvlan \
@@ -60,6 +72,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
 $docker_repo
+  }
 }
 
 function makedir {
