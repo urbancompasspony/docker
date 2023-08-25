@@ -47,7 +47,17 @@ docker_repo="krishnasrinivas/wetty"
 
 # Adjust if needed
 function docker_custom {
-docker run -d \
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+  docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-v /etc/localtime:/etc/localtime:ro \
+$docker_repo
+  } || {
+  docker run -d \
 --name=$var1 \
 --network macvlan \
 --ip=$var2 \
