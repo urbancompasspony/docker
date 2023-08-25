@@ -47,7 +47,29 @@ docker_repo="urbancompasspony/xpra-ubuntu:latest"
 
 # Adjust if needed
 function docker_custom {
-docker run -d \
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+  docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+--memory="$var6" \
+--cpus="$var7" \
+-e PORTS=$var3 \
+-e CHILD=$var4 \
+-e passw0rd=$var5 \
+-e DISPLAY=$var8 \
+-p $var3:$var3 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/home:/home/user \
+$docker_repo
+
+echo ""
+echo "Access: http://localhost:$var3"
+sleep 5
+  } || {
+  docker run -d \
 --name=$var1 \
 --network macvlan \
 --ip=$var2 \
@@ -67,9 +89,10 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/home:/home/user \
 $docker_repo
 
-echo ""
-echo "Access: http://$var2:$var3"
-sleep 5
+  echo ""
+  echo "Access: http://$var2:$var3"
+  sleep 5
+  }
 }
 
 function makedir {
