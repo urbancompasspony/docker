@@ -110,8 +110,8 @@ httpd:2.4
 dialog --title "Definir Usuario e Senha!" --yesno "Deseja proteger o acesso?" 6 40
   [ $? = 0 ] && {
     VALUE10=$(dialog --ok-label "Definir" --title "Novo Usuario e Senha" --form "Container: $NOMECONTAINER" 9 40 0 \
-"Username: " 1 1 "$VALUE1" 1 11 30 0 \
-"Password: " 2 1 "$VALUE2" 2 11 30 0 \
+"Username: " 1 1 "$VALUE1" 1 11 50 0 \
+"Password: " 2 1 "$VALUE2" 2 11 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
     [ $? -ne 0 ] && exit
     username=$(echo "$VALUE10" | sed -n 1p)
