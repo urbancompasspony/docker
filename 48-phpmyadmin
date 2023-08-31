@@ -56,6 +56,10 @@ docker run -d \
 -e PMA_HOST="$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 $docker_repo
+
+clear
+echo "Access: http://server_ip:8080"
+sleep 3
   } || {
 docker run -d \
 --name=$var1 \
@@ -65,14 +69,14 @@ docker run -d \
 --dns=127.0.0.1 \
 --no-healthcheck \
 --restart=unless-stopped \
--p 8080:80 \
 -e PMA_HOST="$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 $docker_repo
-  }
+
 clear
-echo "Access: http://server_ip:8080"
+echo "Access: http://$var2"
 sleep 3
+  }
 }
 
 function makedir {
