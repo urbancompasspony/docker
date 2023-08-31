@@ -31,7 +31,7 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="Host!"
+VALUE2="0.0.0.0"
 VALUE3="172.17.0.X"
 VALUE4="0"
 VALUE5="0"
@@ -45,14 +45,28 @@ VALUE10="0"
 # Set repository here!
 docker_repo="phpmyadmin:latest"
 
-# Adjust if needed
 function docker_custom {
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
 docker run -d \
 --name=$var1 \
+--network host \
 --no-healthcheck \
 --restart=unless-stopped \
 -p 8080:80 \
--e PMA_HOST="$var2" \
+-e PMA_HOST="$var3" \
+-v /etc/localtime:/etc/localtime:ro \
+$docker_repo
+  } || {
+docker run -d \
+--name=$var1 \
+--network macvlan \
+--ip="$var2" \
+--dns=1.1.1.1 \
+--dns=127.0.0.1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 8080:80 \
+-e PMA_HOST="$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 $docker_repo
 
