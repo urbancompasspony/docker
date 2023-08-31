@@ -69,7 +69,7 @@ docker run -d \
 -e PMA_HOST="$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 $docker_repo
-
+  }
 clear
 echo "Access: http://server_ip:8080"
 sleep 3
