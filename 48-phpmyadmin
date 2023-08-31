@@ -8,15 +8,15 @@
 export NOMECONTAINER="phpmyadmin"
 
 # From 1 to 10!
-var_cont="3"
+var_cont="2"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
 # Static Name!
 CustmN1="Container"
 
-CustmN2="Local IP"
-CustmN3="Idocker0"
+CustmN2="Idocker0"
+CustmN3="."
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -31,8 +31,8 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="0.0.0.0"
-VALUE3="172.17.0.X"
+VALUE2="172.17.0.X"
+VALUE3="0"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -46,37 +46,19 @@ VALUE10="0"
 docker_repo="phpmyadmin:latest"
 
 function docker_custom {
-  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
 docker run -d \
 --name=$var1 \
 --network host \
 --no-healthcheck \
 --restart=unless-stopped \
 -p 8080:80 \
--e PMA_HOST="$var3" \
+-e PMA_HOST="$var2" \
 -v /etc/localtime:/etc/localtime:ro \
 $docker_repo
 
 clear
-echo "Access: http://server_ip:8080"
+echo "Access: http://server_host_ip:8080"
 sleep 3
-  } || {
-docker run -d \
---name=$var1 \
---network macvlan \
---ip="$var2" \
---dns=1.1.1.1 \
---dns=127.0.0.1 \
---no-healthcheck \
---restart=unless-stopped \
--e PMA_HOST="$var3" \
--v /etc/localtime:/etc/localtime:ro \
-$docker_repo
-
-clear
-echo "Access: http://$var2"
-sleep 3
-  }
 }
 
 function makedir {
