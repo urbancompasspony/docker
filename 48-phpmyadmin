@@ -49,7 +49,6 @@ docker_repo="phpmyadmin:latest"
 function docker_custom {
 docker run -d \
 --name=$var1 \
---hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
 -p 8080:80 \
