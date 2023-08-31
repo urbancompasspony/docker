@@ -5,7 +5,7 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="php-my-admin"
+export NOMECONTAINER="phpmyadmin"
 
 # From 1 to 10!
 var_cont="3"
