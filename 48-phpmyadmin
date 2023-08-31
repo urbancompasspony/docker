@@ -1,0 +1,448 @@
+#!/bin/bash
+
+# =============================================================================
+# ### C O N T R O L ### P A N E L ########################################### #
+# =============================================================================
+
+# Set container name and hostname here.
+export NOMECONTAINER="php-my-admin"
+
+# From 1 to 10!
+var_cont="2"
+
+# MENU NAMES - 123456789 or ABCDEFGHI
+function custom_names {
+# Static Name!
+CustmN1="Container"
+
+CustmN2="Local IP"
+CustmN3="Idocker0"
+CustmN4="."
+CustmN5="."
+CustmN6="."
+CustmN7="."
+CustmN8="."
+CustmN9="."
+CustmN10="."
+}
+
+# MENU DEFAULT VALUES
+function custom_values {
+# Static Value!
+VALUE1="$NOMECONTAINER"
+
+VALUE2="0.0.0.0"
+VALUE3="172.17.0.X"
+VALUE4="0"
+VALUE5="0"
+VALUE6="0"
+VALUE7="0"
+VALUE8="0"
+VALUE9="0"
+VALUE10="0"
+}
+
+# Set repository here!
+docker_repo="phpmyadmin:latest"
+
+dbhost 
+
+# Adjust if needed
+function docker_custom {
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 8080:80 \
+-e PMA_HOST=$var2 \
+-v /etc/localtime:/etc/localtime:ro \
+$docker_repo
+  } || {
+docker run -d \
+--name=$var1 \
+--network macvlan \
+--ip=$var2 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 8080:80 \
+-e PMA_HOST=$var2 \
+-v /etc/localtime:/etc/localtime:ro \
+$docker_repo
+  }
+}
+
+function makedir {
+  mkdir -p /srv/containers/"$NOMECONTAINER"/
+}
+
+# USE IT ONLY IF NEEDED:
+function docker_extras {
+#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
+#docker restart "$NOMECONTAINER"
+
+# =============================================================================
+# ########################################################################### #
+# =============================================================================
+
+echo "0" > /dev/null
+}
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root! Saindo..."
+    exit
+    }
+}
+
+function export_all {
+  export var1; export var2; export var3; export var4; export var5
+  export var6; export var7; export var8; export var9; export var10
+}
+
+export_all
+
+function var_read {
+  var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+  var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+  var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+  var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+  var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
+  var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
+  var7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
+  var8=$(sed -n '8p' /srv/containers/$NOMECONTAINER/Information)
+  var9=$(sed -n '9p' /srv/containers/$NOMECONTAINER/Information)
+  var10=$(sed -n '10p' /srv/containers/$NOMECONTAINER/Information)
+
+  VALUE1=$var1; VALUE2=$var2; VALUE3=$var3; VALUE4=$var4; VALUE5=$var5
+  VALUE6=$var6; VALUE7=$var7; VALUE8=$var8; VALUE9=$var9; VALUE10=$var10
+}
+
+function burn_var {
+  export_all
+
+  makedir
+
+  chmod 777 -R /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var8" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var9" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var10" >> /srv/containers/"$NOMECONTAINER"/Information
+}
+
+function error {
+  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+  menu
+}
+
+function docker_stop_rm {
+  [ $(docker stop "$NOMECONTAINER") ] && {
+    docker rm "$NOMECONTAINER"
+  } || {
+    echo "O container $NOMECONTAINER não existe. Continuando..."
+  }
+}
+
+function bkp_and_rm_data {
+  datetime=$(date +"%d-%m %H-%M")
+  echo "Fazendo backup de $NOMECONTAINER:"
+  mkdir -p /srv/containers/.backupcnt
+  zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
+  echo "Removendo a pasta de dados de $NOMECONTAINER:"
+  rm -iR /srv/containers/"$NOMECONTAINER"
+}
+
+function checkB {
+  export_all
+
+  NOMECONTAINER=$var1
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "$NOMECONTAINER já existente!" --yesno "Deseja refazê-lo?" 6 40
+    [ $? = 0 ] && {
+      dialog --title "Recriando o container:" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var_read
+        docker_stop_rm
+        create
+      } || {
+        dialog --title "Recriando o container:" --yesno "Fazer backup e remover a pasta /srv/containers/$NOMECONTAINER?" 6 40
+        [ $? = 0 ] && {
+          docker_stop_rm
+          bkp_and_rm_data
+          menu
+        } || {
+          dialog --title "Recriando o container:" --yesno "Fazer REMOVER a pasta /srv/containers/$NOMECONTAINER?" 6 40
+          [ $? = 0 ] && {
+            docker_stop_rm
+            echo "Removendo o diretório /srv/containers/$NOMECONTAINER"
+            rm -R /srv/containers/"$NOMECONTAINER"
+            menu
+          } || {
+            docker_stop_rm
+            create
+          }
+        }
+      }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    create
+  }
+
+}
+
+function menu {
+  export_all
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    custom_values
+    custom_names
+    var_read
+  } || {
+    custom_names
+    custom_values
+    }
+
+[ $var_cont -le "0" ] && {
+  clear
+  echo "Incorrect value of var_cont: $var_cont."
+  echo "Exiting..."
+  exit
+}
+
+[ $var_cont -eq "1" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 8 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+}
+
+[ $var_cont -eq "2" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 9 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+}
+
+[ $var_cont -eq "3" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+}
+
+[ $var_cont -eq "4" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 11 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+}
+
+[ $var_cont -eq "5" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 12 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+}
+
+[ $var_cont -eq "6" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 13 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+}
+
+[ $var_cont -eq "7" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 14 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
+"$CustmN7: " 7 1 "$VALUE7" 7 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+var7=$(echo "$VALUE0" | sed -n 7p)
+}
+
+[ $var_cont -eq "8" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 15 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
+"$CustmN7: " 7 1 "$VALUE7" 7 11 30 0 \
+"$CustmN8: " 8 1 "$VALUE8" 8 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+var7=$(echo "$VALUE0" | sed -n 7p)
+var8=$(echo "$VALUE0" | sed -n 8p)
+}
+
+[ $var_cont -eq "9" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 16 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
+"$CustmN7: " 7 1 "$VALUE7" 7 11 30 0 \
+"$CustmN8: " 8 1 "$VALUE8" 8 11 30 0 \
+"$CustmN9: " 9 1 "$VALUE9" 9 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+var7=$(echo "$VALUE0" | sed -n 7p)
+var8=$(echo "$VALUE0" | sed -n 8p)
+var9=$(echo "$VALUE0" | sed -n 9p)
+}
+
+[ $var_cont -eq "10" ] && {
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 17 40 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+"$CustmN5: " 6 1 "$VALUE6" 6 11 30 0 \
+"$CustmN5: " 7 1 "$VALUE7" 7 11 30 0 \
+"$CustmN5: " 8 1 "$VALUE8" 8 11 30 0 \
+"$CustmN5: " 9 1 "$VALUE9" 9 11 30 0 \
+"$CustmN5: " 10 1 "$VALUE10" 10 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+var7=$(echo "$VALUE0" | sed -n 7p)
+var8=$(echo "$VALUE0" | sed -n 8p)
+var9=$(echo "$VALUE0" | sed -n 9p)
+var10=$(echo "$VALUE0" | sed -n 10p)
+}
+
+[ $var_cont -ge "11" ] && {
+  clear
+  echo "Incorrect value of var_cont: $var_cont."
+  echo "Exiting..."
+  exit
+}
+
+checkB
+
+}
+
+function checkC {
+  #IPMachine=$(hostname -I | awk '{print $1}')
+  MyIP=$(cat /srv/containers/scripts/myip)
+  [ "$MyIP" = "$myip" ] && {
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
+    menu
+  } || {
+    create
+    }
+}
+
+function create {
+  export_all
+  burn_var
+  docker_custom
+  docker_extras
+}
+
+################################################################################
+
+# Start
+checkA
+menu
+
+################################################################################
+
+#Ending
+unset var1
+unset var2
+unset var3
+unset var4
+unset var5
+unset var6
+unset var7
+unset var8
+unset var9
+unset var10
+
+exit 1
