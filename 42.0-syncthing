@@ -54,6 +54,7 @@ function docker_custom {
 --network host \
 --restart=unless-stopped \
 --no-healthcheck \
+--privileged \
 -p 8384:8384 \
 -p 22000:22000/tcp \
 -p 22000:22000/udp \
@@ -76,6 +77,7 @@ $docker_repo
 --dns=127.0.0.1 \
 --no-healthcheck \
 --restart=unless-stopped \
+--privileged \
 -p 8384:8384 \
 -p 22000:22000/tcp \
 -p 22000:22000/udp \
