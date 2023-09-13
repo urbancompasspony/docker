@@ -75,7 +75,7 @@ function checkB {
 function menu {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7
 
-VALUE1="mysql-custom"; VALUE2=""; VALUE3="0"; VALUE4="0"; VALUE5="0"; VALUE6="0"; VALUE7="/srv/containers/$NOMECONTAINER"
+VALUE1="mysql-custom"; VALUE2=""; VALUE3="0"; VALUE4="0"; VALUE5="0"; VALUE6="0"; VALUE7="/srv/containers/NOMECONTAINER"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: MySQL" 14 40 0 \
 "NameCont:" 1 1 "$VALUE1" 1 10 20 0 \
