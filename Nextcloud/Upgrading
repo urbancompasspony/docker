@@ -6,6 +6,11 @@ versionnc="26"
 
 #####################################################################################
 
+[ "$EUID" -ne 0 ] && {
+echo "Execute esse script como Root! Saindo..."
+exit
+}
+
 echo "Parando o container Nextcloud"
 sleep 2
 docker stop nextcloud
