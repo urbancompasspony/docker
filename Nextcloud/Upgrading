@@ -1,0 +1,63 @@
+#####################################################################################
+
+# ATENTO À VERSÃO CERTA! Vá até a ultima sub-versão e depois troque a versão pontual!
+# Se não tomar cuidado o next quebra!
+versionnc="26"
+
+#####################################################################################
+
+echo "Parando o container Nextcloud"
+sleep 2
+docker stop nextcloud
+echo "Removendo o container Nextcloud"
+sleep 2
+docker rm nextcloud
+
+echo "Baixando Nextcloud Versão $versionnc"
+sleep 2
+docker pull nextcloud:"$versionnc"
+
+echo "Iniciando container do Nextcloud na versão $versionnc"
+sleep 2
+docker run -d \
+--name=nextcloud \
+--hostname=nextcloud \
+--network macvlan \
+--ip=172.20.0.33 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--restart=unless-stopped \
+--no-healthcheck \
+-p 80:80 \
+-p 443:443 \
+-e VIRTUAL_PROTO=https \
+-e VIRTUAL_PORT=443 \
+-e VIRTUAL_HOST="cs.linuxuniverse.com.br" \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/nextcloud/config:/var/www/html/config \
+-v /mnt/disk6p0/data:/var/www/html/data \
+nextcloud:"$versionnc"
+
+echo "Conectando ao banco de dados"
+sleep 2
+docker network connect bridge nextcloud
+
+echo "Aplicando alguns pacotes"
+sleep 2
+docker exec nextcloud apt update
+docker exec nextcloud apt install smbclient nano -y
+docker exec nextcloud apt install certbot python3-certbot-apache -y
+
+# Manually:
+# Inside container creating a Let's Encrypt SSL:
+# docker exec -it nextcloud bash
+# certbot --apache -d seu-site.com
+
+echo "Último reinicio do container!"
+sleep 2
+docker restart nextcloud
+
+echo "Upgrade finalizado!"
+sleep 2
+
+exit 0
