@@ -58,6 +58,7 @@ function docker_custom {
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
 -v /srv/containers/"$NOMECONTAINER"/dnsmasq.d/:/etc/dnsmasq.d \
+-v /srv/containers/"$NOMECONTAINER"/log/:/var/log/pihole \
 -p 80:80 \
 -p 443:443 \
 -p 67:67/tcp \
@@ -80,6 +81,7 @@ $docker_repo
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
 -v /srv/containers/"$NOMECONTAINER"/dnsmasq.d/:/etc/dnsmasq.d \
+-v /srv/containers/"$NOMECONTAINER"/log/:/var/log/pihole \
 -p 80:80 \
 -p 443:443 \
 -p 67:67/tcp \
@@ -92,7 +94,7 @@ $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{etc,dnsmasq.d}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/{etc,dnsmasq.d,log}
 }
 
 # USE IT ONLY IF NEEDED:
