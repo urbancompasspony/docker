@@ -65,7 +65,7 @@ function makedir {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-docker exec "$NOMECONTAINER" bash ./dwagent.sh
+docker exec "$NOMECONTAINER" bash -c "./dwagent.sh"
 docker restart "$NOMECONTAINER"
 
 # =============================================================================
