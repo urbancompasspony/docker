@@ -3,9 +3,10 @@
 # DWService
 /bin/sh /usr/share/dwagent/native/dwagsvc run &
 sleep 10
+
 /bin/sh /usr/share/dwagent/native/dwagsvc run
 
-# AutoMount
+# Trying mounting
 /script.sh &
 
 # Keep container running!
