@@ -10,7 +10,7 @@ sudo tar -cvf archive.tar /srv/containers/CONTAINER_NAME
 sudo tar -cvf /home/urbancompasspony/archive.tar -C /home/nathandrake/my_files/omg/ .
 
 # To restore everything over /srv/:
-sudo tar -xvf archive.tar -C /
+sudo tar -xvf archive.tar -C /srv/containers/
 
 # To restore everything that is on /home/nathandrake/archive.tar over /home/nathandrake/my_files/omg/:
 sudo tar -xvf /home/urbancompasspony/archive.tar -C /home/urbancompasspony/my_files/omg/
