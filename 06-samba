@@ -12,7 +12,7 @@
 # Set container name and hostname here.
 export NOMECONTAINER="new-smb-shr"
 
-# From 1 to 10!
+# CHECK BELLOW IF CHANGE THIS TO ANY VALUE BEYOND 3!
 var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
@@ -273,7 +273,7 @@ var2=$(echo "$VALUE0" | sed -n 2p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 20 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
 var1=$(echo "$VALUE0" | sed -n 1p)
