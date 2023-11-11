@@ -65,6 +65,7 @@ docker run -d \
 -v /srv/containers/"$var1"/log/samba:/var/log/samba \
 -v /srv/containers/"$var1"/run/samba:/run/samba \
 -v /srv/containers/"$var1"/log:/var/log \
+-v /srv/containers/"$var1"/run/rsyslogd.pid:/run/rsyslogd.pid \
 $var3 \
 $REPOSITORY
 
@@ -177,6 +178,7 @@ function configfiles {
     touch /srv/containers/"$var1"/etc/rsyslog.conf
     touch /srv/containers/"$var1"/log/syslog
     touch /srv/containers/"$var1"/log/samba/rsyslog
+    touch /srv/containers/"$var1"/run/rsyslog.pid
 
     rsync -va /etc/ /srv/containers/"$var1"/etc/
 
