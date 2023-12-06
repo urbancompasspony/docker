@@ -18,7 +18,7 @@ CustmN1="Local IP "
 CustmN2="Password "
 CustmN3="IP = Host"
 CustmN4="Container"
-CustmN5="."
+CustmN5="Interface"
 CustmN6="."
 CustmN7="."
 CustmN8="."
@@ -34,7 +34,7 @@ VALUE1="0.0.0.0"
 VALUE2="P4ssw0rd"
 VALUE3="0.0.0.0"
 VALUE4="pihole"
-VALUE5="0"
+VALUE5="macvlan"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -70,7 +70,7 @@ $docker_repo
   } || {
   docker run -d \
 --name=$NOMECONTAINER \
---network macvlan \
+--network $var5 \
 --ip=$var1 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
