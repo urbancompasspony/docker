@@ -66,4 +66,4 @@ read; sleep 1
 # echo "Starting SYSTEMD-RESOLVED"
 # systemctl start systemd-resolved
 
-exit 0
+exit 1
