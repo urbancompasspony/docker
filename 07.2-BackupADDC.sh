@@ -36,8 +36,8 @@ echo "macvlan" >> /srv/exported/$migration_name/Information
 # Backup Folders:
 
 echo "BackingUp samba folder and smb.conf"
-rsync -vaAxhHt /var/lib/samba/ /srv/exported/$migration_name/data/
-rsync -vaAxhHt /etc/samba/smb.conf /srv/exported/$migration_name/config/
+rsync -vaAxhHt /var/lib/samba/ /srv/containers/$migration_name/data/
+rsync -vaAxhHt /etc/samba/ /srv/containers/$migration_name/config/
 
 echo "Stopping SAMBA-AD-DC"
 systemctl start samba-ad-dc
