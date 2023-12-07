@@ -59,4 +59,22 @@ echo "Press Enter to Exit."
 read
 sleep 1
 
+# RUN
+# echo "Creating BKP-Resolv inside /etc"
+# cp /etc/resolv.conf /etc/resolv-"$datetime"
+# echo "Stopping SAMBA-AD-DC"
+# systemctl stop samba-ad-dc
+# echo "Disabling SAMBA-AD-DC"
+# systemctl disable samba-ad-dc
+# echo "Masking SAMBA-AD-DC"
+# systemctl mask samba-ad-dc
+# echo "Unmasking SYSTEMD-RESOLVED"
+# systemctl unmask systemd-resolved
+# echo "Enabling SYSTEMD-RESOLVED"
+# systemctl enable systemd-resolved
+# touch /etc/resolv.conf
+# echo "nameserver 127.0.0.53" > /etc/resolv.conf
+# echo "Starting SYSTEMD-RESOLVED"
+# systemctl start systemd-resolved
+
 exit 0
