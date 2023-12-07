@@ -7,9 +7,6 @@
 
 migration_name="dominio"
 
-echo "Setting Migration Name: $migration_name"
-datetime=$(date +"%d-%m-%H-%M")
-
 echo "Stopping SAMBA-AD-DC"
 sudo systemctl stop samba-ad-dc
 
