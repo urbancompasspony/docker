@@ -16,7 +16,7 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="ORIGINS"
+CustmN3="Port"
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="chrome-extension://cmgdpmlhgjhoadnonobjeekmfcehffco"
+VALUE3="11434"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -54,10 +54,10 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
--e "OLLAMA_ORIGINS=$var3" \
+-p "$var4":"$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data:/root/.ollama \
-$docker_repo
+$docker_repo serve
   } || {
 docker run -d \
 --name=$var1 \
@@ -68,10 +68,10 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
--e "OLLAMA_ORIGINS=$var3" \
+-p "$var4":"$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data:/root/.ollama \
-$docker_repo
+$docker_repo serve
   }
 }
 
@@ -246,7 +246,7 @@ var2=$(echo "$VALUE0" | sed -n 2p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 70 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
 var1=$(echo "$VALUE0" | sed -n 1p)
@@ -258,7 +258,7 @@ var3=$(echo "$VALUE0" | sed -n 3p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 11 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 70 0 \
 "$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
@@ -272,7 +272,7 @@ var4=$(echo "$VALUE0" | sed -n 4p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 12 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 70 0 \
 "$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
 "$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
