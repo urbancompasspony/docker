@@ -31,7 +31,7 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="localhost"
+VALUE2="LOCAL ONLY!"
 VALUE3="3000:8080"
 VALUE4="0"
 VALUE5="0"
@@ -62,9 +62,7 @@ $docker_repo
   } || {
 docker run -d \
 --name=$var1 \
---network macvlan \
---ip=$var2 \
---dns=1.1.1.1  \
+--network host \
 --dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
