@@ -31,7 +31,7 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="0.0.0.0"
+VALUE2="localhost"
 VALUE3="11434"
 VALUE4="0"
 VALUE5="0"
