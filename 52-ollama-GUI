@@ -58,7 +58,7 @@ docker run -d \
 -p "$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data:/app/backend/data \
-$docker_repo serve
+$docker_repo
   } || {
 docker run -d \
 --name=$var1 \
@@ -73,7 +73,7 @@ docker run -d \
 -p "$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data:/app/backend/data \
-$docker_repo serve
+$docker_repo
   }
 }
 
