@@ -63,7 +63,6 @@ $docker_repo
 docker run -d \
 --name=$var1 \
 --network host \
---dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
