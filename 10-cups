@@ -5,10 +5,10 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="A-CUSTOM-A"
+export NOMECONTAINER="cups-printer"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,8 +16,8 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
+CustmN3="Username"
+CustmN4="Password"
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -32,8 +32,8 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
+VALUE3="admin"
+VALUE4="admin"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -43,7 +43,7 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="CUSTOM/DOCKER:LATEST"
+docker_repo="anujdatar/cups:latest"
 
 # Adjust if needed
 function docker_custom {
@@ -55,15 +55,18 @@ docker run -d \
 --dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
+--device /dev/bus/usb \
 --restart=unless-stopped \
+-e CUPSADMIN=$var3 \
+-e CUPSPASSWORD=$var4 \
+-p 631:631 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
+-v /srv/containers/"$NOMECONTAINER"/config:/etc/cups \
 $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/config
 }
 
 # USE IT ONLY IF NEEDED:
