@@ -59,6 +59,7 @@ docker run -d \
 --restart=unless-stopped \
 -e CUPSADMIN=$var3 \
 -e CUPSPASSWORD=$var4 \
+-e TZ="America/Bahia" \
 -p 631:631 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/etc/cups \
