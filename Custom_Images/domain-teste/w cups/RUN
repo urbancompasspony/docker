@@ -204,9 +204,10 @@ clean
 # Remove loop network from smb.conf:
 #docker exec $NOMECONTAINER bash -c "sed '/127.0.0/d' /etc/samba/smb.conf"
 
-# Installing curl less and dialog:
-docker exec $NOMECONTAINER bash -c "apt update"
-docker exec $NOMECONTAINER bash -c "apt install curl less dialog -y"
+# Load ADMX
+#samba-tool gpo admxload -U Administrator "${SAMBA_DEBUG_OPTION}"
+# Import Windows admx&adml
+#samba-tool gpo admxload -U Administrator --admx-dir="${admxdir}" "${SAMBA_DEBUG_OPTION}"
 
 # Getting MENU for samba-tools:
 docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init"
