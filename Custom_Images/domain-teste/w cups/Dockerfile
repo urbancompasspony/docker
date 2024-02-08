@@ -6,15 +6,14 @@ ENV TZ "America/Bahia"
 ENV CUPSADMIN admin
 ENV CUPSPASSWORD p4ssw0rd
 
-EXPOSE 631
-EXPOSE 5353/udp
+EXPOSE 42 53 53/udp 88 88/udp 135 137-138/udp 139 389 389/udp 445 464 464/udp 636 3268-3269 49152-65535 5353/udp 631
 
 RUN apt update && apt upgrade -y
 
 RUN apt install -y pkg-config
 RUN apt install -y msitools apt-utils attr acl curl dialog samba smbclient ldap-utils winbind libnss-winbind libpam-winbind krb5-user krb5-kdc supervisor openvpn inetutils-ping nano libpam-krb5 samba-dsdb-modules samba-vfs-modules wget
 
-RUN apt install -y rsyslog less
+RUN apt install -y rsyslog less msitools
 
 RUN apt install -qqy \
     usbutils \
@@ -29,6 +28,10 @@ RUN apt install -qqy \
     hp-ppd \
     hplip \
     avahi-daemon
+
+RUN admxurl=$(curl -s 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=103507' | grep -o -m1 -E "url=http.*msi" | cut -d '=' -f2) \
+    && wget -O admx.msi "$admxurl" \
+    && msiextract -C /tmp/ admx.msi
 
 RUN apt autoremove && \
     apt clean && \
