@@ -204,9 +204,10 @@ clean
 # Remove loop network from smb.conf:
 #docker exec $NOMECONTAINER bash -c "sed '/127.0.0/d' /etc/samba/smb.conf"
 
+# NOT NEED???
 # Installing curl less and dialog:
-docker exec $NOMECONTAINER bash -c "apt update"
-docker exec $NOMECONTAINER bash -c "apt install curl less dialog -y"
+#docker exec $NOMECONTAINER bash -c "apt update"
+#docker exec $NOMECONTAINER bash -c "apt install curl less dialog -y"
 
 # Getting MENU for samba-tools:
 docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init"
@@ -215,9 +216,9 @@ docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.ba
 docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
 
 # Getting new admx!
-#RUN apt-get update \
-#    && apt-get upgrade -y \
-#    && apt-get install -y msitools wget curl \
+#RUN apt update \
+#    && apt upgrade -y \
+#    && apt install -y msitools \
 #    && admxurl=$(curl -s 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=103507' | grep -o -m1 -E "url=http.*msi" | cut -d '=' -f2) \
 #    && wget -O admx.msi "$admxurl" \
 #    && msiextract -C /tmp/ admx.msi
