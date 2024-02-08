@@ -214,6 +214,14 @@ docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
 
+# Getting new admx!
+#RUN apt-get update \
+#    && apt-get upgrade -y \
+#    && apt-get install -y msitools wget curl \
+#    && admxurl=$(curl -s 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=103507' | grep -o -m1 -E "url=http.*msi" | cut -d '=' -f2) \
+#    && wget -O admx.msi "$admxurl" \
+#    && msiextract -C /tmp/ admx.msi
+
 docker restart $NOMECONTAINER
 
 # Adjusting /syslog and /sysvol permissions:
