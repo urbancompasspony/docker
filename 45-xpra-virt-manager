@@ -8,7 +8,7 @@
 export NOMECONTAINER="xpra-virt-manager"
 
 # From 1 to 10!
-var_cont="6"
+var_cont="5"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -19,7 +19,7 @@ CustmN2="Password"
 CustmN3="Disp.Res"
 CustmN4="Port    "
 CustmN5="Local IP"
-CustmN6="Disk?"
+CustmN6="."
 CustmN7="."
 CustmN8="."
 CustmN9="."
@@ -35,7 +35,7 @@ VALUE2="P4ssw0rd"
 VALUE3="1360x768"
 VALUE4="9876"
 VALUE5="0.0.0.0"
-VALUE6="/mnt/vms"
+VALUE6="0"
 VALUE7="0"
 VALUE8="0"
 VALUE9="0"
@@ -64,7 +64,6 @@ function docker_custom {
 -v /srv/containers/$NOMECONTAINER/home:/home \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
--v /mnt/"$var6":/var/lib/libvirt/vms \
 $docker_repo
   } || {
     docker run -d \
@@ -87,13 +86,13 @@ $docker_repo
 -v /srv/containers/$NOMECONTAINER/home:/home \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
--v /mnt/"$var6":/var/lib/libvirt/vms \
 $docker_repo
   }
 }
 
 function makedir {
-  mkdir -p /mnt/"$var6"
+#mkdir -p /mnt/"$var6"
+echo a > /dev/null
 }
 
 # USE IT ONLY IF NEEDED:
