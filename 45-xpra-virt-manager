@@ -8,7 +8,7 @@
 export NOMECONTAINER="xpra-virt-manager"
 
 # From 1 to 10!
-var_cont="5"
+var_cont="6"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -19,7 +19,7 @@ CustmN2="Password"
 CustmN3="Disp.Res"
 CustmN4="Port    "
 CustmN5="Local IP"
-CustmN6="."
+CustmN6="Disk?"
 CustmN7="."
 CustmN8="."
 CustmN9="."
@@ -35,7 +35,7 @@ VALUE2="P4ssw0rd"
 VALUE3="1360x768"
 VALUE4="9876"
 VALUE5="0.0.0.0"
-VALUE6="0"
+VALUE6="/mnt/vms"
 VALUE7="0"
 VALUE8="0"
 VALUE9="0"
@@ -61,10 +61,10 @@ function docker_custom {
 -e resolution="$var3" \
 -e PORTS="$var4" \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/$NOMECONTAINER/ISO:/ISO \
 -v /srv/containers/$NOMECONTAINER/home:/home \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
+-v /var/lib/libvirt/vms:/var/lib/libvirt/vms \
 $docker_repo
   } || {
     docker run -d \
@@ -84,16 +84,16 @@ $docker_repo
 -e resolution="$var3" \
 -e PORTS="$var4" \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/$NOMECONTAINER/ISO:/ISO \
 -v /srv/containers/$NOMECONTAINER/home:/home \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
+-v /var/lib/libvirt/vms:/var/lib/libvirt/vms \
 $docker_repo
   }
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/ISO
+  mkdir -p /var/lib/libvirt/vms
 }
 
 # USE IT ONLY IF NEEDED:
