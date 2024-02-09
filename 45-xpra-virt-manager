@@ -64,7 +64,7 @@ function docker_custom {
 -v /srv/containers/$NOMECONTAINER/home:/home \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
--v /var/lib/libvirt/vms:/mnt/"$var6" \
+-v /mnt/"$var6":/var/lib/libvirt/vms \
 $docker_repo
   } || {
     docker run -d \
@@ -87,7 +87,7 @@ $docker_repo
 -v /srv/containers/$NOMECONTAINER/home:/home \
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
--v /var/lib/libvirt/vms:/mnt/"$var6" \
+-v /mnt/"$var6":/var/lib/libvirt/vms \
 $docker_repo
   }
 }
