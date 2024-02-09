@@ -100,7 +100,7 @@ function makedir {
 function docker_extras {
   sudo chmod 777 /var/run/libvirt/libvirt-sock
   sudo chmod 777 -R /srv/containers/$NOMECONTAINER/home
-  sudo chmod 777 -R /var/lib/libvirt/"$var6"
+  sudo chmod 777 -R /mnt/"$var6"
 
 # =============================================================================
 # ########################################################################### #
