@@ -39,6 +39,8 @@ function backup {
 
 # Check if this script is running through root user
 checkA
+# Remove any pihole logs first!
+rm /srv/containers/pihole*/log/pihole.log
 # Stop all containers and wait until all are stopped
 dockerctrl stop &&
 # Check if there is some old .tar to delete first
