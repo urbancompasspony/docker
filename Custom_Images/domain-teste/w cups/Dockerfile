@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:devel
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -13,7 +13,7 @@ RUN apt update && apt upgrade -y
 RUN apt install -y pkg-config
 RUN apt install -y msitools apt-utils attr acl curl dialog samba smbclient ldap-utils winbind libnss-winbind libpam-winbind krb5-user krb5-kdc supervisor openvpn inetutils-ping nano libpam-krb5 samba-dsdb-modules samba-vfs-modules wget
 
-RUN apt install -y rsyslog less msitools
+RUN apt install -y rsyslog less msitools ldb-tools
 
 RUN apt install -qqy \
     usbutils \
@@ -31,11 +31,15 @@ RUN apt install -qqy \
 
 RUN admxurl=$(curl -s 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=103507' | grep -o -m1 -E "url=http.*msi" | cut -d '=' -f2) \
     && wget -O admx.msi "$admxurl" \
-    && msiextract -C /tmp/ admx.msi
+    && mkdir /msifiles \
+    && msiextract -C /msifiles/ admx.msi
 
 RUN apt autoremove && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
+
+RUN cp -rp /etc/cups /etc/cups-bak
+VOLUME [ "/etc/cups" ]
 
 RUN sed -i 's/Listen localhost:631/Listen 0.0.0.0:631/' /etc/cups/cupsd.conf && \
     sed -i 's/Browsing Off/Browsing On/' /etc/cups/cupsd.conf && \
@@ -45,18 +49,17 @@ RUN sed -i 's/Listen localhost:631/Listen 0.0.0.0:631/' /etc/cups/cupsd.conf && 
     echo "ServerAlias *" >> /etc/cups/cupsd.conf && \
     echo "DefaultEncryption Never" >> /etc/cups/cupsd.conf
 
-ADD init.sh /init.sh
-ADD 50-default.conf /etc/rsyslog.d/
-ADD rsyslog.conf /etc/
+COPY start.sh /start.sh
+COPY init.sh /init.sh
+COPY entrypoint.sh /
+COPY 50-default.conf /etc/rsyslog.d/
+COPY rsyslog.conf /etc/
 
 RUN chmod 755 /init.sh
 RUN touch /var/log/syslog
 
-RUN cp -rp /etc/cups /etc/cups-bak
-VOLUME [ "/etc/cups" ]
-
-COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
+RUN chmod +x /init.sh
+RUN chmod +x /start.sh
 
-CMD /entrypoint.sh
-CMD /usr/sbin/rsyslogd && /init.sh setup
+CMD /start.sh
