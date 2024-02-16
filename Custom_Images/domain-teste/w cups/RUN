@@ -205,23 +205,19 @@ echo ""
 echo "Removing loop network from smb.conf"
 echo ""
 sudo sed -i '/127.0.0/d' /srv/containers/$NOMECONTAINER/config/smb.conf
-#| sudo tee /srv/containers/$NOMECONTAINER/config/smb.conf
 sleep 0.5
 
 clear
 echo ""
 echo "Applying TLS Certificates for LDAPs!"
 echo ""
-tlsfind=$(cat /srv/containers/$NOMECONTAINER/config/smb.conf | grep tls)
 
-  [ "$tlsfind" = "" ]  && {
-    echo "nothing to do" > /dev/null
-  } || {
-    sudo sed -i "15i tls enabled  = yes" /srv/containers/$NOMECONTAINER/config/smb.conf
-    sudo sed -i "16i tls keyfile  = tls/key.pem" /srv/containers/$NOMECONTAINER/config/smb.conf
-    sudo sed -i "17i tls certfile = tls/cert.pem" /srv/containers/$NOMECONTAINER/config/smb.conf
-    sudo sed -i "18i tls cafile   = tls/ca.pem" /srv/containers/$NOMECONTAINER/config/smb.conf
-  }
+sudo sed -i '/tls/d' /srv/containers/$NOMECONTAINER/config/smb.conf
+
+sudo sed -i "15i tls enabled  = yes" /srv/containers/$NOMECONTAINER/config/smb.conf
+sudo sed -i "16i tls keyfile  = tls/key.pem" /srv/containers/$NOMECONTAINER/config/smb.conf
+sudo sed -i "17i tls certfile = tls/cert.pem" /srv/containers/$NOMECONTAINER/config/smb.conf
+sudo sed -i "18i tls cafile   = tls/ca.pem" /srv/containers/$NOMECONTAINER/config/smb.conf
 sleep 0.5
 
 clear
