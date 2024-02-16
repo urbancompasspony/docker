@@ -51,15 +51,15 @@ RUN sed -i 's/Listen localhost:631/Listen 0.0.0.0:631/' /etc/cups/cupsd.conf && 
 
 COPY start.sh /start.sh
 COPY init.sh /init.sh
-COPY entrypoint.sh /
+COPY cups.sh /
 COPY 50-default.conf /etc/rsyslog.d/
 COPY rsyslog.conf /etc/
 
 RUN chmod 755 /init.sh
 RUN touch /var/log/syslog
 
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /cups.sh
 RUN chmod +x /init.sh
-RUN chmod +x /start.sh
+RUN chmod +x /entrypoint.sh
 
-CMD /start.sh
+CMD /entrypoint.sh
