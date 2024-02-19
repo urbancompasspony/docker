@@ -1,0 +1,11 @@
+docker run --name='tor-privoxy' -d \
+  -p 9050:9050 \
+  -p 9051:9051 \
+  -p 8118:8118 \
+dockage/tor-privoxy:latest
+
+The exposed ports are:
+
+9050: Tor proxy (SOCKS5)
+9051: Tor control port
+8118: Privoxy (HTTP Proxy)
