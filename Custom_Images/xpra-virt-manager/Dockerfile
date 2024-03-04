@@ -29,7 +29,7 @@ RUN apt-get install -y \
     lsb-release \
     mesa-utils \
     xvfb \
-    openssh \
+    openssh-server \
     ssh-askpass
 
 RUN apt-get install -y wget && \
