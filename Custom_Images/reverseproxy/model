@@ -8,6 +8,8 @@
 	ServerAdmin webmaster@localhost
 	DocumentRoot /var/www/html
 
+	Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
+
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 
@@ -16,49 +18,10 @@
 	RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 
 	ProxyPreserveHost On
-	ProxyPass / http://LOCALIP/ timeout=1800
-	ProxyPassReverse / http://LOCALIP/ timeout=1800
+	ProxyPass / http://LOCALIP/
+	ProxyPassReverse / http://LOCALIP/
 
 	ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
-
-	# Cache Options #
-
-	# enable caching for all requests; cache content on local disk
-	CacheEnable disk /
-	CacheRoot /var/cache/apache2/mod_cache_disk/routing
-
-	# common caching directives
-	CacheQuickHandler off
-	CacheLock on
-	CacheLockPath /tmp/mod_cache-lock
-	CacheLockMaxAge 5
-	CacheHeader On
-	
- 	# cache control 
-	# These are used by browsers to force a content refresh (e.g. when developer tools are open).
-	CacheIgnoreNoLastMod Off
-	CacheIgnoreCacheControl Off
-	
-	# unset headers from upstream server
-	Header unset Expires
-	Header unset Cache-Control
-	Header unset Pragma
-   
-	# set expiration headers for static content
-	ExpiresActive On
-	ExpiresByType text/html "access plus 1 years"
-	ExpiresByType image/png "access plus 1 years"
-	ExpiresByType application/javascript "access plus 1 years"
-    
-	# do not cache requests to the REST API
-	#<LocationMatch "^/api/v1/$">
-	#  CacheDisable on
-	#</LocationMatch>
-	
-        # do not cache some pages - by Vilson  
-        #<LocationMatch "^/products/$">
-        #  CacheDisable on
-        #</LocationMatch>
 </VirtualHost>
 
 <IfModule mod_ssl.c>
@@ -68,56 +31,21 @@
 	ServerAdmin webmaster@localhost
 	DocumentRoot /var/www/html
 
+        Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
+
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 
+        RewriteEngine on
+        RewriteRule ^/\.well-known/carddav https://%{SERVER_NAME}/remote.php/dav/ [R=301,L]
+        RewriteRule ^/\.well-known/caldav https://%{SERVER_NAME}/remote.php/dav/ [R=301,L]
+
 #	Include /etc/letsencrypt/options-ssl-apache.conf
-#	SSLCertificateFile /etc/letsencrypt/live/WEBSITEHERE/fullchain.pem
-#	SSLCertificateKeyFile /etc/letsencrypt/live/WEBSITEHERE/privkey.pem
 
 	ProxyPreserveHost On
-	ProxyPass / http://LOCALIP/ timeout=1800
-	ProxyPassReverse / http://LOCALIP/ timeout=1800
+	ProxyPass / http://LOCALIP/
+	ProxyPassReverse / http://LOCALIP/
 
 	ErrorDocument 503 http://cs.linuxuniverse.com.br:7070
-	
-	# Cache Options #
-
-	# enable caching for all requests; cache content on local disk
-	CacheEnable disk /
-	CacheRoot /var/cache/apache2/mod_cache_disk/routing
-
-	# common caching directives
-	CacheQuickHandler off
-	CacheLock on
-	CacheLockPath /tmp/mod_cache-lock
-	CacheLockMaxAge 5
-	CacheHeader On
-	
- 	# cache control 
-	# These are used by browsers to force a content refresh (e.g. when developer tools are open).
-	CacheIgnoreNoLastMod Off
-	CacheIgnoreCacheControl Off
-	
-	# unset headers from upstream server
-	Header unset Expires
-	Header unset Cache-Control
-	Header unset Pragma
-   
-	# set expiration headers for static content
-	ExpiresActive On
-	ExpiresByType text/html "access plus 1 years"
-	ExpiresByType image/png "access plus 1 years"
-	ExpiresByType application/javascript "access plus 1 years"
-    
-	# do not cache requests to the REST API
-	#<LocationMatch "^/api/v1/$">
-	#  CacheDisable on
-	#</LocationMatch>
-	
-        # do not cache some pages - by Vilson  
-        #<LocationMatch "^/products/$">
-        #  CacheDisable on
-        #</LocationMatch>
     </VirtualHost>
 </IfModule>
