@@ -104,12 +104,24 @@ docker run -d \
 --hostname=$NOMECONTAINER \
 --restart=unless-stopped \
 --no-healthcheck \
+--cgroupns=host \
+--privileged \
+-e MYSQL_SERVER_ROOT_PASSWORD="P4ssw0rd" \
+-e MYSQL_SERVER_DB_NAME="onlyoffice" \
+-e MYSQL_SERVER_HOST="mysql-onlyoffice" \
+-e MYSQL_SERVER_USER="administrador" \
+-e MYSQL_SERVER_PASS="P4ssw0rd" \
 -p 80:80 \
+-p 443:443 \
+-p 5222:5222 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/logs:/var/log/onlyoffice  \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/www/onlyoffice/Data \
-onlyoffice/documentserver
+-v /srv/containers/"$NOMECONTAINER"/letsencrypt:/etc/letsencrypt \
+-v /sys/fs/cgroup:/sys/fs/cgroup:rw \
+onlyoffice/communityserver
 }
+
 
 # Get Random Secret:
 # sudo docker exec onlyoffice /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string'
