@@ -1,0 +1,132 @@
+#!/bin/bash
+
+# To use on Website directly!
+
+# To use inside Nextcloud, do not use this container;
+# Instead, install "onlyoffice connector" and "community office server" apps.
+
+# Global config for replication:
+export NOMECONTAINER="onlyoffice"
+
+# IP FIXO DO NOVO CONTAINER
+export var1
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function checkB {
+  export var1; export var2
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+          create
+        } || {
+          create
+        }
+
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+
+        datetime=$(date +"%d-%m %H-%M")
+        mkdir -p /srv/containers/.backupcnt
+        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
+
+        rm -iR /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1
+
+  VALUE1=""
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "" 8 40 0 \
+"Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  [ -z "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    checkC
+    }
+}
+
+function checkC {
+  #IPMachine=$(hostname -I | awk '{print $1}')
+  MyIP=$(cat /srv/containers/scripts/myip)
+  [ "$MyIP" = "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
+    menu
+  } || {
+    create
+  }
+}
+
+function create {
+  export var1
+
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+
+docker run -d \
+--name=$NOMECONTAINER \
+--network macvlan \
+--ip=$var1 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=$NOMECONTAINER \
+--restart=unless-stopped \
+--no-healthcheck \
+-p 80:80 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/logs:/var/log/onlyoffice  \
+-v /srv/containers/"$NOMECONTAINER"/data:/var/www/onlyoffice/Data \
+onlyoffice/documentserver
+}
+
+# Get Random Secret:
+# sudo docker exec onlyoffice /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string'
+
+# Test integrated editor:
+# sudo docker exec onlyoffice sudo supervisorctl start ds:example
+
+# AutoStart:
+# sudo docker exec onlyoffice sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisor/conf.d/ds-example.conf
+
+function clean {
+  unset var1
+}
+
+# Start
+checkA
+checkB
+clean
+
+exit 1
