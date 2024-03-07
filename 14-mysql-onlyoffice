@@ -111,6 +111,7 @@ function checkC {
     menu
   } || {
     createA
+    createB
   }
 }
 
