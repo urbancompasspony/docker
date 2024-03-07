@@ -1,0 +1,188 @@
+#!/bin/bash
+
+# NOME DO BANCO DE DADOS
+export var1
+# IP FIXO DO NOVO CONTAINER
+export var2
+# NOVA SENHA DO ROOT MYSQL
+export var3
+# NOVO BANCO DE DADOS
+export var4
+# USUARIO BANCO DE DADOS
+export var5
+# SENHA DO BANCO DE DADOS
+export var6
+# CAMINHO DO BANCO DE DADOS
+export var7
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function checkB {
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7
+
+  export NOMECONTAINER="$var1"
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+        var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+        var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+        var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
+        var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
+        var7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
+
+        export NOMECONTAINER="$var1"
+
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+
+          checkC
+        } || {
+          checkC
+        }
+        
+      } || {
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+          }
+        
+        datetime=$(date +"%d-%m %H-%M")
+        mkdir -p /srv/containers/.backupcnt
+        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
+        
+        rm -iR /srv/containers/"$NOMECONTAINER"
+
+        checkC
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    checkC
+    }
+}
+
+function menu {
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7
+
+VALUE1="mysql-onlyoffice"; VALUE2=""; VALUE3="0"; VALUE4="onlyoffice"; VALUE5="0"; VALUE6="0"; VALUE7="/srv/containers/NOMECONTAINER"
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: MySQL" 14 40 0 \
+"NameCont:" 1 1 "$VALUE1" 1 10 20 0 \
+"Local IP:" 2 1 "$VALUE2" 2 10 20 0 \
+"MySQL PW" 3 1 "$VALUE3" 3 10 20 0 \
+"DataBase" 4 1 "$VALUE4" 4 10 20 0 \
+"DB User " 5 1 "$VALUE5" 5 10 20 0 \
+"DB Pass " 6 1 "$VALUE6" 6 10 20 0 \
+"DB PATH :" 7 1 "$VALUE7" 7 10 40 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+var4=$(echo "$VALUE0" | sed -n 4p)
+var5=$(echo "$VALUE0" | sed -n 5p)
+var6=$(echo "$VALUE0" | sed -n 6p)
+var7=$(echo "$VALUE0" | sed -n 7p)
+
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var7" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe vazios os campos 1, 2 e 7!" 8 40
+    menu
+  } || {
+    checkB
+    }
+}
+
+function checkC {
+  #IPMachine=$(hostname -I | awk '{print $1}')
+  MyIP=$(cat /srv/containers/scripts/myip)
+  [ "$MyIP" = "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
+    menu
+  } || {
+    createA
+  }
+}
+
+function createA {
+echo "[mysqld]
+sql_mode = 'NO_ENGINE_SUBSTITUTION'
+max_connections = 1000
+max_allowed_packet = 1048576000
+group_concat_max_len = 2048" > /srv/containers/"$NOMECONTAINER"/conf.d/onlyoffice.cnf
+
+echo "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '$var3';
+CREATE USER IF NOT EXISTS 'administrador'@'%' IDENTIFIED WITH mysql_native_password BY '$var3';
+CREATE USER IF NOT EXISTS 'mail_admin'@'%' IDENTIFIED WITH mysql_native_password BY '$var3';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'onlyoffice_user'@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'mail_admin'@'%';
+FLUSH PRIVILEGES;" > /srv/containers/"$NOMECONTAINER"/initdb/setup.sql
+}
+
+function createB {
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7
+
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
+
+sudo docker network create --driver bridge onlyoffice
+
+  docker run -d \
+  --name $var1 \
+  --ip=$var2 \
+  --dns=1.1.1.1  \
+  --dns=127.0.0.1 \
+  --net onlyoffice \
+  --network macvlan \
+  --hostname=$var1 \
+  --restart=unless-stopped \
+  --no-healthcheck \
+  -e MYSQL_ROOT_PASSWORD="$var3" \
+  -e MYSQL_DATABASE="$var4" \
+  -e MYSQL_USER="$var5" \
+  -e MYSQL_PASSWORD="$var6" \
+  -v /etc/localtime:/etc/localtime:ro \
+  -v "$var7"/mysql:/var/lib/mysql \
+  -v /srv/containers/"$NOMECONTAINER"/initdb:/docker-entrypoint-initdb.d \
+  -v /srv/containers/"$NOMECONTAINER"/conf.d:/etc/mysql/conf.d \
+  mysql:8.0.29
+}
+
+# Start
+checkA
+menu
+
+docker network connect bridge $var1
+
+echo "Finalizado!"
+echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
+echo "Localização do banco de dados definida em: $var7"
+
+# Unset vars:
+unset var1
+unset var2
+unset var3
+unset var4
+unset var5
+unset var6
+unset var7
+
+exit 1
