@@ -95,22 +95,32 @@ function create {
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
 
+sudo docker network create --driver bridge onlyoffice
+
+# MySQL PW
+var3=$(sed -n '3p' /srv/containers/mysql-onlyoffice/Information)
+# DataBase
+var4=$(sed -n '4p' /srv/containers/mysql-onlyoffice/Information)
+# DB Pass
+var6=$(sed -n '6p' /srv/containers/mysql-onlyoffice/Information)
+
 docker run -d \
 --name=$NOMECONTAINER \
 --network macvlan \
 --ip=$var1 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
+--net onlyoffice \
 --hostname=$NOMECONTAINER \
 --restart=unless-stopped \
 --no-healthcheck \
 --cgroupns=host \
 --privileged \
--e MYSQL_SERVER_ROOT_PASSWORD="P4ssw0rd" \
--e MYSQL_SERVER_DB_NAME="onlyoffice" \
+-e MYSQL_SERVER_ROOT_PASSWORD="$var3" \
+-e MYSQL_SERVER_DB_NAME="$var4" \
 -e MYSQL_SERVER_HOST="mysql-onlyoffice" \
--e MYSQL_SERVER_USER="administrador" \
--e MYSQL_SERVER_PASS="P4ssw0rd" \
+-e MYSQL_SERVER_USER="$var6" \
+-e MYSQL_SERVER_PASS="$var3" \
 -p 80:80 \
 -p 443:443 \
 -p 5222:5222 \
@@ -121,16 +131,6 @@ docker run -d \
 -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
 onlyoffice/communityserver
 }
-
-
-# Get Random Secret:
-# sudo docker exec onlyoffice /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string'
-
-# Test integrated editor:
-# sudo docker exec onlyoffice sudo supervisorctl start ds:example
-
-# AutoStart:
-# sudo docker exec onlyoffice sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisor/conf.d/ds-example.conf
 
 function clean {
   unset var1
