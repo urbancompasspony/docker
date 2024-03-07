@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Only Work thrpugh IP! Not SSL or FQDN
+# https://help.nextcloud.com/t/collabora-online-with-built-in-code-server-doesnt-work/123502/3
+
 # Global config for replication:
 export NOMECONTAINER="collabora"
 
