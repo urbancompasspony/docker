@@ -75,7 +75,7 @@ function checkB {
 function menu {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7
 
-VALUE1="mysql-onlyoffice"; VALUE2=""; VALUE3="0"; VALUE4="onlyoffice"; VALUE5="0"; VALUE6="0"; VALUE7="/srv/containers/NOMECONTAINER"
+VALUE1="mysql-onlyoffice"; VALUE2=""; VALUE3="0"; VALUE4="onlyoffice"; VALUE5="administrador"; VALUE6="0"; VALUE7="/srv/containers/mysql-onlyoffice"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: MySQL" 14 40 0 \
 "NameCont:" 1 1 "$VALUE1" 1 10 20 0 \
@@ -116,6 +116,8 @@ function checkC {
 }
 
 function createA {
+sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{initdb,conf.d}
+
 echo "[mysqld]
 sql_mode = 'NO_ENGINE_SUBSTITUTION'
 max_connections = 1000
@@ -144,14 +146,11 @@ function createB {
   echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
 
-sudo docker network create --driver bridge onlyoffice
-
   docker run -d \
   --name $var1 \
   --ip=$var2 \
   --dns=1.1.1.1  \
   --dns=127.0.0.1 \
-  --net onlyoffice \
   --network macvlan \
   --hostname=$var1 \
   --restart=unless-stopped \
