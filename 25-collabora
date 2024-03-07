@@ -132,6 +132,13 @@ echo "============================="
 docker exec $NOMECONTAINER curl -k https://$var1:9980
 echo " "
 
+echo ""
+echo "THIS SERVER ONLY WORKS THROUGH IP! WILL NOT WORK OVER FQDN or with SSL"
+echo "More at: https://help.nextcloud.com/t/collabora-online-with-built-in-code-server-doesnt-work/123502/3"
+echo ""
+
+sleep 10
+
 clean
 
 exit
