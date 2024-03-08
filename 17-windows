@@ -8,7 +8,7 @@
 export NOMECONTAINER="windows-custom"
 
 # From 1 to 10!
-var_cont="8"
+var_cont="9"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -22,7 +22,7 @@ CustmN5="CPU Cores"
 CustmN6="Disk Size"
 CustmN7="Inst.Man."
 CustmN8="Path Disk"
-CustmN9="."
+CustmN9="NetInter."
 CustmN10="."
 }
 
@@ -38,7 +38,7 @@ VALUE5="4"
 VALUE6="60G"
 VALUE7="N"
 VALUE8="/srv/containers/$NOMECONTAINER"
-VALUE9="0"
+VALUE9="enp4s0"
 VALUE10="0"
 }
 
@@ -84,6 +84,7 @@ docker run -d \
 --cap-add NET_ADMIN \
 --stop-timeout 120 \
 -p 8006:8006 \
+-e "VM_NET_DEV=$var9" \
 -e "VERSION=$var3" \
 -e "RAM_SIZE=$var4" \
 -e "CPU_CORES=$var5" \
@@ -100,6 +101,7 @@ echo ""
 }
 
 function makedir {
+  mkdir -p /srv/containers/"$var1"
   mkdir -p "$var8"/storage
 }
 
@@ -190,7 +192,7 @@ function bkp_and_rm_data {
 function checkB {
   export_all
 
-  NOMECONTAINER=$var1
+  NOMECONTAINER="$var1"
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     dialog --title "$NOMECONTAINER já existente!" --yesno "Deseja refazê-lo?" 6 40
