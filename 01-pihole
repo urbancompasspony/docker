@@ -53,7 +53,7 @@ function docker_custom {
 --network host \
 --hostname=$NOMECONTAINER \
 --no-healthcheck \
--e SERVERIP=$var4 \
+-e SERVERIP=$var1 \
 -e WEBPASSWORD=$var2 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
