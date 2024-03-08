@@ -60,12 +60,16 @@ docker run -d \
 -p 8006:8006 \
 -e "VERSION=$var3" \
 -e "RAM_SIZE=$var4" \
--e CPU_CORES=$var5" \
--e DISK_SIZE=$var6" \
--e MANUAL="$var7" \
+-e "CPU_CORES=$var5" \
+-e "DISK_SIZE=$var6" \
+-e "MANUAL=$var7" \
 -v /etc/localtime:/etc/localtime:ro \
 -v "$var8"/storage:/storage \
 $docker_repo
+
+echo ""
+echo "Access through serverIP:8006"
+echo ""
   } || {
 docker run -d \
 --name=$var1 \
@@ -80,10 +84,18 @@ docker run -d \
 --cap-add NET_ADMIN \
 --stop-timeout 120 \
 -p 8006:8006 \
+-e "VERSION=$var3" \
+-e "RAM_SIZE=$var4" \
+-e "CPU_CORES=$var5" \
+-e "DISK_SIZE=$var6" \
+-e "MANUAL=$var7" \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
+-v "$var8"/storage:/storage \
 $docker_repo
+
+echo ""
+echo "Access through $var2:8006"
+echo ""
   }
 }
 
