@@ -91,7 +91,7 @@ $docker_repo
 }
 
 function makedir {
-#mkdir -p /mnt/"$var6"
+  sudo mkdir -p /srv/containers/$NOMECONTAINER
 echo a > /dev/null
 }
 
