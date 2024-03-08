@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="win11 win10 win10 win7 vista winxp 2022 2019 2016"
+VALUE3="win11 ... vista winxp 2022"
 VALUE4="4G"
 VALUE5="4"
 VALUE6="60G"
