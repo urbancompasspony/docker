@@ -8,7 +8,7 @@
 export NOMECONTAINER="windows-custom"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="8"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
