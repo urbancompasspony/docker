@@ -112,7 +112,9 @@ onlyoffice/documentserver
 }
 
 # Get Random Secret:
-docker exec onlyoffice /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string' | sudo tee /srv/containers/"$NOMECONTAINER"/data/secret
+docker exec "$NOMECONTAINER" /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string' | sudo tee /srv/containers/"$NOMECONTAINER"/data/token
+
+docker exec "$NOMECONTAINER" sed -i 's/"rejectUnauthorized": true/"rejectUnauthorized": false/g' /etc/onlyoffice/documentserver/default.json
 
 # Test integrated editor:
 # sudo docker exec onlyoffice sudo supervisorctl start ds:example
