@@ -108,7 +108,7 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/logs:/var/log/onlyoffice  \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/www/onlyoffice/Data \
--v /srv/containers/"$NOMECONTAINER"/data:/etc/onlyoffice \
+-v /srv/containers/"$NOMECONTAINER"/etc:/etc/onlyoffice \
 onlyoffice/documentserver
 }
 
