@@ -9,6 +9,7 @@
 	DocumentRoot /var/www/html
 
 	Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
+	Header add Access-Control-Allow-Origin "*"
 
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
@@ -32,6 +33,7 @@
 	DocumentRoot /var/www/html
 
         Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
+	Header add Access-Control-Allow-Origin "*"
 
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
