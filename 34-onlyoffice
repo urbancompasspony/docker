@@ -108,12 +108,11 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/logs:/var/log/onlyoffice  \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/www/onlyoffice/Data \
--v /srv/containers/"$NOMECONTAINER"/etc:/etc/onlyoffice \
 onlyoffice/documentserver
 }
 
 # Get Random Secret:
-# sudo docker exec onlyoffice /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string'
+docker exec onlyoffice /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string' | sudo tee /srv/containers/"$NOMECONTAINER"/data/secret
 
 # Test integrated editor:
 # sudo docker exec onlyoffice sudo supervisorctl start ds:example
