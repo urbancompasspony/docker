@@ -112,6 +112,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/logs:/var/log/onlyoffice  \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/www/onlyoffice/Data \
 -v /srv/containers/"$NOMECONTAINER"/cert:/etc/letsencrypt \
+-v /srv/containers/"$NOMECONTAINER"/etc:/etc/onlyoffice/documentserver \
 onlyoffice/documentserver
 }
 
@@ -121,7 +122,7 @@ echo "==========================================================================
 echo ""
 echo "Generating JWT Secret. Your Token is:"
 echo ""
-echo $JWT_SECRET_0 | sudo tee /srv/containers/"$NOMECONTAINER"/data/secret
+echo $JWT_SECRET_0 | sudo tee /srv/containers/"$NOMECONTAINER"/etc/secret
 echo ""
 echo "==================================================================================================================="
 echo ""
