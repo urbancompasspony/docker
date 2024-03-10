@@ -112,17 +112,21 @@ docker run -d \
 onlyoffice/documentserver
 }
 
+function extras {
 # Get Random Secret:
 docker exec "$NOMECONTAINER" /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string' | sudo tee /srv/containers/"$NOMECONTAINER"/data/token
 docker exec "$NOMECONTAINER" sed -i 's/"rejectUnauthorized": true/"rejectUnauthorized": false/g' /etc/onlyoffice/documentserver/default.json
 docker restart "$NOMECONTAINER"
 
 echo ""
-echo "Generate cert with:"
-echo "bash /usr/bin/documentserver-letsencrypt.sh email@example.com yourdomain.com"
 echo "DO NOT USE REVERSE PROXY!"
 echo ""
+echo "Generate certs with:"
+echo "bash /usr/bin/documentserver-letsencrypt.sh email@example.com yourdomain.com"
+echo ""
+
 sleep 5
+}
 
 # Test integrated editor:
 # sudo docker exec onlyoffice sudo supervisorctl start ds:example
@@ -137,6 +141,7 @@ function clean {
 # Start
 checkA
 checkB
+extras
 clean
 
 exit 1
