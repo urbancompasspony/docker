@@ -113,6 +113,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/www/onlyoffice/Data \
 -v /srv/containers/"$NOMECONTAINER"/lib:/var/lib/onlyoffice \
 -v /srv/containers/"$NOMECONTAINER"/postgresql:/var/lib/postgresql \
+-v /srv/containers/"$NOMECONTAINER"/fonts:/usr/share/fonts/truetype/custom \
 onlyoffice/documentserver
 }
 
@@ -126,9 +127,11 @@ echo $JWT_SECRET_0 | sudo tee /srv/containers/"$NOMECONTAINER"/secret
 echo ""
 echo "==================================================================================================================="
 echo ""
-echo "If Setting on NextCloud:"
-echo "ONLYOFFICE Docs Address: Address of OnlyOffice Docker Service."
-echo "Server Address for internal requests: The FQDN of the Nextcloud Server!"
+echo "If you pretend to set it on NextCloud:"
+echo "ONLYOFFICE Docs Address:"
+echo "Address of OnlyOffice Docker Service with SSL, example: https://officeserver.ddns.net/ with a / at the end!"
+echo "Server Address for internal requests:"
+echo "The FQDN of the Nextcloud Server, example: https://myserver.ddns.net/ with a / at the end!"
 echo ""
 echo "FQDN not acessible on LAN! On this case, will be acessible only through IP."
 echo "To have a FQDN create a server on another IP Address."
@@ -145,7 +148,7 @@ echo "sudo docker exec $NOMECONTAINER sudo supervisorctl start ds:example"
 echo ""
 echo "==================================================================================================================="
 
-sleep 5
+sleep 10
 
 }
 
