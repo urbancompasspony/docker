@@ -95,6 +95,8 @@ function create {
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
 
+JWT_SECRET_0=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
+
 docker run -d \
 --name=$NOMECONTAINER \
 --network macvlan \
@@ -104,6 +106,7 @@ docker run -d \
 --hostname=$NOMECONTAINER \
 --restart=unless-stopped \
 --no-healthcheck \
+-e JWT_SECRET="$JWT_SECRET_0" \
 -p 80:80 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/logs:/var/log/onlyoffice  \
@@ -113,28 +116,41 @@ onlyoffice/documentserver
 }
 
 function extras {
-# Get Random Secret:
-docker exec "$NOMECONTAINER" /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string' | sudo tee /srv/containers/"$NOMECONTAINER"/data/token
-docker exec "$NOMECONTAINER" sed -i 's/"rejectUnauthorized": true/"rejectUnauthorized": false/g' /etc/onlyoffice/documentserver/default.json
-docker restart "$NOMECONTAINER"
+echo "==================================================================================================================="
 
 echo ""
-echo "DO NOT USE REVERSE PROXY!"
+echo "Generating JWT Secret. Your Token is:"
+echo ""
+echo $JWT_SECRET_0 | sudo tee /srv/containers/"$NOMECONTAINER"/data/secret
+echo ""
+echo "==================================================================================================================="
+echo ""
+echo "DO NOT USE REVERSE PROXY TO MANAGE CERTS!"
+echo ""
+echo "On ReverseProxy put:"
+echo ""
+echo "SSLProxyVerify none"
+echo "SSLProxyCheckPeerCN off"
+echo "SSLProxyCheckPeerName off"
+echo "SSLProxyCheckPeerExpire off"
 echo ""
 echo "Generate certs with:"
-echo "bash /usr/bin/documentserver-letsencrypt.sh email@example.com yourdomain.com"
+echo "docker exec $NOMECONTAINER bash /usr/bin/documentserver-letsencrypt.sh goodfriendadvice@protonmail.com DOMAINHERE"
 echo ""
+echo "Test integrated editor:"
+echo "sudo docker exec $NOMECONTAINER sudo supervisorctl start ds:example"
+echo ""
+echo "==================================================================================================================="
 
 sleep 5
+
+#docker exec "$NOMECONTAINER" sed -i 's/"rejectUnauthorized": true/"rejectUnauthorized": false/g' /etc/onlyoffice/documentserver/default.json
+
 }
 
-# Test integrated editor:
-# sudo docker exec onlyoffice sudo supervisorctl start ds:example
-
-# AutoStart:
-# sudo docker exec onlyoffice sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisor/conf.d/ds-example.conf
-
 function clean {
+  unset JWT_SECRET_0
+  unset JWT_SECRET
   unset var1
 }
 
