@@ -111,8 +111,8 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/logs:/var/log/onlyoffice  \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/www/onlyoffice/Data \
--v /srv/containers/"$NOMECONTAINER"/cert:/etc/letsencrypt \
--v /srv/containers/"$NOMECONTAINER"/etc:/etc/onlyoffice/documentserver \
+-v /srv/containers/"$NOMECONTAINER"/lib:/var/lib/onlyoffice \
+-v /srv/containers/"$NOMECONTAINER"/postgresql:/var/lib/postgresql \
 onlyoffice/documentserver
 }
 
@@ -120,9 +120,9 @@ function extras {
 echo "==================================================================================================================="
 
 echo ""
-echo "Generating JWT Secret. Your Token is:"
+echo "Generating JWT Secret.... Your Token is:"
 echo ""
-echo $JWT_SECRET_0 | sudo tee /srv/containers/"$NOMECONTAINER"/etc/secret
+echo $JWT_SECRET_0 | sudo tee /srv/containers/"$NOMECONTAINER"/secret
 echo ""
 echo "==================================================================================================================="
 echo ""
