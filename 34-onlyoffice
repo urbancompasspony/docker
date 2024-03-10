@@ -126,26 +126,18 @@ echo $JWT_SECRET_0 | sudo tee /srv/containers/"$NOMECONTAINER"/secret
 echo ""
 echo "==================================================================================================================="
 echo ""
-echo "DO NOT USE REVERSE PROXY TO MANAGE CERTS!"
+echo "If OnlyOffice will be direct on 80:443 ports of Firewall, run this command and put it on cron:"
+echo "* 10 * * * docker exec onlyoffice bash /usr/bin/documentserver-letsencrypt.sh goodfriendadvice@protonmail.com suitoffice.ddns.net"
 echo ""
-echo "On ReverseProxy put:"
+echo "If behind a ReverseProxy generate certificate normally. Then, edit /sites-enabled/office.conf and add as in:"
+echo "https://raw.githubusercontent.com/urbancompasspony/docker/main/Apache2/https-to-http"
 echo ""
-echo "SSLProxyVerify none"
-echo "SSLProxyCheckPeerCN off"
-echo "SSLProxyCheckPeerName off"
-echo "SSLProxyCheckPeerExpire off"
-echo ""
-echo "Generate certs with:"
-echo "docker exec $NOMECONTAINER bash /usr/bin/documentserver-letsencrypt.sh goodfriendadvice@protonmail.com DOMAINHERE"
-echo ""
-echo "Test integrated editor:"
+echo "Test integrated editor (TEST ONLY!):"
 echo "sudo docker exec $NOMECONTAINER sudo supervisorctl start ds:example"
 echo ""
 echo "==================================================================================================================="
 
 sleep 5
-
-#docker exec "$NOMECONTAINER" sed -i 's/"rejectUnauthorized": true/"rejectUnauthorized": false/g' /etc/onlyoffice/documentserver/default.json
 
 }
 
