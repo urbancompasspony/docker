@@ -35,6 +35,8 @@
 # 00 01 01 * * docker exec nextcloud certbot --apache renew
 # Will auto renew SSL once a month and run cron.php when needed.
 
+# Last but not least: NEVER use it through bridge if want to access some AD!
+
 # The End!
 
 #############################################################################################################
@@ -182,9 +184,6 @@ function clean {
 # Start
 checkA
 checkB
-
-# For LDAP, remote it! Use IP of MySQL Server instead.
-#docker network connect bridge $NOMECONTAINER
 
 # Some scripts to run after installation
 docker exec nextcloud apt update
