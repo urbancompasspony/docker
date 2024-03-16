@@ -149,11 +149,9 @@ function create {
 checkA
 menu
 
-docker network connect bridge $var1
-
 echo "Finalizado!"
 echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
-echo "Localização do banco de dados definida em: $var7"
+echo "Banco de dados acessível a partir de: $var2"
 
 # Unset vars:
 unset var1
