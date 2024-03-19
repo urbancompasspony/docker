@@ -8,8 +8,6 @@
 	ServerAdmin webmaster@localhost
 	DocumentRoot /var/www/html
 
-#	Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
-
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 
@@ -31,7 +29,7 @@
 	ServerAdmin webmaster@localhost
 	DocumentRoot /var/www/html
 
- #       Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
+        Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
 
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
