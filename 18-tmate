@@ -66,8 +66,6 @@ function docker_custom {
 $docker_repo
 }
 
-#-p 2223:2223 \
-
 function makedir {
   mkdir -p /srv/containers/"$NOMECONTAINER"/keys
   cd /srv/containers/"$NOMECONTAINER" ; curl -s -q https://raw.githubusercontent.com/tmate-io/tmate-ssh-server/master/create_keys.sh | bash
@@ -75,8 +73,8 @@ function makedir {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-clear
 echo " "
+echo "Take note about keys above!"
 echo "Please open up $var4 port on Firewall!"
 echo "Server Online!"
 echo " "
