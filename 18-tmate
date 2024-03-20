@@ -31,7 +31,7 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="0.0.0.0"
+VALUE2="LocalOnly"
 VALUE3="NOIP URL"
 VALUE4="2223"
 VALUE5="0"
@@ -50,16 +50,13 @@ function docker_custom {
   docker run -d \
 --name=$var1 \
 --cap-add SYS_ADMIN \
---ip $var2 \
---dns 127.0.0.1 \
---dns 1.1.1.1 \
---network macvlan \
+--network host \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
--e "SSH_HOSTNAME=$var3" \
+-e SSH_HOSTNAME=$var3 \
 -e SSH_KEYS_PATH=/keys \
--e "SSH_PORT_LISTEN=$var4" \
+-e SSH_PORT_LISTEN=$var4 \
 -e USE_PROXY_PROTOCOL=0 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/keys:/keys \
@@ -70,21 +67,21 @@ function makedir {
   rm -R /srv/containers/"$NOMECONTAINER"/keys
   mkdir -p /srv/containers/"$NOMECONTAINER"/keys
   cd /srv/containers/"$NOMECONTAINER" ; curl -s -q https://raw.githubusercontent.com/tmate-io/tmate-ssh-server/master/create_keys.sh | bash > /srv/containers/"$NOMECONTAINER"/tmate.conf
-
-  var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
-  sed -i "s/localhost/$var3/g" /srv/containers/tmate-server/tmate.conf
-
-  var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
-  sed -i "s/22/$var4/g" /srv/containers/tmate-server/tmate.conf
 }
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-echo " "
-echo "Take note about keys above!"
-echo "Please open up $var4 port on Firewall!"
-echo "Server Online!"
-echo " "
+  var_new0=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+  sed -i "s/localhost/$var_new0/g" /srv/containers/tmate-server/tmate.conf
+
+  var_new1=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+  sed -i "s/22/$var_new1/g" /srv/containers/tmate-server/tmate.conf
+
+  echo " "
+  echo "Take note about keys above!"
+  echo "Please open up $var4 port on Firewall!"
+  echo "Server Online!"
+  echo " "
 
 # =============================================================================
 # ########################################################################### #
