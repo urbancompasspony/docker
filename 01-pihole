@@ -450,6 +450,7 @@ function create {
 ################################################################################
 
 # Force aways get newest version!
+clear
 docker pull pihole/pihole:latest
 
 # Start
