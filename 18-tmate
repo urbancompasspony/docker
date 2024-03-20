@@ -68,7 +68,7 @@ $docker_repo
 
 function makedir {
   mkdir -p /srv/containers/"$NOMECONTAINER"/keys
-  cd /srv/containers/"$NOMECONTAINER" ; curl -s -q https://raw.githubusercontent.com/tmate-io/tmate-ssh-server/master/create_keys.sh | bash
+  cd /srv/containers/"$NOMECONTAINER" ; curl -s -q https://raw.githubusercontent.com/tmate-io/tmate-ssh-server/master/create_keys.sh | bash > /srv/containers/"$NOMECONTAINER"/tmate.conf
 }
 
 # USE IT ONLY IF NEEDED:
