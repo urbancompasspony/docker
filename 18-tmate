@@ -73,6 +73,9 @@ function makedir {
 
   var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
   sed -i "s/localhost/$var3/g" /srv/containers/tmate-server/tmate.conf
+
+  var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+  sed -i "s/22/$var4/g" /srv/containers/tmate-server/tmate.conf
 }
 
 # USE IT ONLY IF NEEDED:
