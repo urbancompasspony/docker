@@ -67,8 +67,12 @@ $docker_repo
 }
 
 function makedir {
+  rm -R /srv/containers/"$NOMECONTAINER"/keys
   mkdir -p /srv/containers/"$NOMECONTAINER"/keys
   cd /srv/containers/"$NOMECONTAINER" ; curl -s -q https://raw.githubusercontent.com/tmate-io/tmate-ssh-server/master/create_keys.sh | bash > /srv/containers/"$NOMECONTAINER"/tmate.conf
+
+  var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+  sed -i "s/localhost/$var3/g" /srv/containers/tmate-server/tmate.conf
 }
 
 # USE IT ONLY IF NEEDED:
