@@ -2,6 +2,7 @@
 
 # Nextcloud Version!
 # Check var4!
+version=28
 
 #############################################################################################################
 
@@ -98,7 +99,7 @@ function checkB {
 function menu {
   export var1; export var2; export var3
 
-  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="cloud.my-website.com"; VALUE4="27"
+  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="cloud.my-website.com"; VALUE4="$version"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Campo NxtData: VAR/data autopreenchido! \nDefina 1 diretório abaixo e sem /." 13 40 0 \
 "Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
