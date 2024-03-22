@@ -143,7 +143,16 @@ function create {
     echo "Continuando..."
     }
 
-  mkdir -p /srv/containers/"$NOMECONTAINER"
+  mkdir -p /srv/containers/"$NOMECONTAINER"/php
+  touch /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini
+
+echo -e "opcache.enable=1
+opcache.interned_strings_buffer=32
+opcache.max_accelerated_files=10000
+opcache.memory_consumption=360
+opcache.save_comments=1
+opcache.revalidate_freq=60" > /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini
+
   mkdir -p "$var2"
 
   touch /srv/containers/"$NOMECONTAINER"/Information
@@ -172,6 +181,7 @@ docker run -d \
 -e VIRTUAL_HOST="$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
+-v /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini \
 -v "$var2"/data:/var/www/html/data \
 nextcloud:"$var4"
 }
