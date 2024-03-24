@@ -229,6 +229,9 @@ docker restart $NOMECONTAINER
 docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
 docker exec $NOMECONTAINER chmod 777 -R /var/lib/samba/sysvol
 
+# Adjust SYSVOL ACL:
+docker exec $NOMECONTAINER samba-tool ntacl sysvolreset -U Administrator
+
 # Finish
 docker restart $NOMECONTAINER
 
