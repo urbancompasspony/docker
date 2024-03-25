@@ -17,6 +17,8 @@ export var5
 export var6
 # CAMINHO DO PONTO DE MONTAGEM BASE
 export var7
+# SENHA DO SERVIÇO CUPS
+export var8
 
 [ $(arch) = "x86_64" ] && {
   REPOSITORY="urbancompasspony/domain-teste:latest"
@@ -32,7 +34,7 @@ function checkA {
 }
 
 function checkB {
-  export var1; export var2; export var3; export var4; export var5; export var6; export var7
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7; export var8
 
   [ -f "/srv/containers/"$NOMECONTAINER"/Information" ] && {
     dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja refazer o container?" 6 40
@@ -46,6 +48,7 @@ function checkB {
         var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
         var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
         var7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
+        var8=$(sed -n '8p' /srv/containers/$NOMECONTAINER/Information)
 
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
@@ -73,7 +76,7 @@ function checkB {
 }
 
 function menu {
-  export var1; export var2; export var3; export var4; export var5; export var6; export var7
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7; export var8
 
   [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
     VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
@@ -83,8 +86,9 @@ function menu {
     VALUE5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
     VALUE6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
     VALUE7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE8=$(sed -n '8p' /srv/containers/$NOMECONTAINER/Information)
   } || {
-    VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5="$HOSTNAME"; VALUE6="macvlan"; VALUE7="-v /mnt:/mnt"; VALUE8="admin"; VALUE9="admin"
+    VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5="$HOSTNAME"; VALUE6="macvlan"; VALUE7="-v /mnt:/mnt"; VALUE8="p4ssw0rd"
   }
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
@@ -95,6 +99,7 @@ function menu {
 "Hostname:" 5 1 "$VALUE5" 5 10 34 0 \
 "NetLAN  :" 6 1 "$VALUE6" 6 10 34 0 \
 "MNT Path:" 7 1 "$VALUE7" 7 10 50 0 \
+"CUPSPass:" 8 1 "$VALUE8" 8 10 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
@@ -106,8 +111,9 @@ function menu {
   var5=$(echo "$VALUE0" | sed -n 5p)
   var6=$(echo "$VALUE0" | sed -n 6p)
   var7=$(echo "$VALUE0" | sed -n 7p)
+  var8=$(echo "$VALUE0" | sed -n 8p)
 
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] || [ -z "$var8" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -127,12 +133,13 @@ function checkC {
 }
 
 function create {
-  export var1; export var2; export var3; export var4; export var5; export var6; export var7
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7; export var8
   
   mkdir -p /srv/containers/"$NOMECONTAINER"/log
   mkdir -p /srv/containers/"$NOMECONTAINER"/cups/{config,log}
 
   touch /srv/containers/"$NOMECONTAINER"/Information
+
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
@@ -140,6 +147,7 @@ function create {
   echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var8" >> /srv/containers/"$NOMECONTAINER"/Information
 
   touch /srv/containers/"$NOMECONTAINER"/log/syslog
 
@@ -161,8 +169,8 @@ docker run -d \
 -e "DOMAINPASS=$var3" \
 -e "DNSFORWARDER=$var4" \
 -e "HOSTIP=$var2" \
--e CUPSADMIN="administrator" \
--e CUPSPASSWORD="$var3" \
+-e CUPSADMIN="admin" \
+-e CUPSPASSWORD="$var8" \
 -e TZ="America/Bahia" \
 -p $var2:53:53 \
 -p $var2:53:53/udp \
@@ -211,10 +219,8 @@ sleep 0.5
 echo ""
 echo "Applying TLS Certificates for LDAPs!"
 echo ""
-
 sudo sed -i '/tls/d' /srv/containers/$NOMECONTAINER/config/smb.conf
 sudo sed -i '/ldap/d' /srv/containers/$NOMECONTAINER/config/smb.conf
-
 sudo sed -i "15i tls enabled  = yes" /srv/containers/$NOMECONTAINER/config/smb.conf
 sudo sed -i "16i tls keyfile  = tls/key.pem" /srv/containers/$NOMECONTAINER/config/smb.conf
 sudo sed -i "17i tls certfile = tls/cert.pem" /srv/containers/$NOMECONTAINER/config/smb.conf
@@ -253,6 +259,7 @@ echo ""
 echo "Restarting Domain!"
 echo ""
 docker restart $NOMECONTAINER
+sleep 0.5
 
 echo ""
 echo "Adjusting /syslog"
@@ -276,8 +283,8 @@ sleep 0.5
 
 echo ""
 echo "Active Directory & Domain Controller OK!"
-sleep 3
 echo ""
+sleep 3
 
 unset var1
 unset var2
@@ -286,5 +293,6 @@ unset var4
 unset var5
 unset var6
 unset var7
+unset var8
 
 exit 1
