@@ -49,7 +49,7 @@ RUN sed -i 's/Listen localhost:631/Listen 0.0.0.0:631/' /etc/cups/cupsd.conf && 
     echo "ServerAlias *" >> /etc/cups/cupsd.conf && \
     echo "DefaultEncryption Never" >> /etc/cups/cupsd.conf
 
-COPY start.sh /start.sh
+COPY entrypoint.sh /entrypoint.sh
 COPY init.sh /init.sh
 COPY cups.sh /
 COPY 50-default.conf /etc/rsyslog.d/
