@@ -7,7 +7,7 @@
 /init.sh setup &
 
 # CUPS SERVER
-/entrypoint.sh &
+/cups.sh &
 
 # Block container exit
 tail -f /dev/null
