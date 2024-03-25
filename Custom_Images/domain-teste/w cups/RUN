@@ -263,6 +263,12 @@ docker exec $NOMECONTAINER chmod 777 -R /var/lib/samba/sysvol
 sleep 0.5
 
 echo ""
+echo "Adjusting SYSVOL Permissions"
+echo ""
+docker exec $NOMECONTAINER samba-tool ntacl sysvolreset -U Administrator
+sleep 0.5
+
+echo ""
 echo "Restarting Domain!"
 echo ""
 docker restart $NOMECONTAINER
