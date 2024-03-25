@@ -200,6 +200,8 @@ checkB
 
 # Some adjusts after install:
 
+clear
+
 echo ""
 echo "Removing loop network from smb.conf"
 echo ""
