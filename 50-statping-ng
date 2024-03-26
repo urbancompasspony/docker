@@ -5,7 +5,7 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="A-CUSTOM-A"
+export NOMECONTAINER="statping-ng"
 
 # From 1 to 10!
 var_cont="2"
@@ -71,7 +71,7 @@ function docker_extras {
 
 echo ""
 echo "Acces through: $var2:8080"
-echo "'
+echo ""
 sleep 5
 
 # =============================================================================
