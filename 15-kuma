@@ -72,7 +72,7 @@ function docker_extras {
 
 echo ""
 echo "Acces through: $var2:3001"
-echo "'
+echo ""
 sleep 5
 
 # =============================================================================
