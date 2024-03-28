@@ -45,6 +45,8 @@ VALUE10="0"
 # Set repository here!
 docker_repo="portainer/portainer-ce:latest"
 
+docker run -d
+
 # Adjust if needed
 function docker_custom {
 docker run -d \
@@ -56,6 +58,8 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-p 8000:8000 \
+-p 9443:9443 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
 -v /var/run/docker.sock:/var/run/docker.sock \
@@ -63,7 +67,7 @@ $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/data
 }
 
 # USE IT ONLY IF NEEDED:
