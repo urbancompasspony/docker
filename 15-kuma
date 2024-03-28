@@ -416,6 +416,10 @@ function create {
 
 ################################################################################
 
+# Force aways get newest version!
+clear
+docker pull louislam/uptime-kuma:1
+
 # Start
 checkA
 menu
