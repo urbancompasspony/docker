@@ -29,11 +29,6 @@ RUN apt install -qqy \
     hplip \
     avahi-daemon
 
-RUN admxurl=$(curl -s 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=103507' | grep -o -m1 -E "url=http.*msi" | cut -d '=' -f2) \
-    && wget -O admx.msi "$admxurl" \
-    && mkdir /msifiles \
-    && msiextract -C /msifiles/ admx.msi
-
 RUN apt autoremove && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
