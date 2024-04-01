@@ -16,7 +16,7 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
+CustmN3="ServerIP"
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -31,8 +31,8 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="0.0.0.0"
-VALUE3="0"
+VALUE2="Host Only!"
+VALUE3="0.0.0.0"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -47,28 +47,15 @@ docker_repo="krishnasrinivas/wetty"
 
 # Adjust if needed
 function docker_custom {
-  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
 docker run -d \
 --name=$var1 \
 --network host \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+--add-host=host.docker.internal:host-gateway \
 -v /etc/localtime:/etc/localtime:ro \
 $docker_repo
-  } || {
-docker run -d \
---name=$var1 \
---network macvlan \
---ip=$var2 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=$var1 \
---no-healthcheck \
---restart=unless-stopped \
--v /etc/localtime:/etc/localtime:ro \
-$docker_repo
-  }
 }
 
 function makedir {
