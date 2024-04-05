@@ -94,7 +94,7 @@ function menu {
 "LAN DNS :" 4 1 "$VALUE4" 4 10 34 0 \
 "Hostname:" 5 1 "$VALUE5" 5 10 34 0 \
 "NetLAN  :" 6 1 "$VALUE6" 6 10 34 0 \
-"MNT Path:" 7 1 "$VALUE7" 7 10 50 0 \
+"MNT Path:" 7 1 "$VALUE7" 7 10 100 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
