@@ -415,6 +415,9 @@ function create {
 
 ################################################################################
 
+# Keep up to date!
+docker pull ghcr.io/netbootxyz/netbootxyz
+
 # Start
 checkA
 menu
