@@ -71,8 +71,14 @@ function makedir {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+clear
+echo ""
+echo "Turn on TFTP SERVER + NEXT SERVER and set IP for PXE Server container"
+echo "Put these on pfSense:"
+echo "Default BIOS: netboot.xyz.kpxe"
+echo "UEFI 32 e 64: netboot.xyz.efi"
+echo ""
+sleep 5
 
 # =============================================================================
 # ########################################################################### #
