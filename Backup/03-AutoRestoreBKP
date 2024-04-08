@@ -1,0 +1,40 @@
+#!/bin/bash
+
+datetime=$(date +"%d_%m_%y")
+source=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
+destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
+cd "$source"
+
+function start {
+  files=()
+
+while IFS= read -r -d $'\0' file; do
+  files+=("$file" "")
+done < <(find "$destiny" -type f -name "*.tar" -print0)
+
+# Verificar se há pelo menos 1 arquivo ou gerar erro.
+  [ ${#files[@]} -eq 0 ] && {
+    clear
+    echo "Nenhum arquivo encontrado em $directory"
+  } || {
+    file=$(dialog --stdout --title "Escolha um arquivo de Backup:" --cancel-label "Sair" --menu "Lista de backups encontrados:" 0 0 0 "${files[@]}")
+    [ $? -ne 0 ] && exit # Se pressionar Voltar nesta tela, ele sai do programa!
+    clear
+    echo "$file"
+    NAME="$(basename "$file" .tar)"
+
+    echo "$NAME"
+    filtered=$(echo "$NAME" | sed 's/.\{9\}$//')
+    echo $filtered
+
+#    echo "Fazendo backup do atual container $file"
+#    sudo tar -cvf "$destiny"/"$file"-"$datetime".tar "$file"
+#    clear
+#    echo "Restaurando Backup! Aguarde..."
+#    sudo tar -xvf $file.tar -C /srv/containers/
+  }
+}
+
+start
+
+exit 1
