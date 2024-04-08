@@ -1,6 +1,6 @@
 #!/bin/bash
 
-datetime=$(date +"%d_%m_%y")
+datetime=$(date +"%d_%m_%y_%H:%M")
 source=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
 destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
 cd "$source"
@@ -18,20 +18,23 @@ done < <(find "$destiny" -type f -name "*.tar" -print0)
     echo "Nenhum arquivo encontrado em $directory"
   } || {
     file=$(dialog --stdout --title "Escolha um arquivo de Backup:" --cancel-label "Sair" --menu "Lista de backups encontrados:" 0 0 0 "${files[@]}")
-    [ $? -ne 0 ] && exit # Se pressionar Voltar nesta tela, ele sai do programa!
-    clear
-    echo "$file"
+    [ $? -ne 0 ] && return # Se pressionar Voltar nesta tela, ele sai do programa!
     NAME="$(basename "$file" .tar)"
+    file=$(echo "$NAME" | sed 's/.\{9\}$//')
 
-    echo "$NAME"
-    filtered=$(echo "$NAME" | sed 's/.\{9\}$//')
-    echo $filtered
+    clear ; echo "Parando o container $file"
+    docker stop $file &&
 
-#    echo "Fazendo backup do atual container $file"
-#    sudo tar -cvf "$destiny"/"$file"-"$datetime".tar "$file"
-#    clear
-#    echo "Restaurando Backup! Aguarde..."
-#    sudo tar -xvf $file.tar -C /srv/containers/
+    clear; echo "Fazendo backup do atual container $file"
+    mkdir -p /srv/backup4restore/
+    sudo tar -cvf /srv/backup4restore/"$file"-"$datetime".tar "$file" &&
+
+    clear; echo "Restaurando Backup! Aguarde..."
+    sudo tar -xvf $file.tar -C /srv/containers/ &&
+
+    clear; echo "Restauracao concluida! Reiniciando o container $file..."
+    docker start $file &&
+    sleep 3
   }
 }
 
