@@ -207,7 +207,7 @@ clean
 # NOT NEED???
 # Installing curl less and dialog:
 docker exec $NOMECONTAINER bash -c "apt update"
-docker exec $NOMECONTAINER bash -c "apt install tree curl less dialog -y"
+docker exec $NOMECONTAINER bash -c "apt install libnss-winbind tree curl less dialog -y"
 
 # Getting MENU for samba-tools:
 docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init"
