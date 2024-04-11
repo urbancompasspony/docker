@@ -29,6 +29,9 @@ done < <(find "$destiny" -type f -name "*.tar" -print0)
     mkdir -p /srv/backup4restore/
     sudo tar -cvf /srv/backup4restore/"$file"-"$datetime".tar "$file" &&
 
+    POR FAVOR CONFIRME QUE VOCE ESTA DE ACORDO COM OS RISCOS INERENTES A ESTA RESTAURACAO!
+    "eu estou ciente dos riscos"
+
     clear; echo "Restaurando Backup! Aguarde..."
     sudo tar -xvf $file.tar -C /srv/containers/ &&
 
