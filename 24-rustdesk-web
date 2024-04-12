@@ -43,7 +43,7 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="keyurbhole/flutter_web_desk"
+docker_repo="keyurbhole/flutter_web_desk:v1.0.0"
 
 # Adjust if needed
 function docker_custom {
