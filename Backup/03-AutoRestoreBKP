@@ -1,9 +1,10 @@
 #!/bin/bash
 
-datetime=$(date +"%d_%m_%y_%H:%M")
+datetime=$(date +"%d_%m_%y_%H_%M")
+
 source=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
+
 destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
-cd "$source"
 
 function start {
   files=()
@@ -15,29 +16,48 @@ done < <(find "$destiny" -type f -name "*.tar" -print0)
 # Verificar se há pelo menos 1 arquivo ou gerar erro.
   [ ${#files[@]} -eq 0 ] && {
     clear
-    echo "Nenhum arquivo encontrado em $directory"
+    echo ""
+    echo "Nenhum arquivo de backup encontrado!"
+    echo ""
+    sleep 3
   } || {
     file=$(dialog --stdout --title "Escolha um arquivo de Backup:" --cancel-label "Sair" --menu "Lista de backups encontrados:" 0 0 0 "${files[@]}")
-    [ $? -ne 0 ] && return # Se pressionar Voltar nesta tela, ele sai do programa!
+    [ $? -ne 0 ] && return
+
     NAME="$(basename "$file" .tar)"
-    file=$(echo "$NAME" | sed 's/.\{9\}$//')
+    file2=$(echo "$NAME" | sed 's/.\{9\}$//')
 
-    clear ; echo "Parando o container $file"
-    docker stop $file &&
+    VALUE0=$(dialog --help-button --help-label 'Riscos' --ok-label "Restaurar" --title "Restauracao" --form "Restaurando o seguinte container: \n\n$file\n\nPOR FAVOR CONFIRME QUE VOCE ESTA DE ACORDO COM OS RISCOS INERENTES A ESTA RESTAURACAO! \n\nRepita no campo abaixo: \neu estou ciente dos riscos" 18 50 0 \
+"." 1 1 "$VALUE1" 1 1 50 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
-    clear; echo "Fazendo backup do atual container $file"
-    mkdir -p /srv/backup4restore/
-    sudo tar -cvf /srv/backup4restore/"$file"-"$datetime".tar "$file" &&
+    case $? in
+      0) echo "." > /dev/null ;;
+      1) exit ;;
+      2) dialog --title "RISCOS" --msgbox "Os riscos sao relativamente baixos. \n\n
+O container sera parado, o backup restaurado e o servico iniciado em seguida automaticamente. O procedimento de restauracao por si nao causa problemas. \n\nPorem se voce restaurar uma versao muito antiga do Active Directory, Nextcloud, MySQL ou Syncthing, ou seja, qualquer servico altamente dependente de bancos de dados, podera ter corrompimento de metadados e ate falhas de integracao ao comunicar com os clientes previamente conectados! \n\nSe for restaurar, tente restaurar backups mais recentes para evitar imprevistos." 23 50 ; return ;;
+    esac
 
-    POR FAVOR CONFIRME QUE VOCE ESTA DE ACORDO COM OS RISCOS INERENTES A ESTA RESTAURACAO!
-    "eu estou ciente dos riscos"
+    var1=$(echo "$VALUE0" | sed -n 1p)
 
-    clear; echo "Restaurando Backup! Aguarde..."
-    sudo tar -xvf $file.tar -C /srv/containers/ &&
-
-    clear; echo "Restauracao concluida! Reiniciando o container $file..."
-    docker start $file &&
-    sleep 3
+    [ "$var1" = "eu estou ciente dos riscos" ] && {
+      clear ; echo ""; echo "Parando o container $file2. Aguarde pacientemente, isso pode levar varios minutos!"; echo ""
+      sleep 1
+      docker stop "$file2" &&
+      clear; echo ""; echo "Fazendo um backup do atual container $file2. Por favor, insira a senha do Administrador!"; echo ""
+      sudo mkdir -p /srv/backup4restore/
+      sudo tar -cvf /srv/backup4restore/"$file2"-"$datetime".tar "$source"/"$file2" &&
+      clear ; echo ""; echo "O backup gerado esta separado em /srv/backup4restore/!"; echo ""; sleep 3
+      clear; echo ""; echo "Restaurando o backup escolhido. Aguarde pacientemente, isso pode levar varios minutos!"; echo ""
+      sudo tar -xvf "$file" -C /srv/containers/ && sleep 3
+      clear; echo ""; echo "Iniciando o container $file2 sob a restauracao realizada..."; echo ""
+      docker start "$file2" &&
+      clear; echo ""; echo "Restauracao concluida! Verifique se o servico esta funcional."; echo ""
+      sleep 3
+    } || {
+      clear; echo ""; echo "Repete a frase por favor! Saindo..."
+      sleep 3
+    }
   }
 }
 
