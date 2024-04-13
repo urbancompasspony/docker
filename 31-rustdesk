@@ -145,6 +145,16 @@ sudo rsync -a /srv/containers/"$NOMECONTAINER"/HBBS/ /srv/containers/"$NOMECONTA
 docker start hbbr
 docker start hbbs
 
+clear
+echo ""
+echo "Open these ports on pfSense:"
+echo ""
+echo "HBBS | $var1 | 21115 (TCP) / 21116 (TCP-UDP) / 21118 (TCP)" >> /srv/containers/"$NOMECONTAINER"/Information
+echo ""
+echo "HBBR | $var2 | 21117 (TCP) / 21119 (TCP)" >> /srv/containers/"$NOMECONTAINER"/Information
+echo ""
+sleep 15
+
 unset var1
 unset var2
 
