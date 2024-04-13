@@ -1,1 +1,7 @@
-WIP
+#!/bin/bash
+
+clear
+echo ""
+echo "Em breve!"
+echo ""
+sleep 3
