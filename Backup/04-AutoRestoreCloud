@@ -46,31 +46,31 @@ function error0 {
 
 function hash01 {
   clear
-  echo "'
+  echo ""
   echo "Em Breve!"
 }
 
 function hash02 {
   clear
-  echo "'
+  echo ""
   echo "Em Breve!"
 }
 
 function hash03 {
   clear
-  echo "'
+  echo ""
   echo "Em Breve!"
 }
 
 function hash04 {
   clear
-  echo "'
+  echo ""
   echo "Em Breve!"
 }
 
 function hash05 {
   clear
-  echo "'
+  echo ""
   echo "Em Breve!"
 }
 
