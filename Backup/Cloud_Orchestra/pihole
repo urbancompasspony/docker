@@ -1,0 +1,90 @@
+#!/bin/bash
+
+NOMECONTAINER="pihole"
+
+# Set repository here!
+docker_repo="pihole/pihole:latest"
+
+function docker_custom {
+  [ "$var1" = "host" ] || [ "$var1" = "Host" ] || [ "$var1" = "HOST" ] || [ "$var1" = "hostname" ] || [ "$var1" = "localhost" ] && {
+  docker run -d \
+--name=$NOMECONTAINER \
+--network host \
+--hostname=$NOMECONTAINER \
+--no-healthcheck \
+-e SERVERIP=$var1 \
+-e WEBPASSWORD=$var2 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
+-v /srv/containers/"$NOMECONTAINER"/dnsmasq.d/:/etc/dnsmasq.d \
+-v /srv/containers/"$NOMECONTAINER"/log/:/var/log/pihole \
+-p 80:80 \
+-p 443:443 \
+-p 67:67/tcp \
+-p 67:67/udp \
+-p 53:53/tcp \
+-p 53:53/udp \
+--restart=unless-stopped \
+--shm-size=512m \
+$docker_repo
+  } || {
+  docker run -d \
+--name=$NOMECONTAINER \
+--network $var5 \
+--ip=$var1 \
+--dns=1.1.1.1  \
+--hostname=$NOMECONTAINER \
+--no-healthcheck \
+-e SERVERIP=$var1 \
+-e WEBPASSWORD=$var2 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
+-v /srv/containers/"$NOMECONTAINER"/dnsmasq.d/:/etc/dnsmasq.d \
+-v /srv/containers/"$NOMECONTAINER"/log/:/var/log/pihole \
+-p 80:80 \
+-p 443:443 \
+-p 67:67/tcp \
+-p 67:67/udp \
+-p 53:53/tcp \
+-p 53:53/udp \
+--restart=unless-stopped \
+--shm-size=512m \
+$docker_repo
+  }
+}
+
+function docker_extras {
+
+docker start "$NOMECONTAINER"
+docker exec "$NOMECONTAINER" rm /etc/pihole/pihole-FTL.conf
+docker exec "$NOMECONTAINER" touch /etc/pihole/pihole-FTL.conf
+docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
+docker exec "$NOMECONTAINER" bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
+docker restart "$NOMECONTAINER"
+
+# =============================================================================
+# ########################################################################### #
+# =============================================================================
+
+echo "0" > /dev/null
+}
+
+function var_read {
+  var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+  var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+  var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+  var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+  var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
+  var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
+  var7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
+  var8=$(sed -n '8p' /srv/containers/$NOMECONTAINER/Information)
+  var9=$(sed -n '9p' /srv/containers/$NOMECONTAINER/Information)
+  var10=$(sed -n '10p' /srv/containers/$NOMECONTAINER/Information)
+
+  VALUE1=$var1; VALUE2=$var2; VALUE3=$var3; VALUE4=$var4; VALUE5=$var5
+  VALUE6=$var6; VALUE7=$var7; VALUE8=$var8; VALUE9=$var9; VALUE10=$var10
+}
+
+var_read
+docker_custom
+docker_extras
