@@ -5,3 +5,31 @@ echo ""
 echo "Em breve!"
 echo ""
 sleep 3
+
+hash0="cded81e2523899b1f981bab084bcf1c4"
+hash1="e7ad599887b1baf90b830435dac14ba3"
+hash2="4a45c115f438d5da4b6ea856153bc9d9"
+hash3="445b6c94326839fcb988a096760f0e13"
+hash4="f9c88e3c538ce7379fdd4bcc2c71f103"
+
+password=$(dialog --backtitle "Server Restore" --title " " --insecure --passwordbox "Cole seu Token!" 0 0 2>&1 > /dev/tty)
+hash0=$(echo "$password" | md5sum | awk '{print $1}')
+  [ $? -ne 0 ] && exit
+  [ -z "$password" ] && {
+      dialog --title "ERROR" --msgbox "É necessário digitar uma senha para continuar." 6 40
+      clear
+  } || {
+    [ "$hash0" = "$hash1" ] && {
+      start
+    } || {
+      [ "$hash0" = "$hash2" ] && {
+        startocult
+      } || {
+        clear
+        dialog --title "ERROR" --msgbox "Senha incorreta. \nTente novamente!" 6 30
+        timeout=$((timeout+1)); sleep $timeout
+        init
+      }
+    }
+  }
+}
