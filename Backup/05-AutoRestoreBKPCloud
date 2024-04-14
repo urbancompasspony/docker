@@ -21,7 +21,7 @@ done < <(find "$destiny" -type f -name "*.tar" -print0)
     echo ""
     sleep 3
   } || {
-    file=$(dialog --stdout --title "Escolha um arquivo de Backup:" --cancel-label "Sair" --menu "Lista de backups encontrados:" 0 0 0 "${files[@]}")
+    file=$(dialog --stdout --title "Escolha um arquivo de Backup:" --cancel-label "Sair" --menu "Backups da Nuvem Baixados:" 0 0 0 "${files[@]}")
     [ $? -ne 0 ] && return
 
     NAME="$(basename "$file" .tar)"
@@ -43,22 +43,29 @@ O container sera parado, o backup restaurado e o servico iniciado em seguida aut
     [ "$var1" = "eu estou ciente dos riscos" ] && {
       clear ; echo ""; echo "Parando o container $file2. Aguarde pacientemente, isso pode levar varios minutos!"; echo ""
       sleep 1
-      docker stop "$file2" &&
-      clear; echo ""; echo "Fazendo um backup do atual container $file2. Por favor, insira a senha do Administrador!"; echo ""
-      sudo mkdir -p /srv/backup4restore/
-      sudo tar -cvf /srv/backup4restore/"$file2"-"$datetime".tar "$source"/"$file2" &&
-      clear ; echo ""; echo "O backup gerado esta separado em /srv/backup4restore/!"; echo ""; sleep 3
-      clear; echo ""; echo "Restaurando o backup escolhido. Aguarde pacientemente, isso pode levar varios minutos!"; echo ""
-      sudo tar -xvf "$file" -C /srv/containers/ && sleep 3
-      clear; echo ""; echo "Iniciando o container $file2 sob a restauracao realizada..."; echo ""
-      docker start "$file2" &&
-      clear; echo ""; echo "Restauracao concluida! Verifique se o servico esta funcional."; echo ""
-      sleep 3
+      [ docker stop "$file2" ] && {
+        clear; echo ""; echo "Container encontrado e parado."; sleep 1; echo "Fazendo um backup do atual container $file2. Por favor, insira a senha do Administrador se solicitado!"; echo ""
+        sudo mkdir -p /srv/backup4restore/; sudo tar -cvf /srv/backup4restore/"$file2"-"$datetime".tar "$source"/"$file2" &&
+        clear ; echo ""; echo "O backup gerado esta separado em /srv/backup4restore/!"; echo ""; sleep 3
+        retoring0
+      } || {
+        clear; echo ""; echo "Container nao encontrado. Prosseguindo..."; sleep 3
+        retoring0
+      }
     } || {
       clear; echo ""; echo "Repete a frase por favor! Saindo..."
       sleep 3
     }
   }
+}
+
+function retoring0 {
+  clear; echo ""; echo "Restaurando o backup escolhido. Aguarde pacientemente, isso pode levar VARIOS minutos!"; echo ""
+  sudo tar -xvf "$file" -C /srv/containers/ && sleep 3
+  clear; echo ""; echo "Iniciando o container $file2 sob a restauracao realizada..."; echo ""
+  docker start "$file2" &&
+  clear; echo ""; echo "Restauracao concluida! Verifique se o servico esta funcional."; echo ""
+  sleep 3
 }
 
 start
