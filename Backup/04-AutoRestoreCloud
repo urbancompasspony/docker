@@ -25,8 +25,7 @@ fi
 hash1="cded81e2523899b1f981bab084bcf1c4"
 hash2="e7ad599887b1baf90b830435dac14ba3"
 hash3="4a45c115f438d5da4b6ea856153bc9d9"
-hash4="a"
-#445b6c94326839fcb988a096760f0e13
+hash4="445b6c94326839fcb988a096760f0e13"
 hash5="f9c88e3c538ce7379fdd4bcc2c71f103"
 
 clear; echo ""; read -p "Digite seu Token: " -r "token0"
