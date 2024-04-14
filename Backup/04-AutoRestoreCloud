@@ -25,7 +25,8 @@ fi
 hash1="cded81e2523899b1f981bab084bcf1c4"
 hash2="e7ad599887b1baf90b830435dac14ba3"
 hash3="4a45c115f438d5da4b6ea856153bc9d9"
-hash4="445b6c94326839fcb988a096760f0e13"
+hash4="a"
+#445b6c94326839fcb988a096760f0e13
 hash5="f9c88e3c538ce7379fdd4bcc2c71f103"
 
 clear; echo ""; read -p "Digite seu Token: " -r "token0"
@@ -36,21 +37,34 @@ function init0 {
     return
   } || {
     [ "$token0" = "$hash1" ] && {
-      hash01
+      linkcloud "brunobr"
+      listfolders0 "BR Info Store!"
     } || {
       [ "$token0" = "$hash2" ] && {
-        hash02
+        linkcloud "david"
+        listfolders0 "DH Tech Info!"
       } || {
         [ "$token0" = "$hash3" ] && {
-          hash03
+          linkcloud "brunowr"
+          listfolders0 "Bruno!"
         } || {
           [ "$token0" = "$hash4" ] && {
-            hash04
+            empresa="excelsior"
+            linkcloud "$empresa"
+            listfolders0 "Eu mesmo uhul!"
+            linkcloud "$empresa" "$folderchoice"
+            listfolders0 "Eu mesmo uhul!"
+            downloadcloud0
+            return
           } || {
             [ "$token0" = "$hash5" ] && {
-              hash05
+              linkcloud "suitit"
+              listfolders0 "SuitIT!"
             } || {
-              error0; return
+              clear
+              dialog --title "ERROR" --msgbox "Token incorreto. \nTente novamente!" 6 30
+              timeout=$((timeout+1)); sleep $timeout
+              return
             }
           }
         }
@@ -59,76 +73,26 @@ function init0 {
   }
 }
 
-function error0 {
-  clear
-  dialog --title "ERROR" --msgbox "Token incorreto. \nTente novamente!" 6 30
-  timeout=$((timeout+1)); sleep $timeout
-  return
-}
-
-function hash01 {
-  linkcloud "brunobr"
-  listfolders0
-}
-
-function hash02 {
-  linkcloud "david"
-  listfolders0
-}
-
-function hash03 {
-  linkcloud "brunowr"
-  listfolders0
-}
-
-function hash04 {
-  linkcloud "excelsior"
-  listfolders0
-}
-
-function hash05 {
-  linkcloud "suitit"
-  listfolders0
-}
-
 function linkcloud {
-  linkparameter="$1"
+  linkparameter="$webadress/$1/$2"
   URLG1=$(curl -ku "$usern4me":"$passw0rd" "$linkparameter" | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g')
 }
 
 function listfolders0 {
   IFS=$'\n' read -rd '' -a options <<< "$URLG1"
-  cmd=(dialog --keep-tite --backtitle "Bem-Vindo XXX" --menu "Selecione uma empresa:" 0 0 0)
+  cmd=(dialog --keep-tite --backtitle "Bem-Vindo $1" --menu "Selecione uma empresa:" 0 0 0)
   menu_options=()
-
   for ((i = 0; i < ${#options[@]}; i++)); do
     menu_options+=("$((i + 1))" "${options[i]}")
   done
-
   choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
   [ $? -ne 0 ] && return
 
   folderchoice="${options[choice - 1]}"
-  listtars0 "$folderchoice"
 }
 
-function listtars0 {
-  IFS=$'\n' read -rd '' -a options <<< "$URLG1"
-  cmd=(dialog --keep-tite --menu "Selecione uma:" 0 0 0)
-  menu_options=()
-
-  for ((i = 0; i < ${#options[@]}; i++)); do
-    menu_options+=("$((i + 1))" "${options[i]}")
-  done
-
-  choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
-  [ $? -ne 0 ] && return
-
-  downloadcloud
-}
-
-function downloadcloud {
-  wget --user $usern4me --password $passw0rd "$linkparameter"/"$folderchoice"/${options[choice - 1]} -O $destpath/${options[choice - 1]}
+function downloadcloud0 {
+  sudo wget --user $usern4me --password $passw0rd "$linkparameter"/"$folderchoice" -O "$destpath"/"$folderchoice"
 }
 
 init0
