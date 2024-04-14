@@ -36,16 +36,31 @@ function init0 {
     return
   } || {
     [ "$token0" = "$hash1" ] && {
-      linkcloud "brunobr"
+      empresa="brunobr"
+      linkcloud "$empresa"
       listfolders0 "BR Info Store!"
+      linkcloud "$empresa" "$folderchoice"
+      listfolders0 "BR Info Store!"
+      downloadcloud0
+      return
     } || {
       [ "$token0" = "$hash2" ] && {
-        linkcloud "david"
+        empresa="david"
+        linkcloud "$empresa"
         listfolders0 "DH Tech Info!"
+        linkcloud "$empresa" "$folderchoice"
+        listfolders0 "DH Tech Info!"
+        downloadcloud0
+        return
       } || {
         [ "$token0" = "$hash3" ] && {
-          linkcloud "brunowr"
+          empresa="brunowr"
+          linkcloud "$empresa"
           listfolders0 "Bruno!"
+          linkcloud "$empresa" "$folderchoice"
+          listfolders0 "Bruno!"
+          downloadcloud0
+          return
         } || {
           [ "$token0" = "$hash4" ] && {
             empresa="excelsior"
@@ -57,8 +72,13 @@ function init0 {
             return
           } || {
             [ "$token0" = "$hash5" ] && {
-              linkcloud "suitit"
+              empresa="suitit"
+              linkcloud "$empresa"
               listfolders0 "SuitIT!"
+              linkcloud "$empresa" "$folderchoice"
+              listfolders0 "SuitIT!"
+              downloadcloud0
+              return
             } || {
               clear
               dialog --title "ERROR" --msgbox "Token incorreto. \nTente novamente!" 6 30
@@ -79,7 +99,7 @@ function linkcloud {
 
 function listfolders0 {
   IFS=$'\n' read -rd '' -a options <<< "$URLG1"
-  cmd=(dialog --keep-tite --backtitle "Bem-Vindo $1" --menu "Selecione uma empresa:" 0 0 0)
+  cmd=(dialog --keep-tite --backtitle "Bem-Vindo $1" --menu "Selecione uma opcao:" 0 0 0)
   menu_options=()
   for ((i = 0; i < ${#options[@]}; i++)); do
     menu_options+=("$((i + 1))" "${options[i]}")
@@ -95,5 +115,4 @@ function downloadcloud0 {
 }
 
 init0
-
 exit 1
