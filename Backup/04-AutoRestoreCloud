@@ -4,15 +4,16 @@ export pty=True
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
-sudo mkdir /srv/torestore
-destpath="/srv/torestore"
+sudo mkdir /srv/restoredcloud
+destpath="/srv/restoredcloud"
 
-serverip="172.20.0.22"
+serverip="172.20.0.46"
 lanhost="http://$serverip"
-wanhost="http://z.net-freaks.com:3434"
+wanhost="http://z.net-freaks.com:4646"
 
-usern4me=""
-passw0rd=""
+# Absolute Random!
+usern4me="c841af1850c240cea68d18878d435bed"
+passw0rd="d41d8cd98f00b204e9800998ecf8427e"
 
 if ping -c 1 $serverip >/dev/null; then
   webadress="$lanhost"
@@ -20,13 +21,14 @@ else
   webadress="$wanhost"
 fi
 
+# More Random!
 hash1="cded81e2523899b1f981bab084bcf1c4"
 hash2="e7ad599887b1baf90b830435dac14ba3"
 hash3="4a45c115f438d5da4b6ea856153bc9d9"
 hash4="445b6c94326839fcb988a096760f0e13"
 hash5="f9c88e3c538ce7379fdd4bcc2c71f103"
 
-clear; echo "#---------------#"; read -p "Digite seu Token: " -r "token0"
+clear; echo ""; read -p "Digite seu Token: " -r "token0"
 
 function init0 {
   [ -z "$token0" ] && {
@@ -65,37 +67,52 @@ function error0 {
 }
 
 function hash01 {
-  clear
-  echo ""
-  echo "Em Breve! bbr"
+  linkcloud "brunobr"
+  listfolders0
 }
 
 function hash02 {
-  clear
-  echo ""
-  echo "Em Breve! d"
+  linkcloud "david"
+  listfolders0
 }
 
 function hash03 {
-  clear
-  echo ""
-  echo "Em Breve! bw"
+  linkcloud "brunowr"
+  listfolders0
 }
 
 function hash04 {
-  clear
-  echo ""
-  echo "Em Breve! n"
+  linkcloud "excelsior"
+  listfolders0
 }
 
 function hash05 {
-  clear
-  echo ""
-  echo "Em Breve! s"
+  linkcloud "suitit"
+  listfolders0
 }
 
-function init1 {
-  URLG1=$(curl -ku "$usern4me":"$passw0rd" "$1" | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g')
+function linkcloud {
+  linkparameter="$1"
+  URLG1=$(curl -ku "$usern4me":"$passw0rd" "$linkparameter" | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g')
+}
+
+function listfolders0 {
+  IFS=$'\n' read -rd '' -a options <<< "$URLG1"
+  cmd=(dialog --keep-tite --backtitle "Bem-Vindo XXX" --menu "Selecione uma empresa:" 0 0 0)
+  menu_options=()
+
+  for ((i = 0; i < ${#options[@]}; i++)); do
+    menu_options+=("$((i + 1))" "${options[i]}")
+  done
+
+  choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
+  [ $? -ne 0 ] && return
+
+  folderchoice="${options[choice - 1]}"
+  listtars0 "$folderchoice"
+}
+
+function listtars0 {
   IFS=$'\n' read -rd '' -a options <<< "$URLG1"
   cmd=(dialog --keep-tite --menu "Selecione uma:" 0 0 0)
   menu_options=()
@@ -107,25 +124,11 @@ function init1 {
   choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
   [ $? -ne 0 ] && return
 
-  init2 "${options[choice - 1]}"
+  downloadcloud
 }
 
-function init2 {
-  URLG1=$(curl -ku "$usern4me":"$passw0rd" "$1" | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g')
-  IFS=$'\n' read -rd '' -a options <<< "$URLG1"
-  cmd=(dialog --keep-tite --menu "Selecione uma:" 0 0 0)
-  menu_options=()
-
-  for ((i = 0; i < ${#options[@]}; i++)); do
-    menu_options+=("$((i + 1))" "${options[i]}")
-  done
-
-  choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
-  [ $? -ne 0 ] && return
-
-  sudo mkdir -p "$destpath"
-  wget --user $usern4me --password $passw0rd $webadress/${options[choice - 1]} -O $destpath/${options[choice - 1]}
-  sudo chmod 777 -R "$destpath"
+function downloadcloud {
+  wget --user $usern4me --password $passw0rd "$linkparameter"/"$folderchoice"/${options[choice - 1]} -O $destpath/${options[choice - 1]}
 }
 
 function check {
