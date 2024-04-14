@@ -1,14 +1,34 @@
 #!/bin/bash
 
+export pty=True
+export NEEDRESTART_MODE=a
+export DEBIAN_FRONTEND=noninteractive
+
+sudo mkdir /srv/torestore
+destpath="/srv/torestore"
+
+serverip="172.20.0.22"
+lanhost="http://$serverip"
+wanhost="http://z.net-freaks.com:3434"
+
+usern4me=""
+passw0rd=""
+
+if ping -c 1 $serverip >/dev/null; then
+  webadress="$lanhost"
+else
+  webadress="$wanhost"
+fi
+
 hash1="cded81e2523899b1f981bab084bcf1c4"
 hash2="e7ad599887b1baf90b830435dac14ba3"
 hash3="4a45c115f438d5da4b6ea856153bc9d9"
 hash4="445b6c94326839fcb988a096760f0e13"
 hash5="f9c88e3c538ce7379fdd4bcc2c71f103"
 
-clear; echo ""; read -p "Digite seu Token: " -r "token0"
+clear; echo "#---------------#"; read -p "Digite seu Token: " -r "token0"
 
-function init {
+function init0 {
   [ -z "$token0" ] && {
     dialog --title "ERROR" --msgbox "É necessário digitar seu Token para continuar!" 6 40
     return
@@ -74,6 +94,50 @@ function hash05 {
   echo "Em Breve! s"
 }
 
-init
+function init1 {
+  URLG1=$(curl -ku "$usern4me":"$passw0rd" "$1" | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g')
+  IFS=$'\n' read -rd '' -a options <<< "$URLG1"
+  cmd=(dialog --keep-tite --menu "Selecione uma:" 0 0 0)
+  menu_options=()
+
+  for ((i = 0; i < ${#options[@]}; i++)); do
+    menu_options+=("$((i + 1))" "${options[i]}")
+  done
+
+  choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
+  [ $? -ne 0 ] && return
+
+  sudo mkdir -p "$destpath"
+  wget --user $usern4me --password $passw0rd $webadress/${options[choice - 1]} -O $destpath/${options[choice - 1]}
+  sudo chmod 777 -R "$destpath"
+}
+
+function init2 {
+  URLG1=$(curl -ku "$usern4me":"$passw0rd" "$1" | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g')
+  IFS=$'\n' read -rd '' -a options <<< "$URLG1"
+  cmd=(dialog --keep-tite --menu "Selecione uma:" 0 0 0)
+  menu_options=()
+
+  for ((i = 0; i < ${#options[@]}; i++)); do
+    menu_options+=("$((i + 1))" "${options[i]}")
+  done
+
+  choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
+  [ $? -ne 0 ] && return
+
+  sudo mkdir -p "$destpath"
+  wget --user $usern4me --password $passw0rd $webadress/${options[choice - 1]} -O $destpath/${options[choice - 1]}
+  sudo chmod 777 -R "$destpath"
+}
+
+function check {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+check
+init0
 
 exit 1
