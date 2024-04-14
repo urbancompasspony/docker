@@ -131,14 +131,6 @@ function downloadcloud {
   wget --user $usern4me --password $passw0rd "$linkparameter"/"$folderchoice"/${options[choice - 1]} -O $destpath/${options[choice - 1]}
 }
 
-function check {
-  [ "$EUID" -ne 0 ] && {
-    echo "Execute esse script como Root!"
-    exit
-    }
-}
-
-check
 init0
 
 exit 1
