@@ -107,9 +107,7 @@ function init1 {
   choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
   [ $? -ne 0 ] && return
 
-  sudo mkdir -p "$destpath"
-  wget --user $usern4me --password $passw0rd $webadress/${options[choice - 1]} -O $destpath/${options[choice - 1]}
-  sudo chmod 777 -R "$destpath"
+  init2 "${options[choice - 1]}"
 }
 
 function init2 {
