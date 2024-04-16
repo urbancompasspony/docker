@@ -108,6 +108,16 @@ docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/p
 docker exec "$NOMECONTAINER" bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
 docker restart "$NOMECONTAINER"
 
+# TODO
+#/srv/containers/pihole-cpd/dnsmasq.d/02-custom-settings.conf
+# forward lookups
+#server=/ad.cpd.local/172.20.0.40
+# PTR/reverse lookups
+#server=/0.20.172.in-addr.arpa/172.20.0.140
+#dns-forward-max=5096
+#min-cache-ttl=300
+#rebind-domain-ok=
+
 # =============================================================================
 # ########################################################################### #
 # =============================================================================
