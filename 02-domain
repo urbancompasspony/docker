@@ -84,14 +84,14 @@ function menu {
     VALUE6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
     VALUE7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
   } || {
-    VALUE1=""; VALUE2=""; VALUE3=""; VALUE4=""; VALUE5="$HOSTNAME"; VALUE6="macvlan"; VALUE7="-v /mnt:/mnt"
+    VALUE1="ad."; VALUE2=""; VALUE3=""; VALUE4="8.8.8.8, 1.1.1.1, 208.67.2222.2222"; VALUE5="$HOSTNAME"; VALUE6="macvlan"; VALUE7="-v /mnt:/mnt"
   }
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
 "F.Q.D.N.: " 1 1 "$VALUE1" 1 10 34 0 \
 "Local IP:" 2 1 "$VALUE2" 2 10 34 0 \
 "ADM Pass:" 3 1 "$VALUE3" 3 10 34 0 \
-"LAN DNS :" 4 1 "$VALUE4" 4 10 34 0 \
+"LAN DNS :" 4 1 "$VALUE4" 4 10 100 0 \
 "Hostname:" 5 1 "$VALUE5" 5 10 34 0 \
 "NetLAN  :" 6 1 "$VALUE6" 6 10 34 0 \
 "MNT Path:" 7 1 "$VALUE7" 7 10 100 0 \
