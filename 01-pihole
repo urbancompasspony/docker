@@ -98,7 +98,6 @@ function makedir {
   mkdir -p /srv/containers/"$NOMECONTAINER"/{etc,dnsmasq.d,log}
 }
 
-# USE IT ONLY IF NEEDED:
 function docker_extras {
 
 docker start "$NOMECONTAINER"
@@ -106,17 +105,21 @@ docker exec "$NOMECONTAINER" rm /etc/pihole/pihole-FTL.conf
 docker exec "$NOMECONTAINER" touch /etc/pihole/pihole-FTL.conf
 docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
 docker exec "$NOMECONTAINER" bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
-docker restart "$NOMECONTAINER"
 
-# TODO
-#/srv/containers/pihole-cpd/dnsmasq.d/02-custom-settings.conf
-# forward lookups
-#server=/ad.cpd.local/172.20.0.40
-# PTR/reverse lookups
-#server=/0.20.172.in-addr.arpa/172.20.0.140
-#dns-forward-max=5096
-#min-cache-ttl=300
-#rebind-domain-ok=
+[ -f /srv/containers/"$NOMECONTAINER"/dnsmasq.d/02-custom-settings.conf ] || {
+  docker exec "$NOMECONTAINER" bash -c "echo '# domain forward lookups' > /etc/dnsmasq.d/02-custom-settings.conf"
+  docker exec "$NOMECONTAINER" bash -c "echo '#server=/ad.domain.local/191.168.0.10' >> /etc/dnsmasq.d/02-custom-settings.conf"
+  docker exec "$NOMECONTAINER" bash -c "echo '# domain PTR/reverse lookups' >> /etc/dnsmasq.d/02-custom-settings.conf"
+  docker exec "$NOMECONTAINER" bash -c "echo '#server=/0.168.192.in-addr.arpa/192.168.0.10' >> /etc/dnsmasq.d/02-custom-settings.conf"
+  docker exec "$NOMECONTAINER" bash -c "echo '# Custom DNS Max Queries and Cache' >> /etc/dnsmasq.d/02-custom-settings.conf"
+  docker exec "$NOMECONTAINER" bash -c "echo 'dns-forward-max=5096' >> /etc/dnsmasq.d/02-custom-settings.conf"
+  docker exec "$NOMECONTAINER" bash -c "echo 'min-cache-ttl=300' >> /etc/dnsmasq.d/02-custom-settings.conf"
+  docker exec "$NOMECONTAINER" bash -c "echo 'rebind-domain-ok=' >> /etc/dnsmasq.d/02-custom-settings.conf"
+} && {
+  echo "." >/dev/null
+}
+
+docker restart "$NOMECONTAINER"
 
 # =============================================================================
 # ########################################################################### #
