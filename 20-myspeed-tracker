@@ -47,6 +47,18 @@ docker_repo="germannewsmaker/myspeed"
 
 # Adjust if needed
 function docker_custom {
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 5216:5216 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/data:/myspeed/data \
+$docker_repo
+  } || {
 docker run -d \
 --name=$var1 \
 --network macvlan \
@@ -60,6 +72,7 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data:/myspeed/data \
 $docker_repo
+  }
 }
 
 function makedir {
