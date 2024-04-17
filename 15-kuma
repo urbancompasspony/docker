@@ -47,6 +47,19 @@ docker_repo="louislam/uptime-kuma:1"
 
 # Adjust if needed
 function docker_custom {
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 3001:3001 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v /srv/containers/"$NOMECONTAINER"/data:/app/data \
+$docker_repo
+  } || {
 docker run -d \
 --name=$var1 \
 --network macvlan \
@@ -61,6 +74,7 @@ docker run -d \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v /srv/containers/"$NOMECONTAINER"/data:/app/data \
 $docker_repo
+  }
 }
 
 function makedir {
