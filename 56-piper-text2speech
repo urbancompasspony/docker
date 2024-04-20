@@ -1,0 +1,21 @@
+WIP
+
+#!/bin/bash
+
+docker run -d \
+  --name=piper \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Etc/UTC \
+  -e PIPER_VOICE=en_US-lessac-medium \
+  -e PIPER_LENGTH=1.0 `#optional` \
+  -e PIPER_NOISE=0.667 `#optional` \
+  -e PIPER_NOISEW=0.333 `#optional` \
+  -e PIPER_SPEAKER=0 `#optional` \
+  -e PIPER_PROCS=1 `#optional` \
+  -p 10200:10200 \
+  -v /path/to/data:/config \
+  --restart unless-stopped \
+  lscr.io/linuxserver/piper:latest
+
+exit 0
