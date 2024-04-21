@@ -18,7 +18,7 @@ function checkA {
 function checkB {
 # Does not forget about the SLASH!
   # Delete files older than 3 days
-  find "$destiny"/ -type f -mtime +3 -delete
+  find "$destiny"/ -type f -mtime +1 -delete
   # Delete folders older than 3 days
   #find "$destiny"/ -type d -mtime +3 -exec rm -rf {} \;
   # Delete empty folders
