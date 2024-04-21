@@ -51,8 +51,10 @@ function docker_custom {
   docker run -d \
 --name=$NOMECONTAINER \
 --network host \
---hostname=$NOMECONTAINER \
+--hostname=$var4 \
 --no-healthcheck \
+--restart=unless-stopped \
+--shm-size=512m \
 -e SERVERIP=$var3 \
 -e WEBPASSWORD=$var2 \
 -v /etc/localtime:/etc/localtime:ro \
@@ -65,8 +67,6 @@ function docker_custom {
 -p 67:67/udp \
 -p 53:53/tcp \
 -p 53:53/udp \
---restart=unless-stopped \
---shm-size=512m \
 $docker_repo
   } || {
   docker run -d \
@@ -74,8 +74,10 @@ $docker_repo
 --network $var5 \
 --ip=$var1 \
 --dns=1.1.1.1  \
---hostname=$NOMECONTAINER \
+--hostname=$var4 \
 --no-healthcheck \
+--restart=unless-stopped \
+--shm-size=512m \
 -e SERVERIP=$var1 \
 -e WEBPASSWORD=$var2 \
 -v /etc/localtime:/etc/localtime:ro \
@@ -88,8 +90,6 @@ $docker_repo
 -p 67:67/udp \
 -p 53:53/tcp \
 -p 53:53/udp \
---restart=unless-stopped \
---shm-size=512m \
 $docker_repo
   }
 }
