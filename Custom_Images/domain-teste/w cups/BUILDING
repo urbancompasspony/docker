@@ -1,0 +1,2 @@
+
+docker buildx build -t urbancompasspony/domain .
