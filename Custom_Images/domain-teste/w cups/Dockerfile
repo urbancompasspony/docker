@@ -1,19 +1,21 @@
 FROM ubuntu:24.04
 
-ENV DEBIAN_FRONTEND noninteractive
-
 ENV TZ "America/Bahia"
 ENV CUPSADMIN admin
 ENV CUPSPASSWORD p4ssw0rd
+
+ENV DEBIAN_FRONTEND noninteractive
 
 EXPOSE 42 53 53/udp 88 88/udp 135 137-138/udp 139 389 389/udp 445 464 464/udp 636 3268-3269 49152-65535 5353/udp
 
 RUN apt update && apt upgrade -y
 
 RUN apt install -y pkg-config
-RUN apt install -y libnss-winbind tree msitools apt-utils attr acl curl dialog samba smbclient ldap-utils winbind libnss-winbind libpam-winbind krb5-user krb5-kdc supervisor openvpn inetutils-ping nano libpam-krb5 samba-dsdb-modules samba-vfs-modules wget
 
-RUN apt install -y rsyslog less msitools ldb-tools
+RUN apt install -y samba smbclient ldap-utils libnss-winbind winbind libpam-winbind krb5-user libpam-krb5 samba-dsdb-modules samba-vfs-modules krb5-kdc \
+    apt-utils attr acl curl dialog supervisor openvpn inetutils-ping nano wget less tree iperf
+
+RUN apt install -y rsyslog msitools ldb-tools
 
 RUN apt install -qqy \
     usbutils \
