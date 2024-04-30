@@ -1,7 +1,6 @@
-
 smb.conf:
 ad dc functional level = 2016
 
-samba-tool domain functionalprep --function-level=2012_R2
-samba-tool domain schemaupgrade --schema=2012_R2s
-samba-tool domain level raise --domain-level=2012 --forest-level=2012_R2
+samba-tool domain schemaupgrade --schema=2019
+samba-tool domain functionalprep --function-level=2016
+samba-tool domain level raise --domain-level=2016 --forest-level=2016
