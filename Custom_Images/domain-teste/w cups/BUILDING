@@ -1,2 +1,6 @@
 
-docker buildx build -t urbancompasspony/domain .
+docker buildx build -t urbancompasspony/domain-teste .
+
+docker login
+
+docker push urbancompasspony/domain-teste
