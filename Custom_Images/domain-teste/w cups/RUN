@@ -57,11 +57,11 @@ function checkB {
         } || {
           create
         }
-        
+
       } || {
         docker stop "$NOMECONTAINER"
         docker rm "$NOMECONTAINER"
-        
+
         rm -iR /srv/containers/"$NOMECONTAINER"
 
         menu
@@ -134,11 +134,14 @@ function checkC {
 
 function create {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7; export var8
-  
-  mkdir -p /srv/containers/"$NOMECONTAINER"/log
+
+  mkdir -p /srv/containers/"$NOMECONTAINER"/{log,data,config}
   mkdir -p /srv/containers/"$NOMECONTAINER"/cups/{config,log}
 
   touch /srv/containers/"$NOMECONTAINER"/Information
+  touch /srv/containers/"$NOMECONTAINER"/log/syslog
+
+  [ "$var8" = "" ] && { var8="admin"; }
 
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
@@ -148,8 +151,6 @@ function create {
   echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var8" >> /srv/containers/"$NOMECONTAINER"/Information
-
-  touch /srv/containers/"$NOMECONTAINER"/log/syslog
 
 docker run -d \
 --name $NOMECONTAINER \
@@ -203,22 +204,26 @@ $REPOSITORY
 }
 
 # Start here!
-docker pull "$REPOSITORY"
+#docker pull "$REPOSITORY"
 checkA
 checkB
 
-# Some adjustments after installing #
+clear
 
-clear; echo ""
-echo "Removing loop network from smb.conf"; echo ""
+echo ""; echo "############################################################"
+echo ""; echo "Removing loopback network from smb.conf"; echo ""
 sudo sed -i '/127.0.0/d' /srv/containers/$NOMECONTAINER/config/smb.conf
+echo "OK"
 sleep 0.5
 
-clear echo ""; echo "Restoring CUPS Config Files"; echo ""
-docker exec $NOMECONTAINER bash -c "cp -rpn /etc/cups-bak/* /etc/cups/"
+echo ""; echo "############################################################"
+echo ""; echo "Restoring CUPS Default Config"; echo ""
+docker exec $NOMECONTAINER bash -c "cp -rp /etc/cups-bak/* /etc/cups/"
+echo "OK"
 sleep 0.5
 
-clear; echo ""; echo "Adjusting CUPS Services"; echo ""
+echo ""; echo "############################################################"
+echo ""; echo "Adjusting CUPS Services"; echo ""
 docker exec $NOMECONTAINER bash -c "sed -i 's/Listen localhost:631/Listen 0.0.0.0:631/' /etc/cups/cupsd.conf"
 docker exec $NOMECONTAINER bash -c "sed -i 's/Browsing Off/Browsing On/' /etc/cups/cupsd.conf"
 docker exec $NOMECONTAINER bash -c "sed -i 's/<Location \/>/<Location \/>\n  Allow All/' /etc/cups/cupsd.conf"
@@ -226,34 +231,61 @@ docker exec $NOMECONTAINER bash -c "sed -i 's/<Location \/admin>/<Location \/adm
 docker exec $NOMECONTAINER bash -c "sed -i 's/<Location \/admin\/conf>/<Location \/admin\/conf>\n  Allow All/' /etc/cups/cupsd.conf"
 docker exec $NOMECONTAINER bash -c "echo 'ServerAlias *' >> /etc/cups/cupsd.conf"
 docker exec $NOMECONTAINER bash -c "echo 'DefaultEncryption Never' >> /etc/cups/cupsd.conf"
+echo "OK"
 sleep 0.5
 
-clear; echo ""; echo "Getting MENU for samba-tools"; echo ""
+echo ""; echo "############################################################"
+echo ""; echo "Getting MENU for samba-tools"; echo ""
 docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init"
 docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
+echo "OK"
 sleep 0.5
 
-clear; echo ""; echo "Restarting Domain!"; echo ""
+echo ""; echo "############################################################"
+echo ""; echo "Restarting Domain!"; echo ""
 docker restart "$NOMECONTAINER"
+echo ""; echo "OK"
 sleep 0.5
 
-clear; echo ""; echo "Adjusting /syslog"; echo ""
+echo ""; echo "############################################################"
+echo ""; echo "Adjusting /syslog"; echo ""
 docker exec $NOMECONTAINER rm /run/rsyslog.pid
 docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
 docker exec $NOMECONTAINER chmod 777 -R /var/lib/samba/sysvol
+echo ""; echo "OK"
 sleep 0.5
 
-clear; echo ""; echo "Adjusting SYSVOL Permissions"; echo ""
+echo ""; echo "############################################################"
+echo ""; echo "Adjusting SYSVOL Permissions"; echo ""
 docker exec $NOMECONTAINER samba-tool ntacl sysvolreset -U Administrator
+echo ""; echo "OK"
 sleep 0.5
 
-clear; echo ""; echo "Restarting Domain again because restarting never is enough!"; echo ""
+echo ""; echo "############################################################"
+echo ""; echo "Restarting Domain again because restarting never is enough!"; echo ""
 docker restart $NOMECONTAINER
+echo ""; echo "OK"
 sleep 0.5
 
-clear; echo ""; echo "Active Directory & Domain Controller is UP!"; echo ""
+echo ""; echo "############################################################"
+echo ""; echo "Checking if container is Ok, UP and Running:"; echo ""
+echo "5"
+sleep 1
+echo "4"
+sleep 1
+echo "3"
+sleep 1
+echo "2"
+sleep 1
+echo "1"
+sleep 1
+echo "0"
+sleep 1
+echo ""; docker ps -a | grep dominio
+sleep 1
+echo ""; echo "Active Directory & Domain Controller is Ok, UP and Running!"; echo ""
 sleep 3
 
 unset var1
