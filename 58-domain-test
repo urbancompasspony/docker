@@ -1,0 +1,300 @@
+#!/bin/bash
+
+# Global config for replication:
+export NOMECONTAINER="dominio"
+
+# FQDN DA NOVA FLORESTA
+export var1
+# IP FIXO DO NOVO CONTAINER
+export var2
+# SENHA DO USUARIO ADMINISTRATOR
+export var3
+# DEFINA O DNS QUE O DOMINIO USARÁ
+export var4
+# HOSTNAME DO CONTAINER
+export var5
+# PLACA DE REDE A SER USADA - Normalmente não muda.
+export var6
+# CAMINHO DO PONTO DE MONTAGEM BASE
+export var7
+# SENHA DO SERVIÇO CUPS
+export var8
+
+[ $(arch) = "x86_64" ] && {
+  REPOSITORY="urbancompasspony/domain-teste:latest"
+} || {
+  REPOSITORY="urbancompasspony/domain-teste-arm:latest"
+}
+
+function checkA {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root!"
+    exit
+    }
+}
+
+function checkB {
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7; export var8
+
+  [ -f "/srv/containers/"$NOMECONTAINER"/Information" ] && {
+    dialog --title "Container $NOMECONTAINER já existe!" --yesno "Deseja refazer o container?" 6 40
+    [ $? = 0 ] && {
+      dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
+      [ $? = 0 ] && {
+        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+        var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+        var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+        var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
+        var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
+        var7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
+        var8=$(sed -n '8p' /srv/containers/$NOMECONTAINER/Information)
+
+        [ $(docker stop "$NOMECONTAINER") ] && {
+          docker rm "$NOMECONTAINER"
+
+          create
+        } || {
+          create
+        }
+
+      } || {
+        docker stop "$NOMECONTAINER"
+        docker rm "$NOMECONTAINER"
+
+        rm -iR /srv/containers/"$NOMECONTAINER"
+
+        menu
+        }
+    } || {
+      echo "A instalação local será mantida! Saindo..."
+      exit
+    }
+  } || {
+    menu
+    }
+}
+
+function menu {
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7; export var8
+
+  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+    VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
+    VALUE8=$(sed -n '8p' /srv/containers/$NOMECONTAINER/Information)
+  } || {
+    VALUE1="ad."; VALUE2=""; VALUE3=""; VALUE4="1.0.0.1"; VALUE5="$HOSTNAME"; VALUE6="macvlan"; VALUE7="-v /mnt:/mnt"; VALUE8="p4ssw0rd"
+  }
+
+  VALUE0=$(dialog --ok-label "Criar" --title "Container" --form "Container: $NOMECONTAINER" 15 50 0 \
+"F.Q.D.N.: " 1 1 "$VALUE1" 1 10 34 0 \
+"Local IP:" 2 1 "$VALUE2" 2 10 34 0 \
+"ADM Pass:" 3 1 "$VALUE3" 3 10 34 0 \
+"LAN DNS :" 4 1 "$VALUE4" 4 10 34 0 \
+"Hostname:" 5 1 "$VALUE5" 5 10 34 0 \
+"NetLAN  :" 6 1 "$VALUE6" 6 10 34 0 \
+"MNT Path:" 7 1 "$VALUE7" 7 10 50 0 \
+"CUPSPass:" 8 1 "$VALUE8" 8 10 50 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
+  var5=$(echo "$VALUE0" | sed -n 5p)
+  var6=$(echo "$VALUE0" | sed -n 6p)
+  var7=$(echo "$VALUE0" | sed -n 7p)
+  var8=$(echo "$VALUE0" | sed -n 8p)
+
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ] || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] || [ -z "$var7" ] || [ -z "$var8" ] && {
+    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
+    menu
+  } || {
+    checkC
+    }
+}
+
+function checkC {
+  #IPMachine=$(hostname -I | awk '{print $1}')
+  MyIP=$(cat /srv/containers/scripts/myip)
+  [ "$MyIP" = "$var1" ] && {
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
+    menu
+  } || {
+    create
+  }
+}
+
+function create {
+  export var1; export var2; export var3; export var4; export var5; export var6; export var7; export var8
+
+  mkdir -p /srv/containers/"$NOMECONTAINER"/{log,data,config}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/cups/{config,log}
+
+  touch /srv/containers/"$NOMECONTAINER"/Information
+  touch /srv/containers/"$NOMECONTAINER"/log/syslog
+
+  [ "$var8" = "" ] && { var8="admin"; }
+
+  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var8" >> /srv/containers/"$NOMECONTAINER"/Information
+
+docker run -d \
+--name $NOMECONTAINER \
+--dns-search $var1 \
+--dns $var2 \
+--dns $var4 \
+--add-host "$var5"."$var1":"$var2" \
+--privileged \
+--network $var6 \
+--ip=$var2 \
+--restart=unless-stopped \
+--no-healthcheck \
+--device /dev/bus/usb \
+--ulimit nofile=1024:1024 \
+-h $var5 \
+-e "DOMAIN=$var1" \
+-e "DOMAINPASS=$var3" \
+-e "DNSFORWARDER=$var4" \
+-e "HOSTIP=$var2" \
+-e CUPSADMIN="admin" \
+-e CUPSPASSWORD="$var8" \
+-e TZ="America/Bahia" \
+-p $var2:53:53 \
+-p $var2:53:53/udp \
+-p $var2:88:88 \
+-p $var2:88:88/udp \
+-p $var2:135:135 \
+-p $var2:137:137 \
+-p $var2:137:137/udp \
+-p $var2:138:138 \
+-p $var2:138:138/udp \
+-p $var2:139:139 \
+-p $var2:389:389 \
+-p $var2:389:389/udp \
+-p $var2:445:445 \
+-p $var2:464:464 \
+-p $var2:464:464/udp \
+-p $var2:636:636 \
+-p $var2:1024-1044:1024-1044 \
+-p $var2:3268-3269:3268-3269 \
+-p 631:631 \
+-p 631:631/udp \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/log/syslog:/var/log/syslog \
+-v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
+-v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
+-v /srv/containers/"$NOMECONTAINER"/cups/config:/etc/cups \
+-v /srv/containers/"$NOMECONTAINER"/cups/log:/var/log/cups \
+$var7 \
+$REPOSITORY
+}
+
+# Start here!
+#docker pull "$REPOSITORY"
+checkA
+checkB
+
+clear
+
+echo ""; echo "############################################################"
+echo ""; echo "Removing loopback network from smb.conf"; echo ""
+sudo sed -i '/127.0.0/d' /srv/containers/$NOMECONTAINER/config/smb.conf
+echo "OK"
+sleep 0.5
+
+echo ""; echo "############################################################"
+echo ""; echo "Restoring CUPS Default Config"; echo ""
+docker exec $NOMECONTAINER bash -c "cp -rp /etc/cups-bak/* /etc/cups/"
+echo "OK"
+sleep 0.5
+
+echo ""; echo "############################################################"
+echo ""; echo "Adjusting CUPS Services"; echo ""
+docker exec $NOMECONTAINER bash -c "sed -i 's/Listen localhost:631/Listen 0.0.0.0:631/' /etc/cups/cupsd.conf"
+docker exec $NOMECONTAINER bash -c "sed -i 's/Browsing Off/Browsing On/' /etc/cups/cupsd.conf"
+docker exec $NOMECONTAINER bash -c "sed -i 's/<Location \/>/<Location \/>\n  Allow All/' /etc/cups/cupsd.conf"
+docker exec $NOMECONTAINER bash -c "sed -i 's/<Location \/admin>/<Location \/admin>\n  Allow All\n  Require user @SYSTEM/' /etc/cups/cupsd.conf"
+docker exec $NOMECONTAINER bash -c "sed -i 's/<Location \/admin\/conf>/<Location \/admin\/conf>\n  Allow All/' /etc/cups/cupsd.conf"
+docker exec $NOMECONTAINER bash -c "echo 'ServerAlias *' >> /etc/cups/cupsd.conf"
+docker exec $NOMECONTAINER bash -c "echo 'DefaultEncryption Never' >> /etc/cups/cupsd.conf"
+echo "OK"
+sleep 0.5
+
+echo ""; echo "############################################################"
+echo ""; echo "Getting MENU for samba-tools"; echo ""
+docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init"
+docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
+docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
+docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
+echo "OK"
+sleep 0.5
+
+echo ""; echo "############################################################"
+echo ""; echo "Restarting Domain!"; echo ""
+docker restart "$NOMECONTAINER"
+echo ""; echo "OK"
+sleep 0.5
+
+echo ""; echo "############################################################"
+echo ""; echo "Adjusting /syslog"; echo ""
+docker exec $NOMECONTAINER rm /run/rsyslog.pid
+docker exec $NOMECONTAINER chmod 777 -R /var/log/syslog
+docker exec $NOMECONTAINER chmod 777 -R /var/lib/samba/sysvol
+echo ""; echo "OK"
+sleep 0.5
+
+echo ""; echo "############################################################"
+echo ""; echo "Adjusting SYSVOL Permissions"; echo ""
+docker exec $NOMECONTAINER samba-tool ntacl sysvolreset -U Administrator
+echo ""; echo "OK"
+sleep 0.5
+
+echo ""; echo "############################################################"
+echo ""; echo "Restarting Domain again because restarting never is enough!"; echo ""
+docker restart $NOMECONTAINER
+echo ""; echo "OK"
+sleep 0.5
+
+echo ""; echo "############################################################"
+echo ""; echo "Checking if container is Ok, UP and Running:"; echo ""
+echo "5"
+sleep 1
+echo "4"
+sleep 1
+echo "3"
+sleep 1
+echo "2"
+sleep 1
+echo "1"
+sleep 1
+echo "0"
+sleep 1
+echo ""; docker ps -a | grep dominio
+sleep 1
+echo ""; echo "Active Directory & Domain Controller is Ok, UP and Running!"; echo ""
+sleep 3
+
+unset var1
+unset var2
+unset var3
+unset var4
+unset var5
+unset var6
+unset var7
+unset var8
+
+exit 1
