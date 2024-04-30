@@ -24,6 +24,19 @@ export var7
   REPOSITORY="urbancompasspony/domain-arm"
 }
 
+function check_new_smb {
+  cupspass=$(sed -n '8p' /srv/containers/dominio/Information)
+  [ "$cupspass" = "" ] || [ "$cupspass" = " " ] && {
+    #echo "SAMBA VELHO ENCONTRADO"
+    echo "." >/dev/null
+  } || {
+    clear
+    echo "SAMBA NOVO ENCONTRADO! Execute o script novo por favor. Saindo."
+    sleep 3
+    exit
+  }
+}
+
 function checkA {
   [ "$EUID" -ne 0 ] && {
     echo "Execute esse script como Root!"
@@ -195,6 +208,7 @@ function clean {
 }
 
 # Start
+check_new_smb
 checkA
 checkB
 clean
