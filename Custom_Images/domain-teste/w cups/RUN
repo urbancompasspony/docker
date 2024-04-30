@@ -283,9 +283,7 @@ echo "1"
 sleep 1
 echo "0"
 sleep 1
-echo ""; docker ps -a | grep dominio
-sleep 1
-echo ""; echo "Active Directory & Domain Controller is Ok, UP and Running!"; echo ""
+echo ""; docker ps -a | grep dominio; echo ""
 sleep 3
 
 unset var1
