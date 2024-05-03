@@ -46,6 +46,7 @@ VALUE10="0"
 docker_repo="immybot/remotely:latest"
 
 # Adjust if needed
+function docker_custom {
 docker run -d \
 --name=$var1 \
 --network macvlan \
