@@ -59,6 +59,7 @@ docker run -d \
 -e "ASPNETCORE_HTTP_PORTS=5000" \
 -e "ASPNETCORE_ENVIRONMENT=Production" \
 -e "Remotely_ApplicationOptions__DbProvider=$var3" \
+-e "Remotely_ApplicationOptions__DockerGateway=$var2" \
 -e "Remotely_ConnectionStrings__SQLite=Data Source=/app/AppData/Remotely.db" \
 -e "Remotely_ConnectionStrings__SQLServer=Server=(localdb)\\$var4;Database=Remotely-Server-53bc9b9d-9d6a-45d4-8429-2a2761773502;Trusted_Connection=True;MultipleActiveResultSets=true" \
 -e "Serilog__MinimumLevel__Override__Microsoft.AspNetCore=Warning" \
@@ -69,7 +70,7 @@ docker run -d \
 $docker_repo
 }
 
-# MYSQL NOT TESTED!
+# MYSQL NOT TESTED YET!
 
 function makedir {
   mkdir -p /srv/containers/"$NOMECONTAINER"/data
