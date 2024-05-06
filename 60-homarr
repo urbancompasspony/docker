@@ -57,9 +57,10 @@ docker run -d \
 -p 7575:7575 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /var/run/docker.sock:/var/run/docker.sock \
--v /srv/containers/"$NOMECONTAINER"/configs:/app/data/configs \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
 -v /srv/containers/"$NOMECONTAINER"/icons:/app/public/icons \
+-v /srv/containers/"$NOMECONTAINER"/configs:/app/data/configs \
+-v /srv/containers/"$NOMECONTAINER"/backgrounds:/app/public/backgrounds \
 $docker_repo
   } || {
 docker run -d \
@@ -77,6 +78,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
 -v /srv/containers/"$NOMECONTAINER"/icons:/app/public/icons \
 -v /srv/containers/"$NOMECONTAINER"/configs:/app/data/configs \
+-v /srv/containers/"$NOMECONTAINER"/backgrounds:/app/public/backgrounds \
 $docker_repo
   }
 }
