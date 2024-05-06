@@ -60,7 +60,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
 -v /srv/containers/"$NOMECONTAINER"/icons:/app/public/icons \
 -v /srv/containers/"$NOMECONTAINER"/configs:/app/data/configs \
--v /srv/containers/"$NOMECONTAINER"/backgrounds:/app/public/backgrounds \
+-v /srv/containers/"$NOMECONTAINER"/backgrounds:/app/public/imgs/backgrounds \
 $docker_repo
   } || {
 docker run -d \
@@ -78,7 +78,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
 -v /srv/containers/"$NOMECONTAINER"/icons:/app/public/icons \
 -v /srv/containers/"$NOMECONTAINER"/configs:/app/data/configs \
--v /srv/containers/"$NOMECONTAINER"/backgrounds:/app/public/backgrounds \
+-v /srv/containers/"$NOMECONTAINER"/backgrounds:/app/public/imgs/backgrounds \
 $docker_repo
   }
 }
