@@ -84,7 +84,7 @@ $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{configs,data,icons}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/{configs,data,icons,backgrounds}
 }
 
 # USE IT ONLY IF NEEDED:
