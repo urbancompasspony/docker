@@ -166,8 +166,6 @@ checkA
 checkB
 clean
 
-docker network connect bridge $NOMECONTAINER
-
 echo "Finalizado!"
 echo "Aguarde aproximadamente 2 minutos para início do banco de dados."
 echo "Localização do banco de dados definida em: $var7"
