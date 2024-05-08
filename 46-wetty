@@ -31,8 +31,8 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="Host Only!"
-VALUE3="0.0.0.0"
+VALUE2="0.0.0.0"
+VALUE3="172.17.0.1"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -47,16 +47,31 @@ docker_repo="wettyoss/wetty"
 
 # Adjust if needed
 function docker_custom {
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
 docker run -d \
 --name=$var1 \
 --network host \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
---add-host=host.docker.internal:host-gateway \
 -v /etc/localtime:/etc/localtime:ro \
 -p 3000:3000 \
 $docker_repo --bypass-helmet --allow-iframe --ssh-host=$var3
+} || {
+docker run -d \
+--name=$var1 \
+--network macvlan \
+--ip=$var2 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+--add-host=host.docker.internal:host-gateway \
+-v /etc/localtime:/etc/localtime:ro \
+-p 3000:3000 \
+$docker_repo --bypass-helmet --allow-iframe --force-ssh --ssh-host="$var3" --ssh-user="administrador"
+ }
 }
 
 function makedir {
