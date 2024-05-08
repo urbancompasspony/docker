@@ -54,6 +54,7 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-e UPTIME_KUMA_DISABLE_FRAME_SAMEORIGIN=true \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /var/run/docker.sock:/var/run/docker.sock \
@@ -69,6 +70,7 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-e UPTIME_KUMA_DISABLE_FRAME_SAMEORIGIN=true \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /var/run/docker.sock:/var/run/docker.sock \
