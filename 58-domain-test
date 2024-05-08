@@ -203,6 +203,8 @@ echo ""; echo "############################################################"
 echo ""; echo "Restoring CUPS Default Config"; echo ""
 docker exec $NOMECONTAINER bash -c "cp -rp /etc/cups-bak/* /etc/cups/"
 docker exec $NOMECONTAINER bash -c "cp -rp /filter/* /usr/lib/cups/filter/"
+docker exec $NOMECONTAINER bash -c "chmod 0755 -R /usr/lib/cups/filter/"
+docker exec $NOMECONTAINER bash -c "chown root:root -R /usr/lib/cups/filter/"
 
 echo "OK"
 sleep 0.5
