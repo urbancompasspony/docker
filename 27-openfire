@@ -130,17 +130,8 @@ checkA
 checkB
 clean
 
+docker exec $NOMECONTAINER bash -c "https://github.com/igniterealtime/Openfire/releases/download/v4.7.3/openfire_4.7.3_all.deb -O openfire.deb"
+
 docker restart $NOMECONTAINER
-
-clear
-echo ""
-echo "Getting Spark 4.8.1 from https://www.igniterealtime.org/downloads/"
-echo "Enter Container manually and run: dpkg -i openfire.deb"
-echo "Then restart container manually. CHECK IF THERE IS A NEW VERSION OF SPARK AND EDIT THIS SCRIPT ACCORDINGLY!"
-echo ""
-
-docker exec $NOMECONTAINER bash -c "wget https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire_4.8.1_all.deb -O openfire.deb"
-
-sleep 3
 
 exit 1
