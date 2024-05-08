@@ -16,7 +16,7 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="ServerIP"
+CustmN3="."
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -31,8 +31,8 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="Host Only!"
-VALUE3="0.0.0.0"
+VALUE2="0.0.0.0"
+VALUE3="0"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -43,7 +43,7 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="krishnasrinivas/wetty"
+docker_repo="wettyoss/wetty"
 
 # Adjust if needed
 function docker_custom {
@@ -55,7 +55,8 @@ docker run -d \
 --restart=unless-stopped \
 --add-host=host.docker.internal:host-gateway \
 -v /etc/localtime:/etc/localtime:ro \
-$docker_repo
+-p 3000:3000 \
+$docker_repo --bypass-helmet --allow-iframe --ssh-host=$var2
 }
 
 function makedir {
