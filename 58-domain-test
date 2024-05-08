@@ -136,7 +136,7 @@ function create {
   export var1; export var2; export var3; export var4; export var5; export var6; export var7; export var8
 
   mkdir -p /srv/containers/"$NOMECONTAINER"/{log,data,config}
-  mkdir -p /srv/containers/"$NOMECONTAINER"/cups/{config,log}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/cups/{config,log,filter}
 
   touch /srv/containers/"$NOMECONTAINER"/Information
   touch /srv/containers/"$NOMECONTAINER"/log/syslog
@@ -162,9 +162,11 @@ docker run -d \
 --network $var6 \
 --ip=$var2 \
 --restart=unless-stopped \
---no-healthcheck \
 --device /dev/bus/usb \
 --ulimit nofile=1024:1024 \
+--no-healthcheck \
+-p $var2:53:53 -p $var2:53:53/udp -p $var2:88:88 -p $var2:88:88/udp -p $var2:135:135 -p $var2:137:137 -p $var2:137:137/udp -p $var2:138:138 -p $var2:138:138/udp -p $var2:139:139 -p $var2:389:389 -p $var2:389:389/udp \
+-p $var2:445:445 -p $var2:464:464 -p $var2:464:464/udp -p $var2:636:636 -p $var2:1024-1044:1024-1044 -p $var2:3268-3269:3268-3269 -p 631:631 -p 631:631/udp \
 -h $var5 \
 -e "DOMAIN=$var1" \
 -e "DOMAINPASS=$var3" \
@@ -173,32 +175,13 @@ docker run -d \
 -e CUPSADMIN="admin" \
 -e CUPSPASSWORD="$var8" \
 -e TZ="America/Bahia" \
--p $var2:53:53 \
--p $var2:53:53/udp \
--p $var2:88:88 \
--p $var2:88:88/udp \
--p $var2:135:135 \
--p $var2:137:137 \
--p $var2:137:137/udp \
--p $var2:138:138 \
--p $var2:138:138/udp \
--p $var2:139:139 \
--p $var2:389:389 \
--p $var2:389:389/udp \
--p $var2:445:445 \
--p $var2:464:464 \
--p $var2:464:464/udp \
--p $var2:636:636 \
--p $var2:1024-1044:1024-1044 \
--p $var2:3268-3269:3268-3269 \
--p 631:631 \
--p 631:631/udp \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/log/syslog:/var/log/syslog \
 -v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
 -v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
 -v /srv/containers/"$NOMECONTAINER"/cups/config:/etc/cups \
 -v /srv/containers/"$NOMECONTAINER"/cups/log:/var/log/cups \
+-v /srv/containers/"$NOMECONTAINER"/cups/filter:/filter \
 $var7 \
 $REPOSITORY
 }
@@ -219,6 +202,8 @@ sleep 0.5
 echo ""; echo "############################################################"
 echo ""; echo "Restoring CUPS Default Config"; echo ""
 docker exec $NOMECONTAINER bash -c "cp -rp /etc/cups-bak/* /etc/cups/"
+docker exec $NOMECONTAINER bash -c "cp -rp /filter/* /usr/lib/cups/filter/"
+
 echo "OK"
 sleep 0.5
 
