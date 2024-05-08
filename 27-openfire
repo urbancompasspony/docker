@@ -130,7 +130,7 @@ checkA
 checkB
 clean
 
-docker exec $NOMECONTAINER bash -c "https://github.com/igniterealtime/Openfire/releases/download/v4.7.3/openfire_4.7.3_all.deb -O openfire.deb"
+docker exec $NOMECONTAINER bash -c "wget https://github.com/igniterealtime/Openfire/releases/download/v4.7.3/openfire_4.7.3_all.deb -O openfire.deb"
 
 docker restart $NOMECONTAINER
 
