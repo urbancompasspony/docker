@@ -72,7 +72,8 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 -e UPTIME_KUMA_DISABLE_FRAME_SAMEORIGIN=true \
--p 3001:3001 \
+-e UPTIME_KUMA_PORT="$var3" \
+-p "$var3":"$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v /srv/containers/"$NOMECONTAINER"/data:/app/data \
