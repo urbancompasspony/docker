@@ -68,6 +68,8 @@ function makedir {
 # USE IT ONLY IF NEEDED:
 function docker_extras {
 docker exec $NOMECONTAINER bash -c "echo 'ssh administrador@localhost -p 2222' >> /root/.bashrc"
+docker exec $NOMECONTAINER bash -c "echo 'ssh administrador@localhost -p 2222' >> /home/userwetty/.bashrc"
+docker exec $NOMECONTAINER bash -c "echo 'ssh administrador@localhost -p 2222' >> /home/admin/.bashrc"
 
 # =============================================================================
 # ########################################################################### #
@@ -126,7 +128,7 @@ function burn_var {
   echo "$var9" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var10" >> /srv/containers/"$NOMECONTAINER"/Information
 
-  # Save tunnel credentials!
+  # EXTRA Save tunnel credentials!
   echo "$var3" > /srv/containers/"$NOMECONTAINER"/data/ssh
   echo "$var4" >> /srv/containers/"$NOMECONTAINER"/data/ssh
   echo "$var5" >> /srv/containers/"$NOMECONTAINER"/data/ssh
