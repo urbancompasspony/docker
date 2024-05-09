@@ -8,7 +8,7 @@
 export NOMECONTAINER="kuma-tracker"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,7 +16,7 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
+CustmN3="Port"
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
+VALUE3="3001"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -55,7 +55,8 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 -e UPTIME_KUMA_DISABLE_FRAME_SAMEORIGIN=true \
--p 3001:3001 \
+-e UPTIME_KUMA_PORT="$var3" \
+-p "$var3":"$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v /srv/containers/"$NOMECONTAINER"/data:/app/data \
