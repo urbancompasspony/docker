@@ -1,47 +1,26 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
-################################################################################
-# ENV BLOCK ####################################################################
+EXPOSE 22
 
 ENV DEBIAN_FRONTEND noninteractive
 
-################################################################################
-# ADD BLOCK ####################################################################
-
-ADD dwagent.sh /dwagent.sh
-ADD entrypoint.sh /entrypoint.sh
-ADD script.sh /script.sh
-
-################################################################################
-# RUN BLOCK ####################################################################
-
 RUN apt update && apt upgrade -y
 
-RUN apt install -y wget curl sudo sshfs cifs-utils nano openssh-server && \
+RUN apt install -y wget curl openssh-server nano sudo sshfs && \
     apt autoremove && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
-    
-RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu 
-RUN echo 'ubuntu:ubuntu' | chpasswd
+
 RUN mkdir /run/sshd
 
 RUN service ssh start
 
-RUN chmod +x /entrypoint.sh
-RUN chmod 755 /entrypoint.sh
+RUN useradd -rm -d /home/userweb -s /bin/bash -g root -G sudo -u 1001 userweb
 
-RUN chmod +x /script.sh
-RUN chmod 755 /script.sh
+RUN echo 'userweb:a18528d4d46a7e22b721b326e964b670' | chpasswd
 
-################################################################################
-# PORT BLOCK ###################################################################
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
+    echo "export VISIBLE=now" >> /etc/profile
 
-EXPOSE 22
-
-################################################################################
-# CMD BLOCK ####################################################################
-
-CMD ["/usr/sbin/sshd","-D"]
-
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/usr/sbin/sshd", "-D"]
