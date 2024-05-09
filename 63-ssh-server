@@ -56,6 +56,7 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+--add-host=host.docker.internal:host-gateway \
 -v /etc/localtime:/etc/localtime:ro \
 $docker_repo
 }
@@ -66,7 +67,6 @@ function makedir {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-docker network connect bridge "$NOMECONTAINER"
 
 # =============================================================================
 # ########################################################################### #
