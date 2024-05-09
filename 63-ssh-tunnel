@@ -5,10 +5,10 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="ssh-server"
+export NOMECONTAINER="ssh-tunnel"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="8"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,12 +16,12 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
-CustmN5="."
-CustmN6="."
-CustmN7="."
-CustmN8="."
+CustmN3="pfS.Pass"
+CustmN4="pfS.User"
+CustmN5="pfS.IP  "
+CustmN6="New Port"
+CustmN7="Srv. IP "
+CustmN8="Srv.Port"
 CustmN9="."
 CustmN10="."
 }
@@ -32,18 +32,18 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
-VALUE5="0"
-VALUE6="0"
-VALUE7="0"
-VALUE8="0"
+VALUE3="p4sswd"
+VALUE4="admin"
+VALUE5="192.168.0.1"
+VALUE6="2222"
+VALUE7="192.168.0.3"
+VALUE8="22"
 VALUE9="0"
 VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="urbancompasspony/ssh-server:latest"
+docker_repo="urbancompasspony/ssh-tunnel:latest"
 
 # Adjust if needed
 function docker_custom {
@@ -56,13 +56,13 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
---add-host=host.docker.internal:host-gateway \
 -v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/data:/data \
 $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"
+  mkdir -p /srv/containers/"$NOMECONTAINER"/data
 }
 
 # USE IT ONLY IF NEEDED:
@@ -112,6 +112,7 @@ function burn_var {
 
   chmod 777 -R /srv/containers/"$NOMECONTAINER"
   touch /srv/containers/"$NOMECONTAINER"/Information
+  touch /srv/containers/"$NOMECONTAINER"/data/ssh
 
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
@@ -123,6 +124,14 @@ function burn_var {
   echo "$var8" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var9" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var10" >> /srv/containers/"$NOMECONTAINER"/Information
+
+  # Save tunnel credentials!
+  echo "$var3" > /srv/containers/"$NOMECONTAINER"/data/ssh
+  echo "$var4" >> /srv/containers/"$NOMECONTAINER"/data/ssh
+  echo "$var5" >> /srv/containers/"$NOMECONTAINER"/data/ssh
+  echo "$var6" >> /srv/containers/"$NOMECONTAINER"/data/ssh
+  echo "$var7" >> /srv/containers/"$NOMECONTAINER"/data/ssh
+  echo "$var8" >> /srv/containers/"$NOMECONTAINER"/data/ssh
 }
 
 function error {
