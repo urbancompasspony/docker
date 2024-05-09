@@ -8,7 +8,7 @@
 export NOMECONTAINER="wetty"
 
 # From 1 to 10!
-var_cont="3"
+var_cont="5"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -17,8 +17,8 @@ CustmN1="Container"
 
 CustmN2="Cont. IP"
 CustmN3="Srv.  IP"
-CustmN4="."
-CustmN5="."
+CustmN4="SSH User"
+CustmN5="SSH Pass"
 CustmN6="."
 CustmN7="."
 CustmN8="."
@@ -33,8 +33,8 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="0.0.0.0"
-VALUE4="0"
-VALUE5="0"
+VALUE4="userwetty"
+VALUE5="a18528d4d46a7e22b721b326e964b670"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -56,10 +56,9 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
---add-host=host.docker.internal:host-gateway \
 -v /etc/localtime:/etc/localtime:ro \
 -p 3000:3000 \
-$docker_repo --bypass-helmet --allow-iframe --force-ssh --ssh-host="$var3" --ssh-user="userweb" --ssh-pass="a18528d4d46a7e22b721b326e964b670"
+$docker_repo --bypass-helmet --allow-iframe --force-ssh --ssh-host="$var3" --ssh-user="$var4" --ssh-pass="$var5"
 }
 
 function makedir {
@@ -261,7 +260,7 @@ VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
 "$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
 "$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
-"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 11 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
 var1=$(echo "$VALUE0" | sed -n 1p)
