@@ -1,2 +1,0 @@
-
-00 01 * * * rm /srv/containers/pihole*/log/pihole.log
