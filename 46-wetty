@@ -31,7 +31,7 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="Host Only!"
+VALUE2="0.0.0.0"
 VALUE3="0.0.0.0"
 VALUE4="0"
 VALUE5="0"
@@ -49,13 +49,17 @@ docker_repo="wettyoss/wetty"
 function docker_custom {
 docker run -d \
 --name=$var1 \
---network host \
+--network macvlan \
+--ip=$var2 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+--add-host=host.docker.internal:host-gateway \
 -v /etc/localtime:/etc/localtime:ro \
 -p 3000:3000 \
-$docker_repo --bypass-helmet --allow-iframe --ssh-host=$var3
+$docker_repo --bypass-helmet --allow-iframe --force-ssh --ssh-host="$var3" --ssh-user="userweb" --ssh-pass="a18528d4d46a7e22b721b326e964b670"
 }
 
 function makedir {
