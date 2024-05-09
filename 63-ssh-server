@@ -5,7 +5,7 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="ssh-server"
+export NOMECONTAINER="ssh-wetty"
 
 # From 1 to 10!
 var_cont="2"
