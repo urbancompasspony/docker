@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NOMECONTAINER="RustDesk"
+NOMECONTAINER="rustdesk"
 
 # IP FIXO DO hbbs
 export var1
