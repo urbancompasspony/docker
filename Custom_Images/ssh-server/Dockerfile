@@ -6,14 +6,18 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt update && apt upgrade -y
 
-RUN apt install -y wget curl openssh-server nano sudo sshfs && \
+RUN apt install -y wget curl sshpass openssh-server nano sudo sshfs && \
     apt autoremove && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /run/sshd
+ADD entrypoint.sh /entrypoint.sh
 
-RUN service ssh start
+RUN chmod +x /entrypoint.sh
+
+RUN chmod 755 /entrypoint.sh
+
+RUN mkdir /run/sshd
 
 RUN useradd -rm -d /home/userweb -s /bin/bash -g root -G sudo -u 1001 userweb
 
@@ -23,4 +27,8 @@ RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/s
     sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
     echo "export VISIBLE=now" >> /etc/profile
 
+RUN service ssh start
+
 CMD ["/usr/sbin/sshd", "-D"]
+
+ENTRYPOINT ["/entrypoint.sh"]
