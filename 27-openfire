@@ -131,7 +131,16 @@ checkB
 clean
 
 docker exec $NOMECONTAINER bash -c "wget https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire_4.7.3_all.deb -O openfire.deb"
-
 docker restart $NOMECONTAINER
 
+clear
+
+echo ""
+echo "QUALQUER QUE SEJA A CIRCUNSTANCIA QUE TE FEZ REINSTALAR ESSE CONTAINER"
+echo "ESTEJA PREPARADO PRA RECONFIGURA-LO EM TODAS AS ESTACOES DE TRABALHO!"
+echo "Em caso de erros graves do OpenFire Server (web em erro 500 ou 503) reinstale do zero"
+echo "e reconfigure do zero, puxando o banco de dados anterior seja ele o AD, MariaDB ou o MySQL"
+echo "Isso perde todos os certificados, portanto precisara refazer os acessos nas maquinas cliente!"
+echo ""
+sleep 10
 exit 1
