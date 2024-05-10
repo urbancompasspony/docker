@@ -58,9 +58,13 @@ docker run -d \
 --restart=unless-stopped \
 --cap-add SYS_RAWIO \
 --cap-add SYS_ADMIN \
+--device=/dev/sda \
+--device=/dev/sda \
+--device=/dev/sda \
+--device=/dev/sda \
+--device=/dev/sda \
 -p 8080:8080 \
 -p 8086:8086 \
--v /dev:/dev \
 -v /run/udev:/run/udev:ro \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/opt/scrutiny/config \
