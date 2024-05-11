@@ -7,6 +7,9 @@
 # Set container name and hostname here.
 export NOMECONTAINER="scrutiny"
 
+# Get Devices!
+mydevices=($(sudo smartctl --scan | awk {'print $1'}))
+
 # From 1 to 10!
 var_cont="2"
 
@@ -58,11 +61,7 @@ docker run -d \
 --restart=unless-stopped \
 --cap-add SYS_RAWIO \
 --cap-add SYS_ADMIN \
---device=/dev/sda \
---device=/dev/sda \
---device=/dev/sda \
---device=/dev/sda \
---device=/dev/sda \
+$device_args \
 -p 8080:8080 \
 -p 8086:8086 \
 -v /run/udev:/run/udev:ro \
@@ -421,6 +420,13 @@ function create {
 }
 
 ################################################################################
+
+mydevices=$(sudo smartctl --scan | awk {'print $1'})
+
+for i in $mydevices
+  do
+    device_args+="--device=$i "
+  done
 
 # Start
 checkA
