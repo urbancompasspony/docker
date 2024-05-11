@@ -61,13 +61,13 @@ docker run -d \
 --restart=unless-stopped \
 --cap-add SYS_RAWIO \
 --cap-add SYS_ADMIN \
-$device_args \
 -p 8080:8080 \
 -p 8086:8086 \
 -v /run/udev:/run/udev:ro \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/opt/scrutiny/config \
 -v /srv/containers/"$NOMECONTAINER"/influxdb2:/opt/scrutiny/influxdb \
+$device_args \
 $docker_repo
 }
 
