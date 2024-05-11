@@ -7,9 +7,6 @@
 # Set container name and hostname here.
 export NOMECONTAINER="scrutiny"
 
-# Get Devices!
-mydevices=($(sudo smartctl --scan | awk {'print $1'}))
-
 # From 1 to 10!
 var_cont="2"
 
