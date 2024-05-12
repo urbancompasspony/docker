@@ -8,7 +8,7 @@
 export NOMECONTAINER="dashdot"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
+VALUE3="3001"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -55,7 +55,8 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 --privileged \
--p 80:3001 \
+-e DASHDOT_PORT=$var3 \
+-p 80:$var3 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /:/mnt/host:ro \
 $docker_repo
@@ -70,7 +71,8 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 --privileged \
--p 80:3001 \
+-e DASHDOT_PORT=$var3 \
+-p 80:$var3 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /:/mnt/host:ro \
 $docker_repo
