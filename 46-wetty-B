@@ -19,7 +19,7 @@ CustmN2="Cont. IP"
 CustmN3="Srv.  IP"
 CustmN4="SSH User"
 CustmN5="SSH Pass"
-CustmN6="."
+CustmN6="WebPort"
 CustmN7="."
 CustmN8="."
 CustmN9="."
@@ -35,7 +35,7 @@ VALUE2="0.0.0.0"
 VALUE3="0.0.0.0"
 VALUE4="userwetty"
 VALUE5="a18528d4d46a7e22b721b326e964b670"
-VALUE6="0"
+VALUE6="3000"
 VALUE7="0"
 VALUE8="0"
 VALUE9="0"
@@ -51,14 +51,14 @@ docker run -d \
 --name=$var1 \
 --network macvlan \
 --ip=$var2 \
---dns=1.1.1.1  \
+--dns=1.1.1.1 \
 --dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
--p 3000:3000 \
-$docker_repo --bypass-helmet --allow-iframe --force-ssh --ssh-host="$var3" --ssh-user="$var4" --ssh-pass="$var5"
+-p $var6:$var6 \
+$docker_repo --bypass-helmet --allow-iframe --force-ssh --port="$var6" --ssh-host="$var3" --ssh-user="$var4" --ssh-pass="$var5"
 }
 
 function makedir {
