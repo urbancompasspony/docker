@@ -8,7 +8,7 @@
 export NOMECONTAINER="file-browser"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,7 +16,7 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
+CustmN3="Path Dir"
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
+VALUE3="/mnt"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -44,6 +44,9 @@ VALUE10="0"
 
 # Set repository here!
 docker_repo="filebrowser/filebrowser:latest"
+
+sudo mkdir -p /srv/containers/"$NOMECONTAINER"/config/
+sudo wget https://raw.githubusercontent.com/filebrowser/filebrowser/master/docker/root/defaults/settings.json -O /srv/containers/"$NOMECONTAINER"/config/.filebrowser.json
 
 # Adjust if needed
 function docker_custom {
@@ -57,9 +60,9 @@ docker run -d \
 -u $(id -u):$(id -g) \
 -p 8081:80 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/root:/srv \
+-v $var3:/srv \
 -v /srv/containers/"$NOMECONTAINER"/config/.filebrowser.json:/.filebrowser.json \
--v /srv/containers/"$NOMECONTAINER"/database/database.db:/database.db \
+-v /srv/containers/"$NOMECONTAINER"/database:/database \
 $docker_repo
   } || {
 docker run -d \
@@ -74,16 +77,15 @@ docker run -d \
 -u $(id -u):$(id -g) \
 -p 8081:80 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/root:/srv \
+-v $var3:/srv \
 -v /srv/containers/"$NOMECONTAINER"/config/.filebrowser.json:/.filebrowser.json \
--v /srv/containers/"$NOMECONTAINER"/database/database.db:/database.db \
+-v /srv/containers/"$NOMECONTAINER"/database:/database \
 $docker_repo
   }
 }
 
 function makedir {
   mkdir -p /srv/containers/"$NOMECONTAINER"/{config,database,root}
-#  sudo touch /srv/containers/"$NOMECONTAINER"/config/.filebrowser.json
 }
 
 # USE IT ONLY IF NEEDED:
