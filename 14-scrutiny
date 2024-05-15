@@ -58,6 +58,7 @@ docker run -d \
 --restart=unless-stopped \
 --cap-add SYS_RAWIO \
 --cap-add SYS_ADMIN \
+--privileged \
 -p 8080:8080 \
 -p 8086:8086 \
 -v /run/udev:/run/udev:ro \
@@ -422,7 +423,11 @@ mydevices=$(sudo smartctl --scan | awk {'print $1'})
 
 for i in $mydevices
   do
-    device_args+="--device=$i "
+    [ $i = "/dev/bus/0" ] && {
+      sudo touch /srv/containers/"$NOMECONTAINER"/config/collector.yaml
+    } || {
+      device_args+="--device=$i "
+    }
   done
 
 # Start
@@ -430,6 +435,15 @@ checkA
 menu
 
 ################################################################################
+
+[ -f /srv/containers/"$NOMECONTAINER"/config/collector.yaml ] && {
+  clear
+  echo "/dev/bus detected! Set properly inside collector.yaml."
+  echo "https://github.com/AnalogJ/scrutiny/blob/master/docs/TROUBLESHOOTING_DEVICE_COLLECTOR.md#raid-controllers-megaraid3warehbaadaptechpeetc"
+  sleep 5
+} || {
+  echo . >/dev/null
+}
 
 #Ending
 unset var1
