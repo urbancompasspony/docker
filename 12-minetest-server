@@ -61,7 +61,7 @@ docker run -d \
 -e PUID=1000 \
 -e PGID=1000 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
+-v /srv/containers/"$NOMECONTAINER"/config:/config/.minetest \
 $docker_repo
 }
 
@@ -71,6 +71,9 @@ function makedir {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
+echo "Download Minetest Game and extract it to /config/games/minetest_game folder!"
+echo "wget https://content.minetest.net/packages/Minetest/minetest_game/releases/25032/download/"
+sleet 5
 
 # =============================================================================
 # ########################################################################### #
