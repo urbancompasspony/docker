@@ -71,9 +71,8 @@ function makedir {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-echo "Download Minetest Game and extract it to /config/games/minetest_game folder!"
-echo "wget https://content.minetest.net/packages/Minetest/minetest_game/releases/25032/download/"
-sleet 5
+echo "Download Minetest Default Game and extract it to /config/games/minetest_game folder!"
+wget https://content.minetest.net/packages/Minetest/minetest_game/releases/25032/download/ -O /home/administrador/minetest_game.zip
 
 # =============================================================================
 # ########################################################################### #
