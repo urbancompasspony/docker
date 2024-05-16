@@ -57,6 +57,7 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 -p 30000:30000/udp \
+-e CLI_ARGS="--gameid devtest"
 -e PUID=1000 \
 -e PGID=1000 \
 -v /etc/localtime:/etc/localtime:ro \
