@@ -8,7 +8,7 @@
 export NOMECONTAINER="minetest-server"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,7 +16,7 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
+CustmN3="Parameters"
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
+VALUE3="--gameid minetest --terminal --verbose"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -58,7 +58,7 @@ docker run -d \
 --restart=unless-stopped \
 --shm-size=256m \
 -p 30000:30000/udp \
--e CLI_ARGS="--gameid minetest" \
+-e CLI_ARGS="$var3" \
 -e PUID=1000 \
 -e PGID=1000 \
 -v /etc/localtime:/etc/localtime:ro \
@@ -237,7 +237,7 @@ var2=$(echo "$VALUE0" | sed -n 2p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 60 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
 var1=$(echo "$VALUE0" | sed -n 1p)
