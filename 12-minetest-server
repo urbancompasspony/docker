@@ -58,7 +58,7 @@ docker run -d \
 --restart=unless-stopped \
 --shm-size=256m \
 -p 30000:30000/udp \
--e CLI_ARGS="--gameid minetest"
+-e CLI_ARGS="--gameid minetest" \
 -e PUID=1000 \
 -e PGID=1000 \
 -v /etc/localtime:/etc/localtime:ro \
