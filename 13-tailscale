@@ -5,7 +5,7 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="A-CUSTOM-A"
+export NOMECONTAINER="tailscale"
 
 # From 1 to 10!
 var_cont="2"
@@ -43,22 +43,10 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="CUSTOM/DOCKER:LATEST"
+docker_repo="tailscale/tailscale:latest"
 
 # Adjust if needed
 function docker_custom {
-  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
-docker run -d \
---name=$var1 \
---network host \
---hostname=$var1 \
---no-healthcheck \
---restart=unless-stopped \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
-$docker_repo
-  } || {
 docker run -d \
 --name=$var1 \
 --network macvlan \
@@ -68,15 +56,20 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+--cap-add=NET_ADMIN \
+--cap-add=NET_RAW \
+-e TS_USERSPACE=0 \
+-e TS_STATE_DIR=/var/lib/tailscale \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
+-v /dev/net/tun:/dev/net/tun \
+-v /srv/containers/"$NOMECONTAINER"/config:/var/lib/tailscale \
 $docker_repo
-  }
 }
 
+#-v /var/lib:/var/lib
+
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/config
 }
 
 # USE IT ONLY IF NEEDED:
