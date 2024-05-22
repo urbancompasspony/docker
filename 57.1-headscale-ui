@@ -68,8 +68,10 @@ function makedir {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+clear
+echo "RUN ON SERVER: headscale apikeys create -e 9999d"
+echo ""
+sleep 5
 
 # =============================================================================
 # ########################################################################### #
