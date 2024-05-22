@@ -60,18 +60,17 @@ docker run -d \
 --publish 0.0.0.0:9090:9090 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/etc/headscale \
+-v /srv/containers/"$NOMECONTAINER"/data:/var/lib/headscale \
 $docker_repo \
   headscale serve
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/config
+  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
 }
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
 
 # =============================================================================
 # ########################################################################### #
