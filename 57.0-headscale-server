@@ -68,8 +68,9 @@ $docker_repo \
 function special_headscale {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
   sudo wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/headscale/config.yaml -O /srv/containers/"$NOMECONTAINER"/config/config.yaml
+
   sudo sed -i 's/MYVAR1/$var3/' /srv/containers/"$NOMECONTAINER"/config/config.yaml
-  sudo sed -i 's/MYVAR2/$var4/' /srv/containers/"$NOMECONTAINER"/config/config.yaml
+  #sudo sed -i 's/MYVAR2/$var4/' /srv/containers/"$NOMECONTAINER"/config/config.yaml
 }
 
 # USE IT ONLY IF NEEDED:
