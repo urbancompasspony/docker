@@ -1,0 +1,25 @@
+docker run -d \
+  --name=snipe-it \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Etc/UTC \
+  -e APP_URL=http://localhost:8080 \
+  -e MYSQL_PORT_3306_TCP_ADDR= \
+  -e MYSQL_PORT_3306_TCP_PORT= \
+  -e MYSQL_DATABASE= \
+  -e MYSQL_USER= \
+  -e MYSQL_PASSWORD= \
+  -e APP_ENV=production `#optional` \
+  -e APP_DEBUG=false `#optional` \
+  -e APP_LOCALE= `#optional` \
+  -e MAIL_PORT_587_TCP_ADDR=US/Pacific `#optional` \
+  -e MAIL_PORT_587_TCP_PORT=US/Pacific `#optional` \
+  -e MAIL_ENV_FROM_ADDR=US/Pacific `#optional` \
+  -e MAIL_ENV_FROM_NAME=US/Pacific `#optional` \
+  -e MAIL_ENV_ENCRYPTION=US/Pacific `#optional` \
+  -e MAIL_ENV_USERNAME=US/Pacific `#optional` \
+  -e MAIL_ENV_PASSWORD=US/Pacific `#optional` \
+  -p 8080:80 \
+  -v /path/to/data:/config \
+  --restart unless-stopped \
+  lscr.io/linuxserver/snipe-it:latest
