@@ -58,7 +58,7 @@ docker run -d \
 --restart=unless-stopped \
 --publish 0.0.0.0:8080:8080 \
 --publish 0.0.0.0:9090:9090 \
--p 27896:8080 \
+-p 27896:27896 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/etc/headscale \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/lib/headscale \
