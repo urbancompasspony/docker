@@ -1,0 +1,11 @@
+docker run -d \
+  --name=changedetection.io \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Etc/UTC \
+  -e BASE_URL= `#optional` \
+  -e PLAYWRIGHT_DRIVER_URL= `#optional` \
+  -p 5000:5000 \
+  -v /path/to/changedetection.io/config:/config \
+  --restart unless-stopped \
+  lscr.io/linuxserver/changedetection.io:latest
