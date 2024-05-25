@@ -8,7 +8,7 @@
 export NOMECONTAINER="headscale"
 
 # From 1 to 10!
-var_cont="4"
+var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -17,7 +17,7 @@ CustmN1="Container"
 
 CustmN2="Local IP"
 CustmN3="Address "
-CustmN4="MagicDNS"
+CustmN4="."
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -33,7 +33,7 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="myaddress.ddns.net"
-VALUE4="FQDN.com"
+VALUE4="0"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -58,6 +58,7 @@ docker run -d \
 --restart=unless-stopped \
 --publish 0.0.0.0:8080:8080 \
 --publish 0.0.0.0:9090:9090 \
+-p 27896:8080 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/etc/headscale \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/lib/headscale \
@@ -69,8 +70,9 @@ function special_headscale {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
   sudo wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/headscale/config.yaml -O /srv/containers/"$NOMECONTAINER"/config/config.yaml
 
-  sudo sed -i 's/MYVAR1/$var3/' /srv/containers/"$NOMECONTAINER"/config/config.yaml
-  #sudo sed -i 's/MYVAR2/$var4/' /srv/containers/"$NOMECONTAINER"/config/config.yaml
+  sudo touch /srv/containers/"$NOMECONTAINER"/data/db.sqlite
+
+  sudo sed -i "s/MYVAR/$var3/" /srv/containers/"$NOMECONTAINER"/config/config.yaml
 }
 
 # USE IT ONLY IF NEEDED:
