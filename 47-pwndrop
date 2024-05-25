@@ -1,0 +1,10 @@
+docker run -d \
+  --name=pwndrop \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Etc/UTC \
+  -e SECRET_PATH=/pwndrop `#optional` \
+  -p 8080:8080 \
+  -v /path/to/pwndrop/appdata:/config \
+  --restart unless-stopped \
+  lscr.io/linuxserver/pwndrop:latest
