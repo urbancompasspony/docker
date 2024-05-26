@@ -8,7 +8,7 @@
 export NOMECONTAINER="windows-custom"
 
 # From 1 to 10!
-var_cont="9"
+var_cont="10"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -20,14 +20,16 @@ CustmN3="W.Version"
 CustmN4="RAM  Size"
 CustmN5="CPU Cores"
 CustmN6="Disk Size"
-CustmN7="Inst.Man."
+CustmN7=""
 CustmN8="Path Disk"
-CustmN9="NetInter."
-CustmN10="."
+CustmN9="Username"
+CustmN10="Password"
 }
 
 # MENU DEFAULT VALUES
 function custom_values {
+mydevice=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
+
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
@@ -36,10 +38,10 @@ VALUE3="win11 ... vista winxp 2022"
 VALUE4="4G"
 VALUE5="4"
 VALUE6="60G"
-VALUE7="N"
+VALUE7="/mnt/disk01"
 VALUE8="/srv/containers/$NOMECONTAINER"
-VALUE9="enpXsY"
-VALUE10="0"
+VALUE9="Usuario"
+VALUE10="p4ssw0rd"
 }
 
 # Set repository here!
@@ -62,10 +64,15 @@ docker run -d \
 -e "RAM_SIZE=$var4" \
 -e "CPU_CORES=$var5" \
 -e "DISK_SIZE=$var6" \
--e "MANUAL=$var7" \
--e "VM_NET_DEV=$var9" \
+-e "VM_NET_DEV=$mydevice" \
+-e "LANGUAGE=Portuguese" \
+-e "REGION=pt-BR" \
+-e "KEYBOARD=pt-BR" \
+-e "USERNAME=$var9" \
+-e "PASSWORD=$var10" \
 -v /etc/localtime:/etc/localtime:ro \
 -v "$var8"/storage:/storage \
+-v "$var7":/shared \
 $docker_repo
 
 echo ""
@@ -89,10 +96,15 @@ docker run -d \
 -e "RAM_SIZE=$var4" \
 -e "CPU_CORES=$var5" \
 -e "DISK_SIZE=$var6" \
--e "MANUAL=$var7" \
--e "VM_NET_DEV=$var9" \
+-e "VM_NET_DEV=$mydevice" \
+-e "LANGUAGE=Portuguese" \
+-e "REGION=pt-BR" \
+-e "KEYBOARD=pt-BR" \
+-e "USERNAME=$var9" \
+-e "PASSWORD=$var10" \
 -v /etc/localtime:/etc/localtime:ro \
 -v "$var8"/storage:/storage \
+-v "$var7":/shared \
 $docker_repo
 
 echo ""
@@ -102,14 +114,13 @@ echo ""
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$var1"
+  mkdir -p /srv/containers/"$NOMECONTAINER"
   mkdir -p "$var8"/storage
+  mkdir -p "$var7"
 }
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
 
 # =============================================================================
 # ########################################################################### #
