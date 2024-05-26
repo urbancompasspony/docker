@@ -96,7 +96,7 @@ docker run -d \
 -e "RAM_SIZE=$var4" \
 -e "CPU_CORES=$var5" \
 -e "DISK_SIZE=$var6" \
--e "VM_NET_DEV=$mydevice" \
+-e "VM_NET_DEV=eth0" \
 -e "LANGUAGE=Portuguese" \
 -e "REGION=pt-BR" \
 -e "KEYBOARD=pt-BR" \
