@@ -43,7 +43,7 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="linuxserver/pwndrop:latest"
+docker_repo="lscr.io/linuxserver/pwndrop:latest"
 
 # Adjust if needed
 function docker_custom {
