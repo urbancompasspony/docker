@@ -20,7 +20,7 @@ CustmN3="W.Version"
 CustmN4="RAM  Size"
 CustmN5="CPU Cores"
 CustmN6="Disk Size"
-CustmN7=""
+CustmN7="Shared F."
 CustmN8="Path Disk"
 CustmN9="Username"
 CustmN10="Password"
@@ -413,11 +413,11 @@ VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $
 "$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
 "$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
 "$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
-"$CustmN5: " 6 1 "$VALUE6" 6 11 30 0 \
-"$CustmN5: " 7 1 "$VALUE7" 7 11 30 0 \
-"$CustmN5: " 8 1 "$VALUE8" 8 11 30 0 \
-"$CustmN5: " 9 1 "$VALUE9" 9 11 30 0 \
-"$CustmN5: " 10 1 "$VALUE10" 10 11 30 0 \
+"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
+"$CustmN7: " 7 1 "$VALUE7" 7 11 30 0 \
+"$CustmN8: " 8 1 "$VALUE8" 8 11 30 0 \
+"$CustmN9: " 9 1 "$VALUE9" 9 11 30 0 \
+"$CustmN10: " 10 1 "$VALUE10" 10 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
 var1=$(echo "$VALUE0" | sed -n 1p)
