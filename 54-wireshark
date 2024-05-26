@@ -56,12 +56,12 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
---security-opt seccomp=unconfined \
 --cap-add=NET_ADMIN \
+--security-opt seccomp=unconfined \
 -e PUID=1000 \
 -e PGID=1000 \
 -p 3000:3000 \
--p 3001:3001 \ 
+-p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 $docker_repo
@@ -73,6 +73,8 @@ function makedir {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
+#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
+#docker restart "$NOMECONTAINER"
 
 # =============================================================================
 # ########################################################################### #
