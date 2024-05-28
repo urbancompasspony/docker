@@ -56,8 +56,8 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
--e PUID=1000 \
--e PGID=1000 \
+-e PUID=0 \
+-e PGID=0 \
 -p 8200:8200 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
