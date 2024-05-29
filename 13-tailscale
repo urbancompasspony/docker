@@ -50,10 +50,7 @@ function docker_custom {
   [ "$var1" = "host" ] || [ "$var1" = "Host" ] || [ "$var1" = "HOST" ] || [ "$var1" = "hostname" ] || [ "$var1" = "localhost" ] && {
 docker run -d \
 --name=$var1 \
---network macvlan \
---ip=$var2 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
+--network host \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
@@ -69,7 +66,10 @@ $docker_repo
   } || {
 docker run -d \
 --name=$var1 \
---network host \
+--network macvlan \
+--ip=$var2 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
