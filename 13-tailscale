@@ -46,7 +46,7 @@ VALUE10="0"
 docker_repo="tailscale/tailscale:latest"
 
 # Adjust if needed
-function docker_custom {
+  [ "$var1" = "host" ] || [ "$var1" = "Host" ] || [ "$var1" = "HOST" ] || [ "$var1" = "hostname" ] || [ "$var1" = "localhost" ] && {
 docker run -d \
 --name=$var1 \
 --network macvlan \
@@ -65,6 +65,23 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/lib/tailscale \
 $docker_repo
+  } || {
+docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+--cap-add=NET_ADMIN \
+--cap-add=NET_RAW \
+-e TS_ROUTES="$var3" \
+-e TS_USERSPACE=0 \
+-e TS_STATE_DIR=/var/lib/tailscale \
+-v /dev/net/tun:/dev/net/tun \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/config:/var/lib/tailscale \
+$docker_repo
+  }
 }
 
 #-v /var/lib:/var/lib
