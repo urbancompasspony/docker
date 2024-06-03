@@ -65,7 +65,7 @@ docker run -d \
 -e "LDAP_URI=ldap://$var6" \
 -e "LDAP_BASE_DN=$var7" \
 -e "LDAP_BIND_USER_DN=CN=$var8,CN=Users,$var7" \
--e "LDAP_FILTER=&(objectCategory=user)(memberOf=CN=VPN_Users,CN=Users,$var7)" \
+-e "LDAP_FILTER=(&(objectCategory=user)(memberOf=CN=VPN_Users,CN=Users,$var7))" \
 -e "LDAP_BIND_USER_PASS=$var9" \
 -e "ACTIVE_DIRECTORY_COMPAT_MODE=true" \
 -e "LDAP_TLS_VALIDATE_CERT=false" \
