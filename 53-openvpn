@@ -34,7 +34,7 @@ VALUE1="$NOMECONTAINER"
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
 VALUE4="1194"
-VALUE5="meuservidor.ddns.net"
+VALUE5="meuservidorvpn.ddns.net"
 VALUE6="172.20.0.10"
 VALUE7="dc=ad,dc=SERVER,dc=local"
 VALUE8="administrator"
@@ -63,7 +63,7 @@ docker run -d \
 -e "OVPN_SERVER_CN=$var5" \
 -e "LDAP_URI=ldap://$var6" \
 -e "LDAP_BASE_DN=$var7" \
--e "LDAP_BIND_USER_DN=CN="$var8",CN=Users,$var7" \
+-e "LDAP_BIND_USER_DN=CN=$var8,CN=Users,$var7" \
 -e "LDAP_FILTER=&(objectCategory=user)(memberOf=CN=VPN_Users,CN=Users,$var7)" \
 -e "LDAP_BIND_USER_PASS=$var9" \
 -e "ACTIVE_DIRECTORY_COMPAT_MODE=true" \
@@ -94,6 +94,7 @@ function docker_extras {
   sleep 3
   docker exec -it openvpn show-client-config | sudo tee /srv/containers/"$NOMECONTAINER"/client.ovpn >/dev/null
   sudo sed -i '13s/^/setenv CLIENT_CERT 0\n/' /srv/containers/"$NOMECONTAINER"/client.ovpn
+  clear; cat /srv/containers/"$NOMECONTAINER"/client.ovpn
 }
 
 # =============================================================================
