@@ -5,10 +5,10 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="A-CUSTOM-A"
+export NOMECONTAINER="openvpn"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="9"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,13 +16,13 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
-CustmN5="."
-CustmN6="."
-CustmN7="."
-CustmN8="."
-CustmN9="."
+CustmN3="DNS Srv "
+CustmN4="Srv Port"
+CustmN5="Srv Addr"
+CustmN6="DomainIP"
+CustmN7="UserBind"
+CustmN8="Base DN "
+CustmN9="Password"
 CustmN10="."
 }
 
@@ -32,13 +32,13 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
-VALUE5="0"
-VALUE6="0"
-VALUE7="0"
-VALUE8="0"
-VALUE9="0"
+VALUE3="8.8.4.4"
+VALUE4="1194"
+VALUE5="meuservidor.ddns.net"
+VALUE6="172.20.0.10"
+VALUE7="dc=ad,dc=SERVER,dc=local"
+VALUE8="administrator"
+VALUE9="p4ss0rd"
 VALUE10="0"
 }
 
@@ -51,30 +51,27 @@ docker run -d \
 --name=$var1 \
 --network macvlan \
 --ip=$var2 \
---dns=1.0.0.1  \
+--dns=1.1.1.1  \
 --dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
---cap-add=NET_ADMIN \
 --restart=unless-stopped \
--e "USE_CLIENT_CERTIFICATE=" \
--e "LDAP_URI=ldap://" \
--e "LDAP_BASE_DN=" \
--e "LDAP_BIND_USER_DN=" \
--e "LDAP_BIND_USER_PASS=" \
--e "LDAP_FILTER=(memberOf=cn=OpenVPN,cn=groups,cn=accounts,dc=ad,dc=example,dc=org)" \
--e "LDAP_TLS_VALIDATE_CERT=false" \
+--cap-add=NET_ADMIN \
+-e "OVPN_DNS_SERVERS=$var3" \
+-e "OVPN_PORT=$var4" \
+-p "$var4":"$var4" \
+-e "OVPN_SERVER_CN=$var5" \
+-e "LDAP_URI=ldap://$var6" \
+-e "LDAP_BASE_DN=$var7" \
+-e "LDAP_BIND_USER_DN=CN="$var8",CN=Users,$var7" \
+-e "LDAP_FILTER=&(objectCategory=user)(memberOf=CN=VPN_Users,CN=Users,$var7)" \
+-e "LDAP_BIND_USER_PASS=$var9" \
 -e "ACTIVE_DIRECTORY_COMPAT_MODE=true" \
+-e "LDAP_TLS_VALIDATE_CERT=false" \
 -e "OVPN_PROTOCOL=tcp" \
 -e "OVPN_NETWORK=10.50.50.0 255.255.255.0" \
--e "OVPN_ROUTES=172.20.0.0/24" \
--e "OVPN_DNS_SERVERS=8.8.4.4" \
--e "OVPN_SERVER_CN=" \
--e "OVPN_ENABLE_COMPRESSION=false" \
--e "OVPN_TLS_CIPHERS=TLS-DHE-RSA-WITH-AES-256-CBC-SHA:TLS-DHE-RSA-WITH-AES-256-CBC-SHA256:TLS-DHE-RSA-WITH-AES-256-CBC-SHA256:TLS-DHE-RSA-WITH-CAMELLIA-256-CBC-SHA:TLS-DHE-RSA-WITH-AES-128-CBC-SHA" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/etc/openvpn \
--p 1194:1194/udp \
 $docker_repo
 }
 
@@ -84,6 +81,8 @@ function makedir {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
+docker exec -it openvpn show-client-config | sudo tee /srv/containers/"$NOMECONTAINER"/client.ovpn
+sudo sed -i '12s/^/setenv CLIENT_CERT 0\n/' /srv/containers/"$NOMECONTAINER"/client.ovpn
 
 # =============================================================================
 # ########################################################################### #
