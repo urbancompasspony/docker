@@ -86,8 +86,8 @@ function docker_extras {
 } || {
   clear
   echo ""
-  echo "Aguarde o inicio do servico..."
-  sleep 15
+  echo "Aguarde o inicio do servico... ~45s"
+  sleep 45
   echo "...agora sim, pegando o arquivo .ovpn!"
   sleep 3
   docker exec -it openvpn show-client-config | sudo tee /srv/containers/"$NOMECONTAINER"/client.ovpn
