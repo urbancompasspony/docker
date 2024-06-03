@@ -1,6 +1,9 @@
 
-docker buildx build -t urbancompasspony/domain-teste .
-
 docker login
 
+docker buildx build --push --platform linux/amd64,linux/arm64 --tag urbancompasspony/domain-teste .
+
+
+
+docker buildx build -t urbancompasspony/domain-teste .
 docker push urbancompasspony/domain-teste
