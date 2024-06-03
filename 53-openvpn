@@ -47,7 +47,31 @@ docker_repo="wheelybird/openvpn-ldap-otp:latest"
 
 # Adjust if needed
 function docker_custom {
-
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+--cap-add=NET_ADMIN \
+-e "OVPN_DNS_SERVERS=$var3" \
+-e "OVPN_PORT=$var4" \
+-p "$var4":"$var4" \
+-e "OVPN_SERVER_CN=$var5" \
+-e "LDAP_URI=ldap://$var6" \
+-e "LDAP_BASE_DN=$var7" \
+-e "LDAP_BIND_USER_DN=CN=$var8,CN=Users,$var7" \
+-e "LDAP_FILTER=(&(objectCategory=user)(memberOf=CN=VPN_Users,CN=Users,$var7))" \
+-e "LDAP_BIND_USER_PASS=$var9" \
+-e "ACTIVE_DIRECTORY_COMPAT_MODE=true" \
+-e "LDAP_TLS_VALIDATE_CERT=false" \
+-e "OVPN_PROTOCOL=tcp" \
+-e "OVPN_NETWORK=10.50.50.0 255.255.255.0" \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/config:/etc/openvpn \
+$docker_repo
+  } || {
 docker run -d \
 --name=$var1 \
 --network macvlan \
@@ -74,6 +98,7 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/etc/openvpn \
 $docker_repo
+  }
 }
 
 function makedir {
