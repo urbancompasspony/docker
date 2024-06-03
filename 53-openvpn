@@ -19,9 +19,9 @@ CustmN2="Local IP"
 CustmN3="DNS Srv "
 CustmN4="Srv Port"
 CustmN5="Srv Addr"
-CustmN6="DomainIP"
-CustmN7="UserBind"
-CustmN8="Base DN "
+CustmN6="DomainIP" 
+CustmN7="Base DN"
+CustmN8="UserBind"
 CustmN9="Password"
 CustmN10="."
 }
@@ -37,7 +37,7 @@ VALUE4="1194"
 VALUE5="meuservidorvpn.ddns.net"
 VALUE6="172.20.0.10"
 VALUE7="dc=ad,dc=SERVER,dc=local"
-VALUE8="administrator"
+VALUE8="OpenVPN Bind"
 VALUE9="p4ss0rd"
 VALUE10="0"
 }
@@ -47,6 +47,7 @@ docker_repo="wheelybird/openvpn-ldap-otp:latest"
 
 # Adjust if needed
 function docker_custom {
+
 docker run -d \
 --name=$var1 \
 --network macvlan \
