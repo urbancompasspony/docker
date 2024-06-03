@@ -3,9 +3,14 @@
 
 Commands:
 
-docker build --tag domain-teste .
+docker buildx create --name mybuilder
 
-To upload:
+docker buildx use mybuilder
+
 docker login
 
-docker push urbancompasspony/domain-teste:latest
+docker build --tag domain-teste .
+
+EXAMPLE
+
+docker buildx build --push --platform linux/amd64,linux/arm64 --tag urbancompasspony/domain-teste .
