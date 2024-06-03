@@ -118,7 +118,7 @@ function docker_extras {
   sleep 45
   echo "...agora sim, pegando o arquivo .ovpn!"
   sleep 3
-  docker exec -it openvpn show-client-config | sudo tee /srv/containers/"$NOMECONTAINER"/client.ovpn >/dev/null
+  docker exec -it "$NOMECONTAINER" show-client-config | sudo tee /srv/containers/"$NOMECONTAINER"/client.ovpn >/dev/null
   sudo sed -i '13s/^/setenv CLIENT_CERT 0\n/' /srv/containers/"$NOMECONTAINER"/client.ovpn
   clear; cat /srv/containers/"$NOMECONTAINER"/client.ovpn
 }
