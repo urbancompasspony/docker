@@ -1,15 +1,11 @@
 
-## Here I will unite some scripts Dockfile and .sh to build custom images with special parameters.
-
-Commands:
+MULTIARCH!
 
 docker buildx create --name mybuilder
 
 docker buildx use mybuilder
 
 docker login
-
-docker build --tag domain-teste .
 
 EXAMPLE
 
