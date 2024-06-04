@@ -18,12 +18,6 @@ export var6
 # CAMINHO DO PONTO DE MONTAGEM BASE
 export var7
 
-[ $(arch) = "x86_64" ] && {
-  REPOSITORY="urbancompasspony/domain"
-} || {
-  REPOSITORY="urbancompasspony/domain-arm"
-}
-
 function check_new_smb {
   cupspass=$(sed -n '8p' /srv/containers/dominio/Information)
   [ "$cupspass" = "" ] || [ "$cupspass" = " " ] && {
@@ -194,7 +188,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/data/:/var/lib/samba \
 -v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
 $var7 \
-$REPOSITORY
+urbancompasspony/domain
 }
 
 function clean {
