@@ -81,10 +81,10 @@ docker run -d \
 --privileged \
 --cap-add SYS_ADMIN \
 -e "RASPAP_SSID=$var3" \
--e "RASPAP_SSID_PASS=$var4"	\
+-e "RASPAP_SSID_PASS=$var4" \
 -e "RASPAP_WEBGUI_USER=$var5" \
 -e "RASPAP_WEBGUI_PASS=$var6" \
--e "RASPAP_WEBGUI_PORT=$var7" \	
+-e "RASPAP_WEBGUI_PORT=$var7" \
 -e "RASPAP_COUNTRY=BR" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
