@@ -65,7 +65,7 @@ docker run -d \
 -e RASPAP_COUNTRY=BR \
 -v /etc/localtime:/etc/localtime:ro \
 -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
--v /srv/containers/"$NOMECONTAINER"/config:/etc/raspap \
+-v /srv/containers/"$NOMECONTAINER"/backups:/etc/raspap/backups \
 $docker_repo
   } || {
 docker run -d \
@@ -88,13 +88,13 @@ docker run -d \
 -e "RASPAP_COUNTRY=BR" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
--v /srv/containers/"$NOMECONTAINER"/config:/etc/raspap \
+-v /srv/containers/"$NOMECONTAINER"/backups:/etc/raspap/backups \
 $docker_repo
   }
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/config
+  mkdir -p /srv/containers/"$NOMECONTAINER"/backups
 }
 
 # USE IT ONLY IF NEEDED:
