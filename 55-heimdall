@@ -47,6 +47,22 @@ docker_repo="lscr.io/linuxserver/heimdall:latest"
 
 # Adjust if needed
 function docker_custom {
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-e PUID=1000 \
+-e PGID=1000 \
+-e TZ=America/Bahia \
+-p 80:80 \
+-p 443:443 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/config:/config \
+$docker_repo
+  } || {
 docker run -d \
 --name=$var1 \
 --network macvlan \
@@ -64,6 +80,7 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 $docker_repo
+  }
 }
 
 function makedir {
