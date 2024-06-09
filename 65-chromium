@@ -47,26 +47,6 @@ docker_repo="lscr.io/linuxserver/chromium:latest"
 
 # Adjust if needed
 function docker_custom {
-  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
-docker run -d \
---name=$var1 \
---network host \
---hostname=$var1 \
---no-healthcheck \
---restart=unless-stopped \
---shm-size="1gb" \
---security-opt seccomp=unconfined \
--e "CUSTOM_USER=$var4" \
--e "PASSWORD=$var5" \
--e "CUSTOM_PORT=$var3" \
--e "CUSTOM_HTTPS_PORT=$var6" \
--e "CHROME_CLI=$var7" \
--p "$var3":"$var3" \
--p "$var6":"$var6" \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
-$docker_repo
-  } || {
 docker run -d \
 --name=$var1 \
 --network macvlan \
@@ -78,6 +58,7 @@ docker run -d \
 --restart=unless-stopped \
 --shm-size="1gb" \
 --security-opt seccomp=unconfined \
+--add-host host.docker.internal:host-gateway \
 -e "CUSTOM_USER=$var4" \
 -e "PASSWORD=$var5" \
 -e "CUSTOM_PORT=$var3" \
@@ -88,7 +69,6 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 $docker_repo
-  }
 }
 
 function makedir {
@@ -440,6 +420,7 @@ function create {
 ################################################################################
 
 # Start
+
 checkA
 menu
 
