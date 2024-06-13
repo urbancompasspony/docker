@@ -8,7 +8,7 @@
 export NOMECONTAINER="qbittorrent"
 
 # From 1 to 10!
-var_cont="3"
+var_cont="5"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -17,8 +17,8 @@ CustmN1="Container"
 
 CustmN2="Local IP"
 CustmN3="Downloads"
-CustmN4="."
-CustmN5="."
+CustmN4="WebPort"
+CustmN5="Torrent"
 CustmN6="."
 CustmN7="."
 CustmN8="."
@@ -33,8 +33,8 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="/mnt/disk0"
-VALUE4="0"
-VALUE5="0"
+VALUE4="8080"
+VALUE5="6881"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -47,6 +47,25 @@ docker_repo="lscr.io/linuxserver/qbittorrent:latest"
 
 # Adjust if needed
 function docker_custom {
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-e PUID=1000 \
+-e PGID=1000 \
+-e "WEBUI_PORT=$var4" \
+-p "$var4":"$var4" \
+-e "TORRENTING_PORT=$var5" \
+-p "$var5":"$var5" \
+-p "$var5":"$var5"/udp \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/config:/config \
+-v "$var3":/downloads \
+$docker_repo
+  } || {
 docker run -d \
 --name=$var1 \
 --network macvlan \
@@ -58,15 +77,16 @@ docker run -d \
 --restart=unless-stopped \
 -e PUID=1000 \
 -e PGID=1000 \
--e WEBUI_PORT=8080 \
--e TORRENTING_PORT=6881 \
--p 8080:8080 \
--p 6881:6881 \
--p 6881:6881/udp \
+-e "WEBUI_PORT=$var4" \
+-p "$var4":"$var4" \
+-e "TORRENTING_PORT=$var5" \
+-p "$var5":"$var5" \
+-p "$var5":"$var5"/udp \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 -v "$var3":/downloads \
 $docker_repo
+  }
 }
 
 function makedir {
