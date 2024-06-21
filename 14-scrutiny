@@ -65,6 +65,7 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/opt/scrutiny/config \
 -v /srv/containers/"$NOMECONTAINER"/influxdb2:/opt/scrutiny/influxdb \
+-e COLLECTOR_CRON_SCHEDULE="0 0 * * *" \
 $device_args \
 $docker_repo
 }
