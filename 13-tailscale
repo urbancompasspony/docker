@@ -8,7 +8,7 @@
 export NOMECONTAINER="tailscale"
 
 # From 1 to 10!
-var_cont="3"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -17,7 +17,7 @@ CustmN1="Container"
 
 CustmN2="Local IP"
 CustmN3="Advertise"
-CustmN4="."
+CustmN4="Server"
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -33,7 +33,7 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="X.Y.Z.0/24"
-VALUE4="0"
+VALUE4="tailscale.com"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -58,6 +58,7 @@ docker run -d \
 --cap-add=NET_RAW \
 -e TS_USERSPACE=0 \
 -e TS_STATE_DIR=/var/lib/tailscale \
+-e "TS_EXTRA_ARGS=--login-server=$var4" \
 -v /dev/net/tun:/dev/net/tun \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/lib/tailscale \
@@ -77,6 +78,7 @@ docker run -d \
 -e TS_ROUTES="$var3" \
 -e TS_USERSPACE=0 \
 -e TS_STATE_DIR=/var/lib/tailscale \
+-e "TS_EXTRA_ARGS=--login-server=$var4" \
 -v /dev/net/tun:/dev/net/tun \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/lib/tailscale \
