@@ -47,6 +47,22 @@ docker_repo="headscale/headscale:0.22.3"
 
 # Adjust if needed
 function docker_custom {
+  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+docker run -d \
+--name=$var1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+--publish 0.0.0.0:8080:8080 \
+--publish 0.0.0.0:9090:9090 \
+-p 27896:27896 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/config:/etc/headscale \
+-v /srv/containers/"$NOMECONTAINER"/data:/var/lib/headscale \
+$docker_repo \
+  headscale serve
+  } || {
 docker run -d \
 --name=$var1 \
 --network macvlan \
@@ -64,6 +80,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/lib/headscale \
 $docker_repo \
   headscale serve
+  }
 }
 
 function special_headscale {
