@@ -438,6 +438,15 @@ checkA
 menu
 special_headscale
 
+echo ""; echo "############################################################"
+echo ""; echo "Getting MENU for headscale"; echo ""
+docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/escalacabeca -O /root/.init"
+docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
+docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
+docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
+echo "OK"
+sleep 0.5
+
 ################################################################################
 
 #Ending
