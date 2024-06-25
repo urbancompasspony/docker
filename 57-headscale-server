@@ -15,8 +15,8 @@ function custom_names {
 # Static Name!
 CustmN1="Container"
 
-CustmN2="Local IP"
-CustmN3="Address "
+CustmN2="Local IP "
+CustmN3="Address  "
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -84,8 +84,6 @@ $docker_repo \
 }
 
 function special_headscale {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
-
   sudo wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/headscale/config.yaml -O /srv/containers/"$NOMECONTAINER"/config/config.yaml
   sudo touch /srv/containers/"$NOMECONTAINER"/data/db.sqlite
   sudo sed -i "s/MYVAR/$var3/" /srv/containers/"$NOMECONTAINER"/config/config.yaml
@@ -93,6 +91,7 @@ function special_headscale {
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
 
 # =============================================================================
 # ########################################################################### #
@@ -435,17 +434,20 @@ function create {
 
 # Start
 checkA
-menu
+docker_extras
 special_headscale
+menu
 
 echo ""; echo "############################################################"
 echo ""; echo "Getting MENU for headscale"; echo ""
+docker exec $NOMECONTAINER bash -c "apt update; apt install wget dialog -y"
 docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/escalacabeca -O /root/.init"
 docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
-echo "OK"
+echo ""; echo "OK"
 sleep 0.5
+echo ""; echo "############################################################"
 
 ################################################################################
 
