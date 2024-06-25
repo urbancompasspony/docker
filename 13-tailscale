@@ -33,7 +33,7 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="X.Y.Z.0/24"
-VALUE4="tailscale.com"
+VALUE4="https://controlplane.tailscale.com"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -272,7 +272,7 @@ VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
 "$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 60 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
 var1=$(echo "$VALUE0" | sed -n 1p)
