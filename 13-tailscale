@@ -88,16 +88,12 @@ $docker_repo
   }
 }
 
-#-v /var/lib:/var/lib
-
 function makedir {
   mkdir -p /srv/containers/"$NOMECONTAINER"/config
 }
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
 
 # =============================================================================
 # ########################################################################### #
@@ -284,7 +280,7 @@ var4=$(echo "$VALUE0" | sed -n 4p)
 }
 
 [ $var_cont -eq "5" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 12 40 0 \
+VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER\nServer use http(s)://addrss:porta" 13 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
 "$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
