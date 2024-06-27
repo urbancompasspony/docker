@@ -31,8 +31,8 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="0.0.0.0"
-VALUE3="X.Y.Z.0/24"
+VALUE2="my_ip"
+VALUE3="0.0.0.0/0"
 VALUE4=""
 VALUE5=""
 VALUE6="0"
@@ -56,8 +56,8 @@ docker run -d \
 --restart=unless-stopped \
 --cap-add=NET_ADMIN \
 --cap-add=NET_RAW \
--e TS_USERSPACE=0 \
--e TS_STATE_DIR=/var/lib/tailscale \
+-e "TS_USERSPACE=0" \
+-e "TS_STATE_DIR=/var/lib/tailscale" \
 -e "TS_EXTRA_ARGS=--login-server=$var4" \
 -e "TS_AUTHKEY=$var5" \
 -v /dev/net/tun:/dev/net/tun \
@@ -76,9 +76,9 @@ docker run -d \
 --restart=unless-stopped \
 --cap-add=NET_ADMIN \
 --cap-add=NET_RAW \
--e TS_ROUTES="$var3" \
--e TS_USERSPACE=0 \
--e TS_STATE_DIR=/var/lib/tailscale \
+-e "TS_ROUTES=$var3" \
+-e "TS_USERSPACE=0" \
+-e "TS_STATE_DIR=/var/lib/tailscale" \
 -e "TS_EXTRA_ARGS=--login-server=$var4" \
 -e "TS_AUTHKEY=$var5" \
 -v /dev/net/tun:/dev/net/tun \
