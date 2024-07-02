@@ -10,7 +10,7 @@
 export NOMECONTAINER="openvpn-client"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -18,8 +18,8 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
+CustmN3="Subnets "
+CustmN4="Config  "
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -34,8 +34,8 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
+VALUE3=".0/24"
+VALUE4="config.ovpn"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -58,6 +58,8 @@ docker run -d \
 --restart=unless-stopped \
 --cap-add=NET_ADMIN \
 --device=/dev/net/tun \
+-e "ALLOWED_SUBNETS=$var3" \
+-e "CONFIG_FILE=$var4" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 $docker_repo
@@ -73,6 +75,8 @@ docker run -d \
 --restart=unless-stopped \
 --cap-add=NET_ADMIN \
 --device=/dev/net/tun \
+-e "ALLOWED_SUBNETS=$var3" \
+-e "CONFIG_FILE=$var4" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 $docker_repo
