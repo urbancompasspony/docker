@@ -58,9 +58,11 @@ docker run -d \
 --restart=unless-stopped \
 --cap-add=NET_ADMIN \
 --device=/dev/net/tun \
--e "ALLOWED_SUBNETS=$var3" \
--e "VPN_CONFIG_FILE=config.ovpn" \
--e "AUTH_SECRET=/config/auth.txt" \
+-e "SUBNETS=$var3" \
+-e "AUTH_SECRET=auth.txt" \
+-e "KILL_SWITCH=yes" \
+-e "CONFIG_FILE=config.ovpn" \
+-e "--env ${TAP:=eth0}" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/data/vpn \
 $docker_repo
@@ -76,9 +78,11 @@ docker run -d \
 --restart=unless-stopped \
 --cap-add=NET_ADMIN \
 --device=/dev/net/tun \
--e "ALLOWED_SUBNETS=$var3" \
--e "VPN_CONFIG_FILE=config.ovpn" \
--e "AUTH_SECRET=/config/auth.txt" \
+-e "SUBNETS=$var3" \
+-e "AUTH_SECRET=auth.txt" \
+-e "KILL_SWITCH=yes" \
+-e "CONFIG_FILE=config.ovpn" \
+-e "--env ${TAP:=eth0}" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/data/vpn \
 $docker_repo
@@ -92,12 +96,13 @@ function makedir {
 # USE IT ONLY IF NEEDED:
 function docker_extras {
 
-clear; echo ""
-echo "Put this on config.ovpn:"
-echo "auth-user-pass auth.txt"
-echo "create auth.txt"
-echo ""
-sleep 5
+clear
+[ -f /srv/containers/"$NOMECONTAINER"/config/auth.txt ] && {
+  echo . >/dev/null
+} || {
+  echo "create auth.txt"
+  sleep 5
+}
 
 # =============================================================================
 # ########################################################################### #
