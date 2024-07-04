@@ -10,7 +10,7 @@
 export NOMECONTAINER="openvpn-client"
 
 # From 1 to 10!
-var_cont="4"
+var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -19,7 +19,7 @@ CustmN1="Container"
 
 CustmN2="Local IP"
 CustmN3="Subnets "
-CustmN4="Config  "
+CustmN4="."
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -35,7 +35,7 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3=".0/24"
-VALUE4="config.ovpn"
+VALUE4="."
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -59,9 +59,10 @@ docker run -d \
 --cap-add=NET_ADMIN \
 --device=/dev/net/tun \
 -e "ALLOWED_SUBNETS=$var3" \
--e "CONFIG_FILE=$var4" \
+-e "VPN_CONFIG_FILE=config.ovpn" \
+-e "AUTH_SECRET=/config/auth.txt" \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
+-v /srv/containers/"$NOMECONTAINER"/config:/data/vpn \
 $docker_repo
   } || {
 docker run -d \
@@ -76,9 +77,10 @@ docker run -d \
 --cap-add=NET_ADMIN \
 --device=/dev/net/tun \
 -e "ALLOWED_SUBNETS=$var3" \
--e "CONFIG_FILE=$var4" \
+-e "VPN_CONFIG_FILE=config.ovpn" \
+-e "AUTH_SECRET=/config/auth.txt" \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
+-v /srv/containers/"$NOMECONTAINER"/config:/data/vpn \
 $docker_repo
   }
 }
