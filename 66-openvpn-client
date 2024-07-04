@@ -90,6 +90,13 @@ function makedir {
 # USE IT ONLY IF NEEDED:
 function docker_extras {
 
+clear; echo ""
+echo "Put this on config.ovpn:"
+echo "auth-user-pass auth.txt"
+echo "create auth.txt"
+echo ""
+sleep 5
+
 # =============================================================================
 # ########################################################################### #
 # =============================================================================
