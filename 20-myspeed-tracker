@@ -425,6 +425,10 @@ function create {
 
 ################################################################################
 
+# Force aways get newest version!
+clear
+docker pull germannewsmaker/myspeed
+
 # Start
 checkA
 menu
