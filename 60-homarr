@@ -54,8 +54,7 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
--e "PORT=$var3" \
--p $var3:7575 \
+-p 7575:7575 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
