@@ -88,7 +88,7 @@ function makedir {
 # USE IT ONLY IF NEEDED:
 function docker_extras {
 clear;
-echo "RUN: docker exec -it ejabberd ejabberdctl register admin localhost passw0rd"
+echo "RUN: docker exec -it ejabberd-chatserver ejabberdctl register admin localhost p4ss0wrd"
 sleep 5
 
 # =============================================================================
