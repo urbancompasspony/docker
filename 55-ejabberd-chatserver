@@ -426,6 +426,11 @@ function checkC {
 function create {
   export_all
   burn_var
+  [ -f /srv/containers/"$NOMECONTAINER"/conf/ejabberd.yml ] || {
+    curl -sSL https://raw.githubusercontent.com/processone/ejabberd/master/ejabberd.yml.example | sudo tee /srv/containers/"$NOMECONTAINER"/conf/ejabberd.yml
+  } && {
+    echo a >/dev/null
+  }
   docker_custom
   docker_extras
 }
