@@ -88,8 +88,11 @@ function makedir {
 # USE IT ONLY IF NEEDED:
 function docker_extras {
 clear;
-echo "RUN: docker exec -it ejabberd-chatserver ejabberdctl register admin localhost p4ss0wrd"
+echo "RUN: docker exec -it ejabberd-chatserver ejabberdctl register admin $var2 p4ss0wrd"
 sleep 5
+clear;
+echo "Use gajim or psi clients to access without TLS!"
+echo "There is no Android because of lack of TLS"
 
 # =============================================================================
 # ########################################################################### #
