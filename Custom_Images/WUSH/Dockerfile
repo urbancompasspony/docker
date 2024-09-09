@@ -34,8 +34,9 @@ RUN apt-get clean && \
     apt-get autoclean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://wush.dev/install.sh | sh
+RUN curl -fsSL https://raw.githubusercontent.com/coder/wush/main/install.sh | bash
 
 COPY start.sh /start.sh
+RUN chmod +x /start.sh
 ENTRYPOINT /start.sh
 #CMD ["/usr/sbin/sshd","-D"]
