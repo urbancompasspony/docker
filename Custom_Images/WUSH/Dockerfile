@@ -34,6 +34,8 @@ RUN apt-get clean && \
     apt-get autoclean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN curl -fsSL https://raw.githubusercontent.com/coder/wush/main/install.sh | bash
+
 ARG LOCAL_USER=user
 
 ARG PRIV_CMDS='/bin/ch*,/bin/cat,/bin/gunzip,/bin/tar,/bin/mkdir,/bin/ps,/bin/mv,/bin/cp,/usr/bin/apt*,/usr/bin/pip*,/bin/yum,/bin/snap,/bin/curl,/bin/tee'
@@ -49,9 +51,8 @@ ENV TERM=linux
 
 WORKDIR /home/${LOCAL_USER}
 
-RUN curl -fsSL https://raw.githubusercontent.com/coder/wush/main/install.sh | bash
-
 COPY start.sh /start.sh
-RUN chmod +x /start.sh
-ENTRYPOINT /start.sh
+RUN sudo chmod +x /start.sh
+ENTRYPOINT sudo /start.sh
+
 #CMD ["/usr/sbin/sshd","-D"]
