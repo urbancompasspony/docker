@@ -2,6 +2,6 @@
 
 while true;
   do
-    wush serve
+    /usr/bin/wush serve
     sleep 5
   done
