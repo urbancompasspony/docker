@@ -55,7 +55,7 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/coder/wush \
+-v /srv/containers/"$NOMECONTAINER"/config:/tmp \
 $docker_repo
   } || {
 docker run -d \
@@ -68,7 +68,7 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
+-v /srv/containers/"$NOMECONTAINER"/config:/tmp \
 $docker_repo
   }
 }
