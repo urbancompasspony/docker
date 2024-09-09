@@ -34,6 +34,21 @@ RUN apt-get clean && \
     apt-get autoclean && \
     rm -rf /var/lib/apt/lists/*
 
+ARG LOCAL_USER=user
+
+ARG PRIV_CMDS='/bin/ch*,/bin/cat,/bin/gunzip,/bin/tar,/bin/mkdir,/bin/ps,/bin/mv,/bin/cp,/usr/bin/apt*,/usr/bin/pip*,/bin/yum,/bin/snap,/bin/curl,/bin/tee'
+
+RUN adduser --disabled-password --gecos "ubuntu" --uid 1000 ${LOCAL_USER}  && \
+    usermod -aG sudo ${LOCAL_USER} && \
+    echo "$LOCAL_USER ALL=NOPASSWD: $PRIV_CMDS" >> /etc/sudoers
+
+USER ${LOCAL_USER}
+
+ENV SHELL=bash
+ENV TERM=linux
+
+WORKDIR /home/${LOCAL_USER}
+
 RUN curl -fsSL https://raw.githubusercontent.com/coder/wush/main/install.sh | bash
 
 COPY start.sh /start.sh
