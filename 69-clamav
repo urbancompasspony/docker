@@ -56,6 +56,7 @@ docker run -d \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/lib/clamav \
+-v /srv/containers/"$NOMECONTAINER"/virus:/virus \
 -v "$var3":/mnt:ro \
 $docker_repo
   } || {
@@ -70,19 +71,24 @@ docker run -d \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data:/var/lib/clamav \
+-v /srv/containers/"$NOMECONTAINER"/virus:/virus \
 -v "$var3":/mnt:ro \
 $docker_repo
   }
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/data
+  mkdir -p /srv/containers/"$NOMECONTAINER"/{data,virus}
 }
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+clear
+echo ""
+echo "Put this on Crontab:"
+echo "00 03 * * * docker exec -t clamAV clamscan --infected --allmatch --detect-pua --recursive --move=/virus /mnt"
+echo ""
+sleep 5
 
 # =============================================================================
 # ########################################################################### #
