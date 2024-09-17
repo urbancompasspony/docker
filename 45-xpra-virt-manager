@@ -65,7 +65,7 @@ function docker_custom {
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
 -v /dev/disk/by-id:/dev/disk/by-id \
-$docker_repo
+$docker_repo &
   } || {
     docker run -d \
 --privileged \
@@ -88,13 +88,12 @@ $docker_repo
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
 -v /dev/disk/by-id:/dev/disk/by-id \
-$docker_repo
+$docker_repo &
   }
 }
 
 function makedir {
   sudo mkdir -p /srv/containers/$NOMECONTAINER
-echo a > /dev/null
 }
 
 # USE IT ONLY IF NEEDED:
