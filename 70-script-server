@@ -55,8 +55,8 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 -p 5000:5000 \
+-p 8080:8080 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config/conf.json:/app/conf/conf.json \
 -v /srv/containers/"$NOMECONTAINER"/runners/:/app/conf/runners \
 -v /srv/containers/"$NOMECONTAINER"/scripts/:/app/scripts/ \
 $docker_repo
@@ -71,12 +71,67 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 -p 5000:5000 \
+-p 8080:8080 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config/conf.json:/app/conf/conf.json \
 -v /srv/containers/"$NOMECONTAINER"/runners/:/app/conf/runners \
 -v /srv/containers/"$NOMECONTAINER"/scripts/:/app/scripts/ \
 $docker_repo
   }
+}
+
+function script_json {
+echo -e "
+{
+  \x22port\x22: \x228080\x22,
+  \x22address\x22: \x22$var2\x22,
+  \x22title\x22: \x22SuitIT Script Server\x22,
+  \x22ssl\x22: {
+    \x22key_path\x22: \x22testing/ssl/script-server.key\x22,
+    \x22cert_path\x22: \x22testing/ssl/script-server.crt\x22
+  },
+  \x22auth\x22: {
+    \x22type\x22: \x22ldap\x22,
+    \x22url\x22: \x22ldap://127.0.0.1\x22,
+    \x22username_pattern\x22: \x22uid=$username,ou=people,dc=test,dc=ldap\x22,
+    \x22version\x22: 3,
+    \x22base_dn\x22: \x22dc=test,dc=ldap\x22,
+    \x22client_id\x22: \x2212345678.apps.googleusercontent.com\x22,
+    \x22secret\x22: \x22AbCdEfgHI\x22
+  },
+  \x22access\x22: {
+	\x22allowed_users\x22: [ \x22myname\x22, \x22my_friend\x22, \x22jack\x22, \x22joe\x22, \x22jihn\x22 ],
+	\x22admin_users\x22: [ \x22buggy@gmail.com\x22, \x22myname\x22 ],
+	\x22groups\x22: {
+		\x22dev\x22: [\x22jack\x22, \x22joe\x22, \x22jihn\x22],
+		\x22support\x22: [\x22my_friend\x22],
+		\x22all\x22: [\x22@admin_users\x22, \x22@dev\x22, \x22@support\x22, \x22alice\x22]
+	},
+	\x22trusted_ips\x22: [ \x22192.168.0.1\x22, \x22172.20.0.0/24\x22 ]
+  },
+  \x22alerts\x22: {
+    \x22destinations\x22: [
+      {
+        \x22type\x22: \x22email\x22,
+        \x22from\x22: \x22buggygm@gmail.com\x22,
+        \x22to\x22: \x22buggygm@gmail.com\x22,
+        \x22server\x22: \x22smtp.gmail.com\x22,
+        \x22auth_enabled\x22: true,
+        \x22login\x22: \x22buggygm@gmail.com\x22,
+        \x22password\x22: \x22$$EMAIL_PWD\x22,
+        \x22tls\x22: true,
+        \x22url\x22: \x22localhost:5000/test_alerts\x22
+      }
+    ]
+  },
+  \x22logging\x22: {
+    \x22execution_file\x22: \x22$DATE-$ID.log\x22,
+    \x22execution_date_format\x22: \x22%y-%m-%d_%H-%M\x22
+  },
+  \x22security\x22: {
+    \x22xsrf_protection\x22: \x22token\x22
+  }
+}" | tee /srv/containers/"$NOMECONTAINER"/config/conf.json
+
 }
 
 function makedir {
@@ -423,6 +478,7 @@ function checkC {
 function create {
   export_all
   burn_var
+  script_json
   docker_custom
   docker_extras
 }
