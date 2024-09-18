@@ -1,3 +1,8 @@
+#Sources:
+#https://github.com/bugy/script-server/tree/master
+#https://hub.docker.com/r/bugy/script-server
+#https://github.com/bugy/script-server/wiki/Server-configuration
+
 #!/bin/bash
 
 # =============================================================================
