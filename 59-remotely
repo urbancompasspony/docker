@@ -66,6 +66,7 @@ docker run -d \
 -e "Serilog__MinimumLevel__Override__System=Warning" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data:/app/AppData \
+-v /srv/containers/"$NOMECONTAINER"/keys:/root/.aspnet/DataProtection-Keys/ \
 -p 5000:5000 \
 $docker_repo
 }
@@ -73,7 +74,7 @@ $docker_repo
 # MYSQL NOT TESTED YET!
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/data
+  mkdir -p /srv/containers/"$NOMECONTAINER"/{data,keys}
 }
 
 # USE IT ONLY IF NEEDED:
