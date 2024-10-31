@@ -196,10 +196,16 @@ checkA
 checkB
 
 # AutoSet Crontab:
-sudo crontab -l > /tmp/crontab
-echo "# Nextcloud Maintenance" | tee -a /tmp/crontab
-echo "*/5 * * * * docker exec -t -u www-data nextcloud php -f /var/www/html/cron.php" | tee -a /tmp/crontab
-sudo crontab /tmp/crontab
+[ -f /srv/containers/scripts/cronnc ] && {
+  echo . >/dev/null
+} || {
+  sudo crontab -l > /tmp/crontab
+  echo "# Nextcloud Maintenance" | tee -a /tmp/crontab
+  echo "*/5 * * * * docker exec -t -u www-data nextcloud php -f /var/www/html/cron.php" | tee -a /tmp/crontab
+  sudo crontab /tmp/crontab
+
+  sudo touch /srv/containers/scripts/cronnc
+}
 
 clean
 
