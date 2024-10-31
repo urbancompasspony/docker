@@ -201,11 +201,14 @@ checkB
 } || {
   sudo crontab -l > /tmp/crontab
   echo "# Nextcloud Maintenance" | tee -a /tmp/crontab
-  echo "*/5 * * * * docker exec -t -u www-data nextcloud php -f /var/www/html/cron.php" | tee -a /tmp/crontab
+  echo "*/5 * * * * docker exec -t -u www-data "$NOMECONTAINER" php -f /var/www/html/cron.php" | tee -a /tmp/crontab
   sudo crontab /tmp/crontab
 
   sudo touch /srv/containers/scripts/cronnc
 }
+
+# Configure SAMBA
+docker exec -it "$NOMECONTAINER" apt update; sudo apt install smbclient -y
 
 clean
 
