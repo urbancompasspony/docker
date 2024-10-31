@@ -202,6 +202,7 @@ checkB
   sudo crontab -l > /tmp/crontab
   echo "# Nextcloud Maintenance" | tee -a /tmp/crontab
   echo "*/5 * * * * docker exec -t -u www-data "$NOMECONTAINER" php -f /var/www/html/cron.php" | tee -a /tmp/crontab
+  echo "# Nextcloud Check SMB Data" | tee -a /tmp/crontab
   echo "*/15 * * * * docker exec -t -u www-data "$NOMECONTAINER" ./occ files:scan --unscanned --all" | tee -a /tmp/crontab
   sudo crontab /tmp/crontab
 
