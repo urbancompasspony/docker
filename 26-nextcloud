@@ -209,6 +209,7 @@ checkB
 
 # Configure SAMBA
 docker exec -it "$NOMECONTAINER" apt update; sudo apt install smbclient -y
+docker restart "$NOMECONTAINER"
 
 clean
 
