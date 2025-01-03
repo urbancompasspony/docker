@@ -10,7 +10,7 @@ export NOMECONTAINER="unifi-network"
 # From 1 to 10!
 var_cont="5"
 
-randompass=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 6; echo)
+randompass=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 8; echo)
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -84,33 +84,20 @@ $docker_repo2
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{db,config}
-  sudo touch /srv/containers/"$NOMECONTAINER"/init-mongo.sh
-
-  echo -e "
-#!/bin/bash
-if which mongosh > /dev/null 2>&1; then
-  mongo_init_bin='mongosh'
-else
-  mongo_init_bin='mongo'
-fi
-"${mongo_init_bin}" <<EOF
-use ${MONGO_AUTHSOURCE}
-db.auth("${MONGO_INITDB_ROOT_USERNAME}", "${MONGO_INITDB_ROOT_PASSWORD}")
-db.createUser({
-  user: "${MONGO_USER}",
-  pwd: "${MONGO_PASS}",
-  roles: [
-    { db: "${MONGO_DBNAME}", role: "dbOwner" },
-    { db: "${MONGO_DBNAME}_stat", role: "dbOwner" }
-  ]
-})
-EOF" | tee /srv/containers/"$var3"/init-mongo.sh
+  mkdir -p /srv/containers/"$NOMECONTAINER"/config
 }
 
 function makecontextra {
-[ -f "/srv/containers/$var3/Information" ] || {
-docker run -d \
+[ -d /srv/containers/"$var3" ] && {
+  clear
+  echo "Container ja existente identificado! Ignorando."
+  sleep 1
+} || {
+  mkdir -p /srv/containers/"$var3"
+  sudo touch /srv/containers/"$var3"/init-mongo.sh
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Contratos/mongodb-model | tee /srv/containers/"$var3"/init-mongo.sh
+  
+  docker run -d \
   --name=$var3 \
   --network macvlan \
   --ip=$var4 \
