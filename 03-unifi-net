@@ -81,7 +81,6 @@ docker run -d \
   -v /etc/localtime:/etc/localtime:ro \
   --restart unless-stopped \
 $docker_repo2
-  }
 }
 
 function makedir {
