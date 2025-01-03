@@ -126,7 +126,7 @@ docker run -d \
   -v /etc/localtime:/etc/localtime:ro \
   -v /srv/containers/"$NOMECONTAINER":/config \
   --restart unless-stopped \
-  lscr.io/linuxserver/unifi-network-application:latest
+  lscr.io/linuxserver/unifi-controller:latest
   }
 
 function clean {
