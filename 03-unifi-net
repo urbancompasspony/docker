@@ -88,11 +88,6 @@ function makedir {
 }
 
 function makecontextra {
-[ -d /srv/containers/"$var3" ] && {
-  clear
-  echo "Container ja existente identificado! Ignorando."
-  sleep 1
-} || {
   mkdir -p /srv/containers/"$var3"
   sudo touch /srv/containers/"$var3"/init-mongo.sh
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Contratos/mongodb-model | tee /srv/containers/"$var3"/init-mongo.sh
@@ -115,7 +110,6 @@ function makecontextra {
   -v /srv/containers/"$var3"/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro \
   --restart unless-stopped \
   $docker_repo1
-  }
 }
 
 # USE IT ONLY IF NEEDED:
