@@ -49,6 +49,7 @@ docker_repo="ollama/ollama"
 function docker_custom {
   [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
 docker run -d \
+--gpus all \
 --name=$var1 \
 --network host \
 --hostname=$var1 \
@@ -60,6 +61,7 @@ docker run -d \
 $docker_repo serve
   } || {
 docker run -d \
+--gpus all \
 --name=$var1 \
 --network macvlan \
 --ip=$var2 \
