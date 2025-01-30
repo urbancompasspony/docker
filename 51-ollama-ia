@@ -15,7 +15,7 @@ function custom_names {
 # Static Name!
 CustmN1="Container"
 
-CustmN2="Local IP"
+CustmN2="GPUd"
 CustmN3="Port"
 CustmN4="."
 CustmN5="."
@@ -31,7 +31,7 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="localhost"
+VALUE2="nvidia or amd"
 VALUE3="11434"
 VALUE4="0"
 VALUE5="0"
@@ -43,11 +43,12 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="ollama/ollama"
+docker_repo1="ollama/ollama"
+docker_repo2="ollama/ollama:rocm"
 
 # Adjust if needed
 function docker_custom {
-  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+  [ "$var2" = "nvidia" ] && {
 docker run -d \
 --gpus all \
 --name=$var1 \
@@ -58,15 +59,28 @@ docker run -d \
 -p "$var4":"$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data:/root/.ollama \
-$docker_repo serve
-  } || {
+$docker_repo1 serve
+  } 
+
+[ "$var2" = "amd" ] && {
 docker run -d \
---gpus all \
+--device /dev/kfd \
+--device /dev/dri \
 --name=$var1 \
---network macvlan \
---ip=$var2 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
+--network host \
+--hostname=$var1 \
+--no-healthcheck \
+--restart=unless-stopped \
+-p "$var4":"$var3" \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/data:/root/.ollama \
+$docker_repo2 serve
+  }
+
+[ "$var2" = "cpu" ] && {
+docker run -d \
+--name=$var1 \
+--network host \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
