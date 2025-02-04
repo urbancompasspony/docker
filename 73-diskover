@@ -1,24 +1,11 @@
-docker run -d \
-  --name=diskover \
-  -e PUID=1000 \
-  -e PGID=1000 \
-  -e TZ=Etc/UTC \
-  -e ES_HOST=elasticsearch \
-  -e ES_PORT=9200 \
-  -p 80:80 \
-  -v /path/to/diskover/config:/config \
-  -v /path/to/diskover/data:/data \
-  --restart unless-stopped \
-  lscr.io/linuxserver/diskover:latest
-
-  #!/bin/bash
+#!/bin/bash
 
 # =============================================================================
 # ### C O N T R O L ### P A N E L ########################################### #
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="A-CUSTOM-A"
+export NOMECONTAINER="diskover"
 
 # From 1 to 10!
 var_cont="2"
@@ -56,7 +43,7 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="CUSTOM/DOCKER:LATEST"
+docker_repo="lscr.io/linuxserver/diskover:latest"
 
 # Adjust if needed
 function docker_custom {
@@ -67,6 +54,11 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-e PUID=1000 \
+-e PGID=1000 \
+-e ES_HOST=elasticsearch \
+-e ES_PORT=9200 \
+-p 80:80 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
@@ -81,6 +73,11 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-e PUID=1000 \
+-e PGID=1000 \
+-e ES_HOST=elasticsearch \
+-e ES_PORT=9200 \
+-p 80:80 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
