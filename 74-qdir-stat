@@ -8,7 +8,7 @@
 export NOMECONTAINER="qdir-stat"
 
 # From 1 to 10!
-var_cont="3"
+var_cont="5"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -17,8 +17,8 @@ CustmN1="Container"
 
 CustmN2="Local IP"
 CustmN3="Path:ro?"
-CustmN4="."
-CustmN5="."
+CustmN4="Username"
+CustmN5="Password"
 CustmN6="."
 CustmN7="."
 CustmN8="."
@@ -33,8 +33,8 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="/mnt:/data:ro"
-VALUE4="0"
-VALUE5="0"
+VALUE4="admin"
+VALUE5=""
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -58,6 +58,8 @@ docker run -d \
 -e PGID=1000 \
 -p 3000:3000 \
 -p 3001:3001 \
+-e CUSTOM_USER="$var4" \
+-e PASSWORD="$var5" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 -v $var3 \
@@ -72,6 +74,8 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-e CUSTOM_USER="$var4" \
+-e PASSWORD="$var5" \
 -e PUID=1000 \
 -e PGID=1000 \
 -p 3000:3000 \
