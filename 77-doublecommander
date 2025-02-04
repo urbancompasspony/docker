@@ -8,7 +8,7 @@
 export NOMECONTAINER="doublecommander"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,8 +16,8 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
+CustmN3="Username"
+CustmN4="Password"
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -32,8 +32,8 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
+VALUE3="admin"
+VALUE4="XXX"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -54,6 +54,8 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-e CUSTOM_USER="$var3" \
+-e PASSWORD="$var4" \
 -e PUID=1000 \
 -e PGID=1000 \
 -p 3000:3000 \
@@ -72,6 +74,8 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-e CUSTOM_USER="$var3" \
+-e PASSWORD="$var4" \
 -e PUID=1000 \
 -e PGID=1000 \
 -p 3000:3000 \
