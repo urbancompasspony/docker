@@ -54,6 +54,7 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-m 1GB \
 -p 9200:9200 \
 -e discovery.type=single-node \
 -e xpack.security.enabled=false \
@@ -72,6 +73,7 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-m 1GB \
 -p 9200:9200 \
 -e discovery.type=single-node \
 -e xpack.security.enabled=false \
