@@ -60,7 +60,7 @@ docker run -d \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
+-v /mnt:/data \
 $docker_repo
   } || {
 docker run -d \
@@ -78,7 +78,7 @@ docker run -d \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
+-v /mnt:/data \
 $docker_repo
   }
 }
