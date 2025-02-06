@@ -1,3 +1,36 @@
+echo "Executando diskover"
+
+wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Custom_Images/diskover/config_defaults.py -O /srv/containers/diskover/data/config_defaults.py
+
+docker stop diskover && docker rm diskover &&
+
+sudo mkdir -p /srv/containers/diskover/data
+sudo mkdir -p /srv/containers/diskover/config
+
+docker run -d \
+--name diskover \
+--network macvlan \
+--ip=172.20.0.34 \
+--dns=1.1.1.1 \
+--dns=127.0.0.1 \
+-e PUID=1000 \
+-e PGID=1000 \
+-e TZ=America/Bahia \
+-e ES_HOST=elasticsearch \
+-e ES_PORT=9200 \
+-e DATABASE=/config/diskoverdb.sqlite3 \
+-v /srv/containers/diskover/data/config_defaults.py:/app/diskover/config_defaults.py \
+-v /srv/containers/diskover/config:/config \
+-v /mnt/disk5p0:/data \
+-p 80:80 \
+--restart unless-stopped \
+-m 4096m \
+--privileged \
+lscr.io/linuxserver/diskover
+
+docker exec -u abc -d diskover python3 /app/diskover/diskover.py /data
+
+
 #!/bin/bash
 
 # =============================================================================
