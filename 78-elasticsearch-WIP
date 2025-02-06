@@ -1,3 +1,31 @@
+sudo sysctl -w vm.max_map_count=262144
+
+echo "Executando elasticsearch"
+
+docker stop elasticsearch && docker rm elasticsearch &&
+
+sudo mkdir -p /srv/containers/elasticsearch/data
+
+docker run -d \
+--name elasticsearch \
+--network macvlan \
+--ip=172.20.0.24 \
+--dns=1.1.1.1 \
+--dns=127.0.0.1 \
+-e PUID=1000 \
+-e PGID=1000 \
+-e discovery.type=single-node \
+-e xpack.security.enabled=false \
+-e bootstrap.memory_lock=true \
+-e "ES_JAVA_OPTS=-Xms1g -Xmx1g" \
+--ulimit memlock=-1:-1 \
+-v /srv/containers/elasticsearch/data:/usr/share/elasticsearch/data \
+-p 9200:9200 \
+--restart unless-stopped \
+--privileged \
+docker.elastic.co/elasticsearch/elasticsearch:7.17.22
+
+
 #!/bin/bash
 
 # =============================================================================
