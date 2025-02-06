@@ -24,8 +24,8 @@ conf = {
     'LOGDIRECTORY': '/var/log/diskover/',
     'MAXTHREADS': None,
     'BLOCKSIZE': 512,
-    'EXCLUDES_DIRS': ['.*', '.snapshot', '.Snapshot', '~snapshot', '~Snapshot', '.zfs'],
-    'EXCLUDES_FILES': ['.*', 'Thumbs.db', '.DS_Store', '._.DS_Store', '.localized', 'desktop.ini'],
+    'EXCLUDES_DIRS': ['.snapshot', '.Snapshot', '~snapshot', '~Snapshot', '.zfs'],
+    'EXCLUDES_FILES': ['Thumbs.db', '.DS_Store', '._.DS_Store', '.localized', 'desktop.ini'],
     'EXCLUDES_EMPTYFILES': True,
     'EXCLUDES_EMPTYDIRS': True,
     'EXCLUDES_MINFILESIZE': 1,
@@ -53,7 +53,7 @@ conf = {
     'ES_HOST': 'localhost',
     'ES_PORT': 9200,
     'ES_USER': 'admin',
-    'ES_PASS': '',
+    'ES_PASS': 'admin',
     'ES_HTTPS': False,
     'ES_SSLVERIFICATION': True,
     'ES_HTTPCOMPRESS': False,
@@ -68,3 +68,4 @@ conf = {
     'ES_SCROLLSIZE': 1000,
     'DATABASE': '/config/diskoverdb.sqlite3'
 }
+
