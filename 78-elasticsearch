@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="1024m"
+VALUE3="2048m"
 VALUE4="2"
 VALUE5="0"
 VALUE6="0"
