@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="-v /mnt:/data"
+VALUE3="/mnt:/data"
 VALUE4="4096m"
 VALUE5="0"
 VALUE6="0"
@@ -47,26 +47,7 @@ docker_repo="lscr.io/linuxserver/diskover"
 
 # Adjust if needed
 function docker_custom {
-  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
-docker run -d \
---name=$var1 \
---network host \
---hostname=$var1 \
---no-healthcheck \
---restart=unless-stopped \
--e PUID=1000 \
--e PGID=1000 \
--e ES_HOST=elasticsearch \
--e ES_PORT=9200 \
--e DATABASE=/config/diskoverdb.sqlite3 \
--p 80:80 \
--m "$var4" \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/data/config_defaults.py:/app/diskover/config_defaults.py \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
-$docker_repo
-  } || {
-docker run -d \
+  docker run -d \
 --name=$var1 \
 --network macvlan \
 --ip=$var2 \
@@ -82,11 +63,11 @@ docker run -d \
 -e DATABASE=/config/diskoverdb.sqlite3 \
 -p 80:80 \
 -m "$var4" \
+-v "$var3" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/data/config_defaults.py:/app/diskover/config_defaults.py \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 $docker_repo
-  }
 }
 
 function makedir {
