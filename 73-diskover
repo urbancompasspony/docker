@@ -1,36 +1,3 @@
-echo "Executando diskover"
-
-wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Custom_Images/diskover/config_defaults.py -O /srv/containers/diskover/data/config_defaults.py
-
-docker stop diskover && docker rm diskover &&
-
-sudo mkdir -p /srv/containers/diskover/data
-sudo mkdir -p /srv/containers/diskover/config
-
-docker run -d \
---name diskover \
---network macvlan \
---ip=172.20.0.34 \
---dns=1.1.1.1 \
---dns=127.0.0.1 \
--e PUID=1000 \
--e PGID=1000 \
--e TZ=America/Bahia \
--e ES_HOST=elasticsearch \
--e ES_PORT=9200 \
--e DATABASE=/config/diskoverdb.sqlite3 \
--v /srv/containers/diskover/data/config_defaults.py:/app/diskover/config_defaults.py \
--v /srv/containers/diskover/config:/config \
--v /mnt/disk5p0:/data \
--p 80:80 \
---restart unless-stopped \
--m 4096m \
---privileged \
-lscr.io/linuxserver/diskover
-
-docker exec -u abc -d diskover python3 /app/diskover/diskover.py /data
-
-
 #!/bin/bash
 
 # =============================================================================
@@ -41,7 +8,7 @@ docker exec -u abc -d diskover python3 /app/diskover/diskover.py /data
 export NOMECONTAINER="diskover"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -49,8 +16,8 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
+CustmN3="Target  "
+CustmN4="Memory  "
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -65,8 +32,8 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
+VALUE3="-v /mnt:/data"
+VALUE4="4096m"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -76,7 +43,7 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="lscr.io/linuxserver/diskover:latest"
+docker_repo="lscr.io/linuxserver/diskover"
 
 # Adjust if needed
 function docker_custom {
@@ -91,10 +58,12 @@ docker run -d \
 -e PGID=1000 \
 -e ES_HOST=elasticsearch \
 -e ES_PORT=9200 \
+-e DATABASE=/config/diskoverdb.sqlite3 \
 -p 80:80 \
+-m "$var4" \
 -v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/data/config_defaults.py:/app/diskover/config_defaults.py \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
 $docker_repo
   } || {
 docker run -d \
@@ -110,22 +79,24 @@ docker run -d \
 -e PGID=1000 \
 -e ES_HOST=elasticsearch \
 -e ES_PORT=9200 \
+-e DATABASE=/config/diskoverdb.sqlite3 \
 -p 80:80 \
+-m "$var4" \
 -v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/data/config_defaults.py:/app/diskover/config_defaults.py \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
 $docker_repo
   }
 }
 
 function makedir {
+  wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Custom_Images/diskover/config_defaults.py -O /srv/containers/"$NOMECONTAINER"/data/config_defaults.py
   mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
 }
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+  docker exec -u abc -d "$NOMECONTAINER" python3 /app/diskover/diskover.py /data
 
 # =============================================================================
 # ########################################################################### #
