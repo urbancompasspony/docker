@@ -1,66 +1,5 @@
 #!/bin/bash
 
-sudo sysctl -w vm.max_map_count=262144
-
-echo "Executando elasticsearch"
-
-docker stop elasticsearch && docker rm elasticsearch &&
-
-sudo mkdir -p /srv/containers/elasticsearch/data
-
-docker run -d \
---name elasticsearch \
---network macvlan \
---ip=172.20.0.24 \
---dns=1.1.1.1 \
---dns=127.0.0.1 \
--e PUID=1000 \
--e PGID=1000 \
--e discovery.type=single-node \
--e xpack.security.enabled=false \
--e bootstrap.memory_lock=true \
--e "ES_JAVA_OPTS=-Xms1g -Xmx1g" \
---ulimit memlock=-1:-1 \
--v /srv/containers/elasticsearch/data:/usr/share/elasticsearch/data \
--p 9200:9200 \
---restart unless-stopped \
---privileged \
-docker.elastic.co/elasticsearch/elasticsearch:7.17.22
-
-echo "Executando Sist-2"
-
-docker stop sist-2 && docker rm sist-2 &&
-
-sudo mkdir -p /srv/containers/sist-2/data
-
-docker run -d \
---name sist-2 \
---network macvlan \
---ip=172.20.0.34 \
---dns=1.1.1.1 \
---dns=127.0.0.1 \
---restart unless-stopped \
--v /srv/containers/sist-2/data:/sist2-admin/ \
--v /mnt/disk5p0:/host \
--p 4090:4090 \
--p 8080:8080 \
--m 4096m \
--w /root/sist2-admin/ \
---entrypoint python3 simon987/sist2:3.4.2-x64-linux /root/sist2-admin/sist2_admin/app.py
-
-#docker exec -u abc -d diskover python3 /app/diskover/diskover.py /data
-
-echo "Pronto!"
-
-
-
-
-
-
-
-
-#!/bin/bash
-
 # =============================================================================
 # ### C O N T R O L ### P A N E L ########################################### #
 # =============================================================================
@@ -69,7 +8,7 @@ echo "Pronto!"
 export NOMECONTAINER="A-CUSTOM-A"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -77,8 +16,8 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
+CustmN3="Target  "
+CustmN4="Memory  "
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -93,8 +32,8 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
+VALUE3="/mnt:/host"
+VALUE4="4096m"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -103,24 +42,9 @@ VALUE9="0"
 VALUE10="0"
 }
 
-# Set repository here!
-docker_repo="CUSTOM/DOCKER:LATEST"
-
 # Adjust if needed
 function docker_custom {
-  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
-docker run -d \
---name=$var1 \
---network host \
---hostname=$var1 \
---no-healthcheck \
---restart=unless-stopped \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
-$docker_repo
-  } || {
-docker run -d \
+  docker run -d \
 --name=$var1 \
 --network macvlan \
 --ip=$var2 \
@@ -129,15 +53,18 @@ docker run -d \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
+-p 4090:4090 \
+-p 8080:8080 \
+-m "$var4" \
+-w /root/sist2-admin/ \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
-$docker_repo
-  }
+-v "$var3" \
+-v /srv/containers/"$NOMECONTAINER"/data:/sist2-admin/ \
+--entrypoint python3 simon987/sist2:3.4.2-x64-linux /root/sist2-admin/sist2_admin/app.py
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/data
 }
 
 # USE IT ONLY IF NEEDED:
