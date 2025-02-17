@@ -57,18 +57,15 @@ docker run -d \
 --no-healthcheck \
 --restart=unless-stopped \
 --privileged \
--e SSL_CERT_DIR="/container/certs" \
--e CATTLE_TLS_MIN_VERSION="1.0" \
 -p 80:80 \
 -p 443:443 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/certs:/container/certs \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/lib/rancher \
-$docker_repo
+$docker_repo --no-cacerts
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,certs}
+  mkdir -p /srv/containers/"$NOMECONTAINER"/config
 }
 
 # USE IT ONLY IF NEEDED:
