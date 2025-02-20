@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# DEPRECATED
+# USE THIS JUST TO UPGRADE OLD PIHOLE INSTANCES!
+# EVENTUALLY, DELETE THIS.
+
 # Global config for replication:
 export NOMECONTAINER="unifi"
 
