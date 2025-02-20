@@ -8,7 +8,7 @@
 export NOMECONTAINER="pihole"
 
 # From 1 to 10!
-var_cont="5"
+var_cont="6"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -19,7 +19,7 @@ CustmN2="Password "
 CustmN3="IP = Host"
 CustmN4="Container"
 CustmN5="Interface"
-CustmN6="."
+CustmN6="TimeZone "
 CustmN7="."
 CustmN8="."
 CustmN9="."
@@ -32,10 +32,10 @@ function custom_values {
 VALUE1="0.0.0.0"
 
 VALUE2="P4ssw0rd"
-VALUE3="0.0.0.0"
+VALUE3="deprecated!"
 VALUE4="pihole"
 VALUE5="macvlan"
-VALUE6="0"
+VALUE6="America/Bahia"
 VALUE7="0"
 VALUE8="0"
 VALUE9="0"
@@ -55,8 +55,9 @@ function docker_custom {
 --no-healthcheck \
 --restart=unless-stopped \
 --shm-size=512m \
--e SERVERIP=$var3 \
--e WEBPASSWORD=$var2 \
+-e FTLCONF_webserver_api_password=$var2 \
+-e TZ=$var6 \
+-e FTLCONF_dns_listeningMode=all \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
 -v /srv/containers/"$NOMECONTAINER"/dnsmasq.d/:/etc/dnsmasq.d \
@@ -78,8 +79,8 @@ $docker_repo
 --no-healthcheck \
 --restart=unless-stopped \
 --shm-size=512m \
--e SERVERIP=$var1 \
--e WEBPASSWORD=$var2 \
+-e FTLCONF_webserver_api_password=$var2 \
+-e TZ=$var6 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/etc/:/etc/pihole \
 -v /srv/containers/"$NOMECONTAINER"/dnsmasq.d/:/etc/dnsmasq.d \
