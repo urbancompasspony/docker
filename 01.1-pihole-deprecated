@@ -4,6 +4,9 @@
 # USE THIS JUST TO UPGRADE OLD PIHOLE INSTANCES!
 # EVENTUALLY, DELETE THIS.
 
+#THE COMMAND IS ALREADY SET! Nothing to do:
+#docker exec "$NOMECONTAINER" pihole-FTL --config misc.etc_dnsmasq_d true
+
 # =============================================================================
 # ### C O N T R O L ### P A N E L ########################################### #
 # =============================================================================
@@ -105,6 +108,9 @@ function makedir {
 function docker_extras {
 
 docker start "$NOMECONTAINER"
+
+docker exec "$NOMECONTAINER" pihole-FTL --config misc.etc_dnsmasq_d true
+
 docker exec "$NOMECONTAINER" rm /etc/pihole/pihole-FTL.conf
 docker exec "$NOMECONTAINER" touch /etc/pihole/pihole-FTL.conf
 docker exec "$NOMECONTAINER" bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
