@@ -214,6 +214,8 @@ docker exec -it "$NOMECONTAINER" apt update
 docker exec -it "$NOMECONTAINER" apt install smbclient libsmbclient-dev -y
 docker restart "$NOMECONTAINER"
 
+docker image prune -af
+
 clean
 
 exit 1
