@@ -184,11 +184,21 @@ $REPOSITORY
 
 # Start here!
 docker pull "$REPOSITORY"
-checkA
-checkB
-docker image prune --all
-
+checkA; checkB
 clear
+
+echo ""; echo "############################################################"
+echo ""; echo "Setting multi-path shared folders"; echo ""
+sudo mkdir /srv/containers/$NOMECONTAINER/config/smb.conf.d/
+[ $(ls -A "/srv/containers/$NOMECONTAINER/config/smb.conf.d/" | wc -l) -ne 0 ] || {
+  sudo touch /srv/containers/$NOMECONTAINER/config/smb.conf.d/EMPTY.conf
+  echo "include = /etc/samba/external/includes.conf" | sudo tee -a /srv/containers/$NOMECONTAINER/config/smb.conf
+  docker exec $NOMECONTAINER bash -c "ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf"
+  echo ""; echo "Multipath configured."
+} && {
+  echo "Everything Ok."
+}
+sleep 0.5
 
 echo ""; echo "############################################################"
 echo ""; echo "Removing loopback network from smb.conf"; echo ""
@@ -255,18 +265,7 @@ sleep 0.5
 
 echo ""; echo "############################################################"
 echo ""; echo "Checking if container is Ok, UP and Running:"; echo ""
-echo "5"
-sleep 1
-echo "4"
-sleep 1
-echo "3"
-sleep 1
-echo "2"
-sleep 1
-echo "1"
-sleep 1
-echo "0"
-sleep 1
+echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1; echo "0"; sleep 1
 echo ""; echo "Active Directory & Domain Controller is Ok, UP and Running!"; echo ""
 sleep 3
 
@@ -278,5 +277,7 @@ unset var5
 unset var6
 unset var7
 unset var8
+
+docker image prune -af
 
 exit 1
