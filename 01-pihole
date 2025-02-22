@@ -488,4 +488,6 @@ unset var8
 unset var9
 unset var10
 
+docker image prune -af
+
 exit 1
