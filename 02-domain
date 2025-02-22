@@ -188,19 +188,6 @@ checkA; checkB
 clear
 
 echo ""; echo "############################################################"
-echo ""; echo "Setting multi-path shared folders"; echo ""
-sudo mkdir /srv/containers/$NOMECONTAINER/config/smb.conf.d/
-[ $(ls -A "/srv/containers/$NOMECONTAINER/config/smb.conf.d/" | wc -l) -ne 0 ] || {
-  sudo touch /srv/containers/$NOMECONTAINER/config/smb.conf.d/EMPTY.conf
-  echo "include = /etc/samba/external/includes.conf" | sudo tee -a /srv/containers/$NOMECONTAINER/config/smb.conf
-  docker exec $NOMECONTAINER bash -c "ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf"
-  echo ""; echo "Multipath configured."
-} && {
-  echo "Everything Ok."
-}
-sleep 0.5
-
-echo ""; echo "############################################################"
 echo ""; echo "Removing loopback network from smb.conf"; echo ""
 sudo sed -i '/127.0.0/d' /srv/containers/$NOMECONTAINER/config/smb.conf
 echo "OK"
@@ -241,6 +228,20 @@ echo ""; echo "############################################################"
 echo ""; echo "Restarting Domain!"; echo ""
 docker restart "$NOMECONTAINER"
 echo ""; echo "OK"
+sleep 0.5
+
+echo ""; echo "############################################################"
+echo ""; echo "Setting multi-path shared folders"; echo ""
+sudo mkdir /srv/containers/$NOMECONTAINER/config/smb.conf.d/
+[ $(ls -A "/srv/containers/$NOMECONTAINER/config/smb.conf.d/" | wc -l) -ne 0 ] || {
+  sudo touch /srv/containers/$NOMECONTAINER/config/smb.conf.d/EMPTY.conf
+  echo "include = /etc/samba/external/includes.conf" | sudo tee -a /srv/containers/$NOMECONTAINER/config/smb.conf
+  echo "ldap server require strong auth = no" | sudo tee -a /srv/containers/$NOMECONTAINER/config/smb.conf
+  docker exec $NOMECONTAINER bash -c "ls /etc/samba/external/smb.conf.d/* | sed -e 's/^/include = /' > /etc/samba/external/includes.conf"
+  echo ""; echo "Multipath configured."
+} && {
+  echo "Everything Ok."
+}
 sleep 0.5
 
 echo ""; echo "############################################################"
