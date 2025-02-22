@@ -143,8 +143,9 @@ function clean {
 }
 
 # Start
+docker pull $docker_repo
 checkA
 menu
 clean
-
+docker image prune -af
 exit 1
