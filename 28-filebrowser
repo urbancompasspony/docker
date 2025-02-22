@@ -426,6 +426,7 @@ function checkC {
 }
 
 function create {
+  docker pull $docker_repo 
   export_all
   burn_var
   docker_custom
@@ -441,6 +442,7 @@ menu
 ################################################################################
 
 #Ending
+docker image prune -af
 unset var1
 unset var2
 unset var3
