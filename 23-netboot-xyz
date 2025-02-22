@@ -422,7 +422,7 @@ function create {
 ################################################################################
 
 # Keep up to date!
-docker pull ghcr.io/netbootxyz/netbootxyz
+docker pull $docker_repo
 
 # Start
 checkA
@@ -431,6 +431,7 @@ menu
 ################################################################################
 
 #Ending
+docker image prune -af
 unset var1
 unset var2
 unset var3
