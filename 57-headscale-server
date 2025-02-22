@@ -433,6 +433,7 @@ function create {
 ################################################################################
 
 # Start
+docker pull $docker_repo
 checkA
 docker_extras
 special_headscale
@@ -452,6 +453,7 @@ echo ""; echo "############################################################"
 ################################################################################
 
 #Ending
+docker image prune -af
 unset var1
 unset var2
 unset var3
