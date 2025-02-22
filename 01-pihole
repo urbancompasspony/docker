@@ -468,7 +468,7 @@ function create {
 
 # Force aways get newest version!
 clear
-docker pull pihole/pihole:latest
+docker pull $docker_repo
 
 # Start
 checkA
