@@ -43,7 +43,7 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="lscr.io/linuxserver/minetest:latest"
+docker_repo="lscr.io/linuxserver/luanti:latest"
 
 # Adjust if needed
 function docker_custom {
@@ -408,6 +408,7 @@ function checkC {
 }
 
 function create {
+  docker pull $docker_repo
   export_all
   burn_var
   docker_custom
@@ -423,6 +424,9 @@ menu
 ################################################################################
 
 #Ending
+
+docker image prune -af
+
 unset var1
 unset var2
 unset var3
