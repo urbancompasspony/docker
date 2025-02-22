@@ -423,7 +423,7 @@ function create {
 ################################################################################
 
 #Ending
-docker image prune -a f
+docker image prune -af
 unset var1
 unset var2
 unset var3
