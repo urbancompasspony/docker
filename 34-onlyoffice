@@ -159,9 +159,10 @@ function clean {
 }
 
 # Start
+docker pull onlyoffice/documentserver
 checkA
 checkB
 extras
 clean
-
+docker image prune -af
 exit 1
