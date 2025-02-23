@@ -100,8 +100,7 @@ function makedir {
 }
 
 function docker_extras {
-
-docker start "$NOMECONTAINER"; sleep 5
+clear; echo ""; echo "Esperar 5s antes de aplicar as configs"; sleep 5
 docker exec "$NOMECONTAINER" pihole-FTL --config misc.etc_dnsmasq_d true
 
 docker exec "$NOMECONTAINER" rm /etc/pihole/pihole-FTL.conf
