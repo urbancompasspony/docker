@@ -42,6 +42,9 @@ VALUE9="0"
 VALUE10="0"
 }
 
+# Set repository here!
+docker_repo="simon987/sist2:x64-linux"
+
 # Adjust if needed
 function docker_custom {
   docker run -d \
@@ -60,7 +63,7 @@ function docker_custom {
 -v /etc/localtime:/etc/localtime:ro \
 -v "$var3" \
 -v /srv/containers/"$NOMECONTAINER"/data:/sist2-admin/ \
---entrypoint python3 simon987/sist2:3.4.2-x64-linux /root/sist2-admin/sist2_admin/app.py
+--entrypoint python3 $docker_repo /root/sist2-admin/sist2_admin/app.py
 }
 
 function makedir {
@@ -405,7 +408,7 @@ function checkC {
 }
 
 function create {
-  docker pull simon987/sist2:3.4.2-x64-linux
+  docker pull $docker_repo
   export_all
   burn_var
   docker_custom
