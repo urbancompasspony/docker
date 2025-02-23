@@ -48,7 +48,6 @@ function checkB {
 
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
-
           create
         } || {
           create
@@ -57,9 +56,7 @@ function checkB {
       } || {
         docker stop "$NOMECONTAINER"
         docker rm "$NOMECONTAINER"
-
         rm -iR /srv/containers/"$NOMECONTAINER"
-
         menu
         }
     } || {
@@ -135,7 +132,6 @@ function create {
 
   mkdir -p /srv/containers/"$NOMECONTAINER"/{log,data,config}
   mkdir -p /srv/containers/"$NOMECONTAINER"/cups/{config,log,filter}
-
   touch /srv/containers/"$NOMECONTAINER"/Information
   touch /srv/containers/"$NOMECONTAINER"/log/syslog
 
