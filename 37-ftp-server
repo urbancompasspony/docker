@@ -13,6 +13,8 @@ export var5
 # PLACA DE REDE A SER USADA
 NETWORKLAN="macvlan"
 
+docker_repo="bogem/ftp"
+
 function menu {
   export var1; export var2; export var3; export var4; export var5
 
@@ -132,7 +134,7 @@ $var3 \
 -p 20:20 \
 -p 21:21 \
 -p 47400-47470:47400-47470 \
-bogem/ftp
+$docker_repo
 }
 
 function clean {
