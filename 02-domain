@@ -129,6 +129,8 @@ function checkC {
 }
 
 function create {
+  docker pull "$REPOSITORY"
+
   export var1; export var2; export var3; export var4; export var5; export var6; export var7; export var8
 
   mkdir -p /srv/containers/"$NOMECONTAINER"/{log,data,config}
@@ -183,7 +185,6 @@ $REPOSITORY
 }
 
 # Start here!
-docker pull "$REPOSITORY"
 checkA; checkB
 clear
 
