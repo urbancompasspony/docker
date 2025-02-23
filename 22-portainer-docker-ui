@@ -421,10 +421,8 @@ function create {
 checkA
 menu
 
-################################################################################
-
-#Ending
 docker image prune -af
+
 unset var1
 unset var2
 unset var3
