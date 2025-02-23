@@ -88,10 +88,8 @@ function checkC {
 }
 
 function create {
-  export var1
-
-  mkdir -p /srv/containers/"$NOMECONTAINER"
-
+  docker pull onlyoffice/documentserver
+  export var1; mkdir -p /srv/containers/"$NOMECONTAINER"
   touch /srv/containers/"$NOMECONTAINER"/Information
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
 
@@ -159,7 +157,6 @@ function clean {
 }
 
 # Start
-docker pull onlyoffice/documentserver
 checkA
 checkB
 extras
