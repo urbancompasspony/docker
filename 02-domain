@@ -184,6 +184,8 @@ $REPOSITORY
 checkA; checkB
 clear
 
+clear; echo ""; echo "Wait 5s before apply configs"; sleep 5
+
 echo ""; echo "############################################################"
 echo ""; echo "Removing loopback network from smb.conf"; echo ""
 sudo sed -i '/127.0.0/d' /srv/containers/$NOMECONTAINER/config/smb.conf
