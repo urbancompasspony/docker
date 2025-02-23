@@ -195,17 +195,11 @@ echo "OK"
 sleep 0.5
 
 echo ""; echo "############################################################"
-echo ""; echo "Restoring CUPS Default Config"; echo ""
+echo ""; echo "CUPS Default Config"; echo ""
 docker exec $NOMECONTAINER bash -c "cp -rp /etc/cups-bak/* /etc/cups/"
 docker exec $NOMECONTAINER bash -c "cp -rp /filter/* /usr/lib/cups/filter/"
 docker exec $NOMECONTAINER bash -c "chmod 0755 -R /usr/lib/cups/filter/"
 docker exec $NOMECONTAINER bash -c "chown root:root -R /usr/lib/cups/filter/"
-
-echo "OK"
-sleep 0.5
-
-echo ""; echo "############################################################"
-echo ""; echo "Adjusting CUPS Services"; echo ""
 docker exec $NOMECONTAINER bash -c "sed -i 's/Listen localhost:631/Listen 0.0.0.0:631/' /etc/cups/cupsd.conf"
 docker exec $NOMECONTAINER bash -c "sed -i 's/Browsing Off/Browsing On/' /etc/cups/cupsd.conf"
 docker exec $NOMECONTAINER bash -c "sed -i 's/<Location \/>/<Location \/>\n  Allow All/' /etc/cups/cupsd.conf"
@@ -234,7 +228,7 @@ sleep 0.5
 echo ""; echo "############################################################"
 echo ""; echo "Setting multi-path shared folders"; echo ""
 sudo mkdir /srv/containers/$NOMECONTAINER/config/smb.conf.d/
-[ $(ls -A "/srv/containers/$NOMECONTAINER/config/smb.conf.d/" | wc -l) -ne 0 ] || {
+[ $(ls -A /srv/containers/$NOMECONTAINER/config/smb.conf.d/ | wc -l) -ne 0 ] || {
   sudo touch /srv/containers/$NOMECONTAINER/config/smb.conf.d/EMPTY.conf
   echo "include = /etc/samba/external/includes.conf" | sudo tee -a /srv/containers/$NOMECONTAINER/config/smb.conf
   echo "ldap server require strong auth = no" | sudo tee -a /srv/containers/$NOMECONTAINER/config/smb.conf
