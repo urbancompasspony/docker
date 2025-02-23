@@ -421,15 +421,11 @@ function create {
 
 ################################################################################
 
-#if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  checkA
-  menu
-#fi
+checkA
+menu
 
-################################################################################
-
-#Ending
 docker image prune -af
+
 unset var1
 unset var2
 unset var3
