@@ -409,7 +409,6 @@ function checkC {
 
 function create {
   docker pull $docker_repo
-
   export_all
   burn_var
   docker_custom
@@ -421,10 +420,6 @@ function create {
 # Start
 checkA
 menu
-
-################################################################################
-
-#Ending
 
 docker image prune -af
 
