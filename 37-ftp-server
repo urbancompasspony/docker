@@ -104,6 +104,7 @@ function checkC {
 }
 
 function create {
+  docker pull $docker_repo
   export var1; export var2; export var3; export var4; export var5
   
   mkdir -p /srv/containers/"$var2"
@@ -143,7 +144,6 @@ function clean {
 }
 
 # Start
-docker pull $docker_repo
 checkA
 menu
 clean
