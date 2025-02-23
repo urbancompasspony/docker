@@ -405,7 +405,7 @@ function checkC {
 }
 
 function create {
-  docker pull $docker_repo
+  docker pull simon987/sist2:3.4.2-x64-linux
   export_all
   burn_var
   docker_custom
@@ -414,12 +414,8 @@ function create {
 
 ################################################################################
 
-#if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  checkA
-  menu
-#fi
-
-################################################################################
+checkA
+menu
 
 #Ending
 docker image prune -af
