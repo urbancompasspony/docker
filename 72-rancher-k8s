@@ -413,17 +413,11 @@ function create {
   docker_extras
 }
 
-################################################################################
+checkA
+menu
 
-#if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  checkA
-  menu
-#fi
-
-################################################################################
-
-#Ending
 docker image prune -af
+
 unset var1
 unset var2
 unset var3
