@@ -458,6 +458,7 @@ function checkC {
 }
 
 function create {
+  docker pull $docker_repo
   export_all
   burn_var
   docker_custom
@@ -466,15 +467,8 @@ function create {
 
 ################################################################################
 
-# Force aways get newest version!
-clear
-docker pull $docker_repo
-
-# Start
 checkA
 menu
-
-################################################################################
 
 #Ending
 unset var1
