@@ -155,7 +155,9 @@ echo ""
 echo "HBBR | $var2 | 21117 (TCP) / 21119 (TCP)" >> /srv/containers/"$NOMECONTAINER"/Information
 echo ""
 sleep 15
+
 docker image prune -af
+
 unset var1
 unset var2
 
