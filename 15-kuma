@@ -43,7 +43,7 @@ VALUE10="0"
 }
 
 # Set repository here!
-docker_repo="louislam/uptime-kuma:1"
+docker_repo="louislam/uptime-kuma:latest"
 
 # Adjust if needed
 function docker_custom {
@@ -426,25 +426,16 @@ function checkC {
 }
 
 function create {
+  docker pull $docker_repo
   export_all
   burn_var
   docker_custom
   docker_extras
 }
 
-################################################################################
-
-# Force aways get newest version!
-clear
-docker pull louislam/uptime-kuma:1
-
-# Start
 checkA
 menu
 
-################################################################################
-
-#Ending
 docker image prune -af
 
 unset var1
