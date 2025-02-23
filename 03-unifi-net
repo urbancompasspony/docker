@@ -452,7 +452,6 @@ function checkC {
 
 function create {
   docker pull $docker_repo2
-
   export_all
   burn_var
   docker_custom
@@ -461,16 +460,8 @@ function create {
 
 ################################################################################
 
-#if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  checkA
-  menu
-#fi
-
-################################################################################
-
-#Ending
-
-docker image prune -af
+checkA
+menu
 
 unset var1
 unset var2
@@ -482,5 +473,7 @@ unset var7
 unset var8
 unset var9
 unset var10
+
+docker image prune -af
 
 exit 1
