@@ -66,6 +66,7 @@ function checkB {
         var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
         var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
         var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
+        var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
 
         [ $(docker stop "$NOMECONTAINER") ] && {
           docker rm "$NOMECONTAINER"
@@ -105,6 +106,7 @@ function menu {
 "Nxt Data:" 2 1 "$VALUE2" 2 10 40 0 \
 "URL WAN :" 3 1 "$VALUE3" 3 10 50 0 \
 "Version :" 4 1 "$VALUE4" 4 10 50 0 \
+"DNS     :" 5 1 "$VALUE4" 5 10 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
@@ -112,8 +114,9 @@ function menu {
   var2=$(echo "$VALUE0" | sed -n 2p)
   var3=$(echo "$VALUE0" | sed -n 3p)
   var4=$(echo "$VALUE0" | sed -n 4p)
+  var5=$(echo "$VALUE0" | sed -n 5p)
 
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ]  || [ -z "$var4" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ]  || [ -z "$var4" ] || [ -z "$var5" ] && {
     dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
     menu
   } || {
@@ -159,6 +162,7 @@ opcache.revalidate_freq=60" > /srv/containers/"$NOMECONTAINER"/php/opcache-recom
   echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
   echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
+  echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
 
 docker pull nextcloud:"$var4"
 
@@ -166,8 +170,7 @@ docker run -d \
 --name=$NOMECONTAINER \
 --network macvlan \
 --ip=$var1 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
+--dns=$var5  \
 --hostname=nextcloud \
 --restart=unless-stopped \
 --no-healthcheck \
