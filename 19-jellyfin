@@ -8,16 +8,16 @@
 export NOMECONTAINER="jellyfin"
 
 # From 1 to 10!
-var_cont="3"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
 # Static Name!
 CustmN1="Container"
 
-CustmN2="Local IP"
+CustmN2="Local IP  "
 CustmN3="Multimidia"
-CustmN4="."
+CustmN4="PiHole?   "
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -33,7 +33,7 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="/mnt/disk01"
-VALUE4="0"
+VALUE4="1.0.0.1"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -64,8 +64,7 @@ docker run -d \
 --name=$var1 \
 --network macvlan \
 --ip=$var2 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
+--dns=$var4 \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
