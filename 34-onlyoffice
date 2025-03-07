@@ -53,8 +53,8 @@ JWT_SECRET_0=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
 docker run -d \
 --name=$NOMECONTAINER \
 --network macvlan \
---ip=$var1 \
---dns=1.1.1.1  \
+--ip=$var2 \
+--dns=$var3  \
 --hostname=$NOMECONTAINER \
 --restart=unless-stopped \
 --no-healthcheck \
