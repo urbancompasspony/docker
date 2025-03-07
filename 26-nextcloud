@@ -104,7 +104,7 @@ function menu {
 "Nxt Data:" 2 1 "$VALUE2" 2 10 40 0 \
 "URL WAN :" 3 1 "$VALUE3" 3 10 50 0 \
 "Version :" 4 1 "$VALUE4" 4 10 50 0 \
-"DNS     :" 5 1 "$VALUE4" 5 10 50 0 \
+"PiHole? :" 5 1 "$VALUE4" 5 10 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
