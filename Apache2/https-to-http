@@ -1,5 +1,5 @@
 
-# ADD THESE ON <VirtualHost *:443> :
+# ADD THESE ON <VirtualHost *:80> :
 
     ProxyPreserveHost On
 
@@ -9,6 +9,8 @@
     RewriteRule ^/?(.*) "ws://luoffice.ddns.net/$1" [P,L]
     RewriteCond %{SERVER_NAME} =luoffice.ddns.net
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+
+# ADD THESE ON <VirtualHost *:443> :
 
         ProxyPreserveHost On
 
