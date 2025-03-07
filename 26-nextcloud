@@ -97,9 +97,7 @@ function checkB {
 }
 
 function menu {
-  export var1; export var2; export var3
-
-  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="deprecated"; VALUE4="$version"
+  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="deprecated"; VALUE4="$version"; VALUE5="1.0.0.1"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Campo NxtData: VAR/data autopreenchido! \nDefina 1 diretório abaixo e sem /." 13 40 0 \
 "Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
@@ -136,9 +134,7 @@ function checkC {
 }
 
 function create {
-  export var1; export var2; export var3; export var4
-
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ]  || [ -z "$var4" ] && {
+  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ]  || [ -z "$var4" ] || [ -z "$var5" ] && {
     dialog --title "ERRO" --msgbox "Erro no arquivo Information!" 8 40
     exit
   } || {
