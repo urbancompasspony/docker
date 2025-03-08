@@ -5,7 +5,7 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="Nextcloud-HPB"
+export NOMECONTAINER="nextcloud-hpb"
 
 # From 1 to 10!
 var_cont="3"
@@ -15,8 +15,8 @@ function custom_names {
 # Static Name!
 CustmN1="Container"
 
-CustmN2="Local IP"
-CustmN3="NCDomain"
+CustmN2="Local IP "
+CustmN3="NCDomain "
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -65,7 +65,7 @@ docker run -d \
 -e TURN_SECRET=$TURN0 \
 -e SIGNALING_SECRET=$SIGNAL0 \
 -e INTERNAL_SECRET=$INTERNAL0 \
--p 8081:8081 \
+-p 80:8081 \
 -v /etc/localtime:/etc/localtime:ro \
 $docker_repo
 }
@@ -255,7 +255,7 @@ var2=$(echo "$VALUE0" | sed -n 2p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 90 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
 var1=$(echo "$VALUE0" | sed -n 1p)
@@ -267,7 +267,7 @@ var3=$(echo "$VALUE0" | sed -n 3p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 11 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 90 0 \
 "$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
@@ -281,7 +281,7 @@ var4=$(echo "$VALUE0" | sed -n 4p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 12 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 90 0 \
 "$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
 "$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
@@ -297,7 +297,7 @@ var5=$(echo "$VALUE0" | sed -n 5p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 13 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 90 0 \
 "$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
 "$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
 "$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
