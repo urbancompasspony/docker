@@ -1,5 +1,6 @@
 Download SMS PowerView:
-https://cs.linuxuniverse.com.br/index.php/s/7qpGCfAJk7ddSg7
+
+wget https://cs.linuxuniverse.com.br/public.php/dav/files/7qpGCfAJk7ddSg7/install_sms.tar.gz
 
 Put it on the container, extract it to /sms
 
