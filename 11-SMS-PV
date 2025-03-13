@@ -8,7 +8,7 @@
 export NOMECONTAINER="sms-powerview"
 
 # From 1 to 10!
-var_cont="5"
+var_cont="3"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -16,9 +16,9 @@ function custom_names {
 CustmN1="Container"
 
 CustmN2="Password"
-CustmN3="Disp.Res"
-CustmN4="Port    "
-CustmN5="Local IP"
+CustmN3="Local IP"
+CustmN4="."
+CustmN5="."
 CustmN6="."
 CustmN7="."
 CustmN8="."
@@ -32,9 +32,9 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="P4ssw0rd"
-VALUE3="1920x1080"
-VALUE4="9876"
-VALUE5="0.0.0.0"
+VALUE3="0.0.0.0"
+VALUE4="0"
+VALUE5="0"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -44,6 +44,15 @@ VALUE10="0"
 
 # Set repository here!
 docker_repo="urbancompasspony/sms_powerview"
+
+[ -d "/srv/containers/$NOMECONTAINER/config" ] || {
+  sudo mkdir -p /srv/containers/$NOMECONTAINER/config
+  wget https://cs.linuxuniverse.com.br/public.php/dav/files/7qpGCfAJk7ddSg7/install_sms.tar.gz
+  tar -xvzf install_sms.tar.gz -C /srv/containers/$NOMECONTAINER/config
+  rm install_sms.tar.gz
+  sudo mv /srv/containers/$NOMECONTAINER/config/sms_powerview/* /srv/containers/$NOMECONTAINER/config/
+  sudo rm -R /srv/containers/$NOMECONTAINER/config/sms_powerview
+}
 
 function docker_custom {
   [ "$var5" = "host" ] || [ "$var5" = "Host" ] || [ "$var5" = "HOST" ] || [ "$var5" = "hostname" ] || [ "$var5" = "localhost" ] && {
@@ -55,39 +64,35 @@ function docker_custom {
 --restart=unless-stopped \
 --device /dev/bus/usb \
 -p 8080:8080 \
--p 8443:8443 \
+-p 15000:15000 \
+-e PASS=$var2 \
 -e DARK_MODE=true \
--e passw0rd="$var2" \
--e resolution="$var3" \
--e PORTS="$var4" \
+-e PASS=$var2 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/$NOMECONTAINER/home:/home \
+-v /srv/containers/$NOMECONTAINER/config:/SMS \
 $docker_repo &
   } || {
     docker run -d \
 --name=$var1 \
 --network macvlan \
---ip="$var5" \
+--ip="$var3" \
 --dns=1.1.1.1  \
---dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
 --device /dev/bus/usb \
 -p 8080:8080 \
--p 8443:8443 \
+-p 15000:15000 \
 -e DARK_MODE=true \
--e passw0rd="$var2" \
--e resolution="$var3" \
--e PORTS="$var4" \
+-e PASS=$var2 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/$NOMECONTAINER/home:/home \
+-v /srv/containers/$NOMECONTAINER/config:/SMS \
 $docker_repo
   }
 }
 
 function makedir {
-  sudo mkdir -p /srv/containers/$NOMECONTAINER
+  sudo mkdir -p /srv/containers/$NOMECONTAINER/config
 }
 
 # USE IT ONLY IF NEEDED:
