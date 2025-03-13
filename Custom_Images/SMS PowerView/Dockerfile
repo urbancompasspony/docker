@@ -4,14 +4,16 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt update && apt upgrade -y
 
-RUN apt install -y pkg-config 
+RUN apt install -y pkg-config
 RUN apt install -y wget curl nano
 RUN apt install -y openjdk-17-jre && \
     apt autoremove && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-ADD entrypoint.sh /entrypoint.sh
+ADD SMS /SMS
+ADD entrypoint.sh /entrypoint.
+
 RUN chmod +x /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
