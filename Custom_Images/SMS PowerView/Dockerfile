@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt upgrade -y
 
 RUN apt install -y pkg-config
-RUN apt install -y wget curl nano
+RUN apt install -y wget curl nano xvfb
 RUN apt install -y openjdk-17-jre && \
     apt autoremove && \
     apt clean && \
