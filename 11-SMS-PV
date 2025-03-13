@@ -8,17 +8,17 @@
 export NOMECONTAINER="sms-powerview"
 
 # From 1 to 10!
-var_cont="2"
+var_cont="5"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
 # Static Name!
 CustmN1="Container"
 
-CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
-CustmN5="."
+CustmN2="Password"
+CustmN3="Disp.Res"
+CustmN4="Port    "
+CustmN5="Local IP"
 CustmN6="."
 CustmN7="."
 CustmN8="."
@@ -31,10 +31,10 @@ function custom_values {
 # Static Value!
 VALUE1="$NOMECONTAINER"
 
-VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
-VALUE5="0"
+VALUE2="P4ssw0rd"
+VALUE3="1920x1080"
+VALUE4="9876"
+VALUE5="0.0.0.0"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -45,42 +45,53 @@ VALUE10="0"
 # Set repository here!
 docker_repo="urbancompasspony/sms_powerview"
 
-# Adjust if needed
 function docker_custom {
-  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
-docker run -d \
+  [ "$var5" = "host" ] || [ "$var5" = "Host" ] || [ "$var5" = "HOST" ] || [ "$var5" = "hostname" ] || [ "$var5" = "localhost" ] && {
+  docker run -d \
 --name=$var1 \
 --network host \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
 --device /dev/bus/usb \
+-p 8080:8080 \
+-p 8443:8443 \
+-e DARK_MODE=true \
+-e passw0rd="$var2" \
+-e resolution="$var3" \
+-e PORTS="$var4" \
 -v /etc/localtime:/etc/localtime:ro \
-$docker_repo
+-v /srv/containers/$NOMECONTAINER/home:/home \
+$docker_repo &
   } || {
-docker run -d \
+    docker run -d \
 --name=$var1 \
 --network macvlan \
---ip=$var2 \
+--ip="$var5" \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
 --device /dev/bus/usb \
+-p 8080:8080 \
+-p 8443:8443 \
+-e DARK_MODE=true \
+-e passw0rd="$var2" \
+-e resolution="$var3" \
+-e PORTS="$var4" \
 -v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/$NOMECONTAINER/home:/home \
 $docker_repo
   }
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"
+  sudo mkdir -p /srv/containers/$NOMECONTAINER
 }
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
 
 # =============================================================================
 # ########################################################################### #
@@ -415,7 +426,6 @@ function checkC {
 }
 
 function create {
-  docker pull $docker_repo
   export_all
   burn_var
   docker_custom
@@ -424,10 +434,13 @@ function create {
 
 ################################################################################
 
+# Start
 checkA
 menu
-docker image prune -af
 
+################################################################################
+
+#Ending
 unset var1
 unset var2
 unset var3
