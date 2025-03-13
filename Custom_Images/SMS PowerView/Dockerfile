@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt upgrade -y
 
@@ -12,9 +12,9 @@ RUN apt install -y openjdk-17-jre && \
     rm -rf /var/lib/apt/lists/*
 
 ADD SMS /SMS
-ADD entrypoint.sh /entrypoint.
+ADD entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
-ENTRYPOINT /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
