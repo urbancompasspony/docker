@@ -1,81 +1,160 @@
-FROM ubuntu:22.04
+FROM ubuntu:noble
 
-ENV DEBIAN_FRONTEND=noninteractive
+ENV PASS='123456'
 
-RUN apt-get update
+SHELL [ "/bin/bash", "-c" ]
 
-RUN apt-get install locales -y && \
-    locale-gen pt_BR.UTF-8
+ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get install -y \
-    software-properties-common \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    dpkg \
-    gcc \
-    sed \
-    sudo \
-    grep \
-    wget \
-    xterm \
-    less \
-    gpgv \
-    libfuse2 \
-    libglib2.0-0 \
-    libxext6 \
-    libsm6 \
-    libxrender1 \
-    lsb-release \
-    mesa-utils \
-    nano \
-    xvfb
+USER root
+RUN <<EOF
+echo 'export LC_ALL=pt_BR.UTF-8' >> /etc/profile.d/locale.sh
+echo 'export LANG=pt_BR.UTF-8' >> /etc/profile.d/locale.sh
+echo 'LANG=pt_BR.UTF-8' >> /etc/locale.conf
+apt-get update
+apt-get install -y locales tzdata
+ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+dpkg-reconfigure -fnoninteractive tzdata
+echo -e 'pt_BR.UTF-8 UTF-8\nen_US.UTF-8 UTF-8' > /etc/locale.gen
+locale-gen
+EOF
 
-RUN apt-get install -y wget && \
-    wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
-    echo "deb https://xpra.org/ jammy main" >> /etc/apt/sources.list.d/xpra.list && \
-    apt-get update && \
-    apt-get install -y xpra
+ENV LANG='pt_BR.UTF-8'
+ENV LANGUAGE='pt_BR:en'
+ENV LC_ALL='pt_BR.UTF-8'
+################----------------> locale/timezone
+#
+#
+#
+################----------------> xpra
+USER root
+RUN <<EOF
+apt-get install -y \
+            bash-completion \
+            bzip2 \
+            curl \
+            dbus-x11 \
+            dbus-user-session \
+            flatpak \
+            fonts-noto-color-emoji \
+            git \
+            gnupg \
+            gzip \
+            htop \
+            iproute2 \
+            iptables \
+            jq \
+            less \
+            libarchive-tools \
+            binutils \
+            libpulse0 \
+            python3-pip \
+            python3-uinput \
+            python3-watchdog \
+            sudo \
+            terminator \
+            tmux \
+            uuid-runtime \
+            vim \
+            wget \
+            x11-xserver-utils \
+            xdg-desktop-portal \
+            xdg-desktop-portal-gnome \
+            xdg-desktop-portal-gtk \
+            xsel \
+            xvfb \
+            xz-utils \
+            --no-install-recommends
 
-RUN apt-get install -y --no-install-recommends \
-    virt-manager \
-    dbus-x11 \
-    libglib2.0-bin \
-    gir1.2-spiceclientgtk-3.0
+apt-get install -y \
+            gir1.2-gstreamer-1.0 \
+            glib-networking \
+            glib-networking-common \
+            glib-networking-services \
+            gstreamer1.0-alsa \
+            gstreamer1.0-gl \
+            gstreamer1.0-pipewire \
+            gstreamer1.0-plugins-bad \
+            gstreamer1.0-plugins-base \
+            gstreamer1.0-plugins-good \
+            gstreamer1.0-plugins-ugly \
+            gstreamer1.0-pulseaudio
 
-RUN apt-get clean && \
-    apt-get autoclean && \
-    rm -rf /var/lib/apt/lists/*
+usermod -aG sudo ubuntu
+EOF
 
-ARG LOCAL_USER=user
+USER root
+RUN <<EOF
+wget -q -O- https://xpra.org/gpg.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/xpra.gpg
 
-ARG PRIV_CMDS='/bin/ch*,/bin/cat,/bin/gunzip,/bin/tar,/bin/mkdir,/bin/ps,/bin/mv,/bin/cp,/usr/bin/apt*,/usr/bin/pip*,/bin/yum,/bin/snap,/bin/curl,/bin/tee'
+echo 'deb [signed-by=/etc/apt/trusted.gpg.d/xpra.gpg arch=amd64] https://xpra.org noble main' > /etc/apt/sources.list.d/xpra.list
 
-RUN adduser --gecos "ubuntu" --uid 1000 ${LOCAL_USER} && \
-    usermod -aG sudo ${LOCAL_USER} \
-    printf "123456\n123456" | chpasswd ${LOCAL_USER}
+apt-get update
+#apt-get install -y xpra
+apt-get install -y xpra xpra-x11 xpra-html5 --no-install-recommends
+EOF
+################----------------> xpra
 
-# Create user space for xpra
-RUN mkdir -p /run/xpra/1000 && \
-    chown -R ${LOCAL_USER}:${LOCAL_USER} /run/xpra && \
-    mkdir -p /run/${LOCAL_USER}/1000 && \
-    chown -R ${LOCAL_USER}:${LOCAL_USER} /run/${LOCAL_USER}
+RUN <<EOF
+cat > /usr/local/bin/xpra-exec.sh <<-IS_XPRA_STARTER
+#!/bin/bash
+export PASS="\${PASS}"
+printf "\$PASS\n\$PASS" | passwd ubuntu
+printf "\n\n                password xpra/sudo: \$PASS                \n\n\n"
+
+
+rm -rf /tmp/.X* 2>>/dev/null
+mkdir -p -m 0700 /run/xpra/ubuntu 2>>/dev/null
+mkdir -p -m 0700 /run/xpra/1000 2>>/dev/null
+mkdir -p -m 0700 /run/user/1000 2>>/dev/null
+chown -R ubuntu:ubuntu /run/user/1000 2>>/dev/null
+chown -R ubuntu:ubuntu /run/xpra/ubuntu 2>>/dev/null
+chown -R ubuntu:ubuntu /run/xpra/1000 2>>/dev/null
+
+mkdir -pv /run/dbus
+
+mkdir -pv -m0700 /run/user/1000
+mkdir -pv -m0775 /run/xpra
+chown -Rv ubuntu:ubuntu /run/user/1000
+chown -Rv ubuntu:ubuntu /run/xpra
+
+rm -rv /run/dbus/* || true
+rm -rv /run/dbus/.* || true
+dbus-daemon --system --fork 2>/dev/null
+
+#####
+
+printf "\$PASS\n\$PASS" | passwd ubuntu
+printf "\n\n                password xpra/sudo: \$PASS                \n\n\n"
+
+runuser -P -l ubuntu -c "
+    XDG_RUNTIME_DIR='/run/user/1000' \\
+    DISPLAY=':15000' \\
+    XCURSOR_SIZE='50' \\
+        xpra start  \\
+        ':15000' \\
+        '-d auth' \\
+        '--bind-tcp=0.0.0.0:15000,auth=password,value=\${PASS}' \\
+        '--mdns=no' \\
+        '--webcam=no' \\
+        '--notifications=no' \\
+        '--bell=no' \\
+        '--no-daemon' \\
+        '--no-audio' \\
+        '--start-on-connect=/usr/bin/terminator' \\
+        '--start=xhost +'
+"
+IS_XPRA_STARTER
+
+chmod +x /usr/local/bin/xpra-exec.sh
+EOF
 
 ADD SMS /SMS
-ADD entrypoint.sh /entrypoint.sh
 
-RUN chmod +x /entrypoint.sh
-RUN chmod 755 /entrypoint.sh
+EXPOSE 15000
 
-USER ${LOCAL_USER}
+VOLUME /home/ubuntu
 
-ENV SHELL=bash
-ENV TERM=linux
+USER root
 
-WORKDIR /home/${LOCAL_USER}
-
-ENV HOSTS="[]"
-ENV passw0rd="P4ss0rd"
-ENV resolution="800x600"
-
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT [ "/usr/local/bin/xpra-exec.sh" ]
