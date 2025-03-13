@@ -149,8 +149,6 @@ IS_XPRA_STARTER
 chmod +x /usr/local/bin/xpra-exec.sh
 EOF
 
-ADD SMS /SMS
-
 EXPOSE 15000
 
 VOLUME /home/ubuntu
