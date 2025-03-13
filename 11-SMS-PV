@@ -66,11 +66,9 @@ function docker_custom {
 -p 8080:8080 \
 -p 15000:15000 \
 -e PASS=$var2 \
--e DARK_MODE=true \
--e PASS=$var2 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/$NOMECONTAINER/config:/SMS \
-$docker_repo &
+$docker_repo
   } || {
     docker run -d \
 --name=$var1 \
@@ -83,7 +81,6 @@ $docker_repo &
 --device /dev/bus/usb \
 -p 8080:8080 \
 -p 15000:15000 \
--e DARK_MODE=true \
 -e PASS=$var2 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/$NOMECONTAINER/config:/SMS \
