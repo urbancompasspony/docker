@@ -8,7 +8,7 @@
 export NOMECONTAINER="chromium-browser"
 
 # From 1 to 10!
-var_cont="3"
+var_cont="4"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -17,7 +17,7 @@ CustmN1="Container"
 
 CustmN2="Local IP"
 CustmN3="Cust.URL"
-CustmN4="."
+CustmN4="PathDir."
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -33,7 +33,7 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="google.com"
-VALUE4="0"
+VALUE4="/srv/containers/$NOMECONTAINER"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -62,7 +62,7 @@ docker run -d \
 -p 3000:3000 \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/data:/config \
+-v $var4/data:/config \
 $docker_repo
   } || {
 docker run -d \
@@ -82,7 +82,7 @@ docker run -d \
 -p 3000:3000 \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/data:/config \
+-v $var4/data:/config \
 $docker_repo
   }
 }
@@ -269,7 +269,7 @@ VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
 "$CustmN3: " 3 1 "$VALUE3" 3 11 90 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 120 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
 var1=$(echo "$VALUE0" | sed -n 1p)
@@ -283,7 +283,7 @@ VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
 "$CustmN3: " 3 1 "$VALUE3" 3 11 90 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 11 120 0 \
 "$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
