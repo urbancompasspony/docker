@@ -33,7 +33,7 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="google.com"
-VALUE4="/srv/containers/$NOMECONTAINER"
+VALUE4="/srv/containers/$NOMECONTAINER/data"
 VALUE5="0"
 VALUE6="0"
 VALUE7="0"
@@ -62,7 +62,7 @@ docker run -d \
 -p 3000:3000 \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
--v $var4/data:/config \
+-v $var4:/config \
 $docker_repo
   } || {
 docker run -d \
@@ -81,13 +81,14 @@ docker run -d \
 -p 3000:3000 \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
--v $var4/data:/config \
+-v $var4:/config \
 $docker_repo
   }
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/data
+  mkdir -p /srv/containers/"$NOMECONTAINER"
+  mkdir -p $var4
 }
 
 # USE IT ONLY IF NEEDED:
