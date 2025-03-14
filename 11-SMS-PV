@@ -61,7 +61,7 @@ sudo rm -R /srv/containers/$NOMECONTAINER/config/sms_powerview
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
---device /dev/bus/usb \
+--device=/dev/ttyUSB0 \
 -p 8080:8080 \
 -p 15000:15000 \
 -e PASS=$var2 \
@@ -77,7 +77,7 @@ $docker_repo
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
---device /dev/bus/usb \
+--device=/dev/ttyUSB0 \
 -p 8080:8080 \
 -p 15000:15000 \
 -e PASS=$var2 \
