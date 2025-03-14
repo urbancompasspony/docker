@@ -256,7 +256,7 @@ var2=$(echo "$VALUE0" | sed -n 2p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 90 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
 var1=$(echo "$VALUE0" | sed -n 1p)
@@ -268,7 +268,7 @@ var3=$(echo "$VALUE0" | sed -n 3p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 11 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 90 0 \
 "$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 [ $? -ne 0 ] && exit
@@ -282,7 +282,7 @@ var4=$(echo "$VALUE0" | sed -n 4p)
 VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 12 40 0 \
 "$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
 "$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 11 90 0 \
 "$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
 "$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
