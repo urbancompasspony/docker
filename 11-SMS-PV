@@ -45,17 +45,16 @@ VALUE10="0"
 # Set repository here!
 docker_repo="urbancompasspony/sms_powerview"
 
-[ -d "/srv/containers/$NOMECONTAINER/config" ] || {
-  sudo mkdir -p /srv/containers/$NOMECONTAINER/config
-  wget https://cs.linuxuniverse.com.br/public.php/dav/files/7qpGCfAJk7ddSg7/install_sms.tar.gz
-  tar -xvzf install_sms.tar.gz -C /srv/containers/$NOMECONTAINER/config
-  rm install_sms.tar.gz
-  sudo mv /srv/containers/$NOMECONTAINER/config/sms_powerview/* /srv/containers/$NOMECONTAINER/config/
-  sudo rm -R /srv/containers/$NOMECONTAINER/config/sms_powerview
-}
-
 function docker_custom {
+sudo mkdir -p /srv/containers/$NOMECONTAINER/config
+wget https://cs.linuxuniverse.com.br/public.php/dav/files/7qpGCfAJk7ddSg7/install_sms.tar.gz
+tar -xvzf install_sms.tar.gz -C /srv/containers/$NOMECONTAINER/config
+rm install_sms.tar.gz
+sudo mv /srv/containers/$NOMECONTAINER/config/sms_powerview/* /srv/containers/$NOMECONTAINER/config/
+sudo rm -R /srv/containers/$NOMECONTAINER/config/sms_powerview
+
   [ "$var5" = "host" ] || [ "$var5" = "Host" ] || [ "$var5" = "HOST" ] || [ "$var5" = "hostname" ] || [ "$var5" = "localhost" ] && {
+
   docker run -d \
 --name=$var1 \
 --network host \
