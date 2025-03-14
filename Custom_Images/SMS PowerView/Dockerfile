@@ -90,7 +90,7 @@ RUN <<EOF
 wget -q -O- https://xpra.org/gpg.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/xpra.gpg
 echo 'deb [signed-by=/etc/apt/trusted.gpg.d/xpra.gpg arch=amd64] https://xpra.org $uversion main' > /etc/apt/sources.list.d/xpra.list
 apt-get update
-apt-get install -y xpra xpra-x11 xpra-html5 --no-install-recommends
+apt-get install -y xpra xpra-x11 xpra-html5
 #apt-get install -y xpra --no-install-recommends
 EOF
 ################----------------> xpra
