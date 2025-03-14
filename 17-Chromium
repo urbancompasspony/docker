@@ -62,7 +62,7 @@ docker run -d \
 -p 3000:3000 \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
+-v /srv/containers/"$NOMECONTAINER"/data:/config \
 $docker_repo
   } || {
 docker run -d \
@@ -82,13 +82,13 @@ docker run -d \
 -p 3000:3000 \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
+-v /srv/containers/"$NOMECONTAINER"/data:/config \
 $docker_repo
   }
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/config
+  mkdir -p /srv/containers/"$NOMECONTAINER"/data
 }
 
 # USE IT ONLY IF NEEDED:
