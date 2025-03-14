@@ -70,7 +70,6 @@ docker run -d \
 --network macvlan \
 --ip=$var2 \
 --dns=1.1.1.1  \
---dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
