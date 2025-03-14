@@ -1,4 +1,4 @@
-FROM ubuntu:noble
+FROM ubuntu:22.04
 
 ENV PASS='123456'
 
@@ -64,6 +64,7 @@ apt-get install -y \
             xsel \
             xvfb \
             xz-utils \
+            python3 \
             --no-install-recommends
 
 apt-get install -y \
@@ -80,18 +81,19 @@ apt-get install -y \
             gstreamer1.0-plugins-ugly \
             gstreamer1.0-pulseaudio
 
+adduser ubuntu
 usermod -aG sudo ubuntu
 EOF
 
 USER root
 RUN <<EOF
-wget -q -O- https://xpra.org/gpg.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/xpra.gpg
+#wget -q -O- https://xpra.org/gpg.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/xpra.gpg
 
-echo 'deb [signed-by=/etc/apt/trusted.gpg.d/xpra.gpg arch=amd64] https://xpra.org noble main' > /etc/apt/sources.list.d/xpra.list
+#echo 'deb [signed-by=/etc/apt/trusted.gpg.d/xpra.gpg arch=amd64] https://xpra.org noble main' > /etc/apt/sources.list.d/xpra.list
 
 apt-get update
-#apt-get install -y xpra
-apt-get install -y xpra xpra-x11 xpra-html5 --no-install-recommends
+apt-get install -y xpra --no-install-recommends
+#apt-get install -y xpra xpra-x11 xpra-html5 --no-install-recommends
 EOF
 ################----------------> xpra
 
@@ -133,8 +135,7 @@ runuser -P -l ubuntu -c "
     XCURSOR_SIZE='50' \\
         xpra start  \\
         ':15000' \\
-        '-d auth' \\
-        '--bind-tcp=0.0.0.0:15000,auth=password,value=\${PASS}' \\
+        '--bind-tcp=0.0.0.0:15000' \\
         '--mdns=no' \\
         '--webcam=no' \\
         '--notifications=no' \\
