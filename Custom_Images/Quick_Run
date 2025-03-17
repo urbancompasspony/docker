@@ -1,7 +1,0 @@
-
-docker run --rm -it -v $PWD:/tmp debian:10-slim /bin/bash
-# --rm : remove after exit
-# -it : interactive TTY
-# -v : mount folder : current folder to /tmp folder of the container
-# debian:10-slim : docker image https://git.io/JJzfy
-# /bin/bash : run bash in this container
