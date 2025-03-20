@@ -1,0 +1,42 @@
+docker run -d \
+    --name=keepalived \
+    --cap-add=NET_ADMIN \
+    --cap-add=NET_BROADCAST \
+    --net host \
+    -e TZ=Europe/Berlin \
+    -e KEEPALIVED_CUSTOM_CONFIG=true \
+    -v "$(pwd)/keepalived.conf:/etc/keepalived/keepalived.conf:ro" \
+    -v "$(pwd)/msmtprc:/root/.msmtprc:ro" \
+    -v "$(pwd)/mail-aliases:/etc/aliases:ro" \
+    shawly/keepalived
+
+    docker run -d \
+    --name=keepalived \
+    --cap-add=NET_ADMIN \
+    --cap-add=NET_BROADCAST \
+    --net host \
+    -e TZ=Europe/Berlin \
+    -e KEEPALIVED_CUSTOM_CONFIG=true \
+    -v "$(pwd)/keepalived.conf:/etc/keepalived/keepalived.conf:ro" \
+    shawly/keepalived
+
+    docker run -d \
+    --name=keepalived \
+    --cap-add=NET_ADMIN \
+    --cap-add=NET_BROADCAST \
+    --net host \
+    -e KEEPALIVED_VIRTUAL_IP=10.11.12.99 \
+    -e KEEPALIVED_CHECK_PORT=443 \
+    -e KEEPALIVED_VIRTUAL_MASK=24 \
+    -e KEEPALIVED_VRID=99 \
+    shawly/keepalived
+
+    TZ	Timezone of the container. Timezone can also be set by mapping /etc/localtime between the host and the container.	Etc/UTC
+KEEPALIVED_VIRTUAL_IP	Floating IP that is used by keepalived	undefined
+KEEPALIVED_VIRTUAL_MASK	Subnet mask of the floating IP (e.g. 24)	undefined
+KEEPALIVED_CHECK_IP	Set this to a specific IP if you only want to check KEEPALIVED_CHECK_PORT on the given IP address	any
+KEEPALIVED_CHECK_PORT	Set this to the port you want to check	undefined
+KEEPALIVED_VRID	The virtual router id	undefined
+KEEPALIVED_INTERFACE	Interface on your host e.g. eth0 (use ip -br l to list all your interfaces). auto automatically determines which interface to use based on set KEEPALIVED_VIRTUAL_IP and KEEPALIVED_VIRTUAL_MASK.	auto
+KEEPALIVED_CHECK_SCRIPT	You can set a custom script that is used for checking if a host is alive	undefined
+KEEPALIVED_CUSTOM_CONFIG	If you set this to true the configuration /etc/keepalived/keepalived.conf will not be set up automatically. Use this if you want to customize your keepalived.conf manually (see Using a custom keepalived.conf)
