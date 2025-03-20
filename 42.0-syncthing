@@ -8,7 +8,7 @@
 export NOMECONTAINER="syncthing"
 
 # From 1 to 10!
-var_cont="3"
+var_cont="5"
 
 # MENU NAMES - 123456789 or ABCDEFGHI
 function custom_names {
@@ -17,8 +17,8 @@ CustmN1="Container"
 
 CustmN2="Local IP"
 CustmN3="SyncPath"
-CustmN4="."
-CustmN5="."
+CustmN4="Memory  "
+CustmN5="CPU %   "
 CustmN6="."
 CustmN7="."
 CustmN8="."
@@ -33,8 +33,8 @@ VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
 VALUE3="/mnt"
-VALUE4="0"
-VALUE5="0"
+VALUE4="4096m"
+VALUE5="1.5"
 VALUE6="0"
 VALUE7="0"
 VALUE8="0"
@@ -52,8 +52,10 @@ function docker_custom {
 --name=$var1 \
 --hostname=$var1 \
 --network host \
---restart=unless-stopped \
 --no-healthcheck \
+--restart=unless-stopped \
+--cpus=$var5 \
+-m "$var4" \
 -p 8384:8384 \
 -p 22000:22000/tcp \
 -p 22000:22000/udp \
@@ -78,6 +80,8 @@ sudo chmod 777 -R /srv/containers/"$NOMECONTAINER"/config
 --dns=127.0.0.1 \
 --no-healthcheck \
 --restart=unless-stopped \
+--cpus=$var5 \
+-m "$var4" \
 -p 8384:8384 \
 -p 22000:22000/tcp \
 -p 22000:22000/udp \
