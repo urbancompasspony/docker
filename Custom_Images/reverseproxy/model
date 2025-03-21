@@ -20,7 +20,7 @@
 	ProxyPass / http://LOCALIP/
 	ProxyPassReverse / http://LOCALIP/
 
-	ErrorDocument 503 http://luclouds.ddns.net:7070
+	ErrorDocument 503 https://404.linuxuniverse.com.br
 </VirtualHost>
 
 <IfModule mod_ssl.c>
@@ -43,6 +43,6 @@
 	ProxyPass / http://LOCALIP/
 	ProxyPassReverse / http://LOCALIP/
 
-	ErrorDocument 503 http://luclouds.ddns.net:7070
+	ErrorDocument 503 https://404.linuxuniverse.com.br
     </VirtualHost>
 </IfModule>
