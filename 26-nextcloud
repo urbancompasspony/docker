@@ -105,8 +105,8 @@ function menu {
 "Nxt Data:" 2 1 "$VALUE2" 2 10 40 0 \
 "URL WAN :" 3 1 "$VALUE3" 3 10 50 0 \
 "Version :" 4 1 "$VALUE4" 4 10 50 0 \
-"PiHole? :" 5 1 "$VALUE4" 5 10 50 0 \
-"ExtraDSK?" 6 1 "$VALUE4" 6 10 150 0 \
+"PiHole? :" 5 1 "$VALUE5" 5 10 50 0 \
+"ExtraDSK?" 6 1 "$VALUE6" 6 10 150 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
@@ -178,7 +178,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
 -v /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini \
 -v "$var2"/data:/var/www/html/data \
-"$var6" \
+$var6 \
 nextcloud:"$var4"
 }
 
@@ -186,6 +186,9 @@ function clean {
   unset var1
   unset var2
   unset var3
+  unset var4
+  unset var5
+  unset var6
 }
 
 # Start
