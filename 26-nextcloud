@@ -98,7 +98,7 @@ function checkB {
 }
 
 function menu {
-  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="deprecated"; VALUE4="$version"; VALUE5="1.0.0.1";  VALUE6="-v /mnt"
+  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="deprecated"; VALUE4="$version"; VALUE5="1.0.0.1";  VALUE6="-v /mnt:/mnt/extra"
 
   VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Campo NxtData: VAR/data autopreenchido! \nDefina 1 diretório abaixo e sem /." 13 40 0 \
 "Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
@@ -106,7 +106,7 @@ function menu {
 "URL WAN :" 3 1 "$VALUE3" 3 10 50 0 \
 "Version :" 4 1 "$VALUE4" 4 10 50 0 \
 "PiHole? :" 5 1 "$VALUE4" 5 10 50 0 \
-"ExtraDSK?" 6 1 "$VALUE4" 6 10 50 0 \
+"ExtraDSK?" 6 1 "$VALUE4" 6 10 150 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
   [ $? -ne 0 ] && exit
@@ -178,7 +178,7 @@ docker run -d \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
 -v /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini \
 -v "$var2"/data:/var/www/html/data \
--v "$var6":/mnt/extra \
+"$var6" \
 nextcloud:"$var4"
 }
 
