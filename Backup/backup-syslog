@@ -21,7 +21,8 @@ function check_size {
   size=$(du --apparent-size --block-size=1 $pathto$logname | awk {print'$1'})
 
   [ "$size" -ge "$scale" ] && {
-    sudo mv "$pathto$logname" "$pathto$logname-$datetime.bkp"
+    #sudo mv "$pathto$logname" "$pathto$logname-$datetime.bkp"
+    sudo tar -I 'lz4 -1 -c -' -cpf "$pathto$logname-$datetime.tar.lz4" "$pathto$logname"
 
     sudo touch "$pathto$logname"
     sudo chmod 777 -R "$pathto$logname"
