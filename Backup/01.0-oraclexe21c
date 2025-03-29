@@ -16,8 +16,7 @@ function checkA {
 
 checkA
 docker stop oraclexe21c &&
-#find "$destiny"/ -type f -mtime +3 -delete
-tar -cvf "$destiny"/oraclexe21c-"$datetime".tar "oraclexe21c"
+tar -I 'lz4 -1 -c -' -cpf "$destiny"/oraclexe21c-"$datetime".tar.lz4 "oraclexe21c"
 docker start oraclexe21c &&
 
 exit 1
