@@ -94,20 +94,21 @@ function init0 {
 
 function linkcloud {
   linkparameter="$webadress/$1/$2"
-  URLG1=$(curl -ku "$usern4me":"$passw0rd" "$linkparameter" | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g')
+  URLG1=$(curl -ku "$usern4me":"$passw0rd" "$linkparameter" | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | sort)
 }
 
 function listfolders0 {
-  IFS=$'\n' read -rd '' -a options <<< "$URLG1"
-  cmd=(dialog --keep-tite --backtitle "Bem-Vindo $1" --menu "Selecione uma opcao:" 0 0 0)
-  menu_options=()
-  for ((i = 0; i < ${#options[@]}; i++)); do
+IFS=$'\n' read -rd '' -a options <<< "$(printf "%s\n" $URLG1 | sort)"
+cmd=(dialog --keep-tite --backtitle "Bem-Vindo $1" --menu "Selecione uma opcao:" 0 0 0)
+menu_options=()
+for ((i = 0; i < ${#options[@]}; i++)); do
     menu_options+=("$((i + 1))" "${options[i]}")
-  done
-  choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
-  [ $? -ne 0 ] && return
+done
+choice=$("${cmd[@]}" "${menu_options[@]}" 2>&1 >/dev/tty)
+[ $? -ne 0 ] && return
 
-  folderchoice="${options[choice - 1]}"
+folderchoice="${options[choice - 1]}"
+
 }
 
 function downloadcloud0 {
