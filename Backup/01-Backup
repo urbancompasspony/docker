@@ -33,7 +33,8 @@ function backup {
   #for dir in $(ls)
   for dir in $(find * -maxdepth 0 ! -path "*oraclexe21c*")
     do
-      tar -cvf "$destiny"/"$dir"-"$datetime".tar "$dir"
+      #tar -cvf "$destiny"/"$dir"-"$datetime".tar "$dir"
+      tar -I 'lz4 -1 -c -' -cpf "$destiny"/"$dir"-"$datetime".tar.lz4 "$dir"
     done
 }
 
