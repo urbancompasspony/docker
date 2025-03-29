@@ -11,7 +11,7 @@ function start {
 
 while IFS= read -r -d $'\0' file; do
   files+=("$file" "")
-done < <(find "$destiny" -type f -name "*.tar" -print0)
+done < <(find "$destiny" -type f -name "*.tar.lz4" -print0)
 
 # Verificar se há pelo menos 1 arquivo ou gerar erro.
   [ ${#files[@]} -eq 0 ] && {
@@ -24,7 +24,7 @@ done < <(find "$destiny" -type f -name "*.tar" -print0)
     file=$(dialog --stdout --title "Escolha um arquivo de Backup:" --cancel-label "Sair" --menu "Lista de backups encontrados:" 0 0 0 "${files[@]}")
     [ $? -ne 0 ] && return
 
-    NAME="$(basename "$file" .tar)"
+    NAME="$(basename "$file" .tar.lz4)"
     file2=$(echo "$NAME" | sed 's/.\{9\}$//')
 
     VALUE0=$(dialog --help-button --help-label 'Riscos' --ok-label "Restaurar" --title "Restauracao" --form "Restaurando o seguinte container: \n\n$file\n\nPOR FAVOR CONFIRME QUE VOCE ESTA DE ACORDO COM OS RISCOS INERENTES A ESTA RESTAURACAO! \n\nRepita no campo abaixo: \neu estou ciente dos riscos" 18 50 0 \
@@ -46,10 +46,12 @@ O container sera parado, o backup restaurado e o servico iniciado em seguida aut
       docker stop "$file2" &&
       clear; echo ""; echo "Fazendo um backup do atual container $file2. Por favor, insira a senha do Administrador!"; echo ""
       sudo mkdir -p /srv/backup4restore/
-      sudo tar -cvf /srv/backup4restore/"$file2"-"$datetime".tar "$source"/"$file2" &&
+      #sudo tar -cvf /srv/backup4restore/"$file2"-"$datetime".tar "$source"/"$file2" &&
+      sudo tar -I 'lz4 -1 -c -' -cpf /srv/backup4restore/"$file2"-"$datetime".tar.lz4 "$source"/"$file2" &&
       clear ; echo ""; echo "O backup gerado esta separado em /srv/backup4restore/!"; echo ""; sleep 3
       clear; echo ""; echo "Restaurando o backup escolhido. Aguarde pacientemente, isso pode levar varios minutos!"; echo ""
-      sudo tar -xvf "$file" -C /srv/containers/ && sleep 3
+      #sudo tar -xvf "$file" -C /srv/containers/ && sleep 3
+      sudo tar -I 'lz4 -d -c -' -xf "$file" -C /srv/containers/ && sleep 3
       clear; echo ""; echo "Iniciando o container $file2 sob a restauracao realizada..."; echo ""
       docker start "$file2" &&
       clear; echo ""; echo "Restauracao concluida! Verifique se o servico esta funcional."; echo ""
