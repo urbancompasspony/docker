@@ -50,7 +50,7 @@ function checkC {
 
 function backup {
   for dir1 in $(find /srv/containers/* -maxdepth 0); do
-    tar -cvf "$destiny"/"$dir1"-"$datetime".tar "$dir"
+    tar -I 'lz4 -1 -c -' -cpf "$destiny"/"$dir1"-"$datetime".tar.lz4 "$dir"
   done
 
   for dir2 in $destiny; do
