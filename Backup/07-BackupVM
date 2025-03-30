@@ -1,0 +1,30 @@
+#!/bin/bash
+
+VM_NAME="Server2022"
+BACKUP_DIR="/mnt/backup/BACKUP_VM"
+RETENTION_DAYS=5
+BACKUP_PREFIX="daily-backup"
+
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+
+mkdir -p "$BACKUP_DIR"
+
+SNAPSHOT_NAME="${BACKUP_PREFIX}-${TIMESTAMP}"
+
+virsh suspend "$VM_NAME"
+
+virsh snapshot-create-as "$VM_NAME" "$SNAPSHOT_NAME" \
+    --description "Automated daily backup" \
+    --live \
+    --disk-only
+
+sudo virsh resume "$VM_NAME"
+
+DISK_PATH=$(virsh domblklist "$VM_NAME" --details | awk '$1=="disk" && $2=="disk" {print $3}')
+
+cp "$DISK_PATH" "${BACKUP_DIR}/backup_${TIMESTAMP}.qcow2"
+
+# Optional: Compress the backup
+# gzip "${BACKUP_DIR}/backup_${TIMESTAMP}.qcow2"
+
+find "$BACKUP_DIR" -name "backup_*.qcow2" -type f -mtime +$RETENTION_DAYS -delete
