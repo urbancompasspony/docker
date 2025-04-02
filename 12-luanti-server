@@ -5,7 +5,7 @@
 # =============================================================================
 
 # Set container name and hostname here.
-export NOMECONTAINER="minetest-server"
+export NOMECONTAINER="luanti-server"
 
 # From 1 to 10!
 var_cont="3"
@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="--gameid minetest --terminal --verbose"
+VALUE3="--gameid luanti --terminal --verbose"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -52,7 +52,6 @@ docker run -d \
 --network macvlan \
 --ip=$var2 \
 --dns=1.1.1.1  \
---dns=127.0.0.1 \
 --hostname=$var1 \
 --no-healthcheck \
 --restart=unless-stopped \
@@ -73,7 +72,7 @@ function makedir {
 # USE IT ONLY IF NEEDED:
 function docker_extras {
 echo "Download Minetest Default Game and extract it to /config/games/minetest_game folder!"
-wget https://content.minetest.net/packages/Minetest/minetest_game/releases/25032/download/ -O /home/administrador/minetest_game.zip
+wget https://content.luanti.org/packages/Luanti/minetest_game/releases/29922/download/ -O /home/administrador/minetest_game.zip
 
 # =============================================================================
 # ########################################################################### #
