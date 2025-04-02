@@ -32,7 +32,7 @@ function custom_values {
 VALUE1="$NOMECONTAINER"
 
 VALUE2="0.0.0.0"
-VALUE3="--gameid luanti --terminal --verbose"
+VALUE3="--gameid minetest --terminal"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
