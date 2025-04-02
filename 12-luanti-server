@@ -66,13 +66,15 @@ $docker_repo
 }
 
 function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/config
+  mkdir -p /srv/containers/"$NOMECONTAINER"/config/games/minetest_game
 }
 
 # USE IT ONLY IF NEEDED:
 function docker_extras {
 echo "Download Minetest Default Game and extract it to /config/games/minetest_game folder!"
 wget https://content.luanti.org/packages/Luanti/minetest_game/releases/29922/download/ -O /home/administrador/minetest_game.zip
+sudo unzip minetest_game.zip -d /srv/containers/"$NOMECONTAINER"/config/
+sudo rm /home/administrador/minetest_game.zip
 
 # =============================================================================
 # ########################################################################### #
