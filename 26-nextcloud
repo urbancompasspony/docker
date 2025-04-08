@@ -171,9 +171,12 @@ docker run -d \
 -p 636:636 \
 -p 80:80 \
 -p 443:443 \
--e VIRTUAL_PROTO=https \
 -e VIRTUAL_PORT=443 \
+-e VIRTUAL_PROTO=https \
 -e VIRTUAL_HOST="$var3" \
+-e PHP_MEMORY_LIMIT=16G \
+-e PHP_UPLOAD_LIMIT=16G \
+-e PHP_OPCACHE_MEMORY_CONSUMPTION=512M \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
 -v /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini \
