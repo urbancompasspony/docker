@@ -100,7 +100,7 @@ function checkB {
 function menu {
   VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="deprecated"; VALUE4="$version"; VALUE5="1.0.0.1";  VALUE6="-v /mnt:/mnt/extra"
 
-  VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Campo NxtData: VAR/data autopreenchido! \nDefina 1 diretório abaixo e sem /." 13 40 0 \
+  VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Campo NxtData: VAR/data autopreenchido! \nDefina 1 diretório abaixo e sem /." 15 40 0 \
 "Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
 "Nxt Data:" 2 1 "$VALUE2" 2 10 40 0 \
 "URL WAN :" 3 1 "$VALUE3" 3 10 50 0 \
