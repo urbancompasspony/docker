@@ -53,6 +53,7 @@ O container sera parado, o backup restaurado e o servico iniciado em seguida aut
       clear; echo ""; echo "Fazendo um backup do atual container $file2. Por favor, insira a senha do Administrador!"; echo ""
       sudo mkdir -p /srv/backup4restore/
       #sudo tar -cvf /srv/backup4restore/"$file2"-"$datetime".tar "$source"/"$file2" &&
+      clear ; echo ""; echo "Geramos um backup do atual container em /srv/backup4restore/!"; echo ""; sleep 3
       sudo tar -I 'lz4 -1 -c -' -cpf /srv/backup4restore/"$file2"-"$datetime".tar.lz4 "$source"/"$file2" &&
       clear ; echo ""; echo "O backup gerado esta separado em /srv/backup4restore/!"; echo ""; sleep 3
       clear; echo ""; echo "Restaurando o backup escolhido. Aguarde pacientemente, isso pode levar varios minutos!"; echo ""
