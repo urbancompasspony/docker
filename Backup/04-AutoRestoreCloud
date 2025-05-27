@@ -4,8 +4,12 @@ export pty=True
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
-sudo mkdir /srv/restoredcloud
-destpath="/srv/restoredcloud"
+destpath=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
+
+[ -d "$destpath" ] || {
+  clear; echo "ERRO: A pasta de backups definida em $destpath não existe. Verifique!"; sleep 3
+  exit 0
+}
 
 serverip="172.20.0.46"
 lanhost="http://$serverip"
