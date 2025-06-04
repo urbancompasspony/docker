@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# Dependências: yq (Go version), dialog, docker
+
+export NOMECONTAINER="A-CUSTOM-A"
+configfile="/srv/containers/$NOMECONTAINER/config.yaml"
+docker_repo="CUSTOM/DOCKER:LATEST"
+
+function makedir {
+  mkdir -p "/srv/containers/$NOMECONTAINER"
+}
+
+function check_root {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root! Saindo..."
+    exit 1
+  }
+}
+
+function save_config {
+  yq -i '.container = "'$var1'"' "$configfile"
+  yq -i '.local_ip = "'$var2'"' "$configfile"
+  # Adicione mais campos conforme necessário
+}
+
+function load_config {
+  [ -f "$configfile" ] || return
+  var1=$(yq '.container' "$configfile")
+  var2=$(yq '.local_ip' "$configfile")
+  # Adicione mais campos conforme necessário
+}
+
+function docker_custom {
+  if [[ "$var2" =~ ^(host|Host|HOST|hostname|localhost)$ ]]; then
+    docker run -d --name="$var1" --network host --hostname="$var1" \
+      --no-healthcheck --restart=unless-stopped \
+      -v /etc/localtime:/etc/localtime:ro \
+      -v "/srv/containers/$NOMECONTAINER/config:/config" \
+      -v "/srv/containers/$NOMECONTAINER/data:/data" \
+      "$docker_repo"
+  else
+    docker run -d --name="$var1" --network macvlan --ip="$var2" \
+      --dns=1.1.1.1 --dns=127.0.0.1 --hostname="$var1" \
+      --no-healthcheck --restart=unless-stopped \
+      -v /etc/localtime:/etc/localtime:ro \
+      -v "/srv/containers/$NOMECONTAINER/config:/config" \
+      -v "/srv/containers/$NOMECONTAINER/data:/data" \
+      "$docker_repo"
+  fi
+}
+
+function create {
+  docker pull "$docker_repo"
+  makedir
+  save_config
+  docker_custom
+  # docker_extras (se necessário)
+}
+
+function menu {
+  makedir
+  load_config
+
+  # Exemplo com 2 campos (adicione mais conforme necessidade)
+  form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 9 40 0 \
+    "Container:" 1 1 "$var1" 1 11 30 0 \
+    "Local IP:" 2 1 "$var2" 2 11 30 0 \
+    3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  [ $? -ne 0 ] && exit
+
+  var1=$(echo "$form" | sed -n 1p)
+  var2=$(echo "$form" | sed -n 2p)
+  
+  create
+}
+
+check_root
+menu
+docker image prune -af
+exit 0
