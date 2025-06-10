@@ -1,81 +1,57 @@
 #!/bin/bash
 
 # =============================================================================
-# ### C O N T R O L ### P A N E L ########################################### #
+# ########################################################################### #
 # =============================================================================
 
-# Set container name and hostname here.
 export NOMECONTAINER="A-CUSTOM-A"
+export docker_repo="CUSTOM/DOCKER:LATEST"
 
-# From 1 to 10!
-var_cont="2"
-
-# MENU NAMES - 123456789 or ABCDEFGHI
-function custom_names {
-# Static Name!
-CustmN1="Container"
-
-CustmN2="Local IP"
-CustmN3="."
-CustmN4="."
-CustmN5="."
-CustmN6="."
-CustmN7="."
-CustmN8="."
-CustmN9="."
+function custom_vars {
+# -----------------------------------
+  CustmN2="Local IP   "
+  CustmN3="DNS Server "
+  CustmN4="MountPoints"
+  CustmN5="Usuario    "
+  CustmN6="Senha      "
+  CustmN7="."
+  CustmN8="."
+  CustmN9="."
+  CustmN10="."
+# -----------------------------------
+  VALUE2="0.0.0.0"
+  VALUE3="8.8.4.4"
+  VALUE4="-v /mnt:/mnt"
+  VALUE5="admin"
+  VALUE6="p4ssw0rd"
+  VALUE7="0"
+  VALUE8="0"
+  VALUE9="0"
+  VALUE10="0"
+# -----------------------------------
 }
 
-# MENU DEFAULT VALUES
-function custom_values {
-# Static Value!
-VALUE1="$NOMECONTAINER"
-
-VALUE2="0.0.0.0"
-VALUE3="0"
-VALUE4="0"
-VALUE5="0"
-VALUE6="0"
-VALUE7="0"
-VALUE8="0"
-VALUE9="0"
-VALUE10="0"
-}
-
-# Set repository here!
-docker_repo="CUSTOM/DOCKER:LATEST"
-
-# Adjust if needed
-function docker_custom {
-  if [[ "$var2" =~ ^(host|Host|HOST|hostname|localhost)$ ]]; then
-docker run -d \
---name="$var1" \
---network host \
---hostname="$var1" \
---no-healthcheck \
---restart=unless-stopped \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
-$docker_repo
+function docker_create {
+  if [[ "$CustmN2" =~ ^(host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
+    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --network host \
+    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -v "/srv/containers/$NOMECONTAINER/config:/config" \
+    -v "/srv/containers/$NOMECONTAINER/data:/data" \
+    -v $var7 \
+    "$docker_repo"
   else
-docker run -d \
---name="$var1" \
---network macvlan \
---ip="$var2" \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname="$var1" \
---no-healthcheck \
---restart=unless-stopped \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/config \
--v /srv/containers/"$NOMECONTAINER"/data:/data \
-"$docker_repo"
+    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --network macvlan --ip="$CustmN2" --dns="$CustmN3" \
+    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -v "/srv/containers/$NOMECONTAINER/config:/config" \
+    -v "/srv/containers/$NOMECONTAINER/data:/data" \
+    -v $var7 \
+    "$docker_repo"
   fi
-}
 
-function makedir {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
+#--privileged
+#--network host --add-host=host.docker.internal:host-gateway \
 }
 
 # USE IT ONLY IF NEEDED:
@@ -86,345 +62,162 @@ function docker_extras {
 # =============================================================================
 # ########################################################################### #
 # =============================================================================
-
 echo "0" > /dev/null
 }
 
-function checkA {
+masterfile="/srv/system.yaml"
+configfile="/srv/containers.yaml"
+
+CustmN1="NomeCont"
+VALUE1="$NOMECONTAINER"
+
+function check_root {
   [ "$EUID" -ne 0 ] && {
-    echo "Execute esse script como Root! Saindo..."
-    exit
-    }
+    clear; echo "Execute esse script como Root! Saindo..."
+    exit 1
+  }
 }
 
-function export_all {
-  export var1; export var2; export var3; export var4; export var5
-  export var6; export var7; export var8; export var9; export var10
-}
-
-export_all
-
-function var_read {
-  var1=$(sed -n '1p' /srv/containers/"$NOMECONTAINER"/Information)
-  var2=$(sed -n '2p' /srv/containers/"$NOMECONTAINER"/Information)
-  var3=$(sed -n '3p' /srv/containers/"$NOMECONTAINER"/Information)
-  var4=$(sed -n '4p' /srv/containers/"$NOMECONTAINER"/Information)
-  var5=$(sed -n '5p' /srv/containers/"$NOMECONTAINER"/Information)
-  var6=$(sed -n '6p' /srv/containers/"$NOMECONTAINER"/Information)
-  var7=$(sed -n '7p' /srv/containers/"$NOMECONTAINER"/Information)
-  var8=$(sed -n '8p' /srv/containers/"$NOMECONTAINER"/Information)
-  var9=$(sed -n '9p' /srv/containers/"$NOMECONTAINER"/Information)
-  var10=$(sed -n '10p' /srv/containers/"$NOMECONTAINER"/Information)
-
-  VALUE1=$var1; VALUE2=$var2; VALUE3=$var3; VALUE4=$var4; VALUE5=$var5
-  VALUE6=$var6; VALUE7=$var7; VALUE8=$var8; VALUE9=$var9; VALUE10=$var10
-}
-
-function burn_var {
-  export_all
-
-  makedir
-
-  chmod 777 -R /srv/containers/"$NOMECONTAINER"
-  touch /srv/containers/"$NOMECONTAINER"/Information
-
-  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-  { echo "$var2"; echo "$var3"; echo "$var4"; echo "$var5"; echo "$var6"; echo "$var7"; echo "$var8"; echo "$var9"; echo "$var10"; } >> /srv/containers/"$NOMECONTAINER"/Information
-}
-
-function docker_stop_rm {
-  if [ "$(docker stop "$NOMECONTAINER")" ];then
-    docker rm "$NOMECONTAINER"
+function lockfile0 {
+  if [ -f /srv/lockfile ]; then
+    load_config
+    docker_create
+    save_config
   else
-    echo "O container $NOMECONTAINER não existe. Continuando..."
+    return
   fi
 }
 
-function bkp_and_rm_data {
-  datetime=$(date +"%d-%m %H-%M")
-  echo "Fazendo backup de $NOMECONTAINER:"
-  mkdir -p /srv/containers/.backupcnt
-  zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/"$NOMECONTAINER"
-  echo "Removendo a pasta de dados de '$NOMECONTAINER':"
-  rm -iR /srv/containers/"$NOMECONTAINER"
+function check_macvlan {
+  macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
+  if [ "$macvlanr" = "no" ]; then
+    clear; echo "A macvlan não existe! Saindo..."; sleep 3
+    exit 0
+  else
+    echo . >/dev/null
+  fi
 }
 
-function checkB {
-  export_all
+function try_pull {
+  if ! docker pull "$docker_repo"; then
+    clear; echo "Erro: docker pull falhou... saindo."; sleep 3
+    exit 1
+  fi
+}
 
-  NOMECONTAINER=$var1
+function main_menu {
+  load_config
 
-  if [ -f "/srv/containers/$NOMECONTAINER/Information" ]; then
-    dialog --title "$NOMECONTAINER já existente!" --yesno "Deseja refazê-lo?" 6 40
-    if [ $? = 0 ]; then
-      dialog --title "Recriando o container:" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
-      if [ $? = 0 ]; then
-        var_read
-        docker_stop_rm
-        create
-      else
-        dialog --title "Recriando o container:" --yesno "Fazer backup e remover a pasta /srv/containers/$NOMECONTAINER?" 6 40
-        if [ $? = 0 ]; then
-          docker_stop_rm
-          bkp_and_rm_data
-          menu
-        else
-          dialog --title "Recriando o container:" --yesno "Fazer REMOVER a pasta /srv/containers/$NOMECONTAINER?" 6 40
-          if [ $? = 0 ]; then
-            docker_stop_rm
-            echo "Removendo o diretório /srv/containers/$NOMECONTAINER"
-            rm -R /srv/containers/"$NOMECONTAINER"
-            menu
-          else
-            docker_stop_rm
-            create
-          fi
-        fi
-      fi
+  form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome sugerido: $NOMECONTAINER" 20 50 0 \
+"$CustmN1: " 1 1 "$VALUE1" 1 15 100 0 \
+"$CustmN2: " 2 1 "$VALUE2" 2 15 100 0 \
+"$CustmN3: " 3 1 "$VALUE3" 3 15 100 0 \
+"$CustmN4: " 4 1 "$VALUE4" 4 15 100 0 \
+"$CustmN5: " 5 1 "$VALUE5" 5 15 100 0 \
+"$CustmN6: " 6 1 "$VALUE6" 6 15 100 0 \
+"$CustmN7: " 7 1 "$VALUE7" 7 15 100 0 \
+"$CustmN8: " 8 1 "$VALUE8" 8 15 100 0 \
+"$CustmN9: " 9 1 "$VALUE9" 9 15 100 0 \
+"$CustmN10: " 10 1 "$VALUE10" 10 15 100 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+
+  VALUE1=$(echo "$form" | sed -n 1p)
+  VALUE2=$(echo "$form" | sed -n 2p)
+  VALUE3=$(echo "$form" | sed -n 3p)
+  VALUE4=$(echo "$form" | sed -n 4p)
+  VALUE5=$(echo "$form" | sed -n 5p)
+  VALUE6=$(echo "$form" | sed -n 6p)
+  VALUE7=$(echo "$form" | sed -n 7p)
+  VALUE8=$(echo "$form" | sed -n 8p)
+  VALUE9=$(echo "$form" | sed -n 9p)
+  VALUE10=$(echo "$form" | sed -n 10p)
+
+  NOMECONTAINER="$CustmN1"
+
+  check_IP
+}
+
+function load_config {
+  [ -f "$configfile" ] || return
+    VALUE1=$(yq -r ".${NOMECONTAINER}" "$configfile")
+    VALUE2=$(yq -r ".${NOMECONTAINER}" "$configfile")
+    VALUE3=$(yq -r ".${NOMECONTAINER}" "$configfile")
+    VALUE4=$(yq -r ".${NOMECONTAINER}" "$configfile")
+    VALUE5=$(yq -r ".${NOMECONTAINER}" "$configfile")
+    VALUE6=$(yq -r ".${NOMECONTAINER}" "$configfile")
+    VALUE7=$(yq -r ".${NOMECONTAINER}" "$configfile")
+    VALUE8=$(yq -r ".${NOMECONTAINER}" "$configfile")
+    VALUE9=$(yq -r ".${NOMECONTAINER}" "$configfile")
+    VALUE10=$(yq -r ".${NOMECONTAINER}" "$configfile")
+  [ "$VALUE1" = "null" ] && return
+    NOMECONTAINER="$VALUE1"
+}
+
+function check_IP {
+  if grep -qw "$VALUE2" "$masterfile"; then
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado:\nMesmo IP do Host!" 6 40
+    return
+  else
+    if grep -qw "$VALUE2" "$configfile"; then
+      dialog --title "ERRO" --msgbox "Conflito de IP detectado:\nMesmo IP de outro container!" 6 40
+      return
     else
-      echo "A instalação local será mantida! Saindo..."
-      exit
+      create
+    fi
+  fi
+}
+
+function mkdir0 {
+  if [ -d "/srv/containers/$NOMECONTAINER" ]; then
+    dialog --title "WARNING" --msgbox "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente" 12 50
+    if [ $(docker stop "$NOMECONTAINER") ]; then
+      docker rm "$NOMECONTAINER"
+    else
+      clear; echo "O container $NOMECONTAINER não existe ou não foi identificado. Continuando..."
     fi
   else
-    create
+    mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
   fi
-
 }
 
-function menu {
-  export_all
+function save_config {
+  sudo touch "$configfile"
+  datetime0=$(date +"%d/%m/%Y - %H:%M")
+  sudo yq -i ".${NOMECONTAINER}.install = \"${datetime0}\"" "$configfile"
 
-  if [ -f "/srv/containers/$NOMECONTAINER/Information" ]; then
-    custom_values
-    custom_names
-    var_read
-  else
-    custom_names
-    custom_values
-  fi
+  sudo yq -i ".${NOMECONTAINER}.${CustmN1} = \"${VALUE1}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.${CustmN2} = \"${VALUE2}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.${CustmN3} = \"${VALUE3}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.${CustmN4} = \"${VALUE4}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.${CustmN5} = \"${VALUE5}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.${CustmN6} = \"${VALUE6}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.${CustmN7} = \"${VALUE7}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.${CustmN8} = \"${VALUE8}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.${CustmN9} = \"${VALUE9}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.${CustmN10} = \"${VALUE10}\"" "$configfile"
 
-[ $var_cont -le "0" ] && {
-  clear
-  echo "Incorrect value of var_cont: $var_cont."
-  echo "Exiting..."
-  exit
-}
-
-[ $var_cont -eq "1" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 8 40 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-var1=$(echo "$VALUE0" | sed -n 1p)
-}
-
-[ $var_cont -eq "2" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 9 40 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-}
-
-[ $var_cont -eq "3" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-var3=$(echo "$VALUE0" | sed -n 3p)
-}
-
-[ $var_cont -eq "4" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 11 40 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-var3=$(echo "$VALUE0" | sed -n 3p)
-var4=$(echo "$VALUE0" | sed -n 4p)
-}
-
-[ $var_cont -eq "5" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 12 40 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
-"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-var3=$(echo "$VALUE0" | sed -n 3p)
-var4=$(echo "$VALUE0" | sed -n 4p)
-var5=$(echo "$VALUE0" | sed -n 5p)
-}
-
-[ $var_cont -eq "6" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 13 40 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
-"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
-"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-var3=$(echo "$VALUE0" | sed -n 3p)
-var4=$(echo "$VALUE0" | sed -n 4p)
-var5=$(echo "$VALUE0" | sed -n 5p)
-var6=$(echo "$VALUE0" | sed -n 6p)
-}
-
-[ $var_cont -eq "7" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 14 40 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
-"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
-"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
-"$CustmN7: " 7 1 "$VALUE7" 7 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-var3=$(echo "$VALUE0" | sed -n 3p)
-var4=$(echo "$VALUE0" | sed -n 4p)
-var5=$(echo "$VALUE0" | sed -n 5p)
-var6=$(echo "$VALUE0" | sed -n 6p)
-var7=$(echo "$VALUE0" | sed -n 7p)
-}
-
-[ $var_cont -eq "8" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 15 40 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
-"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
-"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
-"$CustmN7: " 7 1 "$VALUE7" 7 11 30 0 \
-"$CustmN8: " 8 1 "$VALUE8" 8 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-var3=$(echo "$VALUE0" | sed -n 3p)
-var4=$(echo "$VALUE0" | sed -n 4p)
-var5=$(echo "$VALUE0" | sed -n 5p)
-var6=$(echo "$VALUE0" | sed -n 6p)
-var7=$(echo "$VALUE0" | sed -n 7p)
-var8=$(echo "$VALUE0" | sed -n 8p)
-}
-
-[ $var_cont -eq "9" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 16 40 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
-"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
-"$CustmN6: " 6 1 "$VALUE6" 6 11 30 0 \
-"$CustmN7: " 7 1 "$VALUE7" 7 11 30 0 \
-"$CustmN8: " 8 1 "$VALUE8" 8 11 30 0 \
-"$CustmN9: " 9 1 "$VALUE9" 9 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-var3=$(echo "$VALUE0" | sed -n 3p)
-var4=$(echo "$VALUE0" | sed -n 4p)
-var5=$(echo "$VALUE0" | sed -n 5p)
-var6=$(echo "$VALUE0" | sed -n 6p)
-var7=$(echo "$VALUE0" | sed -n 7p)
-var8=$(echo "$VALUE0" | sed -n 8p)
-var9=$(echo "$VALUE0" | sed -n 9p)
-}
-
-[ $var_cont -eq "10" ] && {
-VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 17 40 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 11 30 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 11 30 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 11 30 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 11 30 0 \
-"$CustmN5: " 5 1 "$VALUE5" 5 11 30 0 \
-"$CustmN5: " 6 1 "$VALUE6" 6 11 30 0 \
-"$CustmN5: " 7 1 "$VALUE7" 7 11 30 0 \
-"$CustmN5: " 8 1 "$VALUE8" 8 11 30 0 \
-"$CustmN5: " 9 1 "$VALUE9" 9 11 30 0 \
-"$CustmN5: " 10 1 "$VALUE10" 10 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && exit
-var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-var3=$(echo "$VALUE0" | sed -n 3p)
-var4=$(echo "$VALUE0" | sed -n 4p)
-var5=$(echo "$VALUE0" | sed -n 5p)
-var6=$(echo "$VALUE0" | sed -n 6p)
-var7=$(echo "$VALUE0" | sed -n 7p)
-var8=$(echo "$VALUE0" | sed -n 8p)
-var9=$(echo "$VALUE0" | sed -n 9p)
-var10=$(echo "$VALUE0" | sed -n 10p)
-}
-
-[ $var_cont -ge "11" ] && {
-  clear
-  echo "Incorrect value of var_cont: $var_cont."
-  echo "Exiting..."
-  exit
-}
-
-checkB
-
-}
-
-function checkC {
-  #IPMachine=$(hostname -I | awk '{print $1}')
-  MyIP=$(cat /srv/containers/scripts/myip)
-  if [ "$MyIP" = "$myip" ]; then
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
-    menu
-  else
-    create
-  fi
 }
 
 function create {
-  docker pull $docker_repo
-  export_all
-  burn_var
-  docker_custom
+  mkdir0
+  save_config
+  docker_create
   docker_extras
 }
 
-################################################################################
+# START HERE #
 
-checkA
-menu
+check_root
+lockfile0
+check_macvlan
+try_pull
+custom_vars
+main_menu
+
 docker image prune -af
 
-unset var1
-unset var2
-unset var3
-unset var4
-unset var5
-unset var6
-unset var7
-unset var8
-unset var9
-unset var10
+unset VALUE1; unset VALUE2; unset VALUE3; unset VALUE4; unset VALUE5; unset VALUE6; unset VALUE7; unset VALUE8; unset VALUE9; unset VALUE10
 
-exit 1
+exit 0
