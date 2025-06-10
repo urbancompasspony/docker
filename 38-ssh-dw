@@ -29,6 +29,16 @@ function check_root {
   }
 }
 
+function lockfile0 {
+  if [ -f /srv/lockfile ]; then
+    load_config
+    docker_create
+    save_config
+  else
+    return
+  fi
+}
+
 function check_macvlan {
   macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
   if [ "$macvlanr" = "no" ]; then
@@ -95,6 +105,8 @@ function save_config {
 }
 
 function docker_create {
+  docker pull "$docker_repo"
+
   docker run -d --privileged --no-healthcheck --restart unless-stopped \
   --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network host --add-host=host.docker.internal:host-gateway \
@@ -107,13 +119,14 @@ function create {
   #check_IP
   mkdir0
   save_config
-  docker pull "$docker_repo"
   docker_create
   docker_extras
+
   docker image prune -af
 }
 
 check_root
+lockfile0
 check_macvlan
 menu_principal
 
