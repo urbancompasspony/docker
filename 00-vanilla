@@ -23,7 +23,6 @@ CustmN6="."
 CustmN7="."
 CustmN8="."
 CustmN9="."
-CustmN10="."
 }
 
 # MENU DEFAULT VALUES
@@ -47,32 +46,32 @@ docker_repo="CUSTOM/DOCKER:LATEST"
 
 # Adjust if needed
 function docker_custom {
-  [ "$var2" = "host" ] || [ "$var2" = "Host" ] || [ "$var2" = "HOST" ] || [ "$var2" = "hostname" ] || [ "$var2" = "localhost" ] && {
+  if [[ "$var2" =~ ^(host|Host|HOST|hostname|localhost)$ ]]; then
 docker run -d \
---name=$var1 \
+--name="$var1" \
 --network host \
---hostname=$var1 \
+--hostname="$var1" \
 --no-healthcheck \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
 $docker_repo
-  } || {
+  else
 docker run -d \
---name=$var1 \
+--name="$var1" \
 --network macvlan \
---ip=$var2 \
+--ip="$var2" \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
---hostname=$var1 \
+--hostname="$var1" \
 --no-healthcheck \
 --restart=unless-stopped \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/"$NOMECONTAINER"/config:/config \
 -v /srv/containers/"$NOMECONTAINER"/data:/data \
-$docker_repo
-  }
+"$docker_repo"
+  fi
 }
 
 function makedir {
@@ -106,16 +105,16 @@ function export_all {
 export_all
 
 function var_read {
-  var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-  var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
-  var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
-  var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
-  var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
-  var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
-  var7=$(sed -n '7p' /srv/containers/$NOMECONTAINER/Information)
-  var8=$(sed -n '8p' /srv/containers/$NOMECONTAINER/Information)
-  var9=$(sed -n '9p' /srv/containers/$NOMECONTAINER/Information)
-  var10=$(sed -n '10p' /srv/containers/$NOMECONTAINER/Information)
+  var1=$(sed -n '1p' /srv/containers/"$NOMECONTAINER"/Information)
+  var2=$(sed -n '2p' /srv/containers/"$NOMECONTAINER"/Information)
+  var3=$(sed -n '3p' /srv/containers/"$NOMECONTAINER"/Information)
+  var4=$(sed -n '4p' /srv/containers/"$NOMECONTAINER"/Information)
+  var5=$(sed -n '5p' /srv/containers/"$NOMECONTAINER"/Information)
+  var6=$(sed -n '6p' /srv/containers/"$NOMECONTAINER"/Information)
+  var7=$(sed -n '7p' /srv/containers/"$NOMECONTAINER"/Information)
+  var8=$(sed -n '8p' /srv/containers/"$NOMECONTAINER"/Information)
+  var9=$(sed -n '9p' /srv/containers/"$NOMECONTAINER"/Information)
+  var10=$(sed -n '10p' /srv/containers/"$NOMECONTAINER"/Information)
 
   VALUE1=$var1; VALUE2=$var2; VALUE3=$var3; VALUE4=$var4; VALUE5=$var5
   VALUE6=$var6; VALUE7=$var7; VALUE8=$var8; VALUE9=$var9; VALUE10=$var10
@@ -130,36 +129,23 @@ function burn_var {
   touch /srv/containers/"$NOMECONTAINER"/Information
 
   echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var7" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var8" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var9" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var10" >> /srv/containers/"$NOMECONTAINER"/Information
-}
-
-function error {
-  dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-  menu
+  { echo "$var2"; echo "$var3"; echo "$var4"; echo "$var5"; echo "$var6"; echo "$var7"; echo "$var8"; echo "$var9"; echo "$var10"; } >> /srv/containers/"$NOMECONTAINER"/Information
 }
 
 function docker_stop_rm {
-  [ $(docker stop "$NOMECONTAINER") ] && {
+  if [ "$(docker stop "$NOMECONTAINER")" ];then
     docker rm "$NOMECONTAINER"
-  } || {
+  else
     echo "O container $NOMECONTAINER não existe. Continuando..."
-  }
+  fi
 }
 
 function bkp_and_rm_data {
   datetime=$(date +"%d-%m %H-%M")
   echo "Fazendo backup de $NOMECONTAINER:"
   mkdir -p /srv/containers/.backupcnt
-  zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
-  echo "Removendo a pasta de dados de $NOMECONTAINER:"
+  zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/"$NOMECONTAINER"
+  echo "Removendo a pasta de dados de '$NOMECONTAINER':"
   rm -iR /srv/containers/"$NOMECONTAINER"
 }
 
@@ -168,54 +154,54 @@ function checkB {
 
   NOMECONTAINER=$var1
 
-  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+  if [ -f "/srv/containers/$NOMECONTAINER/Information" ]; then
     dialog --title "$NOMECONTAINER já existente!" --yesno "Deseja refazê-lo?" 6 40
-    [ $? = 0 ] && {
+    if [ $? = 0 ]; then
       dialog --title "Recriando o container:" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
-      [ $? = 0 ] && {
+      if [ $? = 0 ]; then
         var_read
         docker_stop_rm
         create
-      } || {
+      else
         dialog --title "Recriando o container:" --yesno "Fazer backup e remover a pasta /srv/containers/$NOMECONTAINER?" 6 40
-        [ $? = 0 ] && {
+        if [ $? = 0 ]; then
           docker_stop_rm
           bkp_and_rm_data
           menu
-        } || {
+        else
           dialog --title "Recriando o container:" --yesno "Fazer REMOVER a pasta /srv/containers/$NOMECONTAINER?" 6 40
-          [ $? = 0 ] && {
+          if [ $? = 0 ]; then
             docker_stop_rm
             echo "Removendo o diretório /srv/containers/$NOMECONTAINER"
             rm -R /srv/containers/"$NOMECONTAINER"
             menu
-          } || {
+          else
             docker_stop_rm
             create
-          }
-        }
-      }
-    } || {
+          fi
+        fi
+      fi
+    else
       echo "A instalação local será mantida! Saindo..."
       exit
-    }
-  } || {
+    fi
+  else
     create
-  }
+  fi
 
 }
 
 function menu {
   export_all
 
-  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
+  if [ -f "/srv/containers/$NOMECONTAINER/Information" ]; then
     custom_values
     custom_names
     var_read
-  } || {
+  else
     custom_names
     custom_values
-    }
+  fi
 
 [ $var_cont -le "0" ] && {
   clear
@@ -408,12 +394,12 @@ checkB
 function checkC {
   #IPMachine=$(hostname -I | awk '{print $1}')
   MyIP=$(cat /srv/containers/scripts/myip)
-  [ "$MyIP" = "$myip" ] && {
+  if [ "$MyIP" = "$myip" ]; then
     dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
     menu
-  } || {
+  else
     create
-    }
+  fi
 }
 
 function create {
