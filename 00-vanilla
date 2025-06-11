@@ -70,7 +70,11 @@ masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
 
 CustmN1="NomeCont"
+
+labels=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
+
 VALUE1="$NOMECONTAINER"
+values=("$VALUE1" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
 
 function check_root {
   [ "$EUID" -ne 0 ] && {
@@ -118,9 +122,6 @@ function cleanup0 {
 function main_menu {
   load_config
 
-  labels=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
-  values=("$VALUE1" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
-
   form_args=()
   for idx in "${!labels[@]}"; do
     line=$((idx+1))
@@ -135,7 +136,7 @@ function main_menu {
   mapfile -t VALUES <<< "$form"
 
   for i in {1..10}; do
-    eval "VALUE$i=\"\${VALUES[$((i-1))]}\""
+    declare "VALUE$i=${VALUES[$((i-1))]}"
   done
 
   NOMECONTAINER="$CustmN1"
@@ -145,10 +146,9 @@ function main_menu {
 
 function load_config {
   [ -f "$configfile" ] || return
-    campos=("$NOMECONTAINER" "$teste2" "$teste3" "$teste4" "$teste5" "$teste6" "$teste7" "$teste8" "$teste9" "$teste10")
 
-    for i in "${!campos[@]}"; do
-      eval "VALUE$((i+1))=\"\$(yq -r \".${campos[$i]}\" \"$configfile\")\""
+    for i in "${!values[@]}"; do
+      eval "VALUE$((i+1))=\"\$(yq -r \".${values[$i]}\" \"$configfile\")\""
     done
 
     [ "$VALUE1" = "null" ] && return
