@@ -187,6 +187,7 @@ function save_config {
 
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".${NOMECONTAINER}.install = \"${datetime0}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.baseimg = \"${image_name}\"" "$configfile"
 
   for i in "${!custom_names[@]}"; do
     sudo yq -i ".${NOMECONTAINER}.${custom_names[$i]} = \"${values[$i]}\"" "$configfile"
