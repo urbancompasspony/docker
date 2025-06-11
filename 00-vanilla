@@ -5,8 +5,8 @@
 # =============================================================================
 
 export NOMECONTAINER="A-CUSTOM-A"
-export image_name="pihole etc"
 export docker_repo="CUSTOM/DOCKER:LATEST"
+export image_name="pihole etc"
 
 function custom_vars {
 # -----------------------------------
