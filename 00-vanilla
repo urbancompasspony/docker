@@ -90,12 +90,9 @@ function lockfile0 {
 }
 
 function check_macvlan {
-  macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
-  if [ "$macvlanr" = "no" ]; then
+  if ! docker inspect macvlan 1>/dev/null 2>/dev/null; then
     clear; echo "A macvlan não existe! Saindo..."; sleep 3
     exit 0
-  else
-    echo . >/dev/null
   fi
 }
 
@@ -104,6 +101,18 @@ function try_pull {
     clear; echo "Erro: docker pull falhou... saindo."; sleep 3
     exit 1
   fi
+}
+
+function cleanup0 {
+  docker image prune -af
+
+  for i in {1..10}; do
+    unset "VALUE$i"
+  done
+
+  for i in {1..10}; do
+    unset "CustmN$i"
+  done
 }
 
 function main_menu {
@@ -124,6 +133,7 @@ function main_menu {
   fi
 
   mapfile -t VALUES <<< "$form"
+
   for i in {1..10}; do
     eval "VALUE$i=\"\${VALUES[$((i-1))]}\""
   done
@@ -136,6 +146,7 @@ function main_menu {
 function load_config {
   [ -f "$configfile" ] || return
     campos=("$NOMECONTAINER" "$teste2" "$teste3" "$teste4" "$teste5" "$teste6" "$teste7" "$teste8" "$teste9" "$teste10")
+
     for i in "${!campos[@]}"; do
       eval "VALUE$((i+1))=\"\$(yq -r \".${campos[$i]}\" \"$configfile\")\""
     done
@@ -148,13 +159,11 @@ function check_IP {
   if grep -qw "$VALUE2" "$masterfile"; then
     dialog --title "ERRO" --msgbox "Conflito de IP detectado:\nMesmo IP do Host!" 6 40
     return
+  elif grep -qw "$VALUE2" "$configfile"; then
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado:\nMesmo IP de outro container!" 6 40
+    return
   else
-    if grep -qw "$VALUE2" "$configfile"; then
-      dialog --title "ERRO" --msgbox "Conflito de IP detectado:\nMesmo IP de outro container!" 6 40
-      return
-    else
-      create
-    fi
+    create
   fi
 }
 
@@ -179,7 +188,6 @@ function save_config {
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".${NOMECONTAINER}.install = \"${datetime0}\"" "$configfile"
 
-  # Loop para atualizar todos os campos customizados
   for i in "${!custom_names[@]}"; do
     sudo yq -i ".${NOMECONTAINER}.${custom_names[$i]} = \"${values[$i]}\"" "$configfile"
   done
@@ -190,9 +198,8 @@ function create {
   save_config
   docker_create
   docker_extras
+  cleanup0
 }
-
-# START HERE #
 
 check_root
 lockfile0
@@ -200,9 +207,5 @@ check_macvlan
 try_pull
 custom_vars
 main_menu
-
-docker image prune -af
-
-unset VALUE1; unset VALUE2; unset VALUE3; unset VALUE4; unset VALUE5; unset VALUE6; unset VALUE7; unset VALUE8; unset VALUE9; unset VALUE10
 
 exit 0
