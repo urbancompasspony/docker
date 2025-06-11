@@ -5,6 +5,7 @@
 # =============================================================================
 
 export NOMECONTAINER="A-CUSTOM-A"
+export image_name="pihole etc"
 export docker_repo="CUSTOM/DOCKER:LATEST"
 
 function custom_vars {
@@ -38,7 +39,7 @@ function docker_create {
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -v "/srv/containers/$NOMECONTAINER/config:/config" \
     -v "/srv/containers/$NOMECONTAINER/data:/data" \
-    -v $var7 \
+    -v $VALUE4 \
     "$docker_repo"
   else
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
@@ -46,7 +47,7 @@ function docker_create {
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -v "/srv/containers/$NOMECONTAINER/config:/config" \
     -v "/srv/containers/$NOMECONTAINER/data:/data" \
-    -v $var7 \
+    -v $VALUE4 \
     "$docker_repo"
   fi
 
@@ -108,31 +109,24 @@ function try_pull {
 function main_menu {
   load_config
 
-  form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome sugerido: $NOMECONTAINER" 20 50 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 15 100 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 15 100 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 15 100 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 15 100 0 \
-"$CustmN5: " 5 1 "$VALUE5" 5 15 100 0 \
-"$CustmN6: " 6 1 "$VALUE6" 6 15 100 0 \
-"$CustmN7: " 7 1 "$VALUE7" 7 15 100 0 \
-"$CustmN8: " 8 1 "$VALUE8" 8 15 100 0 \
-"$CustmN9: " 9 1 "$VALUE9" 9 15 100 0 \
-"$CustmN10: " 10 1 "$VALUE10" 10 15 100 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  labels=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
+  values=("$VALUE1" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
 
-  [ $? -ne 0 ] && exit
+  form_args=()
+  for idx in "${!labels[@]}"; do
+    line=$((idx+1))
+    form_args+=("${labels[$idx]}: " "$line" 1 "${values[$idx]}" "$line" 15 100 0)
+  done
 
-  VALUE1=$(echo "$form" | sed -n 1p)
-  VALUE2=$(echo "$form" | sed -n 2p)
-  VALUE3=$(echo "$form" | sed -n 3p)
-  VALUE4=$(echo "$form" | sed -n 4p)
-  VALUE5=$(echo "$form" | sed -n 5p)
-  VALUE6=$(echo "$form" | sed -n 6p)
-  VALUE7=$(echo "$form" | sed -n 7p)
-  VALUE8=$(echo "$form" | sed -n 8p)
-  VALUE9=$(echo "$form" | sed -n 9p)
-  VALUE10=$(echo "$form" | sed -n 10p)
+  if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome sugerido: $NOMECONTAINER" 20 50 0 \
+  "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    exit
+  fi
+
+  mapfile -t VALUES <<< "$form"
+  for i in {1..10}; do
+    eval "VALUE$i=\"\${VALUES[$((i-1))]}\""
+  done
 
   NOMECONTAINER="$CustmN1"
 
@@ -141,17 +135,12 @@ function main_menu {
 
 function load_config {
   [ -f "$configfile" ] || return
-    VALUE1=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE2=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE3=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE4=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE5=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE6=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE7=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE8=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE9=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE10=$(yq -r ".${NOMECONTAINER}" "$configfile")
-  [ "$VALUE1" = "null" ] && return
+    campos=("$NOMECONTAINER" "$teste2" "$teste3" "$teste4" "$teste5" "$teste6" "$teste7" "$teste8" "$teste9" "$teste10")
+    for i in "${!campos[@]}"; do
+      eval "VALUE$((i+1))=\"\$(yq -r \".${campos[$i]}\" \"$configfile\")\""
+    done
+
+    [ "$VALUE1" = "null" ] && return
     NOMECONTAINER="$VALUE1"
 }
 
@@ -172,7 +161,7 @@ function check_IP {
 function mkdir0 {
   if [ -d "/srv/containers/$NOMECONTAINER" ]; then
     dialog --title "WARNING" --msgbox "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente" 12 50
-    if [ $(docker stop "$NOMECONTAINER") ]; then
+    if docker stop "$NOMECONTAINER"; then
       docker rm "$NOMECONTAINER"
     else
       clear; echo "O container $NOMECONTAINER não existe ou não foi identificado. Continuando..."
@@ -184,20 +173,16 @@ function mkdir0 {
 
 function save_config {
   sudo touch "$configfile"
+  custom_names=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
+  values=("$VALUE1" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
+
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".${NOMECONTAINER}.install = \"${datetime0}\"" "$configfile"
 
-  sudo yq -i ".${NOMECONTAINER}.${CustmN1} = \"${VALUE1}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN2} = \"${VALUE2}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN3} = \"${VALUE3}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN4} = \"${VALUE4}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN5} = \"${VALUE5}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN6} = \"${VALUE6}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN7} = \"${VALUE7}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN8} = \"${VALUE8}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN9} = \"${VALUE9}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN10} = \"${VALUE10}\"" "$configfile"
-
+  # Loop para atualizar todos os campos customizados
+  for i in "${!custom_names[@]}"; do
+    sudo yq -i ".${NOMECONTAINER}.${custom_names[$i]} = \"${values[$i]}\"" "$configfile"
+  done
 }
 
 function create {
