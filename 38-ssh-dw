@@ -3,11 +3,10 @@
 NOMECONTAINER="ssh-dw"
 docker_repo="urbancompasspony/ssh-dw:latest"
 base_img="dwservice"
-set_folders="data"
 
 CustmN2="LocalIP"
-CustmN3="teste01"
-CustmN4="."
+CustmN3="teste1"
+CustmN4="teste2"
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -16,7 +15,7 @@ CustmN9="."
 CustmN10="."
 
 VALUE2="HOSTONLY"
-VALUE3="aaa"
+VALUE3="0"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -50,7 +49,8 @@ echo "0" > /dev/null
 masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
 
-labels=("Nome_Container" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
+labels=("Nome_Custom" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
+
 values=("$NOMECONTAINER" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
 
 function check_root {
@@ -90,7 +90,7 @@ function load_config_check {
   if ! [ -f "$configfile" ]; then
     echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile! Saindo."
     exit 1
-  elif grep -qw "$base_img" "$configfile"; then
+  elif grep -qw "$NOMECONTAINER" "$configfile"; then
     load_data
   else
     echo ""; echo "ERRO: NAO ENCONTREI DADOS SUFICIENTES EM $configfile! Saindo."
@@ -102,6 +102,12 @@ function load_data {
   if ! [ -f "$configfile" ]; then
     return
   fi
+
+  if [ "$(grep -c -w "$base_img" "$configfile")" -gt 1 ]; then
+    LISTANOMES=$(yq -r 'to_entries[].value.Nome_Custom' "$configfile")
+    NOMECONTAINER=$(dialog --title "Imagem detectada: $base_img" --backtitle "W A R N I N G" --ok-button "Carregar" --no-cancel --inputbox "Encontrei mais de um container registrado com essa imagem! Qual deseja carregar?\nValores encontrados:\n$LISTANOMES" 0 0 "" 2>&1 > /dev/tty)
+  fi
+
   for i in "${!labels[@]}"; do
     val="$(yq -r '.["'"$NOMECONTAINER"'"].["'"${labels[$i]}"'"]' "$configfile")"
     if [[ "$val" == "null" || -z "$val" ]]; then
@@ -112,6 +118,13 @@ function load_data {
       values[$i]="$val"
     fi
   done
+
+  if [ "$NOMECONTAINER" = "" ]; then
+    dialog --title "WARNING" --msgbox "Campo vazio! Cuidado com a sobrescrita de dados!" 6 40
+    button_ok0="Criar"
+  else
+    button_ok0="Recriar"
+  fi
 }
 
 function save_config {
@@ -128,13 +141,14 @@ function save_config {
 
 function main_menu {
   load_data
+
   form_args=()
   for idx in "${!labels[@]}"; do
     line=$((idx+1))
-    form_args+=("${labels[$idx]}:" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
+    form_args+=("${labels[$idx]}" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
   done
 
-  if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome Sugerido / Padrao: $NOMECONTAINER" 17 80 0 \
+  if ! form=$(dialog --ok-label "$button_ok0" --title "Novo Container" --form "Imagem Base: $base_img" 17 80 0 \
     "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
