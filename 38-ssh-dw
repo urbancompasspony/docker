@@ -9,8 +9,8 @@ export docker_repo="urbancompasspony/ssh-dw:latest"
 export base_img="dwservice"
 export set_folders="data"
 
-#exe   ="12345678901"
-CustmN2="Local IP   "
+#exe   ="1234567890123:"
+CustmN2="Local IP      "
 CustmN3="."
 CustmN4="."
 CustmN5="."
@@ -68,7 +68,8 @@ echo "0" > /dev/null
 masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
 
-CustmN1="Nome Cont."
+#exe   ="1234567890123:"
+CustmN1="Nome Container"
 
 labels=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
 
@@ -99,12 +100,12 @@ function try_pull {
 function lockfile0 {
   if [ -f /srv/lockfile ]; then
     load_config_check
+    try_pull
     docker_create
     docker_extras
     save_config
   else
     main_menu
-    check_IP
   fi
 }
 
@@ -121,6 +122,10 @@ function load_config_check {
 }
 
 function load_data {
+  if ! [ -f "$configfile" ]; then
+    return
+  fi
+  
   for i in "${!values[@]}"; do
     eval "VALUE$((i+1))=\"\$(yq -r \".${values[$i]}\" \"$configfile\")\""
   done
@@ -152,10 +157,10 @@ function main_menu {
   form_args=()
   for idx in "${!labels[@]}"; do
     line=$((idx+1))
-    form_args+=("${labels[$idx]}: " "$line" 1 "${values[$idx]}" "$line" 15 100 0)
+    form_args+=("${labels[$idx]}:" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
   done
 
-  if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome sugerido: $NOMECONTAINER" 20 50 0 \
+  if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome Sugerido / Padrao: $NOMECONTAINER" 17 80 0 \
   "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
@@ -169,6 +174,7 @@ function main_menu {
   NOMECONTAINER="$CustmN1"
 
   save_config
+  check_IP
 }
 
 function check_IP {
@@ -180,6 +186,7 @@ function check_IP {
     main_menu
   else
     mkdir0
+    try_pull
     docker_create
     docker_extras
     cleanup0
@@ -216,7 +223,6 @@ function cleanup0 {
 
 check_root
 check_macvlan
-try_pull
 lockfile0
 
 exit 0
