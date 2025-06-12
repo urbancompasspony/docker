@@ -1,0 +1,155 @@
+#!/bin/bash
+
+function check_root {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root! Saindo..."
+    exit 1
+  }
+}
+
+function check_macvlan {
+  if ! docker inspect macvlan 1>/dev/null 2>/dev/null; then
+    echo "A macvlan não existe! Saindo..."; sleep 3
+    exit 0
+  fi
+}
+
+function try_pull {
+  if ! docker pull "$docker_repo"; then
+    echo "Erro: docker pull falhou... saindo."; sleep 3
+    exit 1
+  fi
+}
+
+function lockfile0 {
+  if [ -f /srv/lockfile ]; then
+    load_config_check
+    try_pull
+    docker_create
+    docker_extras
+    save_config
+  else
+    main_menu
+  fi
+}
+
+function load_config_check {
+  if ! [ -f "$configfile" ]; then
+    echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile! Saindo."
+    exit 1
+  elif grep -qw "$base_img" "$configfile"; then
+    load_data
+  else
+    echo ""; echo "ERRO: NAO ENCONTREI DADOS SUFICIENTES EM $configfile! Saindo."
+    exit 1
+  fi
+}
+
+function load_data {
+  if ! [ -f "$configfile" ]; then
+    return
+  fi
+  for i in "${!labels[@]}"; do
+    val="$(yq -r '.["'"$NOMECONTAINER"'"].["'"${labels[$i]}"'"]' "$configfile")"
+    if [[ "$val" == "null" || -z "$val" ]]; then
+      eval "VALUE$((i+1))=\"${values[$i]}\""
+      values[$i]="${values[$i]}"
+    else
+      eval "VALUE$((i+1))=\"$val\""
+      values[$i]="$val"
+    fi
+  done
+}
+
+function save_config {
+  sudo touch "$configfile"
+
+  datetime0=$(date +"%d-%m-%Y_%H:%M")
+  sudo yq -i ".\"${NOMECONTAINER}\".install = \"${datetime0}\"" "$configfile"
+  sudo yq -i ".\"${NOMECONTAINER}\".baseimg = \"${base_img}\"" "$configfile"
+
+  for i in "${!labels[@]}"; do
+    sudo yq -i ".\"${NOMECONTAINER}\".\"${labels[$i]}\" = \"${values[$i]}\"" "$configfile"
+  done
+}
+
+function main_menu {
+  load_data
+  form_args=()
+  for idx in "${!labels[@]}"; do
+    line=$((idx+1))
+    form_args+=("${labels[$idx]}:" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
+  done
+
+  if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome Sugerido / Padrao: $NOMECONTAINER" 17 80 0 \
+    "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+
+  mapfile -t VALUES <<< "$form"
+  for i in {1..10}; do
+    eval "VALUE$i=\"\${VALUES[$((i-1))]}\""
+    values[$((i-1))]="${VALUES[$((i-1))]}"
+  done
+
+  NOMECONTAINER="${VALUES[0]}"
+
+  save_config
+  check_IP
+}
+
+function check_IP {
+  if [[ "${VALUE2,,}" =~ ^(LOCALONLY|HOSTONLY|ONLYLOCAL|ONLYHOST|localonly|hostonly|onlylocal|onlyhost|host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
+    mkdir0
+    try_pull
+    docker_create
+    docker_extras
+    cleanup0
+  else
+    # Verifica conflito normalmente
+    if grep -qw "$VALUE2" "$masterfile"; then
+      dialog --title "ERRO" --msgbox "Conflito de IP detectado no $masterfile:\nMesmo IP do Host!" 6 40
+      main_menu
+    elif grep -qw "$VALUE2" "$configfile"; then
+      dialog --title "ERRO" --msgbox "Conflito de IP detectado no $configfile:\nMesmo IP de outro container!" 6 40
+      main_menu
+    else
+      mkdir0
+      try_pull
+      docker_create
+      docker_extras
+      cleanup0
+    fi
+  fi
+}
+
+function mkdir0 {
+  if [ -d "/srv/containers/$NOMECONTAINER" ]; then
+    if ! dialog --title "WARNING" --yes-label "Prosseguir" --no-label "CANCELAR" --yesno "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente" 14 50; then
+      exit 0
+    fi
+
+    if docker stop "$NOMECONTAINER"; then
+      docker rm "$NOMECONTAINER"
+      echo "O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 1
+    elif docker rm "$NOMECONTAINER"; then
+      echo "O container $NOMECONTAINER nao estava executando e foi removido. Continuando..."; sleep 1
+    else
+      echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 1
+    fi
+  else
+    mkdir -p /srv/containers/"$NOMECONTAINER"/"$set_folders"
+  fi
+}
+
+function cleanup0 {
+  for i in {1..10}; do
+    unset "VALUE$i"
+  done
+
+  docker image prune -af
+
+  for i in {1..10}; do
+    unset "CustmN$i"
+  done
+}
