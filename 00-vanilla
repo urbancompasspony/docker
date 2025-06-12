@@ -1,55 +1,55 @@
 #!/bin/bash
 
-# =============================================================================
-# ########################################################################### #
-# =============================================================================
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 export NOMECONTAINER="A-CUSTOM-A"
 export docker_repo="CUSTOM/DOCKER:LATEST"
 export base_img="pihole etc"
+export set_folders="{config,data}"
 
-function custom_vars {
-# -----------------------------------
-  CustmN2="Local IP   "
-  CustmN3="DNS Server "
-  CustmN4="MountPoints"
-  CustmN5="Usuario    "
-  CustmN6="Senha      "
-  CustmN7="."
-  CustmN8="."
-  CustmN9="."
-  CustmN10="."
-# -----------------------------------
-  VALUE2="0.0.0.0"
-  VALUE3="8.8.4.4"
-  VALUE4="-v /mnt:/mnt"
-  VALUE5="admin"
-  VALUE6="p4ssw0rd"
-  VALUE7="0"
-  VALUE8="0"
-  VALUE9="0"
-  VALUE10="0"
-# -----------------------------------
-}
+#example="12345678901"
+CustmN2="Local IP   "
+CustmN3="DNS Server "
+CustmN4="."
+CustmN5="."
+CustmN6="."
+CustmN7="."
+CustmN8="."
+CustmN9="."
+CustmN10="."
+
+VALUE2="0.0.0.0"
+VALUE3="8.8.4.4"
+VALUE4="0"
+VALUE5="0"
+VALUE6="0"
+VALUE7="0"
+VALUE8="0"
+VALUE9="0"
+VALUE10="0"
 
 function docker_create {
-  if [[ "$CustmN2" =~ ^(host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
-    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-    --network host \
-    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -v "/srv/containers/$NOMECONTAINER/config:/config" \
-    -v "/srv/containers/$NOMECONTAINER/data:/data" \
-    -v $VALUE4 \
-    "$docker_repo"
-  else
-    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-    --network macvlan --ip="$CustmN2" --dns="$CustmN3" \
-    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -v "/srv/containers/$NOMECONTAINER/config:/config" \
-    -v "/srv/containers/$NOMECONTAINER/data:/data" \
-    -v $VALUE4 \
-    "$docker_repo"
-  fi
+if [[ "$CustmN2" =~ ^(host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
+
+docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+--network host \
+--no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+-v "/srv/containers/$NOMECONTAINER/config:/config" \
+-v "/srv/containers/$NOMECONTAINER/data:/data" \
+"$docker_repo"
+
+else
+
+docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+--network macvlan --ip="$CustmN2" --dns="$CustmN3" \
+--no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+-v "/srv/containers/$NOMECONTAINER/config:/config" \
+-v "/srv/containers/$NOMECONTAINER/data:/data" \
+"$docker_repo"
+
+fi
 
 #--privileged
 #--network host --add-host=host.docker.internal:host-gateway \
@@ -60,16 +60,16 @@ function docker_extras {
 #docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
 #docker restart "$NOMECONTAINER"
 
-# =============================================================================
-# ########################################################################### #
-# =============================================================================
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 echo "0" > /dev/null
 }
 
 masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
 
-CustmN1="NomeCont"
+CustmN1="Nome Cont."
 
 labels=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
 
@@ -81,16 +81,6 @@ function check_root {
     clear; echo "Execute esse script como Root! Saindo..."
     exit 1
   }
-}
-
-function lockfile0 {
-  if [ -f /srv/lockfile ]; then
-    load_config
-    docker_create
-    save_config
-  else
-    return
-  fi
 }
 
 function check_macvlan {
@@ -107,76 +97,39 @@ function try_pull {
   fi
 }
 
-function cleanup0 {
-  docker image prune -af
-
-  for i in {1..10}; do
-    unset "VALUE$i"
-  done
-
-  for i in {1..10}; do
-    unset "CustmN$i"
-  done
-}
-
-function main_menu {
-  load_config
-
-  form_args=()
-  for idx in "${!labels[@]}"; do
-    line=$((idx+1))
-    form_args+=("${labels[$idx]}: " "$line" 1 "${values[$idx]}" "$line" 15 100 0)
-  done
-
-  if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome sugerido: $NOMECONTAINER" 20 50 0 \
-  "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
-    exit
+function lockfile0 {
+  if [ -f /srv/lockfile ]; then
+    load_config_check
+    docker_create
+    docker_extras
+    save_config
+  else
+    main_menu
+    check_IP
   fi
-
-  mapfile -t VALUES <<< "$form"
-
-  for i in {1..10}; do
-    declare "VALUE$i=${VALUES[$((i-1))]}"
-  done
-
-  NOMECONTAINER="$CustmN1"
-
-  check_IP
 }
 
-function load_config {
-  [ -f "$configfile" ] || return
+function load_config_check {
+  if ! [ -f "$configfile" ]; then
+    clear; echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile! Saindo."
+    exit 1
+  elif grep -qw "$base_img" "$configfile"; then
+    load_data
+  else
+    clear; echo ""; echo "ERRO: NAO ENCONTREI DADOS SUFICIENTES EM $configfile! Saindo."
+    exit 1
+  fi
+}
 
-    for i in "${!values[@]}"; do
-      eval "VALUE$((i+1))=\"\$(yq -r \".${values[$i]}\" \"$configfile\")\""
-    done
+function load_data {
+  for i in "${!values[@]}"; do
+    eval "VALUE$((i+1))=\"\$(yq -r \".${values[$i]}\" \"$configfile\")\""
+  done
 
-    [ "$VALUE1" = "null" ] && return
+  if [ "$VALUE1" = "null" ]; then
+    return
+  else
     NOMECONTAINER="$VALUE1"
-}
-
-function check_IP {
-  if grep -qw "$VALUE2" "$masterfile"; then
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado:\nMesmo IP do Host!" 6 40
-    return
-  elif grep -qw "$VALUE2" "$configfile"; then
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado:\nMesmo IP de outro container!" 6 40
-    return
-  else
-    create
-  fi
-}
-
-function mkdir0 {
-  if [ -d "/srv/containers/$NOMECONTAINER" ]; then
-    dialog --title "WARNING" --msgbox "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente" 12 50
-    if docker stop "$NOMECONTAINER"; then
-      docker rm "$NOMECONTAINER"
-    else
-      clear; echo "O container $NOMECONTAINER não existe ou não foi identificado. Continuando..."
-    fi
-  else
-    mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
   fi
 }
 
@@ -194,19 +147,77 @@ function save_config {
   done
 }
 
-function create {
-  mkdir0
+function main_menu {
+  load_data
+
+  form_args=()
+  for idx in "${!labels[@]}"; do
+    line=$((idx+1))
+    form_args+=("${labels[$idx]}: " "$line" 1 "${values[$idx]}" "$line" 15 100 0)
+  done
+
+  if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome sugerido: $NOMECONTAINER" 20 50 0 \
+  "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+
+  mapfile -t VALUES <<< "$form"
+
+  for i in {1..10}; do
+    declare "VALUE$i=${VALUES[$((i-1))]}"
+  done
+
+  NOMECONTAINER="$CustmN1"
+
   save_config
-  docker_create
-  docker_extras
-  cleanup0
+}
+
+function check_IP {
+  if grep -qw "$VALUE2" "$masterfile"; then
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado no $masterfile:\nMesmo IP do Host!" 6 40
+    main_menu
+  elif grep -qw "$VALUE2" "$configfile"; then
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado no $configfile:\nMesmo IP de outro container!" 6 40
+    main_menu
+  else
+    mkdir0
+    docker_create
+    docker_extras
+    cleanup0
+  fi
+}
+
+function mkdir0 {
+  if [ -d "/srv/containers/$NOMECONTAINER" ]; then
+    dialog --title "WARNING" --msgbox "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente" 12 50
+    if docker stop "$NOMECONTAINER"; then
+      docker rm "$NOMECONTAINER"
+      clear; echo "O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 1
+    elif docker rm "$NOMECONTAINER"; then
+      clear; echo "O container $NOMECONTAINER nao estava executando e foi removido. Continuando..."; sleep 1
+    else
+      clear; echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 1
+    fi
+  else
+    mkdir -p /srv/containers/"$NOMECONTAINER"/"$set_folders"
+  fi
+}
+
+function cleanup0 {
+  for i in {1..10}; do
+    unset "VALUE$i"
+  done
+
+  docker image prune -af
+
+  for i in {1..10}; do
+    unset "CustmN$i"
+  done
 }
 
 check_root
-lockfile0
 check_macvlan
 try_pull
-custom_vars
-main_menu
+lockfile0
 
 exit 0
