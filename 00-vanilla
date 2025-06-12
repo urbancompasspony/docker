@@ -9,9 +9,9 @@ export docker_repo="CUSTOM/DOCKER:LATEST"
 export base_img="pihole etc"
 export set_folders="{config,data}"
 
-#exe   ="12345678901"
-CustmN2="Local IP   "
-CustmN3="DNS Server "
+#exe   ="1234567890123:"
+CustmN2="Local IP     :"
+CustmN3="DNS Server   :"
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -69,7 +69,7 @@ echo "0" > /dev/null
 masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
 
-CustmN1="Nome Cont."
+CustmN1="NomeContainer:"
 
 labels=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
 
@@ -106,7 +106,6 @@ function lockfile0 {
     save_config
   else
     main_menu
-    check_IP
   fi
 }
 
@@ -154,10 +153,10 @@ function main_menu {
   form_args=()
   for idx in "${!labels[@]}"; do
     line=$((idx+1))
-    form_args+=("${labels[$idx]}: " "$line" 1 "${values[$idx]}" "$line" 15 100 0)
+    form_args+=("${labels[$idx]}:" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
   done
 
-  if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome sugerido: $NOMECONTAINER" 20 50 0 \
+  if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome Sugerido / Padrao: $NOMECONTAINER" 17 80 0 \
   "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
@@ -171,6 +170,7 @@ function main_menu {
   NOMECONTAINER="$CustmN1"
 
   save_config
+  check_IP
 }
 
 function check_IP {
