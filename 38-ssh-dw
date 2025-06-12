@@ -3,6 +3,7 @@
 NOMECONTAINER="ssh-dw"
 docker_repo="urbancompasspony/ssh-dw:latest"
 base_img="dwservice"
+set_mkdir="data"
 
 CustmN2="LocalIP"
 CustmN3="teste1"
@@ -205,7 +206,7 @@ function mkdir0 {
       echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 1
     fi
   else
-    mkdir -p /srv/containers/"$NOMECONTAINER"/"$set_folders"
+    mkdir -p /srv/containers/"$NOMECONTAINER"/"$set_mkdir"
   fi
 }
 
