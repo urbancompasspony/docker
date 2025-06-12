@@ -6,7 +6,7 @@ base_img="dwservice"
 set_folders="data"
 
 CustmN2="LocalIP"
-CustmN3="."
+CustmN3="teste01"
 CustmN4="."
 CustmN5="."
 CustmN6="."
@@ -16,7 +16,7 @@ CustmN9="."
 CustmN10="."
 
 VALUE2="HOSTONLY"
-VALUE3="0"
+VALUE3="aaa"
 VALUE4="0"
 VALUE5="0"
 VALUE6="0"
@@ -102,16 +102,16 @@ function load_data {
   if ! [ -f "$configfile" ]; then
     return
   fi
-
   for i in "${!labels[@]}"; do
-    eval "VALUE$((i+1))=\"\$(yq -r '.\"${NOMECONTAINER}\".\"${labels[$i]}\"' \"$configfile\")\""
+    val="$(yq -r '.["'"$NOMECONTAINER"'"].["'"${labels[$i]}"'"]' "$configfile")"
+    if [[ "$val" == "null" || -z "$val" ]]; then
+      eval "VALUE$((i+1))=\"${values[$i]}\""
+      values[$i]="${values[$i]}"
+    else
+      eval "VALUE$((i+1))=\"$val\""
+      values[$i]="$val"
+    fi
   done
-
-  if [ "$VALUE1" = "null" ]; then
-    return
-  else
-    NOMECONTAINER="$VALUE1"
-  fi
 }
 
 function save_config {
@@ -128,11 +128,10 @@ function save_config {
 
 function main_menu {
   load_data
-
   form_args=()
   for idx in "${!labels[@]}"; do
     line=$((idx+1))
-    form_args+=("${labels[$idx]}" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
+    form_args+=("${labels[$idx]}:" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
   done
 
   if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome Sugerido / Padrao: $NOMECONTAINER" 17 80 0 \
@@ -141,9 +140,8 @@ function main_menu {
   fi
 
   mapfile -t VALUES <<< "$form"
-
   for i in {1..10}; do
-    declare "VALUE$i=${VALUES[$((i-1))]}"
+    eval "VALUE$i=\"\${VALUES[$((i-1))]}\""
     values[$((i-1))]="${VALUES[$((i-1))]}"
   done
 
@@ -180,7 +178,7 @@ function check_IP {
 
 function mkdir0 {
   if [ -d "/srv/containers/$NOMECONTAINER" ]; then
-    if ! dialog --title 'WARNING' --yes-label 'Prosseguir' --no-label 'CANCELAR' --yesno 'Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente' 12 50; then
+    if ! dialog --title "WARNING" --yes-label "Prosseguir" --no-label "CANCELAR" --yesno "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente" 14 50; then
       exit 0
     fi
 
