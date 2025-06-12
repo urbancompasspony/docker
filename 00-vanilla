@@ -31,7 +31,7 @@ VALUE9="0"
 VALUE10="0"
 
 function docker_create {
-if [[ "$CustmN2" =~ ^(host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
+if [[ "$CustmN2" =~ ^(LOCALONLY|HOSTONLY|ONLYLOCAL|ONLYHOST|localonly|hostonly|onlylocal|onlyhost|host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
 
 docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
 --network host \
