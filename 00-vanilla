@@ -3,7 +3,7 @@
 NOMECONTAINER="A-CUSTOM-A"
 docker_repo="CUSTOM/DOCKER:LATEST"
 base_img="pihole etc"
-set_folders="{config,data}"
+set_mkdir="{config,data}"
 
 CustmN2="Local IP     :"
 CustmN3="DNS Server   :"
@@ -220,7 +220,7 @@ function mkdir0 {
       echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 1
     fi
   else
-    mkdir -p /srv/containers/"$NOMECONTAINER"/"$set_folders"
+    mkdir -p /srv/containers/"$NOMECONTAINER"/"$set_mkdir"
   fi
 }
 
