@@ -1,54 +1,54 @@
 #!/bin/bash
 
-# =============================================================================
-# ########################################################################### #
-# =============================================================================
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
-export NOMECONTAINER="A-CUSTOM-A"
-export docker_repo="CUSTOM/DOCKER:LATEST"
+export NOMECONTAINER="ssh-dw"
+export docker_repo="urbancompasspony/ssh-dw:latest"
+export base_img="dwservice"
+export set_folders="data"
 
-function custom_vars {
-# -----------------------------------
-  CustmN2="Local IP   "
-  CustmN3="DNS Server "
-  CustmN4="MountPoints"
-  CustmN5="Usuario    "
-  CustmN6="Senha      "
-  CustmN7="."
-  CustmN8="."
-  CustmN9="."
-  CustmN10="."
-# -----------------------------------
-  VALUE2="0.0.0.0"
-  VALUE3="8.8.4.4"
-  VALUE4="-v /mnt:/mnt"
-  VALUE5="admin"
-  VALUE6="p4ssw0rd"
-  VALUE7="0"
-  VALUE8="0"
-  VALUE9="0"
-  VALUE10="0"
-# -----------------------------------
-}
+#exe   ="12345678901"
+CustmN2="Local IP   "
+CustmN3="."
+CustmN4="."
+CustmN5="."
+CustmN6="."
+CustmN7="."
+CustmN8="."
+CustmN9="."
+CustmN10="."
+
+VALUE2="HOSTONLY"
+VALUE3="0"
+VALUE4="0"
+VALUE5="0"
+VALUE6="0"
+VALUE7="0"
+VALUE8="0"
+VALUE9="0"
+VALUE10="0"
 
 function docker_create {
-  if [[ "$CustmN2" =~ ^(host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
-    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-    --network host \
-    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -v "/srv/containers/$NOMECONTAINER/config:/config" \
-    -v "/srv/containers/$NOMECONTAINER/data:/data" \
-    -v $var7 \
-    "$docker_repo"
-  else
-    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-    --network macvlan --ip="$CustmN2" --dns="$CustmN3" \
-    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -v "/srv/containers/$NOMECONTAINER/config:/config" \
-    -v "/srv/containers/$NOMECONTAINER/data:/data" \
-    -v $var7 \
-    "$docker_repo"
-  fi
+if [[ "$CustmN2" =~ ^(LOCALONLY|HOSTONLY|ONLYLOCAL|ONLYHOST|localonly|hostonly|onlylocal|onlyhost|host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
+
+docker run -d --privileged --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+--network host --add-host=host.docker.internal:host-gateway \
+--no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/"$NOMECONTAINER"/data:/usr/share \
+"$docker_repo"
+
+else
+
+docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+--network macvlan --ip="$CustmN2" --dns="$CustmN3" \
+--no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+-v "/srv/containers/$NOMECONTAINER/config:/config" \
+-v "/srv/containers/$NOMECONTAINER/data:/data" \
+"$docker_repo"
+
+fi
 
 #--privileged
 #--network host --add-host=host.docker.internal:host-gateway \
@@ -59,17 +59,21 @@ function docker_extras {
 #docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
 #docker restart "$NOMECONTAINER"
 
-# =============================================================================
-# ########################################################################### #
-# =============================================================================
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 echo "0" > /dev/null
 }
 
 masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
 
-CustmN1="NomeCont"
+CustmN1="Nome Cont."
+
+labels=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
+
 VALUE1="$NOMECONTAINER"
+values=("$VALUE1" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
 
 function check_root {
   [ "$EUID" -ne 0 ] && {
@@ -78,23 +82,10 @@ function check_root {
   }
 }
 
-function lockfile0 {
-  if [ -f /srv/lockfile ]; then
-    load_config
-    docker_create
-    save_config
-  else
-    return
-  fi
-}
-
 function check_macvlan {
-  macvlanr=$(docker inspect macvlan 1>/dev/null 2>/dev/null && echo yes || echo no)
-  if [ "$macvlanr" = "no" ]; then
+  if ! docker inspect macvlan 1>/dev/null 2>/dev/null; then
     clear; echo "A macvlan não existe! Saindo..."; sleep 3
     exit 0
-  else
-    echo . >/dev/null
   fi
 }
 
@@ -105,118 +96,127 @@ function try_pull {
   fi
 }
 
+function lockfile0 {
+  if [ -f /srv/lockfile ]; then
+    load_config_check
+    docker_create
+    docker_extras
+    save_config
+  else
+    main_menu
+    check_IP
+  fi
+}
+
+function load_config_check {
+  if ! [ -f "$configfile" ]; then
+    clear; echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile! Saindo."
+    exit 1
+  elif grep -qw "$base_img" "$configfile"; then
+    load_data
+  else
+    clear; echo ""; echo "ERRO: NAO ENCONTREI DADOS SUFICIENTES EM $configfile! Saindo."
+    exit 1
+  fi
+}
+
+function load_data {
+  for i in "${!values[@]}"; do
+    eval "VALUE$((i+1))=\"\$(yq -r \".${values[$i]}\" \"$configfile\")\""
+  done
+
+  if [ "$VALUE1" = "null" ]; then
+    return
+  else
+    NOMECONTAINER="$VALUE1"
+  fi
+}
+
+function save_config {
+  sudo touch "$configfile"
+  custom_names=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
+  values=("$VALUE1" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
+
+  datetime0=$(date +"%d/%m/%Y - %H:%M")
+  sudo yq -i ".${NOMECONTAINER}.install = \"${datetime0}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.baseimg = \"${base_img}\"" "$configfile"
+
+  for i in "${!custom_names[@]}"; do
+    sudo yq -i ".${NOMECONTAINER}.${custom_names[$i]} = \"${values[$i]}\"" "$configfile"
+  done
+}
+
 function main_menu {
-  load_config
+  load_data
 
-  form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome sugerido: $NOMECONTAINER" 20 50 0 \
-"$CustmN1: " 1 1 "$VALUE1" 1 15 100 0 \
-"$CustmN2: " 2 1 "$VALUE2" 2 15 100 0 \
-"$CustmN3: " 3 1 "$VALUE3" 3 15 100 0 \
-"$CustmN4: " 4 1 "$VALUE4" 4 15 100 0 \
-"$CustmN5: " 5 1 "$VALUE5" 5 15 100 0 \
-"$CustmN6: " 6 1 "$VALUE6" 6 15 100 0 \
-"$CustmN7: " 7 1 "$VALUE7" 7 15 100 0 \
-"$CustmN8: " 8 1 "$VALUE8" 8 15 100 0 \
-"$CustmN9: " 9 1 "$VALUE9" 9 15 100 0 \
-"$CustmN10: " 10 1 "$VALUE10" 10 15 100 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
+  form_args=()
+  for idx in "${!labels[@]}"; do
+    line=$((idx+1))
+    form_args+=("${labels[$idx]}: " "$line" 1 "${values[$idx]}" "$line" 15 100 0)
+  done
 
-  [ $? -ne 0 ] && exit
+  if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome sugerido: $NOMECONTAINER" 20 50 0 \
+  "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
 
-  VALUE1=$(echo "$form" | sed -n 1p)
-  VALUE2=$(echo "$form" | sed -n 2p)
-  VALUE3=$(echo "$form" | sed -n 3p)
-  VALUE4=$(echo "$form" | sed -n 4p)
-  VALUE5=$(echo "$form" | sed -n 5p)
-  VALUE6=$(echo "$form" | sed -n 6p)
-  VALUE7=$(echo "$form" | sed -n 7p)
-  VALUE8=$(echo "$form" | sed -n 8p)
-  VALUE9=$(echo "$form" | sed -n 9p)
-  VALUE10=$(echo "$form" | sed -n 10p)
+  mapfile -t VALUES <<< "$form"
+
+  for i in {1..10}; do
+    declare "VALUE$i=${VALUES[$((i-1))]}"
+  done
 
   NOMECONTAINER="$CustmN1"
 
-  check_IP
-}
-
-function load_config {
-  [ -f "$configfile" ] || return
-    VALUE1=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE2=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE3=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE4=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE5=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE6=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE7=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE8=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE9=$(yq -r ".${NOMECONTAINER}" "$configfile")
-    VALUE10=$(yq -r ".${NOMECONTAINER}" "$configfile")
-  [ "$VALUE1" = "null" ] && return
-    NOMECONTAINER="$VALUE1"
+  save_config
 }
 
 function check_IP {
   if grep -qw "$VALUE2" "$masterfile"; then
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado:\nMesmo IP do Host!" 6 40
-    return
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado no $masterfile:\nMesmo IP do Host!" 6 40
+    main_menu
+  elif grep -qw "$VALUE2" "$configfile"; then
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado no $configfile:\nMesmo IP de outro container!" 6 40
+    main_menu
   else
-    if grep -qw "$VALUE2" "$configfile"; then
-      dialog --title "ERRO" --msgbox "Conflito de IP detectado:\nMesmo IP de outro container!" 6 40
-      return
-    else
-      create
-    fi
+    mkdir0
+    docker_create
+    docker_extras
+    cleanup0
   fi
 }
 
 function mkdir0 {
   if [ -d "/srv/containers/$NOMECONTAINER" ]; then
     dialog --title "WARNING" --msgbox "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente" 12 50
-    if [ $(docker stop "$NOMECONTAINER") ]; then
+    if docker stop "$NOMECONTAINER"; then
       docker rm "$NOMECONTAINER"
+      clear; echo "O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 1
+    elif docker rm "$NOMECONTAINER"; then
+      clear; echo "O container $NOMECONTAINER nao estava executando e foi removido. Continuando..."; sleep 1
     else
-      clear; echo "O container $NOMECONTAINER não existe ou não foi identificado. Continuando..."
+      clear; echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 1
     fi
   else
-    mkdir -p /srv/containers/"$NOMECONTAINER"/{config,data}
+    mkdir -p /srv/containers/"$NOMECONTAINER"/"$set_folders"
   fi
 }
 
-function save_config {
-  sudo touch "$configfile"
-  datetime0=$(date +"%d/%m/%Y - %H:%M")
-  sudo yq -i ".${NOMECONTAINER}.install = \"${datetime0}\"" "$configfile"
+function cleanup0 {
+  for i in {1..10}; do
+    unset "VALUE$i"
+  done
 
-  sudo yq -i ".${NOMECONTAINER}.${CustmN1} = \"${VALUE1}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN2} = \"${VALUE2}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN3} = \"${VALUE3}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN4} = \"${VALUE4}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN5} = \"${VALUE5}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN6} = \"${VALUE6}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN7} = \"${VALUE7}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN8} = \"${VALUE8}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN9} = \"${VALUE9}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.${CustmN10} = \"${VALUE10}\"" "$configfile"
+  docker image prune -af
+
+  for i in {1..10}; do
+    unset "CustmN$i"
+  done
 }
-
-function create {
-  mkdir0
-  save_config
-  docker_create
-  docker_extras
-}
-
-# START HERE #
 
 check_root
-lockfile0
 check_macvlan
 try_pull
-custom_vars
-main_menu
-
-docker image prune -af
-
-unset VALUE1; unset VALUE2; unset VALUE3; unset VALUE4; unset VALUE5; unset VALUE6; unset VALUE7; unset VALUE8; unset VALUE9; unset VALUE10
+lockfile0
 
 exit 0
