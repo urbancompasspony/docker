@@ -44,7 +44,7 @@ function docker_extras {
 echo "0" > /dev/null
 }
 
-source <(curl -fsSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/X-base-source.sh)
+source <(curl -fsSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/X-base-source)
 
 check_root
 check_macvlan
