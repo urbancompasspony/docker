@@ -100,6 +100,7 @@ function try_pull {
 function lockfile0 {
   if [ -f /srv/lockfile ]; then
     load_config_check
+    try_pull
     docker_create
     docker_extras
     save_config
@@ -181,6 +182,7 @@ function check_IP {
     main_menu
   else
     mkdir0
+    try_pull
     docker_create
     docker_extras
     cleanup0
@@ -217,7 +219,6 @@ function cleanup0 {
 
 check_root
 check_macvlan
-try_pull
 lockfile0
 
 exit 0
