@@ -125,7 +125,7 @@ function load_data {
   if ! [ -f "$configfile" ]; then
     return
   fi
-  
+
   for i in "${!values[@]}"; do
     eval "VALUE$((i+1))=\"\$(yq -r \".${values[$i]}\" \"$configfile\")\""
   done
@@ -139,6 +139,7 @@ function load_data {
 
 function save_config {
   sudo touch "$configfile"
+
   custom_names=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
   values=("$VALUE1" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
 
