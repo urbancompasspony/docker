@@ -69,7 +69,8 @@ echo "0" > /dev/null
 masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
 
-CustmN1="NomeContainer:"
+#exe   ="1234567890123:"
+CustmN1="Nome Container"
 
 labels=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
 
@@ -122,6 +123,10 @@ function load_config_check {
 }
 
 function load_data {
+  if ! [ -f "$configfile" ]; then
+    return
+  fi
+
   for i in "${!values[@]}"; do
     eval "VALUE$((i+1))=\"\$(yq -r \".${values[$i]}\" \"$configfile\")\""
   done
