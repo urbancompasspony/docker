@@ -6,7 +6,7 @@
 
 export NOMECONTAINER="A-CUSTOM-A"
 export docker_repo="CUSTOM/DOCKER:LATEST"
-export image_name="pihole etc"
+export base_img="pihole etc"
 
 function custom_vars {
 # -----------------------------------
@@ -187,7 +187,7 @@ function save_config {
 
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".${NOMECONTAINER}.install = \"${datetime0}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.baseimg = \"${image_name}\"" "$configfile"
+  sudo yq -i ".${NOMECONTAINER}.baseimg = \"${base_img}\"" "$configfile"
 
   for i in "${!custom_names[@]}"; do
     sudo yq -i ".${NOMECONTAINER}.${custom_names[$i]} = \"${values[$i]}\"" "$configfile"
