@@ -1,15 +1,10 @@
 #!/bin/bash
 
-# ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
+NOMECONTAINER="A-CUSTOM-A"
+docker_repo="CUSTOM/DOCKER:LATEST"
+base_img="pihole etc"
+set_folders="{config,data}"
 
-export NOMECONTAINER="A-CUSTOM-A"
-export docker_repo="CUSTOM/DOCKER:LATEST"
-export base_img="pihole etc"
-export set_folders="{config,data}"
-
-#exe   ="1234567890123:"
 CustmN2="Local IP     :"
 CustmN3="DNS Server   :"
 CustmN4="."
@@ -69,31 +64,26 @@ echo "0" > /dev/null
 masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
 
-#exe   ="1234567890123:"
-CustmN1="Nome Container"
-
-labels=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
-
-VALUE1="$NOMECONTAINER"
-values=("$VALUE1" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
+labels=("Nome_Container" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
+values=("$NOMECONTAINER" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
 
 function check_root {
   [ "$EUID" -ne 0 ] && {
-    clear; echo "Execute esse script como Root! Saindo..."
+    echo "Execute esse script como Root! Saindo..."
     exit 1
   }
 }
 
 function check_macvlan {
   if ! docker inspect macvlan 1>/dev/null 2>/dev/null; then
-    clear; echo "A macvlan não existe! Saindo..."; sleep 3
+    echo "A macvlan não existe! Saindo..."; sleep 3
     exit 0
   fi
 }
 
 function try_pull {
   if ! docker pull "$docker_repo"; then
-    clear; echo "Erro: docker pull falhou... saindo."; sleep 3
+    echo "Erro: docker pull falhou... saindo."; sleep 3
     exit 1
   fi
 }
@@ -112,12 +102,12 @@ function lockfile0 {
 
 function load_config_check {
   if ! [ -f "$configfile" ]; then
-    clear; echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile! Saindo."
+    echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile! Saindo."
     exit 1
   elif grep -qw "$base_img" "$configfile"; then
     load_data
   else
-    clear; echo ""; echo "ERRO: NAO ENCONTREI DADOS SUFICIENTES EM $configfile! Saindo."
+    echo ""; echo "ERRO: NAO ENCONTREI DADOS SUFICIENTES EM $configfile! Saindo."
     exit 1
   fi
 }
@@ -127,8 +117,8 @@ function load_data {
     return
   fi
 
-  for i in "${!values[@]}"; do
-    eval "VALUE$((i+1))=\"\$(yq -r \".${values[$i]}\" \"$configfile\")\""
+  for i in "${!labels[@]}"; do
+    eval "VALUE$((i+1))=\"\$(yq -r '.\"${NOMECONTAINER}\".\"${labels[$i]}\"' \"$configfile\")\""
   done
 
   if [ "$VALUE1" = "null" ]; then
@@ -140,15 +130,13 @@ function load_data {
 
 function save_config {
   sudo touch "$configfile"
-  custom_names=("$CustmN1" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
-  values=("$VALUE1" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
 
-  datetime0=$(date +"%d/%m/%Y - %H:%M")
-  sudo yq -i ".${NOMECONTAINER}.install = \"${datetime0}\"" "$configfile"
-  sudo yq -i ".${NOMECONTAINER}.baseimg = \"${base_img}\"" "$configfile"
+  datetime0=$(date +"%d-%m-%Y_%H:%M")
+  sudo yq -i ".\"${NOMECONTAINER}\".install = \"${datetime0}\"" "$configfile"
+  sudo yq -i ".\"${NOMECONTAINER}\".baseimg = \"${base_img}\"" "$configfile"
 
-  for i in "${!custom_names[@]}"; do
-    sudo yq -i ".${NOMECONTAINER}.${custom_names[$i]} = \"${values[$i]}\"" "$configfile"
+  for i in "${!labels[@]}"; do
+    sudo yq -i ".\"${NOMECONTAINER}\".\"${labels[$i]}\" = \"${values[$i]}\"" "$configfile"
   done
 }
 
@@ -158,11 +146,11 @@ function main_menu {
   form_args=()
   for idx in "${!labels[@]}"; do
     line=$((idx+1))
-    form_args+=("${labels[$idx]}:" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
+    form_args+=("${labels[$idx]}" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
   done
 
   if ! form=$(dialog --ok-label "Criar" --title "Novo Container" --form "Nome Sugerido / Padrao: $NOMECONTAINER" 17 80 0 \
-  "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
 
@@ -170,40 +158,53 @@ function main_menu {
 
   for i in {1..10}; do
     declare "VALUE$i=${VALUES[$((i-1))]}"
+    values[$((i-1))]="${VALUES[$((i-1))]}"
   done
 
-  NOMECONTAINER="$CustmN1"
+  NOMECONTAINER="${VALUES[0]}"
 
   save_config
   check_IP
 }
 
 function check_IP {
-  if grep -qw "$VALUE2" "$masterfile"; then
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado no $masterfile:\nMesmo IP do Host!" 6 40
-    main_menu
-  elif grep -qw "$VALUE2" "$configfile"; then
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado no $configfile:\nMesmo IP de outro container!" 6 40
-    main_menu
-  else
+  if [[ "${VALUE2,,}" =~ ^(LOCALONLY|HOSTONLY|ONLYLOCAL|ONLYHOST|localonly|hostonly|onlylocal|onlyhost|host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
     mkdir0
     try_pull
     docker_create
     docker_extras
     cleanup0
+  else
+    # Verifica conflito normalmente
+    if grep -qw "$VALUE2" "$masterfile"; then
+      dialog --title "ERRO" --msgbox "Conflito de IP detectado no $masterfile:\nMesmo IP do Host!" 6 40
+      main_menu
+    elif grep -qw "$VALUE2" "$configfile"; then
+      dialog --title "ERRO" --msgbox "Conflito de IP detectado no $configfile:\nMesmo IP de outro container!" 6 40
+      main_menu
+    else
+      mkdir0
+      try_pull
+      docker_create
+      docker_extras
+      cleanup0
+    fi
   fi
 }
 
 function mkdir0 {
   if [ -d "/srv/containers/$NOMECONTAINER" ]; then
-    dialog --title "WARNING" --msgbox "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente" 12 50
+    if ! dialog --title 'WARNING' --yes-label 'Prosseguir' --no-label 'CANCELAR' --yesno 'Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente' 12 50; then
+      exit 0
+    fi
+
     if docker stop "$NOMECONTAINER"; then
       docker rm "$NOMECONTAINER"
-      clear; echo "O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 1
+      echo "O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 1
     elif docker rm "$NOMECONTAINER"; then
-      clear; echo "O container $NOMECONTAINER nao estava executando e foi removido. Continuando..."; sleep 1
+      echo "O container $NOMECONTAINER nao estava executando e foi removido. Continuando..."; sleep 1
     else
-      clear; echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 1
+      echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 1
     fi
   else
     mkdir -p /srv/containers/"$NOMECONTAINER"/"$set_folders"
