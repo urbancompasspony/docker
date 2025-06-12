@@ -9,7 +9,7 @@ export docker_repo="CUSTOM/DOCKER:LATEST"
 export base_img="pihole etc"
 export set_folders="{config,data}"
 
-#example="12345678901"
+#exe   ="12345678901"
 CustmN2="Local IP   "
 CustmN3="DNS Server "
 CustmN4="."
