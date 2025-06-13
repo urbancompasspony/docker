@@ -7,23 +7,23 @@ set_mkdir="config data"
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
-CustmN4="."
-CustmN5="."
-CustmN6="."
-CustmN7="."
-CustmN8="."
-CustmN9="."
-CustmN10="."
+CustmN4=""
+CustmN5=""
+CustmN6=""
+CustmN7=""
+CustmN8=""
+CustmN9=""
+CustmN10=""
 
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
-VALUE4="0"
-VALUE5="0"
-VALUE6="0"
-VALUE7="0"
-VALUE8="0"
-VALUE9="0"
-VALUE10="0"
+VALUE4=""
+VALUE5=""
+VALUE6=""
+VALUE7=""
+VALUE8=""
+VALUE9=""
+VALUE10=""
 
 function docker_create {
 if [[ "$VALUE2" =~ ^(LOCALONLY|HOSTONLY|ONLYLOCAL|ONLYHOST|localonly|hostonly|onlylocal|onlyhost|host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
@@ -66,7 +66,7 @@ masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
 button_ok0="Criar"
 
-labels=("Nome_Custom" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
+labels=("nome_custom" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
 
 values=("$NOMECONTAINER" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
 
