@@ -221,7 +221,7 @@ function mkdir0 {
       echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 1
     fi
   else
-    mkdir -p /srv/containers/"$NOMECONTAINER"/"$set_mkdir"
+    mkdir -p /srv/containers/"$NOMECONTAINER"/$set_mkdir
   fi
 }
 
