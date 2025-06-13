@@ -96,8 +96,6 @@ function lockfile0 {
 function process_container {
   local container="$1"
 
-  docker rm -f "$1"
-
   for i in "${!labels[@]}"; do
     val="$(yq -r '.["'"$container"'"].["'"${labels[$i]}"'"]' "$configfile")"
     if [[ "$val" == "null" || -z "$val" ]]; then
@@ -110,6 +108,7 @@ function process_container {
   done
 
   NOMECONTAINER="$container"
+  container_control
   try_pull
   docker_create
   docker_extras
@@ -215,17 +214,20 @@ function mkdir0 {
     if ! dialog --title "WARNING" --yes-label "Prosseguir" --no-label "CANCELAR" --yesno "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/containers/$NOMECONTAINER manualmente" 14 50; then
       exit 0
     fi
-
-    if docker stop "$NOMECONTAINER"; then
-      docker rm "$NOMECONTAINER"
-      echo "O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 1
-    elif docker rm "$NOMECONTAINER"; then
-      echo "O container $NOMECONTAINER nao estava executando e foi removido. Continuando..."; sleep 1
-    else
-      echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 1
-    fi
+    container_control
   else
     mkdir -p /srv/containers/"$NOMECONTAINER"/$set_mkdir
+  fi
+}
+
+function container_control {
+  if docker stop "$NOMECONTAINER"; then
+    docker rm "$NOMECONTAINER"
+    clear; echo "O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 3
+  elif docker rm "$NOMECONTAINER"; then
+    clear; echo "O container $NOMECONTAINER nao estava executando e foi removido. Continuando..."; sleep 3
+  else
+    clear; echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 3
   fi
 }
 
