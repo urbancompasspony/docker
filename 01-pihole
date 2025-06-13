@@ -1,6 +1,7 @@
 #!/bin/bash
 
 NOMECONTAINER="pihole"
+
 docker_repo="pihole/pihole:latest"
 imagem="pihole"
 set_mkdir="etc dnsmasq.d log"
