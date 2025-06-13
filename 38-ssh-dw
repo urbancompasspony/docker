@@ -197,7 +197,7 @@ function ip_conflict_check {
 
 function mkdir0 {
   if [ -d "/srv/containers/$NOMECONTAINER" ]; then
-    if ! dialog --title "WARNING" --yes-label "Prosseguir" --no-label "CANCELAR" --yesno "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/$NOMECONTAINER manualmente" 14 50; then
+    if ! dialog --title "WARNING" --yes-label "Prosseguir" --no-label "CANCELAR" --yesno "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/containers/$NOMECONTAINER manualmente" 14 50; then
       exit 0
     fi
 
