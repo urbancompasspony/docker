@@ -26,16 +26,19 @@ VALUE9=""
 VALUE10=""
 
 function docker_create {
-if [[ "$VALUE2" =~ ^(LOCALONLY|HOSTONLY|ONLYLOCAL|ONLYHOST|localonly|hostonly|onlylocal|onlyhost|host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
+  local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+  if [[ ! "$VALUE2" =~ $ip_regex ]]; then
+  # Se NAO for numerico, execute como host!
 
-  docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-  --network host \
-  --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -v "/srv/containers/$NOMECONTAINER/config:/config" \
-  -v "/srv/containers/$NOMECONTAINER/data:/data" \
-  "$docker_repo"
+    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --network host \
+    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -v "/srv/containers/$NOMECONTAINER/config:/config" \
+    -v "/srv/containers/$NOMECONTAINER/data:/data" \
+    "$docker_repo"
 
-else
+    return
+  fi
 
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
@@ -43,8 +46,6 @@ else
   -v "/srv/containers/$NOMECONTAINER/config:/config" \
   -v "/srv/containers/$NOMECONTAINER/data:/data" \
   "$docker_repo"
-
-fi
 
 # Examples
 # PATH: $VALUE3 \
