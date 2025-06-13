@@ -93,26 +93,39 @@ function try_pull {
 
 function lockfile0 {
   if [ -f /srv/lockfile ]; then
-    load_config_check
-    try_pull
-    docker_create
-    docker_extras
-    save_config
+    if ! [ -f "$configfile" ]; then
+      echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile! Saindo."; sleep 1
+      exit 1
+    else
+      yq -r "to_entries[] | select(.value.baseimg | test(\"$service\")) | .key" "$configfile" | while read -r container; do
+        process_container "$container"
+      done
+    fi
   else
     main_menu
   fi
 }
 
-function load_config_check {
-  if ! [ -f "$configfile" ]; then
-    echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile! Saindo."
-    exit 1
-  elif grep -qw "$NOMECONTAINER" "$configfile"; then
-    load_data
-  else
-    echo ""; echo "ERRO: NAO ENCONTREI DADOS SUFICIENTES EM $configfile! Saindo."
-    exit 1
-  fi
+function process_container {
+  local container="$1"
+  
+  for i in "${!labels[@]}"; do
+    val="$(yq -r '.["'"$container"'"].["'"${labels[$i]}"'"]' "$configfile")"
+    if [[ "$val" == "null" || -z "$val" ]]; then
+      eval "VALUE$((i+1))=\"\""
+      values[i]=""
+    else
+      eval "VALUE$((i+1))=\"$val\""
+      values[i]="$val"
+    fi
+  done
+
+  NOMECONTAINER="$container"
+  container_control
+  try_pull
+  docker_create
+  docker_extras
+  save_config
 }
 
 function load_data {
@@ -180,6 +193,7 @@ function main_menu {
 
 function check_IP {
   if [[ "${VALUE2,,}" =~ ^(LOCALONLY|HOSTONLY|ONLYLOCAL|ONLYHOST|localonly|hostonly|onlylocal|onlyhost|host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
+    save_config
     mkdir0
     try_pull
     docker_create
@@ -213,17 +227,20 @@ function mkdir0 {
     if ! dialog --title "WARNING" --yes-label "Prosseguir" --no-label "CANCELAR" --yesno "Foram identificados dados previamente configurados! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/containers/$NOMECONTAINER manualmente" 14 50; then
       exit 0
     fi
-
-    if docker stop "$NOMECONTAINER"; then
-      docker rm "$NOMECONTAINER"
-      echo "O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 1
-    elif docker rm "$NOMECONTAINER"; then
-      echo "O container $NOMECONTAINER nao estava executando e foi removido. Continuando..."; sleep 1
-    else
-      echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 1
-    fi
+    container_control
   else
     mkdir -p /srv/containers/"$NOMECONTAINER"/$set_mkdir
+  fi
+}
+
+function container_control {
+  if docker stop "$NOMECONTAINER"; then
+    docker rm "$NOMECONTAINER"
+    clear; echo "O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 3
+  elif docker rm "$NOMECONTAINER"; then
+    clear; echo "O container $NOMECONTAINER nao estava executando e foi removido. Continuando..."; sleep 3
+  else
+    clear; echo "O container $NOMECONTAINER nao existia, nao estava executando e/ou nao foi identificado. Continuando..."; sleep 3
   fi
 }
 
