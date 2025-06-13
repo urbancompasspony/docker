@@ -162,7 +162,6 @@ function main_menu {
 
   NOMECONTAINER="${VALUES[0]}"
 
-  save_config
   check_IP
 }
 
@@ -174,14 +173,14 @@ function check_IP {
     docker_extras
     cleanup0
   else
-    # Verifica conflito normalmente
-    if grep -qw "$VALUE2" "$masterfile"; then
-      dialog --title "ERRO" --msgbox "Conflito de IP detectado no $masterfile:\nMesmo IP do Host!" 6 40
+    if ip_conflict_check "$VALUE2" "$NOMECONTAINER" "$configfile"; then
+      dialog --title "ERRO" --msgbox "Conflito de IP detectado no $configfile:\nMesmo IP de outro container!" 7 40
       main_menu
-    elif grep -qw "$VALUE2" "$configfile"; then
-      dialog --title "ERRO" --msgbox "Conflito de IP detectado no $configfile:\nMesmo IP de outro container!" 6 40
+    elif grep -qw "$VALUE2" "$masterfile"; then
+      dialog --title "ERRO" --msgbox "Conflito de IP detectado no $masterfile:\nMesmo IP do host!" 7 40
       main_menu
     else
+      save_config
       mkdir0
       try_pull
       docker_create
@@ -189,6 +188,11 @@ function check_IP {
       cleanup0
     fi
   fi
+}
+
+function ip_conflict_check {
+  local ip="$1"; local mycontainer="$2"; local configfile="$3"
+  yq 'to_entries | map(select(.key != "'"$mycontainer"'")) | .[].value.LocalIP' "$configfile" | grep -wq "$ip"
 }
 
 function mkdir0 {
