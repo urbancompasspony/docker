@@ -27,12 +27,24 @@ VALUE9=""
 VALUE10=""
 
 function docker_create {
-docker run -d --privileged --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-  --network host --add-host=host.docker.internal:host-gateway \
+  local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+  if [[ ! "$VALUE2" =~ $ip_regex ]]; then
+  # Se NAO for numerico, execute como host!
+
+    docker run -d --privileged --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --network host --add-host=host.docker.internal:host-gateway \
+    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -v /srv/containers/"$NOMECONTAINER"/data:/usr/share \
+    "$docker_repo"
+
+    return
+  fi
+
+  docker run -d --privileged --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+  --network macvlan --ip="$VALUE2" --dns="$VALUE3" --add-host=host.docker.internal:host-gateway \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -v /srv/containers/"$NOMECONTAINER"/data:/usr/share \
   "$docker_repo"
-
 
 # Examples
 # PATH: $VALUE3 \
