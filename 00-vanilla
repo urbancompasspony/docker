@@ -3,7 +3,7 @@
 NOMECONTAINER="A-CUSTOM-A"
 docker_repo="CUSTOM/DOCKER:LATEST"
 service="pihole etc"
-set_mkdir="{config,data}"
+set_mkdir="config data"
 
 CustmN2="Local IP     :"
 CustmN3="DNS Server   :"
@@ -26,7 +26,7 @@ VALUE9="0"
 VALUE10="0"
 
 function docker_create {
-if [[ "$CustmN2" =~ ^(LOCALONLY|HOSTONLY|ONLYLOCAL|ONLYHOST|localonly|hostonly|onlylocal|onlyhost|host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
+if [[ "$VALUE2" =~ ^(LOCALONLY|HOSTONLY|ONLYLOCAL|ONLYHOST|localonly|hostonly|onlylocal|onlyhost|host|Host|HOST|local|Local|LOCAL|hostname|Hostname|HostName|HOSTNAME|localhost|Localhost|LocalHost|LOCALHOST|)$ ]]; then
 
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network host \
@@ -38,7 +38,7 @@ if [[ "$CustmN2" =~ ^(LOCALONLY|HOSTONLY|ONLYLOCAL|ONLYHOST|localonly|hostonly|o
 else
 
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-  --network macvlan --ip="$CustmN2" --dns="$CustmN3" \
+  --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -v "/srv/containers/$NOMECONTAINER/config:/config" \
   -v "/srv/containers/$NOMECONTAINER/data:/data" \
