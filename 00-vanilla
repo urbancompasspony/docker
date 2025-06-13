@@ -1,6 +1,7 @@
 #!/bin/bash
 
 NOMECONTAINER="A-CUSTOM-A"
+
 docker_repo="CUSTOM/DOCKER:LATEST"
 imagem="pihole etc"
 set_mkdir="config data"
