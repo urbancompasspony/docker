@@ -7,24 +7,24 @@ service="dwservice"
 set_mkdir="data"
 
 CustmN2="LocalIP"
-CustmN3="."
-CustmN4="."
-CustmN5="."
-CustmN6="."
-CustmN7="."
-CustmN8="."
-CustmN9="."
-CustmN10="."
+CustmN3=""
+CustmN4=""
+CustmN5=""
+CustmN6=""
+CustmN7=""
+CustmN8=""
+CustmN9=""
+CustmN10=""
 
 VALUE2="HOSTONLY"
-VALUE3="0"
-VALUE4="0"
-VALUE5="0"
-VALUE6="0"
-VALUE7="0"
-VALUE8="0"
-VALUE9="0"
-VALUE10="0"
+VALUE3=""
+VALUE4=""
+VALUE5=""
+VALUE6=""
+VALUE7=""
+VALUE8=""
+VALUE9=""
+VALUE10=""
 
 function docker_create {
 docker run -d --privileged --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
@@ -146,7 +146,7 @@ function main_menu {
   form_args=()
   for idx in "${!labels[@]}"; do
     line=$((idx+1))
-    form_args+=("${labels[$idx]}" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
+    form_args+=("${labels[$idx]}:" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
   done
 
   if ! form=$(dialog --ok-label "$button_ok0" --title "Novo Container" --form "Imagem Base: $service" 17 80 0 \
