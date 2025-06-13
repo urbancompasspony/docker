@@ -1,13 +1,14 @@
 #!/bin/bash
 
 NOMECONTAINER="ssh-dw"
+
 docker_repo="urbancompasspony/ssh-dw:latest"
-base_img="dwservice"
+service="dwservice"
 set_mkdir="data"
 
 CustmN2="LocalIP"
-CustmN3="teste1"
-CustmN4="teste2"
+CustmN3="."
+CustmN4="."
 CustmN5="."
 CustmN6="."
 CustmN7="."
@@ -32,20 +33,21 @@ docker run -d --privileged --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   -v /srv/containers/"$NOMECONTAINER"/data:/usr/share \
   "$docker_repo"
 
-#--privileged
-#--network host --add-host=host.docker.internal:host-gateway \
+# Examples
+# PATH: $VALUE3 \
+# -e variavel1="$VALUE4" \
+# --privileged
+# --network host --add-host=host.docker.internal:host-gateway \
 }
 
-# USE IT ONLY IF NEEDED:
 function docker_extras {
 #docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
 #docker restart "$NOMECONTAINER"
+:; }
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
-echo "0" > /dev/null
-}
 
 masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
@@ -104,19 +106,19 @@ function load_data {
     return
   fi
 
-  if [ "$(grep -c -w "$base_img" "$configfile")" -gt 1 ]; then
+  if [ "$(grep -c -w "$service" "$configfile")" -gt 1 ]; then
     LISTANOMES=$(yq -r 'to_entries[].value.Nome_Custom' "$configfile")
-    NOMECONTAINER=$(dialog --title "Imagem detectada: $base_img" --backtitle "W A R N I N G" --ok-button "Carregar" --no-cancel --inputbox "Encontrei mais de um container registrado com essa imagem! Qual deseja carregar?\nValores encontrados:\n$LISTANOMES" 0 0 "" 2>&1 > /dev/tty)
+    NOMECONTAINER=$(dialog --title "Imagem detectada: $service" --backtitle "W A R N I N G" --ok-button "Carregar" --no-cancel --inputbox "Encontrei mais de um container registrado com essa imagem! Qual deseja carregar?\nValores encontrados:\n$LISTANOMES" 0 0 "" 2>&1 > /dev/tty)
   fi
 
   for i in "${!labels[@]}"; do
     val="$(yq -r '.["'"$NOMECONTAINER"'"].["'"${labels[$i]}"'"]' "$configfile")"
     if [[ "$val" == "null" || -z "$val" ]]; then
       eval "VALUE$((i+1))=\"${values[$i]}\""
-      values[$i]="${values[$i]}"
+      values[i]="${values[$i]}"
     else
       eval "VALUE$((i+1))=\"$val\""
-      values[$i]="$val"
+      values[i]="$val"
     fi
   done
 
@@ -133,7 +135,7 @@ function save_config {
 
   datetime0=$(date +"%d-%m-%Y_%H:%M")
   sudo yq -i ".\"${NOMECONTAINER}\".install = \"${datetime0}\"" "$configfile"
-  sudo yq -i ".\"${NOMECONTAINER}\".baseimg = \"${base_img}\"" "$configfile"
+  sudo yq -i ".\"${NOMECONTAINER}\".baseimg = \"${service}\"" "$configfile"
 
   for i in "${!labels[@]}"; do
     sudo yq -i ".\"${NOMECONTAINER}\".\"${labels[$i]}\" = \"${values[$i]}\"" "$configfile"
@@ -149,7 +151,7 @@ function main_menu {
     form_args+=("${labels[$idx]}" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
   done
 
-  if ! form=$(dialog --ok-label "$button_ok0" --title "Novo Container" --form "Imagem Base: $base_img" 17 80 0 \
+  if ! form=$(dialog --ok-label "$button_ok0" --title "Novo Container" --form "Imagem Base: $service" 17 80 0 \
     "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
     return
   fi
@@ -157,7 +159,7 @@ function main_menu {
   mapfile -t VALUES <<< "$form"
   for i in {1..10}; do
     eval "VALUE$i=\"\${VALUES[$((i-1))]}\""
-    values[$((i-1))]="${VALUES[$((i-1))]}"
+    values[i-1]="${VALUES[$((i-1))]}"
   done
 
   NOMECONTAINER="${VALUES[0]}"
