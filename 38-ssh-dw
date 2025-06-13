@@ -51,6 +51,7 @@ function docker_extras {
 
 masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
+button_ok0="Criar"
 
 labels=("Nome_Custom" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
 
@@ -122,10 +123,7 @@ function load_data {
     fi
   done
 
-  if [ "$NOMECONTAINER" = "" ]; then
-    dialog --title "WARNING" --msgbox "Campo vazio! Cuidado com a sobrescrita de dados!" 6 40
-    button_ok0="Criar"
-  else
+  if ! [ "$NOMECONTAINER" = "" ]; then
     button_ok0="Recriar"
   fi
 }
