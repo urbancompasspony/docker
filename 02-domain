@@ -160,7 +160,7 @@ docker run -d \
 --ulimit nofile=1024:1024 \
 --no-healthcheck \
 -p $var2:53:53 -p $var2:53:53/udp -p $var2:88:88 -p $var2:88:88/udp -p $var2:135:135 -p $var2:137:137 -p $var2:137:137/udp -p $var2:138:138 -p $var2:138:138/udp -p $var2:139:139 -p $var2:389:389 -p $var2:389:389/udp \
--p $var2:445:445 -p $var2:464:464 -p $var2:464:464/udp -p $var2:636:636 -p $var2:1024-1044:1024-1044 -p $var2:3268-3269:3268-3269 -p 631:631 -p 631:631/udp \
+-p $var2:445:445 -p $var2:464:464 -p $var2:464:464/udp -p $var2:636:636 -p $var2:1024-1044:1024-1044 -p $var2:3268-3269:3268-3269 -p 631:631 -p 631:631/udp -p 80:80 -p 443:443 \
 -h $var5 \
 -e "DOMAIN=$var1" \
 -e "DOMAINPASS=$var3" \
