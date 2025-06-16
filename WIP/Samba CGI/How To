@@ -1,0 +1,64 @@
+# 1. Acessar container
+docker exec -it seu_container bash
+# 2. Executar comandos da Opção 1
+
+# Atualizar repositórios
+apt update
+
+# Instalar Apache e dependências
+apt install -y apache2 apache2-utils python3 python3-urllib3 sudo
+
+# Habilitar módulos
+a2enmod cgi headers rewrite ssl
+
+# Criar estrutura
+mkdir -p /var/www/samba-admin/cgi-bin
+mkdir -p /var/log/samba-cgi
+
+# Configurar permissões
+chown -R www-data:www-data /var/www/samba-admin
+chmod 755 /var/www/samba-admin/cgi-bin
+
+echo "www-data ALL=(root) NOPASSWD: /usr/bin/samba-tool" > /etc/sudoers.d/samba-cgi
+echo "www-data ALL=(root) NOPASSWD: /usr/bin/net" >> /etc/sudoers.d/samba-cgi
+echo "www-data ALL=(root) NOPASSWD: /usr/sbin/smbcontrol" >> /etc/sudoers.d/samba-cgi
+chmod 440 /etc/sudoers.d/samba-cgi
+
+cat > /etc/apache2/sites-available/samba-admin.conf << 'EOF'
+<VirtualHost *:80>
+    ServerName localhost
+    DocumentRoot /var/www/samba-admin
+    
+    ScriptAlias /cgi-bin/ "/var/www/samba-admin/cgi-bin/"
+    
+    <Directory "/var/www/samba-admin/cgi-bin/">
+        Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+        AddHandler cgi-script .cgi .sh
+        Require all granted
+        AllowOverride None
+    </Directory>
+    
+    <Directory "/var/www/samba-admin">
+        Options -Indexes +FollowSymLinks
+        AllowOverride None
+        Require all granted
+        DirectoryIndex index.html
+    </Directory>
+    
+    ErrorLog ${APACHE_LOG_DIR}/samba-admin_error.log
+    CustomLog ${APACHE_LOG_DIR}/samba-admin_access.log combined
+</VirtualHost>
+EOF
+
+# Habilitar site
+a2ensite samba-admin.conf
+a2dissite 000-default.conf
+
+# Iniciar Apache
+service apache2 start
+
+# Verificar status
+service apache2 status
+
+# 3. Copiar arquivos CGI e HTML
+# 4. Testar: http://IP_CONTAINER
