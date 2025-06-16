@@ -252,8 +252,10 @@ function signal0 {
     if docker stop "$NOMECONTAINER"; then
       docker rm "$NOMECONTAINER"
       clear; echo "SIGTERM + STOP + CLEAN: O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 3
+      return
     elif docker rm "$NOMECONTAINER"; then
       clear; echo "STOP + CLEAN: O container $NOMECONTAINER estava parado e foi removido. Continuando..."; sleep 3
+      return
     else
       clear; echo "CLEAN: O container $NOMECONTAINER nao estava executando. Continuando..."; sleep 3
     fi
