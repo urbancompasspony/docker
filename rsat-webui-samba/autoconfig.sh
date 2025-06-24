@@ -99,26 +99,15 @@ echo "Testando configuração..."
 
 if apache2ctl configtest; then
     echo "Configuração OK!"
-    echo "Apache configurado com sucesso!"
-    echo ""
-    echo "Próximos passos:"
-    echo "1. Script CGI para: /var/www/samba-admin/cgi-bin/samba-admin.cgi"
     mkdir -p /var/www/samba-admin/cgi-bin
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/urbancompasspony.github.io/refs/heads/main/samba-admin.cgi | tee /var/www/samba-admin/cgi-bin/samba-admin.cgi
-    echo "2. Index.html para: /var/www/samba-admin/index.html"
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/samba-admin.cgi | tee /var/www/samba-admin/cgi-bin/samba-admin.cgi
     mkdir -p /var/www/samba-admin
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/urbancompasspony.github.io/refs/heads/main/index.html | tee /var/www/samba-admin/index.html
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/index.html | tee /var/www/samba-admin/index.html
     echo "3. Permissões: chmod 755 /var/www/samba-admin/cgi-bin/samba-admin.cgi"
     chmod +x /var/www/samba-admin/cgi-bin/samba-admin.cgi
     chmod 755 /var/www/samba-admin/cgi-bin/samba-admin.cgi
-    echo "4. Acesse: http://localhost/"
-    echo ""
     echo "Reiniciando Apache..."
     service apache2 restart
-    echo "Logs:"
-    echo "- Apache: /var/log/apache2/samba-admin_error.log"
-    echo "- CGI: /var/log/samba-cgi/actions.log"
-    
 else
     echo "ERRO na configuração do Apache!"
     echo "Verifique os logs: /var/log/apache2/error.log"
