@@ -1,13 +1,12 @@
 FROM ubuntu:24.04
 
-ENV TZ "America/Bahia"
-ENV CUPSADMIN admin
-ENV CUPSPASSWORD p4ssw0rd
-
-ENV DEBIAN_FRONTEND noninteractive
+ENV TZ="America/Bahia"
+ENV CUPSADMIN="admin"
+ENV CUPSPASSWORD="p4ssw0rd"
+ENV DEBIAN_FRONTEND="noninteractive"
 
 # Ports to Expose
-EXPOSE 42 53 53/udp 88 88/udp 135 137-138/udp 139 389 389/udp 445 464 464/udp 636 3268-3269 49152-65535 5353/udp
+EXPOSE 42 53 53/udp 80 443 88 88/udp 135 137-138/udp 139 389 389/udp 445 464 464/udp 636 3268-3269 49152-65535 5353/udp
 
 # APT Base
 RUN apt update && apt upgrade -y
@@ -21,6 +20,9 @@ RUN apt install -y samba smbclient ldap-utils libnss-winbind winbind libpam-winb
 
 # System Tools
 RUN apt install -y rsyslog msitools ldb-tools
+
+# Apache e dependências para CGI
+RUN apt install -y apache2 apache2-utils python3 python3-urllib3 sudo
 
 # For Printers
 RUN apt install -qqy \
@@ -69,4 +71,4 @@ RUN chmod +x /init.sh
 RUN chmod +x /entrypoint.sh
 
 # Run!
-CMD /entrypoint.sh
+CMD ["/entrypoint.sh"]
