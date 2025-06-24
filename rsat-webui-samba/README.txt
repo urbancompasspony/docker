@@ -1,6 +1,3 @@
-Run
-autoconfig.sh
-and start apache2 manually!
 
 # Adicionar usuário
 htpasswd /etc/apache2/auth/.htpasswd novouser
