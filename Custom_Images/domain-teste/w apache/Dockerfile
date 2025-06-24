@@ -1,4 +1,4 @@
-FROM ubuntu:24.04 (TENTAR COM 24.10!)
+FROM ubuntu:24.04
 
 ENV TZ "America/Bahia"
 ENV CUPSADMIN admin
