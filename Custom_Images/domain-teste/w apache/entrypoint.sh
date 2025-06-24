@@ -9,5 +9,8 @@
 # CUPS SERVER
 /cups.sh &
 
+# APACHE SERVER com Samba CGI
+service apache2 start &
+
 # Block container exit
 tail -f /dev/null
