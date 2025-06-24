@@ -21,9 +21,9 @@ export var7
 export var8
 
 [ $(arch) = "x86_64" ] && {
-  REPOSITORY="urbancompasspony/domain-teste:latest"
+  REPOSITORY="urbancompasspony/domain:latest"
 } || {
-  REPOSITORY="urbancompasspony/domain-teste-arm:latest"
+  REPOSITORY="urbancompasspony/domain-arm:latest"
 }
 
 function checkA {
@@ -209,6 +209,13 @@ checkA
 checkB
 
 clear
+echo ""; echo "############################################################"
+echo ""; echo "Configuring Apache2"; echo ""
+docker exec $NOMECONTAINER bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/autoconfig.sh | bash"
+docker exec $NOMECONTAINER bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/setup_auth.sh > setup_auth.sh"
+docker exec $NOMECONTAINER bash -c "chmod +x setup_auth.sh"
+echo "OK"
+sleep 0.5
 
 echo ""; echo "############################################################"
 echo ""; echo "Removing loopback network from smb.conf"; echo ""
@@ -239,14 +246,9 @@ echo ""; echo "Getting MENU for samba-tools"; echo ""
 docker exec $NOMECONTAINER bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init"
 docker exec $NOMECONTAINER bash -c "echo '/root/.init' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
+docker exec $NOMECONTAINER bash -c "echo alias domain=\'/root/.init\' >> /root/.bashrc"
 docker exec $NOMECONTAINER bash -c "chmod +x /root/.init"
 echo "OK"
-sleep 0.5
-
-echo ""; echo "############################################################"
-echo ""; echo "Restarting Domain!"; echo ""
-docker restart "$NOMECONTAINER"
-echo ""; echo "OK"
 sleep 0.5
 
 echo ""; echo "############################################################"
@@ -264,7 +266,7 @@ echo ""; echo "OK"
 sleep 0.5
 
 echo ""; echo "############################################################"
-echo ""; echo "Restarting Domain again because restarting never is enough!"; echo ""
+echo ""; echo "Restarting Domain!"; echo ""
 docker restart $NOMECONTAINER
 echo ""; echo "OK"
 sleep 0.5
