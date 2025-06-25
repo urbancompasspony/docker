@@ -76,7 +76,7 @@ enable_auth() {
 </VirtualHost>
 EOF
 
-    systemctl reload apache2
+    service apache2 restart
     echo "✓ Autenticação ATIVADA!"
 }
 
@@ -123,7 +123,7 @@ disable_auth() {
 </VirtualHost>
 EOF
 
-    systemctl reload apache2
+    service apache2 restart
     echo "✓ Autenticação DESATIVADA! (Acesso livre)"
 }
 
