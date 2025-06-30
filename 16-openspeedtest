@@ -26,7 +26,7 @@ VALUE9=""
 VALUE10=""
 
 function set_mkdir {
-  # sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{data,config}
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"
   # sudo touch /srv/containers/"$NOMECONTAINER"/file
   # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
 :; }
