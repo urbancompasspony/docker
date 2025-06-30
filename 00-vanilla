@@ -29,7 +29,7 @@ function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{data,config}
   # sudo touch /srv/containers/"$NOMECONTAINER"/file
   # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
-}
+:; }
 
 function docker_create {
   local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
