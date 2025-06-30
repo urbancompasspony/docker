@@ -1,136 +1,71 @@
 #!/bin/bash
 
-# Global config for replication:
-export NOMECONTAINER="reverseproxy"
+NOMECONTAINER="reverseproxy"
 
-# IP FIXO DO NOVO CONTAINER
-export var1
+docker_repo="urbancompasspony/reverseproxy:latest"
+imagem="reverse-proxy"
 
-function checkA {
-  [ "$EUID" -ne 0 ] && {
-    echo "Execute esse script como Root!"
-    exit
-    }
-}
+CustmN2="local_ip"
+CustmN3="servidor_dns"
+CustmN4=""
+CustmN5=""
+CustmN6=""
+CustmN7=""
+CustmN8=""
+CustmN9=""
+CustmN10=""
 
-function checkB {
-  export var1
+VALUE2="0.0.0.0"
+VALUE3="8.8.4.4"
+VALUE4=""
+VALUE5=""
+VALUE6=""
+VALUE7=""
+VALUE8=""
+VALUE9=""
+VALUE10=""
 
-  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
-    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
-    [ $? = 0 ] && {
-    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
-      [ $? = 0 ] && {
-        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-        
-        [ $(docker stop "$NOMECONTAINER") ] && {
-          docker rm "$NOMECONTAINER"
-
-          create
-        } || {
-          create
-        }
-        
-      } || {
-        docker stop "$NOMECONTAINER"
-        docker rm "$NOMECONTAINER"
-        
-        datetime=$(date +"%d-%m %H-%M")
-        mkdir -p /srv/containers/.backupcnt
-        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
-        
-        rm -iR /srv/containers/"$NOMECONTAINER"
-
-        menu
-        }
-    } || {
-      echo "A instalação local será mantida! Saindo..."
-      exit
-    }
-  } || {
-    menu
-    }
-}
-
-function menu {
-  export var1
-
-  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
-    VALUE1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-  } || {
-    VALUE1=""
-  }
-
-  VALUE0=$(dialog --ok-label "Criar" --title "Novo Container" --form "Container: $NOMECONTAINER" 10 40 0 \
-"Local IP: " 1 1 "$VALUE1" 1 10 20 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-  [ $? -ne 0 ] && exit
-  var1=$(echo "$VALUE0" | sed -n 1p)
-  
-  [ -z "$var1" ] && {
-    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-    menu
-  } || {
-    checkC
-    }
-}
-
-function checkC {
-  #IPMachine=$(hostname -I | awk '{print $1}')
-  MyIP=$(cat /srv/containers/scripts/myip)
-  [ "$MyIP" = "$var1" ] && {
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
-    menu
-  } || {
-    create
-  }
-}
-
-function create {
-  export var1
-  
-  mkdir -p /srv/containers/"$NOMECONTAINER"/apache2/sites-available
-  mkdir -p /srv/containers/"$NOMECONTAINER"/apache2/sites-enabled
-  mkdir -p /srv/containers/"$NOMECONTAINER"/certbot
-  mkdir -p /srv/containers/"$NOMECONTAINER"/cache
-  
-  touch /srv/containers/"$NOMECONTAINER"/Information
-  
-  [ -f "/srv/containers/"$NOMECONTAINER"/apache2/apache2.conf" ] && {
-    echo "An apache2.conf was found! Skipping download..."
-  } || {
-    echo "An apache2.conf was not found! Downloading a new one..."
+function set_mkdir {
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{apache2,certbot,cache}
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/apache2/{sites-available,sites-enabled}
+    
+  if ! [ -f "/srv/containers/"$NOMECONTAINER"/apache2/apache2.conf" ]; then
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/apache2.conf | sudo tee /srv/containers/"$NOMECONTAINER"/apache2/apache2.conf
-  }
+  fi
 
-  [ -f "/srv/containers/"$NOMECONTAINER"/apache2/mpm_event.conf" ] && {
-    echo "An mpm_event.conf was found! Skipping download..."
-  } || {
-    echo "An mpm_event.conf was not found! Downloading a new one..."
+  if ! [ -f "/srv/containers/"$NOMECONTAINER"/apache2/mpm_event.conf" ]; then
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/mpm_event.conf | sudo tee /srv/containers/"$NOMECONTAINER"/apache2/mpm_event.conf
-  }
+  fi
 
-  [ -f "/srv/containers/"$NOMECONTAINER"/apache2/mpm_worker.conf" ] && {
-    echo "An mpm_worker.conf was found! Skipping download..."
-  } || {
-    echo "An mpm_worker.conf was not found! Downloading a new one..."
+  if ! [ -f "/srv/containers/"$NOMECONTAINER"/apache2/mpm_worker.conf" ]; then
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/mpm_worker.conf | sudo tee /srv/containers/"$NOMECONTAINER"/apache2/mpm_worker.conf
-  }
+  fi
+:; }
 
-  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
+function docker_create {
+  local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
 
-docker run -d \
-  --name=$NOMECONTAINER \
-  --network macvlan \
-  --ip=$var1 \
-  --dns=1.1.1.1  \
-  --dns=127.0.0.1 \
-  --no-healthcheck \
-  --restart unless-stopped \
-  -p 80:80 \
-  -p 443:443 \
-  -v /etc/localtime:/etc/localtime:ro \
+  # Se NAO for numerico, execute como host!
+  if [[ ! "$VALUE2" =~ $ip_regex ]]; then
+  
+    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --network host -p 80:80 -p 443:443 \
+    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -v /srv/containers/"$NOMECONTAINER"/apache2/mpm_event.conf:/etc/apache2/mods-available/mpm_event.conf \
+    -v /srv/containers/"$NOMECONTAINER"/apache2/mpm_worker.conf:/etc/apache2/mods-available/mpm_worker.conf \
+    -v /srv/containers/"$NOMECONTAINER"/apache2/apache2.conf:/etc/apache2/apache2.conf \
+    -v /srv/containers/"$NOMECONTAINER"/apache2/sites-available:/etc/apache2/sites-available \
+    -v /srv/containers/"$NOMECONTAINER"/apache2/sites-enabled:/etc/apache2/sites-enabled \
+    -v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt \
+    -v /srv/containers/"$NOMECONTAINER"/cache:/var/cache/apache2/mod_cache_disk/routing \
+    "$docker_repo"
+
+    return
+  fi
+
+  docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+  --network macvlan --ip="$VALUE2" --dns="$VALUE3" -p 80:80 -p 443:443 \
+  --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -v /srv/containers/"$NOMECONTAINER"/apache2/mpm_event.conf:/etc/apache2/mods-available/mpm_event.conf \
   -v /srv/containers/"$NOMECONTAINER"/apache2/mpm_worker.conf:/etc/apache2/mods-available/mpm_worker.conf \
   -v /srv/containers/"$NOMECONTAINER"/apache2/apache2.conf:/etc/apache2/apache2.conf \
@@ -138,38 +73,238 @@ docker run -d \
   -v /srv/containers/"$NOMECONTAINER"/apache2/sites-enabled:/etc/apache2/sites-enabled \
   -v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt \
   -v /srv/containers/"$NOMECONTAINER"/cache:/var/cache/apache2/mod_cache_disk/routing \
-  urbancompasspony/reverseproxy:latest
-  }
+  "$docker_repo"
 
-function clean {
-  unset var1
+# Examples
+# PATH: $VALUE3 \
+# -e variavel1="$VALUE4" \
+# --privileged
+# --network host --add-host=host.docker.internal:host-gateway \
 }
 
-# Start
-checkA
-checkB
-clean
+function docker_extras {
+#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
+#docker restart "$NOMECONTAINER"
+:; }
 
-# Aways get a new Model.conf file for using on sites-available!
-curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/Custom_Images/reverseproxy/model | sudo tee /srv/containers/$NOMECONTAINER/apache2/sites-available/mysite.com.br.conf
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
-docker exec $NOMECONTAINER chown root:www-data -R /var/cache/apache2/mod_cache_disk/routing
-docker exec $NOMECONTAINER chmod 775 -R /var/cache/apache2/mod_cache_disk/routing
-docker restart $NOMECONTAINER
+masterfile="/srv/system.yaml"
+configfile="/srv/containers.yaml"
+button_ok0="Criar"
 
-echo " "
-echo "To generate NEW certificates, first edit everything under sites-available then create a link to sites-enabled. So run:"
-echo "docker exec $NOMECONTAINER certbot --apache --non-interactive -m myemail@myprovider.com --agree-tos --domain mywebsite.com"
-echo "docker exec $NOMECONTAINER certbot install --cert-name myweb-site.com"
-echo "If needed, create another SSL for www. too!"
-echo " "
-echo "Use NANO inside container to set /sites-available/ and inside container create a link to /sites-enabled/:"
-echo "docker exec -it $NOMECONTAINER bash"
-echo "Restart container to validate, if needed!"
-echo " "
-echo "Manually Force Renew ALL:"
-echo "docker exec -it $NOMECONTAINER certbot --apache renew"
-echo "Container has auto renew script, but use this crontab on Host if needed:"
-echo "* * 01 * * docker exec $NOMECONTAINER certbot --apache renew"
+labels=("nome_custom" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
 
-exit 1
+values=("$NOMECONTAINER" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
+
+function check_root {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root! Saindo..."
+    exit 1
+  }
+}
+
+function check_macvlan {
+  if ! docker inspect macvlan 1>/dev/null 2>/dev/null; then
+    echo "A macvlan não existe! Saindo..."; sleep 3
+    exit 0
+  fi
+}
+
+function try_pull {
+  if ! docker pull "$docker_repo"; then
+    echo "Erro: docker pull falhou... saindo."; sleep 3
+    exit 1
+  fi
+}
+
+function lockfile0 {
+  if [ -f /srv/lockfile ]; then
+    if ! [ -f "$configfile" ]; then
+      echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile DESTE CONTAINER! Saindo."; sleep 5
+      exit 1
+    else
+      yq -r "to_entries[] | select(.value.img_base | test(\"$imagem\")) | .key" "$configfile" | while read -r container; do
+        process_container "$container"
+      done
+    fi
+  else
+    main_menu
+  fi
+}
+
+function process_container {
+  local container="$1"
+
+  for i in "${!labels[@]}"; do
+    val="$(yq -r '.["'"$container"'"].["'"${labels[$i]}"'"]' "$configfile")"
+    if [[ "$val" == "null" || -z "$val" ]]; then
+      eval "VALUE$((i+1))=\"\""
+      values[i]=""
+    else
+      eval "VALUE$((i+1))=\"$val\""
+      values[i]="$val"
+    fi
+  done
+
+  NOMECONTAINER="$container"
+  signal0
+  set_mkdir
+  try_pull
+  docker_create
+  docker_extras
+  save_config
+}
+
+function load_data {
+  if ! [ -f "$configfile" ]; then
+    return
+  fi
+
+  if [ "$(grep -c -w "$imagem" "$configfile")" -gt 1 ]; then
+    LISTANOMES=$(yq -r 'to_entries[] | select(.value.img_base == "'"$imagem"'") | .value.nome_custom' "$configfile")
+    NOMECONTAINER=$(dialog --title "Imagem detectada: $imagem" --backtitle "W A R N I N G" --ok-button "Carregar" --no-cancel --inputbox "Encontrei um ou mais de um container registrado com essa imagem! Qual deseja carregar?\nValores encontrados:\n$LISTANOMES" 0 0 "" 2>&1 > /dev/tty)
+  fi
+
+  for i in "${!labels[@]}"; do
+    val="$(yq -r '.["'"$NOMECONTAINER"'"].["'"${labels[$i]}"'"]' "$configfile")"
+    if [[ "$val" == "null" || -z "$val" ]]; then
+      eval "VALUE$((i+1))=\"${values[$i]}\""
+      values[i]="${values[$i]}"
+    else
+      eval "VALUE$((i+1))=\"$val\""
+      values[i]="$val"
+    fi
+  done
+
+  if ! [ "$NOMECONTAINER" = "" ]; then
+    button_ok0="Recriar"
+  fi
+}
+
+function save_config {
+  sudo touch "$configfile"
+
+  datetime0=$(date +"%d-%m-%Y_%H:%M")
+  sudo yq -i ".\"${NOMECONTAINER}\".instalacao = \"${datetime0}\"" "$configfile"
+  sudo yq -i ".\"${NOMECONTAINER}\".img_base = \"${imagem}\"" "$configfile"
+
+  for i in "${!labels[@]}"; do
+    sudo yq -i ".\"${NOMECONTAINER}\".\"${labels[$i]}\" = \"${values[$i]}\"" "$configfile"
+  done
+}
+
+function main_menu {
+  load_data
+
+  form_args=()
+  for idx in "${!labels[@]}"; do
+    line=$((idx+1))
+    form_args+=("${labels[$idx]}:" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
+  done
+
+  if ! form=$(dialog --ok-label "$button_ok0" --title "Novo Container" --form "Imagem Base: $imagem" 17 80 0 \
+    "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+
+  mapfile -t VALUES <<< "$form"
+  for i in {1..10}; do
+    eval "VALUE$i=\"\${VALUES[$((i-1))]}\""
+    values[i-1]="${VALUES[$((i-1))]}"
+  done
+
+  NOMECONTAINER="${VALUES[0]}"
+
+  check_IP
+}
+
+function check_IP {
+  local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+
+  # Se NAO for numerico, ignore a verificacao.
+  if [[ ! "$VALUE2" =~ $ip_regex ]]; then
+    save_config
+    mkdir0
+    try_pull
+    docker_create
+    docker_extras
+    cleanup0
+    return
+  fi
+
+  # Valor numerico exemplo 192.168.0.1? Verifique!
+  if ip_conflict_check "$VALUE2" "$NOMECONTAINER" "$configfile"; then
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado no $configfile:\nMesmo IP de outro container!" 7 40
+    main_menu
+  elif grep -wq "$VALUE2" "$masterfile"; then
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado no $masterfile:\nMesmo IP do host!" 7 40
+    main_menu
+  else
+    save_config
+    mkdir0
+    try_pull
+    docker_create
+    docker_extras
+    cleanup0
+  fi
+}
+
+function ip_conflict_check {
+  local ip="$1"; local mycontainer="$2"; local configfile="$3"
+  yq 'to_entries | map(select(.key != "'"$mycontainer"'")) | .[].value.local_ip' "$configfile" | grep -wq "$ip"
+}
+
+function mkdir0 {
+  if [ -d "/srv/containers/$NOMECONTAINER" ]; then
+    if ! dialog --title "WARNING" --yes-label "Prosseguir" --no-label "CANCELAR" --yesno "Foram identificados dados de volumes! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/containers/$NOMECONTAINER manualmente" 14 50; then
+      exit 0
+    fi
+    signal0
+  fi
+  signal0
+  set_mkdir
+}
+
+function signal0 {
+  if [ -d /srv/containers/"$NOMECONTAINER" ]; then
+    if docker stop "$NOMECONTAINER"; then
+      docker rm "$NOMECONTAINER"
+      clear; echo "SIGTERM + STOP + CLEAN: O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 3
+      return
+    elif docker rm "$NOMECONTAINER"; then
+      clear; echo "STOP + CLEAN: O container $NOMECONTAINER estava parado e foi removido. Continuando..."; sleep 3
+      return
+    else
+      clear; echo "CLEAN: O container $NOMECONTAINER nao estava executando. Continuando..."; sleep 3
+    fi
+
+    return
+  fi
+
+  if docker rm -f "$NOMECONTAINER"; then
+    clear; echo "SIGKILL + RM: O container $NOMECONTAINER estava executando SEM VOLUME! Foi morto e removido. Continuando..."; sleep 3
+  fi
+}
+
+function cleanup0 {
+  for i in {1..10}; do
+    unset "VALUE$i"
+  done
+
+  for i in {1..10}; do
+    unset "CustmN$i"
+  done
+
+  echo ""; echo "Limpando imagens desnecessarias..."
+  docker image prune -af
+  sleep 1
+}
+
+check_root
+check_macvlan
+lockfile0
+
+exit 0
