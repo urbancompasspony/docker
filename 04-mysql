@@ -45,8 +45,6 @@ function docker_create {
     -e MYSQL_USER="$VALUE5" \
     -e MYSQL_PASSWORD="$VALUE6" \
     -v "$var7"/mysql:/var/lib/mysql \
-    -v "/srv/containers/$NOMECONTAINER/config:/config" \
-    -v "/srv/containers/$NOMECONTAINER/data:/data" \
     "$docker_repo"
 
     return
@@ -60,8 +58,6 @@ function docker_create {
   -e MYSQL_USER="$VALUE5" \
   -e MYSQL_PASSWORD="$VALUE6" \
   -v "$var7"/mysql:/var/lib/mysql \
-  -v "/srv/containers/$NOMECONTAINER/config:/config" \
-  -v "/srv/containers/$NOMECONTAINER/data:/data" \
   "$docker_repo"
 
 # Examples
