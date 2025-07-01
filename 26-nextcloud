@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Nextcloud Version!
-# Check var4!
+# NC Version
 version=30
 
 #############################################################################################################
@@ -41,185 +40,319 @@ version=30
 
 #############################################################################################################
 
-# Global config for replication:
-export NOMECONTAINER="nextcloud"
+NOMECONTAINER="nextcloud"
 
-# IP FIXO DO NOVO CONTAINER
-export var1; export var2; export var3
+docker_repo="nextcloud:$version"
+imagem="nextcloud"
 
-function checkA {
-  [ "$EUID" -ne 0 ] && {
-    echo "Execute esse script como Root!"
-    exit
-    }
-}
+CustmN2="local_ip"
+CustmN3="servidor_dns"
+CustmN4="version"
+CustmN5="data"
+CustmN6="extra_disk"
+CustmN7=""
+CustmN8=""
+CustmN9=""
+CustmN10=""
 
-function checkB {
-  export var1; export var2; export var3
+VALUE2="0.0.0.0"
+VALUE3="8.8.4.4"
+VALUE4="30"
+VALUE5="/srv/containers/$NOMECONTAINER/data"
+VALUE6="-v /mnt:/mnt/extra"
+VALUE7=""
+VALUE8=""
+VALUE9=""
+VALUE10=""
 
-  [ -f "/srv/containers/$NOMECONTAINER/Information" ] && {
-    dialog --title "Dados de $NOMECONTAINER encontrados!" --yesno "Deseja refazer o container?" 6 40
-    [ $? = 0 ] && {
-    dialog --title "Recriando o container $NOMECONTAINER" --yesno "Deseja reaproveitar os DADOS da instalação anterior?" 6 40
-      [ $? = 0 ] && {
-        var1=$(sed -n '1p' /srv/containers/$NOMECONTAINER/Information)
-        var2=$(sed -n '2p' /srv/containers/$NOMECONTAINER/Information)
-        var3=$(sed -n '3p' /srv/containers/$NOMECONTAINER/Information)
-        var4=$(sed -n '4p' /srv/containers/$NOMECONTAINER/Information)
-        var5=$(sed -n '5p' /srv/containers/$NOMECONTAINER/Information)
-        var6=$(sed -n '6p' /srv/containers/$NOMECONTAINER/Information)
-
-        [ $(docker stop "$NOMECONTAINER") ] && {
-          docker rm "$NOMECONTAINER"
-          create
-        } || {
-          create
-        }
-
-      } || {
-        docker stop "$NOMECONTAINER"
-        docker rm "$NOMECONTAINER"
-
-        datetime=$(date +"%d-%m %H-%M")
-        mkdir -p /srv/containers/.backupcnt
-        zip "/srv/containers/.backupcnt/$NOMECONTAINER-$datetime.zip" -r /srv/containers/$NOMECONTAINER
-
-        rm -iR /srv/containers/"$NOMECONTAINER"
-
-        menu
-        }
-    } || {
-      echo "A instalação local será mantida! Saindo..."
-      exit
-    }
-  } || {
-    menu
-    }
-}
-
-function menu {
-  VALUE1=""; VALUE2="/srv/containers/$NOMECONTAINER"; VALUE3="deprecated"; VALUE4="$version"; VALUE5="1.0.0.1";  VALUE6="-v /mnt:/mnt/extra"
-
-  VALUE0=$(dialog --ok-label "Criar" --title "Container: $NOMECONTAINER" --form "Campo NxtData: VAR/data autopreenchido! \nDefina 1 diretório abaixo e sem /." 15 40 0 \
-"Local IP:" 1 1 "$VALUE1" 1 10 20 0 \
-"Nxt Data:" 2 1 "$VALUE2" 2 10 40 0 \
-"URL WAN :" 3 1 "$VALUE3" 3 10 50 0 \
-"Version :" 4 1 "$VALUE4" 4 10 50 0 \
-"PiHole? :" 5 1 "$VALUE5" 5 10 50 0 \
-"ExtraDSK?" 6 1 "$VALUE6" 6 10 150 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-  [ $? -ne 0 ] && exit
-  var1=$(echo "$VALUE0" | sed -n 1p)
-  var2=$(echo "$VALUE0" | sed -n 2p)
-  var3=$(echo "$VALUE0" | sed -n 3p)
-  var4=$(echo "$VALUE0" | sed -n 4p)
-  var5=$(echo "$VALUE0" | sed -n 5p)
-  var6=$(echo "$VALUE0" | sed -n 6p)
-
-  [ -z "$var1" ] || [ -z "$var2" ] || [ -z "$var3" ]  || [ -z "$var4" ] || [ -z "$var5" ] || [ -z "$var6" ] && {
-    dialog --title "ERRO" --msgbox "Não deixe nenhum campo vazio!" 8 40
-    menu
-  } || {
-    checkC
-    }
-}
-
-function checkC {
-  #IPMachine=$(hostname -I | awk '{print $1}')
-  MyIP=$(cat /srv/containers/scripts/myip)
-  [ "$MyIP" = "$var1" ] && {
-    dialog --title "ERRO" --msgbox "Conflito de IP detectado! \nMude para outro IP." 6 40
-    menu
-  } || {
-    create
-  }
-}
-
-function create {
-  mkdir -p /srv/containers/"$NOMECONTAINER"/php
-  touch /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini
+function set_mkdir {
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{php,config}
+  sudo touch /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini
 
 echo -e "opcache.enable=1
 opcache.interned_strings_buffer=64
 opcache.max_accelerated_files=10000
 opcache.memory_consumption=360
 opcache.save_comments=1
-opcache.revalidate_freq=60" > /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini
+opcache.revalidate_freq=60" | sudo tee -a /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini
 
-  mkdir -p "$var2"
+  sudo mkdir -p "$VALUE5"
+:; }
 
-  touch /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var1" > /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var2" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var3" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var4" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var5" >> /srv/containers/"$NOMECONTAINER"/Information
-  echo "$var6" >> /srv/containers/"$NOMECONTAINER"/Information
+function docker_create {
+  local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
 
-docker pull nextcloud:"$var4"
+  # Se NAO for numerico, execute como host!
+  if [[ ! "$VALUE2" =~ $ip_regex ]]; then
 
-docker run -d \
---name=$NOMECONTAINER \
---network macvlan \
---ip=$var1 \
---dns=$var5  \
---hostname=nextcloud \
---restart=unless-stopped \
---no-healthcheck \
--p 389:389 \
--p 636:636 \
--p 80:80 \
--p 443:443 \
--e VIRTUAL_PORT=443 \
--e VIRTUAL_PROTO=https \
--e VIRTUAL_HOST="$var3" \
--e POST_MAX_SIZE=16G \
--e PHP_MEMORY_LIMIT=16G \
--e PHP_UPLOAD_LIMIT=16G \
--e PHP_OPCACHE_MEMORY_CONSUMPTION=512M \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
--v /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini \
--v "$var2"/data:/var/www/html/data \
-$var6 \
-nextcloud:"$var4"
+    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --network host \
+    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -p 389:389 -p 636:636 -p 80:80 -p 443:443 \
+    -e VIRTUAL_PORT=443 -e VIRTUAL_PROTO=https -e POST_MAX_SIZE=16G -e PHP_MEMORY_LIMIT=16G -e PHP_UPLOAD_LIMIT=16G -e PHP_OPCACHE_MEMORY_CONSUMPTION=512M \
+    -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
+    -v /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini \
+    -v "$VALUE5"/data:/var/www/html/data \
+    $VALUE6 \
+    "$docker_repo"
+
+    return
+  fi
+
+  docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+  --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
+  --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+  -p 389:389 -p 636:636 -p 80:80 -p 443:443 \
+  -e VIRTUAL_PORT=443 -e VIRTUAL_PROTO=https -e POST_MAX_SIZE=16G -e PHP_MEMORY_LIMIT=16G -e PHP_UPLOAD_LIMIT=16G -e PHP_OPCACHE_MEMORY_CONSUMPTION=512M \
+  -v /srv/containers/"$NOMECONTAINER"/config:/var/www/html/config \
+  -v /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini \
+  -v "$VALUE5"/data:/var/www/html/data \
+  $VALUE6 \
+  "$docker_repo"
+
+# Examples
+# PATH: $VALUE3 \
+# -e variavel1="$VALUE4" \
+# --privileged
+# --network host --add-host=host.docker.internal:host-gateway \
 }
 
-function clean {
-  unset var1
-  unset var2
-  unset var3
-  unset var4
-  unset var5
-  unset var6
+function docker_extras {
+  if ! [ -f /srv/scripts/cronnc ]; then
+    sudo crontab -l > /tmp/crontab
+    echo "# Nextcloud Maintenance" | tee -a /tmp/crontab
+    echo "*/5 * * * * docker exec -t -u www-data "$NOMECONTAINER" php -f /var/www/html/cron.php" | tee -a /tmp/crontab
+    echo "# Nextcloud Check SMB Data" | tee -a /tmp/crontab
+    echo "*/15 * * * * docker exec -t -u www-data "$NOMECONTAINER" ./occ files:scan --unscanned --all" | tee -a /tmp/crontab
+    sudo crontab /tmp/crontab
+    sudo mkdir -p /srv/scripts
+    sudo touch /srv/scripts/cronnc
+  fi
+
+  # Configure SAMBA
+  docker exec -it "$NOMECONTAINER" apt update
+  docker exec -it "$NOMECONTAINER" apt install smbclient libsmbclient-dev -y
+  docker restart "$NOMECONTAINER"
+:; }
+
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
+masterfile="/srv/system.yaml"
+configfile="/srv/containers.yaml"
+button_ok0="Criar"
+
+labels=("nome_custom" "$CustmN2" "$CustmN3" "$CustmN4" "$CustmN5" "$CustmN6" "$CustmN7" "$CustmN8" "$CustmN9" "$CustmN10")
+
+values=("$NOMECONTAINER" "$VALUE2" "$VALUE3" "$VALUE4" "$VALUE5" "$VALUE6" "$VALUE7" "$VALUE8" "$VALUE9" "$VALUE10")
+
+function check_root {
+  [ "$EUID" -ne 0 ] && {
+    echo "Execute esse script como Root! Saindo..."
+    exit 1
+  }
 }
 
-# Start
-checkA
-checkB
-
-# AutoSet Crontab:
-[ -f /srv/containers/scripts/cronnc ] && {
-  echo . >/dev/null
-} || {
-  sudo crontab -l > /tmp/crontab
-  echo "# Nextcloud Maintenance" | tee -a /tmp/crontab
-  echo "*/5 * * * * docker exec -t -u www-data "$NOMECONTAINER" php -f /var/www/html/cron.php" | tee -a /tmp/crontab
-  echo "# Nextcloud Check SMB Data" | tee -a /tmp/crontab
-  echo "*/15 * * * * docker exec -t -u www-data "$NOMECONTAINER" ./occ files:scan --unscanned --all" | tee -a /tmp/crontab
-  sudo crontab /tmp/crontab
-
-  sudo touch /srv/containers/scripts/cronnc
+function check_macvlan {
+  if ! docker inspect macvlan 1>/dev/null 2>/dev/null; then
+    echo "A macvlan não existe! Saindo..."; sleep 3
+    exit 0
+  fi
 }
 
-# Configure SAMBA
-docker exec -it "$NOMECONTAINER" apt update
-docker exec -it "$NOMECONTAINER" apt install smbclient libsmbclient-dev -y
-docker restart "$NOMECONTAINER"
+function try_pull {
+  if ! docker pull "$docker_repo"; then
+    echo "Erro: docker pull falhou... saindo."; sleep 3
+    exit 1
+  fi
+}
 
-docker image prune -af
+function lockfile0 {
+  if [ -f /srv/lockfile ]; then
+    if ! [ -f "$configfile" ]; then
+      echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile DESTE CONTAINER! Saindo."; sleep 5
+      exit 1
+    else
+      yq -r "to_entries[] | select(.value.img_base | test(\"$imagem\")) | .key" "$configfile" | while read -r container; do
+        process_container "$container"
+      done
+    fi
+  else
+    main_menu
+  fi
+}
 
-clean
+function process_container {
+  local container="$1"
 
-exit 1
+  for i in "${!labels[@]}"; do
+    val="$(yq -r '.["'"$container"'"].["'"${labels[$i]}"'"]' "$configfile")"
+    if [[ "$val" == "null" || -z "$val" ]]; then
+      eval "VALUE$((i+1))=\"\""
+      values[i]=""
+    else
+      eval "VALUE$((i+1))=\"$val\""
+      values[i]="$val"
+    fi
+  done
+
+  NOMECONTAINER="$container"
+  signal0
+  set_mkdir
+  try_pull
+  docker_create
+  docker_extras
+  save_config
+}
+
+function load_data {
+  if ! [ -f "$configfile" ]; then
+    return
+  fi
+
+  if [ "$(grep -c -w "$imagem" "$configfile")" -gt 1 ]; then
+    LISTANOMES=$(yq -r 'to_entries[] | select(.value.img_base == "'"$imagem"'") | .value.nome_custom' "$configfile")
+    NOMECONTAINER=$(dialog --title "Imagem detectada: $imagem" --backtitle "W A R N I N G" --ok-button "Carregar" --no-cancel --inputbox "Encontrei um ou mais de um container registrado com essa imagem! Qual deseja carregar?\nValores encontrados:\n$LISTANOMES" 0 0 "" 2>&1 > /dev/tty)
+  fi
+
+  for i in "${!labels[@]}"; do
+    val="$(yq -r '.["'"$NOMECONTAINER"'"].["'"${labels[$i]}"'"]' "$configfile")"
+    if [[ "$val" == "null" || -z "$val" ]]; then
+      eval "VALUE$((i+1))=\"${values[$i]}\""
+      values[i]="${values[$i]}"
+    else
+      eval "VALUE$((i+1))=\"$val\""
+      values[i]="$val"
+    fi
+  done
+
+  if ! [ "$NOMECONTAINER" = "" ]; then
+    button_ok0="Recriar"
+  fi
+}
+
+function save_config {
+  sudo touch "$configfile"
+
+  datetime0=$(date +"%d-%m-%Y_%H:%M")
+  sudo yq -i ".\"${NOMECONTAINER}\".instalacao = \"${datetime0}\"" "$configfile"
+  sudo yq -i ".\"${NOMECONTAINER}\".img_base = \"${imagem}\"" "$configfile"
+
+  for i in "${!labels[@]}"; do
+    sudo yq -i ".\"${NOMECONTAINER}\".\"${labels[$i]}\" = \"${values[$i]}\"" "$configfile"
+  done
+}
+
+function main_menu {
+  load_data
+
+  form_args=()
+  for idx in "${!labels[@]}"; do
+    line=$((idx+1))
+    form_args+=("${labels[$idx]}:" "$line" 1 "${values[$idx]}" "$line" 17 150 0)
+  done
+
+  if ! form=$(dialog --ok-label "$button_ok0" --title "Novo Container" --form "Imagem Base: $imagem" 17 80 0 \
+    "${form_args[@]}" 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+
+  mapfile -t VALUES <<< "$form"
+  for i in {1..10}; do
+    eval "VALUE$i=\"\${VALUES[$((i-1))]}\""
+    values[i-1]="${VALUES[$((i-1))]}"
+  done
+
+  NOMECONTAINER="${VALUES[0]}"
+
+  check_IP
+}
+
+function check_IP {
+  local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+
+  # Se NAO for numerico, ignore a verificacao.
+  if [[ ! "$VALUE2" =~ $ip_regex ]]; then
+    save_config
+    mkdir0
+    try_pull
+    docker_create
+    docker_extras
+    cleanup0
+    return
+  fi
+
+  # Valor numerico exemplo 192.168.0.1? Verifique!
+  if ip_conflict_check "$VALUE2" "$NOMECONTAINER" "$configfile"; then
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado no $configfile:\nMesmo IP de outro container!" 7 40
+    main_menu
+  elif grep -wq "$VALUE2" "$masterfile"; then
+    dialog --title "ERRO" --msgbox "Conflito de IP detectado no $masterfile:\nMesmo IP do host!" 7 40
+    main_menu
+  else
+    save_config
+    mkdir0
+    try_pull
+    docker_create
+    docker_extras
+    cleanup0
+  fi
+}
+
+function ip_conflict_check {
+  local ip="$1"; local mycontainer="$2"; local configfile="$3"
+  yq 'to_entries | map(select(.key != "'"$mycontainer"'")) | .[].value.local_ip' "$configfile" | grep -wq "$ip"
+}
+
+function mkdir0 {
+  if [ -d "/srv/containers/$NOMECONTAINER" ]; then
+    if ! dialog --title "WARNING" --yes-label "Prosseguir" --no-label "CANCELAR" --yesno "Foram identificados dados de volumes! \n\nParando e removendo container caso esteja rodando. \n\nSe precisar, apague o conteudo de /srv/containers/$NOMECONTAINER manualmente" 14 50; then
+      exit 0
+    fi
+    signal0
+  fi
+  signal0
+  set_mkdir
+}
+
+function signal0 {
+  if [ -d /srv/containers/"$NOMECONTAINER" ]; then
+    if docker stop "$NOMECONTAINER"; then
+      docker rm "$NOMECONTAINER"
+      clear; echo "SIGTERM + STOP + CLEAN: O container $NOMECONTAINER estava executando, foi parado e removido. Continuando..."; sleep 3
+      return
+    elif docker rm "$NOMECONTAINER"; then
+      clear; echo "STOP + CLEAN: O container $NOMECONTAINER estava parado e foi removido. Continuando..."; sleep 3
+      return
+    else
+      clear; echo "CLEAN: O container $NOMECONTAINER nao estava executando. Continuando..."; sleep 3
+    fi
+
+    return
+  fi
+
+  if docker rm -f "$NOMECONTAINER"; then
+    clear; echo "SIGKILL + RM: O container $NOMECONTAINER estava executando SEM VOLUME! Foi morto e removido. Continuando..."; sleep 3
+  fi
+}
+
+function cleanup0 {
+  for i in {1..10}; do
+    unset "VALUE$i"
+  done
+
+  for i in {1..10}; do
+    unset "CustmN$i"
+  done
+
+  echo ""; echo "Limpando imagens desnecessarias..."
+  docker image prune -af
+  sleep 1
+}
+
+check_root
+check_macvlan
+lockfile0
+
+exit 0
