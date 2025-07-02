@@ -5,7 +5,9 @@ NOMECONTAINER="unifi-network"
 docker_repo="lscr.io/linuxserver/unifi-network-application:latest"
 docker_repo1="docker.io/mongo:4.4"
 
-imagem="pihole dwservice etc"
+imagem="unifi-net & mongo-db"
+
+randompass=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 8; echo)
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
@@ -28,8 +30,6 @@ VALUE9=""
 VALUE10=""
 
 function set_mkdir {
-  randompass=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 8; echo)
-
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/config
   # sudo touch /srv/containers/"$NOMECONTAINER"/file
   # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
