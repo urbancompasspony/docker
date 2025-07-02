@@ -26,9 +26,7 @@ VALUE9=""
 VALUE10=""
 
 function set_mkdir {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{data,config}
-  # sudo touch /srv/containers/"$NOMECONTAINER"/file
-  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/home/user
 :; }
 
 function docker_create {
@@ -73,18 +71,12 @@ function docker_create {
   -v "/srv/containers/$NOMECONTAINER/config:/config" \
   -v "/srv/containers/$NOMECONTAINER/data:/data" \
   "$docker_repo" &
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
   sudo chmod 777 /var/run/libvirt/libvirt-sock
-  sudo chmod 777 -R /srv/containers/"$NOMECONTAINER"/home
-  docker restart "$NOMECONTAINER"
+  sudo chmod 777 -R /srv/containers/"$NOMECONTAINER"/home/user
+  sleep 3; docker restart "$NOMECONTAINER"
 :; }
 
 # ----------------------------------------------------------------------
