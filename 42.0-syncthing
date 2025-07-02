@@ -43,7 +43,7 @@ function docker_create {
     -p 8384:8384 -p 22000:22000/tcp -p 22000:22000/udp -p 21027:21027/udp \
     -m "$VALUE5" \
     -v /srv/containers/"$NOMECONTAINER"/config:/var/syncthing/config \
-    -v "$var3":/var/syncthing \
+    -v $var3:/var/syncthing \
     "$docker_repo"
 
     return
@@ -56,7 +56,7 @@ function docker_create {
   -p 8384:8384 -p 22000:22000/tcp -p 22000:22000/udp -p 21027:21027/udp \
   -m "$VALUE5" \
   -v /srv/containers/"$NOMECONTAINER"/config:/var/syncthing/config \
-  -v "$var3":/var/syncthing \
+  -v $var3:/var/syncthing \
   "$docker_repo"
 
 # Examples
