@@ -43,6 +43,7 @@ function docker_create {
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -e ORACLEPWD="$VALUE4" \
     -v /srv/containers/"$NOMECONTAINER"/sysconfig:/etc/sysconfig \
     -v /srv/containers/"$NOMECONTAINER"/root/.bashrc:/root/.bashrc \
     -v /srv/containers/"$NOMECONTAINER"/dbs:/opt/oracle/dbs \
@@ -58,6 +59,7 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+  -e ORACLEPWD="$VALUE4" \
   -v /srv/containers/"$NOMECONTAINER"/sysconfig:/etc/sysconfig \
   -v /srv/containers/"$NOMECONTAINER"/root/.bashrc:/root/.bashrc \
   -v /srv/containers/"$NOMECONTAINER"/dbs:/opt/oracle/dbs \
@@ -139,9 +141,8 @@ ORACLR_CONNECTION_DATA =
       (PRESENTATION = RO)
     )
   )" | sudo tee -a /srv/containers/"$NOMECONTAINER"/netadmin/tnsnames.ora
+    return
   fi
-
-  docker exec "$NOMECONTAINER" bash -c "(echo '$VALUE4'; echo '$VALUE4';) | /etc/init.d/oracle-xe-21c configure"
 :; }
 
 # ----------------------------------------------------------------------
