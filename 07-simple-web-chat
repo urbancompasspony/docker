@@ -7,7 +7,7 @@ imagem="swc"
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
-CustmN4=""
+CustmN4="porta"
 CustmN5=""
 CustmN6=""
 CustmN7=""
@@ -17,7 +17,7 @@ CustmN10=""
 
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
-VALUE4=""
+VALUE4="8080"
 VALUE5=""
 VALUE6=""
 VALUE7=""
@@ -44,7 +44,7 @@ function docker_create {
     --health-interval=30s \
     --health-timeout=10s \
     --health-retries=3 \
-    -p 8080:80 \
+    -p $VALUE4:80 \
     -v /srv/containers/"$NOMECONTAINER"/data:/var/www/html/chat/data \
     "$docker_repo"
 
@@ -58,7 +58,7 @@ function docker_create {
   --health-interval=30s \
   --health-timeout=10s \
   --health-retries=3 \
-  -p 8080:80 \
+  -p $VALUE4:80 \
   -v /srv/containers/"$NOMECONTAINER"/data:/var/www/html/chat/data \
   "$docker_repo"
 }
