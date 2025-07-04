@@ -27,6 +27,11 @@ VALUE10=""
 
 function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/data
+  sudo touch /srv/containers/"$NOMECONTAINER"/data/messages.json
+  echo '{"messages":[]}' | sudo tee /srv/containers/"$NOMECONTAINER"/data/messages.json
+  sudo touch /srv/containers/"$NOMECONTAINER"/data/users.json
+  echo '{"users":[]}' | sudo tee /srv/containers/"$NOMECONTAINER"/data/users.json
+  sudo touch /srv/containers/"$NOMECONTAINER"/data/container.log
 :; }
 
 function docker_create {
@@ -42,7 +47,9 @@ function docker_create {
     --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     --no-healthcheck \
     -p 8080:80 \
-    -v /srv/containers/"$NOMECONTAINER"/data:/var/www/html/chat/data \
+    -v /srv/containers/"$NOMECONTAINER"/data/messages.json:/var/www/html/data/messages.json \
+    -v /srv/containers/"$NOMECONTAINER"/data/users.json:/var/www/html/data/users.json \
+    -v /srv/containers/"$NOMECONTAINER"/data/container.log:/srv/containers/simple-web-chat/data/container.log \
     "$docker_repo"
 
     return
@@ -53,7 +60,9 @@ function docker_create {
   --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   --no-healthcheck \
   -p 8080:80 \
-  -v /srv/containers/"$NOMECONTAINER"/data:/var/www/html/chat/data \
+  -v /srv/containers/"$NOMECONTAINER"/data/messages.json:/var/www/html/data/messages.json \
+  -v /srv/containers/"$NOMECONTAINER"/data/users.json:/var/www/html/data/users.json \
+  -v /srv/containers/"$NOMECONTAINER"/data/container.log:/srv/containers/simple-web-chat/data/container.log \
   "$docker_repo"
 }
 
