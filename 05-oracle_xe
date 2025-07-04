@@ -85,6 +85,7 @@ export ORAENV_ASK=NO
 export ORACLE_SID=XE
 export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
 export PATH=$ORACLE_HOME/bin:$PATH
+
 #. /opt/oracle/product/21c/dbhomeXE/bin/oraenv
 
 alias listener='lsnrctl status'
