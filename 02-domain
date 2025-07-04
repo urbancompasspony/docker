@@ -103,17 +103,14 @@ function docker_extras {
 clear
 echo ""; echo "############################################################"
 echo ""; echo "Configuring Apache2"; echo ""
-
 docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/autoconfig.sh | bash"
 docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/setup_auth.sh > setup_auth.sh"
 docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auth-toggle.sh > auth-toggle.sh"
 docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Apache2/auth-togle-for-ad.sh > auth-togle-for-ad.sh"
-
 docker exec "$NOMECONTAINER" bash -c "mv setup_auth.sh /usr/bin/; chmod +x /usr/bin/setup_auth.sh"
 docker exec "$NOMECONTAINER" bash -c "mv auth-toggle.sh /usr/bin/; chmod +x /usr/bin/auth-toggle.sh"
 docker exec "$NOMECONTAINER" bash -c "mv auth-togle-for-ad.sh /usr/bin/; chmod +x /usr/bin/auth-togle-for-ad.sh"
 docker exec "$NOMECONTAINER" bash -c "bash /usr/bin/auth-togle-for-ad.sh"
-
 echo ""; echo "OK"; sleep 0.5
 
 echo ""; echo "############################################################"
