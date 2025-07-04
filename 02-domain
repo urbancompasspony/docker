@@ -18,7 +18,7 @@ CustmN6="Hostname"
 CustmN7="Net_LAN"
 CustmN8="MNT_Path"
 CustmN9="CUPSPass"
-CustmN10=""
+CustmN10="WebPass"
 
 VALUE2="ad."
 VALUE3=""
@@ -28,13 +28,12 @@ VALUE6="$HOSTNAME"
 VALUE7="macvlan"
 VALUE8="-v /mnt:/mnt"
 VALUE9="admin"
-VALUE10=""
+VALUE10="admin"
 
 function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{log,data,config}
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/cups/{config,log}
   sudo touch /srv/containers/"$NOMECONTAINER"/log/syslog
-
 }
 
 function docker_create {
@@ -64,8 +63,8 @@ function docker_create {
     -v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
     -v /srv/containers/"$NOMECONTAINER"/cups/config:/etc/cups \
     -v /srv/containers/"$NOMECONTAINER"/cups/log:/var/log/cups \
-    -v "/srv/containers/$NOMECONTAINER/config:/config" \
-    -v "/srv/containers/$NOMECONTAINER/data:/data" \
+    -v /srv/containers/"$NOMECONTAINER"/config:/config \
+    -v /srv/containers/"$NOMECONTAINER"/data:/data \
     $VALUE8 \
     "$docker_repo"
 
@@ -93,8 +92,8 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/config/:/etc/samba/external \
   -v /srv/containers/"$NOMECONTAINER"/cups/config:/etc/cups \
   -v /srv/containers/"$NOMECONTAINER"/cups/log:/var/log/cups \
-  -v "/srv/containers/$NOMECONTAINER/config:/config" \
-  -v "/srv/containers/$NOMECONTAINER/data:/data" \
+  -v /srv/containers/"$NOMECONTAINER"/config:/config \
+  -v /srv/containers/"$NOMECONTAINER"/data:/data \
   $VALUE8 \
   "$docker_repo"
 }
@@ -104,13 +103,14 @@ clear
 echo ""; echo "############################################################"
 echo ""; echo "Configuring Apache2"; echo ""
 docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/autoconfig.sh | bash"
-docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/setup_auth.sh > setup_auth.sh"
+docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Apache2/auth-togle-for-ad.sh  | bash"
 docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auth-toggle.sh > auth-toggle.sh"
-docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Apache2/auth-togle-for-ad.sh > auth-togle-for-ad.sh"
-docker exec "$NOMECONTAINER" bash -c "mv setup_auth.sh /usr/bin/; chmod +x /usr/bin/setup_auth.sh"
 docker exec "$NOMECONTAINER" bash -c "mv auth-toggle.sh /usr/bin/; chmod +x /usr/bin/auth-toggle.sh"
-docker exec "$NOMECONTAINER" bash -c "mv auth-togle-for-ad.sh /usr/bin/; chmod +x /usr/bin/auth-togle-for-ad.sh"
-docker exec "$NOMECONTAINER" bash -c "bash /usr/bin/auth-togle-for-ad.sh"
+docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/setup_auth.sh > setup_auth.sh"
+docker exec "$NOMECONTAINER" bash -c "mv setup_auth.sh /usr/bin/; chmod +x /usr/bin/setup_auth.sh"
+docker exec "$NOMECONTAINER" bash -c "mkdir -p /etc/apache2/auth"
+docker exec "$NOMECONTAINER" bash -c "htpasswd -c /etc/apache2/auth/.htpasswd admin"
+docker exec "$NOMECONTAINER" bash -c "htpasswd -b /etc/apache2/auth/.htpasswd admin $VALUE10"
 echo ""; echo "OK"; sleep 0.5
 
 echo ""; echo "############################################################"
