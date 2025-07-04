@@ -91,7 +91,7 @@ EM_EXPRESS_PORT=5500
 CHARSET=$CHARSETDB
 DBFILE_DEST=
 DB_DOMAIN=$DEDM
-SKIP_VALIDATIONS=true" >> /srv/containers/"$var1"/sysconfig/oracle-xe-21c.conf
+SKIP_VALIDATIONS=true" >> /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
 
   echo -e "
 # User specific aliases and functions for Oracle!
@@ -116,11 +116,11 @@ echo 'Show Tablespaces: SELECT TABLESPACE_NAME FROM USER_TABLESPACES; '
 echo 'Show PDB: SELECT PDB_ID, PDB_NAME, STATUS FROM DBA_PDBS ORDER BY PDB_ID; '
 echo 'Show All Tables: SELECT table_name, owner, tablespace_name FROM all_tables; '
 echo ' '
-" >> /srv/containers/"$var1"/root/.bashrc
+" >> /srv/containers/"$NOMECONTAINER"/root/.bashrc
 
   docker_extras_2
 
-  docker exec "$var1" bash -c "(echo '$VALUE4'; echo '$VALUE4';) | /etc/init.d/oracle-xe-21c configure"
+  docker exec "$NOMECONTAINER" bash -c "(echo '$VALUE4'; echo '$VALUE4';) | /etc/init.d/oracle-xe-21c configure"
 :; }
 
 function docker_extras_2 {
@@ -134,12 +134,12 @@ LISTENER =
       (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
       (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
     )
-  )" >> /srv/containers/"$var1"/netadmin/listener.ora
+  )" >> /srv/containers/"$NOMECONTAINER"/netadmin/listener.ora
 
   echo -e "NAMES.DIRECTORY_PATH= (TNSNAMES, EZCONNECT)
 SQLNET.ALLOWED_LOGON_VERSION=10
 SQLNET.ALLOWED_LOGON_VERSION_CLIENT=10
-SQLNET.ALLOWED_LOGON_VERSION_SERVER=10" >> /srv/containers/"$var1"/netadmin/sqlnet.ora
+SQLNET.ALLOWED_LOGON_VERSION_SERVER=10" >> /srv/containers/"$NOMECONTAINER"/netadmin/sqlnet.ora
 
   echo -e "XE =
   (DESCRIPTION =
@@ -162,8 +162,9 @@ ORACLR_CONNECTION_DATA =
       (SID = CLRExtProc)
       (PRESENTATION = RO)
     )
-  )" >> /srv/containers/"$var1"/netadmin/tnsnames.ora
+  )" >> /srv/containers/"$NOMECONTAINER"/netadmin/tnsnames.ora
   fi
+}
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
