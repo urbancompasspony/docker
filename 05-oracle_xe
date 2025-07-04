@@ -19,15 +19,14 @@ VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
 VALUE4="#A1234abc"
 VALUE5="1521"
-VALUE6="AL32UTF8 or WE8MSWIN1252"
+VALUE6="WE8MSWIN1252 or AL32UTF8"
 VALUE7="ftagricola"
 VALUE8="5500"
 VALUE9=""
 VALUE10=""
 
 function set_mkdir {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{oradata,root,netadmin,sysconfig}
-
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{adump,dbs,oradata,root,netadmin,sysconfig,audit}
   sudo touch /srv/containers/"$NOMECONTAINER"/root/.bashrc
   sudo touch /srv/containers/"$NOMECONTAINER"/netadmin/sqlnet.ora
   sudo touch /srv/containers/"$NOMECONTAINER"/netadmin/listener.ora
@@ -46,8 +45,11 @@ function docker_create {
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -v /srv/containers/"$NOMECONTAINER"/sysconfig:/etc/sysconfig \
     -v /srv/containers/"$NOMECONTAINER"/root/.bashrc:/root/.bashrc \
+    -v /srv/containers/"$NOMECONTAINER"/dbs:/opt/oracle/dbs \
     -v /srv/containers/"$NOMECONTAINER"/oradata:/opt/oracle/oradata \
     -v /srv/containers/"$NOMECONTAINER"/netadmin:/opt/oracle/homes/OraDBHome21cXE/network/admin \
+    -v /srv/containers/"$NOMECONTAINER"/adump:/opt/oracle/admin/XE/adump \
+    -v /srv/containers/"$NOMECONTAINER"/audit:/opt/oracle/product/21c/dbhomeXE/rdbms/audit \
     "$docker_repo"
 
     return
@@ -58,8 +60,11 @@ function docker_create {
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -v /srv/containers/"$NOMECONTAINER"/sysconfig:/etc/sysconfig \
   -v /srv/containers/"$NOMECONTAINER"/root/.bashrc:/root/.bashrc \
+  -v /srv/containers/"$NOMECONTAINER"/dbs:/opt/oracle/dbs \
   -v /srv/containers/"$NOMECONTAINER"/oradata:/opt/oracle/oradata \
   -v /srv/containers/"$NOMECONTAINER"/netadmin:/opt/oracle/homes/OraDBHome21cXE/network/admin \
+  -v /srv/containers/"$NOMECONTAINER"/adump:/opt/oracle/admin/XE/adump \
+  -v /srv/containers/"$NOMECONTAINER"/audit:/opt/oracle/product/21c/dbhomeXE/rdbms/audit \
   "$docker_repo"
 }
 
@@ -74,11 +79,11 @@ SKIP_VALIDATIONS=true" | sudo tee -a /srv/containers/"$NOMECONTAINER"/sysconfig/
   echo -e "
 # User specific aliases and functions for Oracle!
 umask 022
-ORACLE_SID=XE
-ORAENV_ASK=NO
-ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
-PATH=$PATH:$ORACLE_HOME/bin
-. /opt/oracle/product/21c/dbhomeXE/bin/oraenv
+export ORAENV_ASK=NO
+export ORACLE_SID=XE
+export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
+export PATH=$ORACLE_HOME/bin:$PATH
+#. /opt/oracle/product/21c/dbhomeXE/bin/oraenv
 
 alias listener='lsnrctl status'
 alias lservice='lsnrctl service'
