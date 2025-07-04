@@ -8,20 +8,20 @@ imagem="oraclexe21c"
 CustmN2="local_ip"
 CustmN3="servidor_dns"
 CustmN4="password"
-CustmN5=""
-CustmN6=""
-CustmN7=""
-CustmN8=""
+CustmN5="lstn_port:"
+CustmN6="charset"
+CustmN7="db_domain"
+CustmN8="em_exp_port"
 CustmN9=""
 CustmN10=""
 
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
 VALUE4="#A1234abc"
-VALUE5=""
-VALUE6=""
-VALUE7=""
-VALUE8=""
+VALUE5="1521"
+VALUE6="AL32UTF8 or WE8MSWIN1252"
+VALUE7="ftagricola"
+VALUE8="5500"
 VALUE9=""
 VALUE10=""
 
@@ -61,37 +61,15 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/oradata:/opt/oracle/oradata \
   -v /srv/containers/"$NOMECONTAINER"/netadmin:/opt/oracle/homes/OraDBHome21cXE/network/admin \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
-  export_all
-
-  VALUE1="1521"; VALUE2="AL32UTF8 / WE8MSWIN1252"; VALUE3="ftagricola"
-
-  if VALUE_DB=$(dialog --ok-label "Definir" --title "OracleDB" --form "Escolha 1 Charset abaixo!" 11 40 0 \
-"LstnPort: " 1 1 "$VALUE1" 1 11 30 0 \
-"Char Set: " 2 1 "$VALUE2" 2 11 30 0 \
-"DBDomain: " 3 1 "$VALUE3" 3 11 30 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty); then
-    exit
-  fi
-
-portexp=$(echo "$VALUE_DB" | sed -n 1p)
-CHARSETDB=$(echo "$VALUE_DB" | sed -n 2p)
-DEDM=$(echo "$VALUE_DB" | sed -n 3p)
-
-  echo -e "LISTENER_PORT=$portexp
-EM_EXPRESS_PORT=5500
-CHARSET=$CHARSETDB
+  echo -e "LISTENER_PORT=$VALUE5
+EM_EXPRESS_PORT=$VALUE8
+CHARSET=$VALUE6
 DBFILE_DEST=
-DB_DOMAIN=$DEDM
-SKIP_VALIDATIONS=true" >> /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
+DB_DOMAIN=$VALUE7
+SKIP_VALIDATIONS=true" | sudo tee -a /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
 
   echo -e "
 # User specific aliases and functions for Oracle!
@@ -104,7 +82,7 @@ PATH=$PATH:$ORACLE_HOME/bin
 
 alias listener='lsnrctl status'
 alias lservice='lsnrctl service'
-alias sqlplus='sqlplus system/$VALUE4@localhost:$portexp/XE.$DEDM'
+alias sqlplus='sqlplus system/$VALUE4@localhost:$VALUE5/XE.$VALUE7'
 
 echo ' '
 echo 'listener: alias to check listener and oracle process status!'
@@ -116,16 +94,9 @@ echo 'Show Tablespaces: SELECT TABLESPACE_NAME FROM USER_TABLESPACES; '
 echo 'Show PDB: SELECT PDB_ID, PDB_NAME, STATUS FROM DBA_PDBS ORDER BY PDB_ID; '
 echo 'Show All Tables: SELECT table_name, owner, tablespace_name FROM all_tables; '
 echo ' '
-" >> /srv/containers/"$NOMECONTAINER"/root/.bashrc
+" | sudo tee -a /srv/containers/"$NOMECONTAINER"/root/.bashrc
 
-  docker_extras_2
-
-  docker exec "$NOMECONTAINER" bash -c "(echo '$VALUE4'; echo '$VALUE4';) | /etc/init.d/oracle-xe-21c configure"
-:; }
-
-function docker_extras_2 {
-  # For specific conditions or business
-  if [ "$DEDM" = "ftagricola" ]; then
+  if [ "$VALUE7" = "ftagricola" ]; then
 
   echo -e "DEFAULT_SERVICE_LISTENER = XE
 LISTENER =
@@ -134,12 +105,12 @@ LISTENER =
       (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
       (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
     )
-  )" >> /srv/containers/"$NOMECONTAINER"/netadmin/listener.ora
+  )" | sudo tee -a /srv/containers/"$NOMECONTAINER"/netadmin/listener.ora
 
   echo -e "NAMES.DIRECTORY_PATH= (TNSNAMES, EZCONNECT)
 SQLNET.ALLOWED_LOGON_VERSION=10
 SQLNET.ALLOWED_LOGON_VERSION_CLIENT=10
-SQLNET.ALLOWED_LOGON_VERSION_SERVER=10" >> /srv/containers/"$NOMECONTAINER"/netadmin/sqlnet.ora
+SQLNET.ALLOWED_LOGON_VERSION_SERVER=10" | sudo tee -a /srv/containers/"$NOMECONTAINER"/netadmin/sqlnet.ora
 
   echo -e "XE =
   (DESCRIPTION =
@@ -162,9 +133,11 @@ ORACLR_CONNECTION_DATA =
       (SID = CLRExtProc)
       (PRESENTATION = RO)
     )
-  )" >> /srv/containers/"$NOMECONTAINER"/netadmin/tnsnames.ora
+  )" | sudo tee -a /srv/containers/"$NOMECONTAINER"/netadmin/tnsnames.ora
   fi
-}
+
+  docker exec "$NOMECONTAINER" bash -c "(echo '$VALUE4'; echo '$VALUE4';) | /etc/init.d/oracle-xe-21c configure"
+:; }
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
