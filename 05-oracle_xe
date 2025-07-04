@@ -85,8 +85,7 @@ export ORAENV_ASK=NO
 export ORACLE_SID=XE
 export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
 export PATH=$ORACLE_HOME/bin:$PATH
-
-#. /opt/oracle/product/21c/dbhomeXE/bin/oraenv
+  #. /opt/oracle/product/21c/dbhomeXE/bin/oraenv
 
 alias listener='lsnrctl status'
 alias lservice='lsnrctl service'
@@ -102,48 +101,7 @@ echo 'Show Tablespaces: SELECT TABLESPACE_NAME FROM USER_TABLESPACES; '
 echo 'Show PDB: SELECT PDB_ID, PDB_NAME, STATUS FROM DBA_PDBS ORDER BY PDB_ID; '
 echo 'Show All Tables: SELECT table_name, owner, tablespace_name FROM all_tables; '
 echo ' '
-" | sudo tee -a /srv/containers/"$NOMECONTAINER"/root/.bashrc
-
-  if [ "$VALUE7" = "ftagricola" ]; then
-
-  echo -e "DEFAULT_SERVICE_LISTENER = XE
-LISTENER =
-  (DESCRIPTION_LIST =
-    (DESCRIPTION =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
-      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
-    )
-  )" | sudo tee -a /srv/containers/"$NOMECONTAINER"/netadmin/listener.ora
-
-  echo -e "NAMES.DIRECTORY_PATH= (TNSNAMES, EZCONNECT)
-SQLNET.ALLOWED_LOGON_VERSION=10
-SQLNET.ALLOWED_LOGON_VERSION_CLIENT=10
-SQLNET.ALLOWED_LOGON_VERSION_SERVER=10" | sudo tee -a /srv/containers/"$NOMECONTAINER"/netadmin/sqlnet.ora
-
-  echo -e "XE =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = XE.ftagricola)
-    )
-  )
-
-LISTENER_XE =
-  (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
-
-ORACLR_CONNECTION_DATA =
-  (DESCRIPTION =
-    (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
-    )
-    (CONNECT_DATA =
-      (SID = CLRExtProc)
-      (PRESENTATION = RO)
-    )
-  )" | sudo tee -a /srv/containers/"$NOMECONTAINER"/netadmin/tnsnames.ora
-    return
-  fi
+" | sudo tee /srv/containers/"$NOMECONTAINER"/root/.bashrc
 :; }
 
 # ----------------------------------------------------------------------
