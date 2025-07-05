@@ -26,13 +26,18 @@ VALUE9="nao"
 VALUE10=""
 
 function set_mkdir {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{bin,adump,dbs,oradata,root,netadmin,sysconfig,audit}
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{log,bin,adump,audit,dbs,oradata,root,netadmin,sysconfig}
+
   sudo touch /srv/containers/"$NOMECONTAINER"/root/.bashrc
   sudo touch /srv/containers/"$NOMECONTAINER"/netadmin/sqlnet.ora
   sudo touch /srv/containers/"$NOMECONTAINER"/netadmin/listener.ora
   sudo touch /srv/containers/"$NOMECONTAINER"/netadmin/tnsnames.ora
   sudo touch /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/oracle-extra-files/startoracle.sh -O /srv/containers/oraclexe21c/bin/startoracle.sh
+  sudo touch /srv/containers/"$NOMECONTAINER"/log/listener.log
+
+  if ! [ -f /srv/containers/"$NOMECONTAINER"/bin/startoracle.sh ]; then
+    sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/oracle-extra-files/startoracle.sh -O /srv/containers/"$NOMECONTAINER"/bin/startoracle.sh
+  fi
 :; }
 
 function docker_create {
@@ -52,6 +57,7 @@ function docker_create {
     -v /srv/containers/"$NOMECONTAINER"/netadmin:/opt/oracle/homes/OraDBHome21cXE/network/admin \
     -v /srv/containers/"$NOMECONTAINER"/adump:/opt/oracle/admin/XE/adump \
     -v /srv/containers/"$NOMECONTAINER"/audit:/opt/oracle/product/21c/dbhomeXE/rdbms/audit \
+    -v /srv/containers/"$NOMECONTAINER"/log:/opt/oracle/product/21c/dbhomeXE/network/log \
     -v /srv/containers/"$NOMECONTAINER"/bin/startoracle.sh:/usr/local/bin/startoracle.sh \
     "$docker_repo"
 
@@ -69,6 +75,7 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/netadmin:/opt/oracle/homes/OraDBHome21cXE/network/admin \
   -v /srv/containers/"$NOMECONTAINER"/adump:/opt/oracle/admin/XE/adump \
   -v /srv/containers/"$NOMECONTAINER"/audit:/opt/oracle/product/21c/dbhomeXE/rdbms/audit \
+  -v /srv/containers/"$NOMECONTAINER"/log:/opt/oracle/product/21c/dbhomeXE/network/log \
   -v /srv/containers/"$NOMECONTAINER"/bin/startoracle.sh:/usr/local/bin/startoracle.sh \
   "$docker_repo"
 }
@@ -92,7 +99,7 @@ export PATH=$PATH:/opt/oracle/product/21c/dbhomeXE/bin
 
 alias listener='lsnrctl status'
 alias lservice='lsnrctl service'
-alias sqlplus='sqlplus system/$VALUE4@localhost:$VALUE5/XE'
+alias sqlplus='sqlplus system/#A2370kft@localhost:1521/XE.$VALUE7'
 
 echo ' '
 echo 'listener: alias to check listener and oracle process status!'
@@ -107,7 +114,7 @@ echo ' '
 " | sudo tee /srv/containers/"$NOMECONTAINER"/root/.bashrc
 
 if [ "$VALUE9" = sim ]; then
-
+docker exec "$NOMECONTAINER" bash -c '
   if ! grep -q "XE:" /etc/oratab 2>/dev/null; then
     echo "XE:/opt/oracle/product/21c/dbhomeXE:N" >> /etc/oratab
   fi
@@ -124,8 +131,8 @@ EOF
 export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
 export ORACLE_SID=XE
 export PATH=/opt/oracle/product/21c/dbhomeXE/bin:\$PATH
-sqlplus / as sysdba @/tmp/startup.sql
-"
+sqlplus / as sysdba @/tmp/startup.sql"
+'
 fi
 
 :; }
