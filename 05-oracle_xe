@@ -34,10 +34,6 @@ function set_mkdir {
   sudo touch /srv/containers/"$NOMECONTAINER"/netadmin/tnsnames.ora
   sudo touch /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
   sudo touch /srv/containers/"$NOMECONTAINER"/log/listener.log
-
-  if ! [ -f /srv/containers/"$NOMECONTAINER"/bin/startoracle.sh ]; then
-    sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/oracle-extra-files/startoracle.sh -O /srv/containers/"$NOMECONTAINER"/bin/startoracle.sh
-  fi
 :; }
 
 function docker_create {
