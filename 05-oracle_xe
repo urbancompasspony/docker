@@ -34,6 +34,8 @@ function set_mkdir {
   sudo touch /srv/containers/"$NOMECONTAINER"/netadmin/tnsnames.ora
   sudo touch /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
   sudo touch /srv/containers/"$NOMECONTAINER"/log/listener.log
+
+  sudo chmod 777 /srv/containers/"$NOMECONTAINER"/log/listener.log
 :; }
 
 function docker_create {
@@ -54,7 +56,6 @@ function docker_create {
     -v /srv/containers/"$NOMECONTAINER"/adump:/opt/oracle/admin/XE/adump \
     -v /srv/containers/"$NOMECONTAINER"/audit:/opt/oracle/product/21c/dbhomeXE/rdbms/audit \
     -v /srv/containers/"$NOMECONTAINER"/log:/opt/oracle/product/21c/dbhomeXE/network/log \
-    -v /srv/containers/"$NOMECONTAINER"/bin/startoracle.sh:/usr/local/bin/startoracle.sh \
     "$docker_repo"
 
     return
@@ -72,7 +73,6 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/adump:/opt/oracle/admin/XE/adump \
   -v /srv/containers/"$NOMECONTAINER"/audit:/opt/oracle/product/21c/dbhomeXE/rdbms/audit \
   -v /srv/containers/"$NOMECONTAINER"/log:/opt/oracle/product/21c/dbhomeXE/network/log \
-  -v /srv/containers/"$NOMECONTAINER"/bin/startoracle.sh:/usr/local/bin/startoracle.sh \
   "$docker_repo"
 }
 
@@ -111,10 +111,7 @@ echo ' '
 
 if [ "$VALUE9" = sim ]; then
 docker exec "$NOMECONTAINER" bash -c '
-  if ! grep -q "XE:" /etc/oratab 2>/dev/null; then
-    echo "XE:/opt/oracle/product/21c/dbhomeXE:N" >> /etc/oratab
-  fi
-
+  echo "XE:/opt/oracle/product/21c/dbhomeXE:N" >> /etc/oratab
   chown -R oracle:oinstall /opt/oracle/admin
 
   cat > /tmp/startup.sql << 'EOF'
