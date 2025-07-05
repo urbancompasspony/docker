@@ -12,7 +12,7 @@ CustmN5="lstn_port:"
 CustmN6="charset"
 CustmN7="db_domain"
 CustmN8="em_exp_port"
-CustmN9=""
+CustmN9="reinstalar?"
 CustmN10=""
 
 VALUE2="0.0.0.0"
@@ -22,16 +22,17 @@ VALUE5="1521"
 VALUE6="WE8MSWIN1252 or AL32UTF8"
 VALUE7="ftagricola"
 VALUE8="5500"
-VALUE9=""
+VALUE9="nao"
 VALUE10=""
 
 function set_mkdir {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{dbs,oradata,root,netadmin,sysconfig}
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{bin,adump,dbs,oradata,root,netadmin,sysconfig,audit}
   sudo touch /srv/containers/"$NOMECONTAINER"/root/.bashrc
   sudo touch /srv/containers/"$NOMECONTAINER"/netadmin/sqlnet.ora
   sudo touch /srv/containers/"$NOMECONTAINER"/netadmin/listener.ora
   sudo touch /srv/containers/"$NOMECONTAINER"/netadmin/tnsnames.ora
   sudo touch /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/oracle-extra-files/startoracle.sh -O /srv/containers/oraclexe21c/bin/startoracle.sh
 :; }
 
 function docker_create {
@@ -49,6 +50,9 @@ function docker_create {
     -v /srv/containers/"$NOMECONTAINER"/dbs:/opt/oracle/dbs \
     -v /srv/containers/"$NOMECONTAINER"/oradata:/opt/oracle/oradata \
     -v /srv/containers/"$NOMECONTAINER"/netadmin:/opt/oracle/homes/OraDBHome21cXE/network/admin \
+    -v /srv/containers/"$NOMECONTAINER"/adump:/opt/oracle/admin/XE/adump \
+    -v /srv/containers/"$NOMECONTAINER"/audit:/opt/oracle/product/21c/dbhomeXE/rdbms/audit \
+    -v /srv/containers/"$NOMECONTAINER"/bin/startoracle.sh:/usr/local/bin/startoracle.sh \
     "$docker_repo"
 
     return
@@ -63,6 +67,9 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/dbs:/opt/oracle/dbs \
   -v /srv/containers/"$NOMECONTAINER"/oradata:/opt/oracle/oradata \
   -v /srv/containers/"$NOMECONTAINER"/netadmin:/opt/oracle/homes/OraDBHome21cXE/network/admin \
+  -v /srv/containers/"$NOMECONTAINER"/adump:/opt/oracle/admin/XE/adump \
+  -v /srv/containers/"$NOMECONTAINER"/audit:/opt/oracle/product/21c/dbhomeXE/rdbms/audit \
+  -v /srv/containers/"$NOMECONTAINER"/bin/startoracle.sh:/usr/local/bin/startoracle.sh \
   "$docker_repo"
 }
 
@@ -80,7 +87,7 @@ umask 022
 export ORAENV_ASK=NO
 export ORACLE_SID=XE
 export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
-export PATH=$ORACLE_HOME/bin:$PATH
+export PATH=$PATH:/opt/oracle/product/21c/dbhomeXE/bin
   #. /opt/oracle/product/21c/dbhomeXE/bin/oraenv
 
 alias listener='lsnrctl status'
@@ -99,45 +106,27 @@ echo 'Show All Tables: SELECT table_name, owner, tablespace_name FROM all_tables
 echo ' '
 " | sudo tee /srv/containers/"$NOMECONTAINER"/root/.bashrc
 
-  if [ "$VALUE7" = "ftagricola" ]; then
+if [ "$VALUE9" = sim ]; then
 
-  echo -e "DEFAULT_SERVICE_LISTENER = XE
-LISTENER =
-  (DESCRIPTION_LIST =
-    (DESCRIPTION =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
-      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
-    )
-  )" | sudo tee /srv/containers/"$NOMECONTAINER"/netadmin/listener.ora
-
-  echo -e "NAMES.DIRECTORY_PATH= (TNSNAMES, EZCONNECT)
-SQLNET.ALLOWED_LOGON_VERSION=10
-SQLNET.ALLOWED_LOGON_VERSION_CLIENT=10
-SQLNET.ALLOWED_LOGON_VERSION_SERVER=10" | sudo tee /srv/containers/"$NOMECONTAINER"/netadmin/sqlnet.ora
-
-  echo -e "XE =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = XE.ftagricola)
-    )
-  )
-
-LISTENER_XE =
-  (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
-
-ORACLR_CONNECTION_DATA =
-  (DESCRIPTION =
-    (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
-    )
-    (CONNECT_DATA =
-      (SID = CLRExtProc)
-      (PRESENTATION = RO)
-    )
-  )" | sudo tee /srv/containers/"$NOMECONTAINER"/netadmin/tnsnames.ora
+  if ! grep -q "XE:" /etc/oratab 2>/dev/null; then
+    echo "XE:/opt/oracle/product/21c/dbhomeXE:N" >> /etc/oratab
   fi
+
+  chown -R oracle:oinstall /opt/oracle/admin
+
+  cat > /tmp/startup.sql << 'EOF'
+STARTUP;
+ALTER PLUGGABLE DATABASE ALL OPEN;
+EXIT;
+EOF
+
+  su - oracle -c "
+export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
+export ORACLE_SID=XE
+export PATH=/opt/oracle/product/21c/dbhomeXE/bin:\$PATH
+sqlplus / as sysdba @/tmp/startup.sql
+"
+fi
 
 :; }
 
