@@ -80,7 +80,7 @@ EM_EXPRESS_PORT=$VALUE8
 CHARSET=$VALUE6
 DBFILE_DEST=
 DB_DOMAIN=$VALUE7
-SKIP_VALIDATIONS=true" | sudo tee -a /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
+SKIP_VALIDATIONS=true" | sudo tee /srv/containers/"$NOMECONTAINER"/sysconfig/oracle-xe-21c.conf
 
   echo -e "
 # User specific aliases and functions for Oracle!
@@ -110,7 +110,7 @@ echo ' '
 if [ "$VALUE9" = sim ]; then
 
   docker exec "$NOMECONTAINER" bash -c '
-  echo "XE:/opt/oracle/product/21c/dbhomeXE:N" >> /etc/oratab
+  echo "XE:/opt/oracle/product/21c/dbhomeXE:N" | tee /etc/oratab
   chown -R oracle:oinstall /opt/oracle/admin
   cat > /tmp/startup.sql << 'EOF'
 STARTUP;
