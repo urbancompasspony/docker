@@ -18,8 +18,8 @@ CustmN10=""
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
 VALUE4="/mnt"
-VALUE5="4096m"
-VALUE6="1.5"
+VALUE5="2048m"
+VALUE6="1"
 VALUE7=""
 VALUE8=""
 VALUE9=""
@@ -58,17 +58,10 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/config:/var/syncthing/config \
   -v $VALUE4:/var/syncthing \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+
 :; }
 
 # ----------------------------------------------------------------------
