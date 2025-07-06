@@ -94,11 +94,16 @@ export PATH=$PATH:/opt/oracle/product/21c/dbhomeXE/bin
 alias listener='lsnrctl status'
 alias lservice='lsnrctl service'
 alias sqlplus='sqlplus system/#A2370kft@localhost:1521/XE.$VALUE7'
+alias oraclestart='/etc/init.d/oracle-xe-21c start'
+alias oraclenew='/etc/init.d/oracle-xe-21c configure'
 
 echo ' '
-echo 'listener: alias to check listener and oracle process status!'
-echo 'lservice: alias to check listener and oracle process status!'
-echo 'sqlplus: alias to check OracleDB status!'
+echo 'listener: alias to check listener and oracle process status'
+echo 'lservice: alias to check listener and oracle process status'
+echo 'sqlplus: alias to check OracleDB status'
+echo ' '
+echo 'oraclestart: alias to start OracleDB manually'
+echo 'oraclenew: alias to configure a NEW OracleDB'
 echo ' '
 echo 'Show Tables: SELECT USERNAME FROM ALL_USERS ORDER BY USERNAME; '
 echo 'Show Tablespaces: SELECT TABLESPACE_NAME FROM USER_TABLESPACES; '
@@ -108,7 +113,6 @@ echo ' '
 " | sudo tee /srv/containers/"$NOMECONTAINER"/root/.bashrc
 
 if [ "$VALUE9" = sim ]; then
-
   docker exec "$NOMECONTAINER" bash -c '
   echo "XE:/opt/oracle/product/21c/dbhomeXE:N" | tee /etc/oratab
   chown -R oracle:oinstall /opt/oracle/admin
@@ -123,8 +127,20 @@ export ORACLE_SID=XE
 export PATH=/opt/oracle/product/21c/dbhomeXE/bin:\$PATH
 sqlplus / as sysdba @/tmp/startup.sql"
 '
-
   docker restart "$NOMECONTAINER"
+else
+  docker exec "$NOMECONTAINER" bash -c '
+  chown -R 54321:54321 /opt/oracle/oradata/
+  chown -R 54321:54321 /opt/oracle/admin/XE
+  chown -R 54321:54321 /opt/oracle/homes/OraDBHome21cXE/network/admin
+  chown -R 54321:54321 /opt/oracle/product/21c/dbhomeXE/network/log
+  chown -R 54321:54321 /opt/oracle/dbs
+  chmod -R 755 /opt/oracle/oradata/
+  chmod -R 755 /opt/oracle/admin/XE
+  chmod -R 755 /opt/oracle/dbs
+  chmod -R 755 /opt/oracle/product/21c/dbhomeXE/network/log
+  chmod -R 755 /opt/oracle/homes/OraDBHome21cXE/network/admin
+  '
 fi
 
 :; }
