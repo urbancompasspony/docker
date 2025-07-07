@@ -1,173 +1,270 @@
-# docker
+# 🐳 Docker Environment
 
-Since it is hard to find compose.yaml base code to use Docker Compose,
-everything under this repository is made to be run with bash through .sh scripts.
+> **Note**: Since it's challenging to find reliable `compose.yaml` base code for Docker Compose, this repository is designed to run with bash scripts (`.sh` files). Maintenance and additional configurations must be handled separately.
 
-Maintenance and other configurations need to be made separately.
+## 📋 Table of Contents
 
-# F.A.Q. / Cheat Sheet
+- [Installation](#-installation)
+- [Network Configuration](#-network-configuration)
+- [Platform-Specific Setup](#-platform-specific-setup)
+- [Common Use Cases](#-common-use-cases)
+- [Backup & Restore](#-backup--restore)
+- [Samba Domain Controller](#-samba-domain-controller)
+- [FAQ & Troubleshooting](#-faq--troubleshooting)
 
-# Installation
+## 🚀 Installation
 
-## If running on Ubuntu and you DON'T pretend to use a virtual IP:
+### Debian/Ubuntu-based Systems
 
-First, run these:
+#### Standard Installation
+```bash
+sudo apt install docker.io
+```
+*This provides stable packages sufficient for most use cases.*
 
-$ sudo systemctl stop systemd-resolved
+#### Ubuntu-specific DNS Configuration
+**⚠️ Only required if NOT using virtual IP:**
 
-$ sudo systemctl disable systemd-resolved
+1. **Stop and disable systemd-resolved:**
+   ```bash
+   sudo systemctl stop systemd-resolved
+   sudo systemctl disable systemd-resolved
+   sudo unlink /etc/resolv.conf
+   ```
 
-$ sudo unlink /etc/resolv.conf
+2. **Create new DNS configuration:**
+   ```bash
+   sudo nano /etc/resolv.conf
+   ```
+   
+   Add the following content:
+   ```
+   nameserver IP_OF_YOUR_GATEWAY
+   search HOSTNAME_OF_GATEWAY_IF_THERES_ANY
+   ```
+   
+   **Example with pfSense:**
+   ```
+   nameserver 192.168.0.1
+   search mypfsense.localdomain
+   ```
 
-Then edit /etc/resolv.conf creating a new file and put this inside:
+> **💡 Note**: This prevents ethernet connection loss on Docker server. Not necessary when using macvlan network!
 
-$ sudo nano /etc/resolv.conf
+## 🌐 Network Configuration
 
-nameserver IP_OF_YOUR_GATEWAY
-
-search HOSTNAME_OF_GATEWAY_IF_THERES_ANY
-
-Example with pfSense:
-
-nameserver 192.168.0.1
-
-search mypfsense.localdomain
-
-With this, you will not lost ethernet connection on Docker server.
-
-This is not necessary if using macvlan network!
-
-## Installing on Debian-based:
-
-Just install this:
-
-$ sudo apt install docker.io
-
-It's enough to catch stable packages.
-
-## Some options to configure Network:
-
-To change MAC Address, add this line inside script:
-
+### MAC Address Customization
+Add this line inside your script to change MAC address:
+```bash
 --mac-address 02:42:c0:a8:00:02 \
+```
 
-Creating a new network to expose your docker container on LAN through a different IP:
+### Creating macvlan Network
+Expose your Docker container on LAN through a different IP:
 
-$ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0 macvlan
+```bash
+sudo docker network create -d macvlan \
+  --subnet=192.168.0.0/24 \
+  --gateway=192.168.0.1 \
+  -o parent=eth0 \
+  macvlan
+```
 
-All scripts inside this repository consider macvlan as default network as default. Change if needed.
+> **📌 Default**: All scripts in this repository use `macvlan` as the default network.
 
-If you need to create more different subnets through same parent, change .10 to .20 and so on.
+### Multiple Subnets
+For different subnets on the same parent interface:
 
-Example:
+```bash
+sudo docker network create -d macvlan \
+  --subnet=192.168.0.0/24 \
+  --gateway=192.168.0.1 \
+  -o parent=eth0.20 \
+  macvlan-custom
+```
 
-$ sudo docker network create -d macvlan --subnet=192.168.0.0/24 --gateway=192.168.0.1 -o parent=eth0.20 macvlan-custom
+> **⚠️ Warning**: Docker treats the number after `.` as a sub-parent, but requires additional configuration. **Recommendation**: Run each macvlan on its own network adapter.
 
-Docker will assume that number from . is a sub-parent! But it needs more adjusts, not work out of box.
+## 🔧 Platform-Specific Setup
 
-So for now, run a docker server and it's subs-services on an unique subnet, inside the same DHCP.
+### Raspberry Pi
+Install required modules and reboot:
+```bash
+sudo apt install linux-modules-extra-raspi
+sudo reboot
+```
 
-Recommended to run every macvlan on it's on network adapter!
+**Without this, you'll encounter:**
+```
+failed to create the macvlan port: operation not supported
+```
 
-## Raspberry Pi
+### PiHole on Domain Network
+1. **Access container:**
+   ```bash
+   sudo docker exec -it pihole /bin/bash
+   ```
 
-Install this: linux-modules-extra-raspi AND REBOOT!
+2. **Install nano and configure:**
+   ```bash
+   apt update && apt install nano
+   nano /etc/pihole/pihole-FTL.conf
+   ```
 
-Or you will get the error "failed to create the macvlan port: operation not supported."
+3. **Add rate limit configuration:**
+   ```
+   RATE_LIMIT=0/0
+   ```
 
-## PiHole on Domain Network
+4. **Restart container** (not just the service)
 
-Inside Container:
+## 💻 Common Use Cases
 
-apt update; apt install nano
+### SSH into Container
+```bash
+sudo docker exec -it <container_name> /bin/bash
+```
 
-nano /etc/pihole/pihole-FTL.conf
+### View Running Containers
+```bash
+sudo docker ps -a
+```
 
-Add: RATE_LIMIT=0/0
+### Check Docker Images
+```bash
+sudo docker images
+```
 
-Restart docker container, not just the pihole-FTL.service.
+## 💾 Backup & Restore
 
-# Use Cases
+### Creating Backups
 
-## To connect to a container through SSH
+#### Method 1: Commit and Save
+```bash
+# Get container ID
+sudo docker images
 
-$ sudo docker exec -it pihole /bin/bash
+# Create backup (stop container first)
+sudo docker commit -p <CONTAINER_ID> my-backup
 
-# Backup & Restore
-
-## Backup
-
-sudo docker images -> catch the ID!
-
-sudo docker commit -p ID_HERE my-backup # Necessary to stop Container and make an read-only secure version.
-
+# Save to tar file
 sudo docker save -o /path/to/my-backup.tar my-backup
+```
 
-Do not forget about -v (volume) folders and some parameters when running! - And permissions too.
+#### Method 2: Export Running Container
+```bash
+# On source host
+docker export <container_name> > my_container.tar
 
-Container backup will store only system configurations, not data files.
+# Transfer to target host
+scp my_container.tar user@target_host:~
+```
 
-## Restore
+> **⚠️ Important**: Container backups store only system configurations, not data files. Remember to backup volumes (`-v`) and note all parameters used!
 
+### Restoring Backups
+
+#### Method 1: Load from Save
+```bash
 sudo docker image load -i /path/to/my-backup.tar
+```
 
-Then run with all parameters used before, to keep everything as needed. Example, to restore a backup from file 02-smb-ad-dc:
-
+Then run with original parameters:
+```bash
 docker run -t -i -d \
-	--network macvlan \
-	--ip=THE_SAME_IP_AS_BEFORE \
-	-v /SAME/PATH/TO:/var/lib/samba \
-	-v /SAME/PATH/TO/ANOTHER:/etc/samba/external \
-	--privileged \
-  	--restart=unless-stopped \
-  	--name samba \
-	my-backup
+    --network macvlan \
+    --ip=THE_SAME_IP_AS_BEFORE \
+    -v /SAME/PATH/TO:/var/lib/samba \
+    -v /SAME/PATH/TO/ANOTHER:/etc/samba/external \
+    --privileged \
+    --restart=unless-stopped \
+    --name samba \
+    my-backup
+```
 
-## Backup of Running Image
+#### Method 2: Import from Export
+```bash
+# On target host
+cat my_container.tar | docker import - my_container:latest
 
-On the source host:
+# Create new container
+docker run -d --name my_new_container my_container:latest
+```
 
-$ docker export my_container > my_container.tar
+## 🏢 Samba Domain Controller
 
-Copy the tar archive to the target host using scp:
+### Credits & References
+- **Base**: [Fmstrat/samba-domain](https://github.com/Fmstrat/samba-domain)
+- **Inspiration**: [crazy-max/docker-samba](https://github.com/crazy-max/docker-samba)
+- **Additional Help**: [instantlinux/samba-dc](https://hub.docker.com/r/instantlinux/samba-dc)
 
-$ scp my_container.tar user@target_host:~
+### Environment Variables
 
-On the target host:
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DOMAIN` | `CORP.EXAMPLE.COM` | Your domain name |
+| `DOMAINPASS` | *(required)* | Administrator password (remove after first setup) |
+| `HOSTIP` | *(optional)* | IP address to advertise |
+| `JOIN` | `false` | Set to `true` to join existing domain |
+| `JOINSITE` | *(optional)* | Site name when joining domain |
+| `DNSFORWARDER` | *(optional)* | DNS server IP for unresolved requests |
+| `INSECURELDAP` | `false` | Remove secure LDAP requirement (not recommended for production) |
+| `MULTISITE` | `false` | Connect to OpenVPN site via ovpn file |
+| `NOCOMPLEXITY` | `false` | Remove password complexity requirements |
 
-$ cat my_container.tar | docker import - my_container:latest
+### Volume Mappings
 
-Create a new container from the image:
+```bash
+# Essential volumes
+-v /etc/localtime:/etc/localtime:ro                           # Timezone sync
+-v /data/docker/containers/samba/data/:/var/lib/samba         # Samba data
+-v /data/docker/containers/samba/config/samba:/etc/samba/external  # Configuration
 
-$ docker run -d --name my_new_container my_container:latest
+# Optional (for VPN connectivity)
+-v /data/docker/containers/samba/config/openvpn/docker.ovpn:/docker.ovpn
+-v /data/docker/containers/samba/config/openvpn/credentials:/credentials
+```
 
-## Samba Domain
+### VPN Credentials Format
+Create credentials file with:
+```
+username
+password
+```
 
-Credits:
-https://github.com/Fmstrat/samba-domain
+Ensure your `.ovpn` file contains:
+```
+auth-user-pass /credentials
+```
 
-Inspired:
-https://github.com/crazy-max/docker-samba
+## ❓ FAQ & Troubleshooting
 
-Helped by:
-https://hub.docker.com/r/instantlinux/samba-dc
+### Common Issues
 
-Environment variables for quick start
+**Q: Container can't access network**
+- Check if macvlan network is properly configured
+- Verify parent interface name (`eth0`, `ens33`, etc.)
 
-DOMAIN defaults to CORP.EXAMPLE.COM and should be set to your domain
-DOMAINPASS should be set to your administrator password, be it existing or new. This can be removed from the environment after the first setup run.
-HOSTIP can be set to the IP you want to advertise.
-JOIN defaults to false and means the container will provision a new domain. Set this to true to join an existing domain.
-JOINSITE is optional and can be set to a site name when joining a domain, otherwise the default site will be used.
-DNSFORWARDER is optional and if an IP such as 192.168.0.1 is supplied will forward all DNS requests samba can't resolve to that DNS server
-INSECURELDAP defaults to false. When set to true, it removes the secure LDAP requirement. While this is not recommended for production it is required for some LDAP tools. You can remove it later from the smb.conf file stored in the config directory.
-MULTISITE defaults to false and tells the container to connect to an OpenVPN site via an ovpn file with no password. For instance, if you have two locations where you run your domain controllers, they need to be able to interact. The VPN allows them to do that.
-NOCOMPLEXITY defaults to false. When set to true it removes password complexity requirements including complexity, history-length, min-pwd-age, max-pwd-age
+**Q: DNS resolution fails**
+- Ensure DNS configuration is correct
+- Check if systemd-resolved conflicts exist
 
-Volumes for quick start
-/etc/localtime:/etc/localtime:ro - Sets the timezone to match the host
-/data/docker/containers/samba/data/:/var/lib/samba - Stores samba data so the container can be moved to another host if required.
-/data/docker/containers/samba/config/samba:/etc/samba/external - Stores the smb.conf so the container can be mored or updates can be easily made.
-/data/docker/containers/samba/config/openvpn/docker.ovpn:/docker.ovpn - Optional for connecting to another site via openvpn.
-/data/docker/containers/samba/config/openvpn/credentials:/credentials - Optional for connecting to another site via openvpn that requires a username/password. The format for this file should be two lines, with the username on the first, and the password on the second. Also, make sure your ovpn file contains auth-user-pass /credentials
+**Q: Permission denied errors**
+- Use `--privileged` flag for containers requiring system access
+- Check volume mount permissions
 
+**Q: Container won't start after reboot**
+- Add `--restart=unless-stopped` to your run command
+- Check if required networks exist after reboot
+
+### Best Practices
+
+1. **Always backup** volumes and configurations before major changes
+2. **Use macvlan** for production deployments requiring LAN integration
+3. **Document all parameters** used in container creation
+4. **Test restores** regularly to ensure backup integrity
+5. **Monitor logs** with `docker logs <container_name>`
+
+---
+
+> **💡 Pro Tip**: Keep a script file with your exact `docker run` command for easy container recreation!
