@@ -11,10 +11,10 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 --network macvlan \
 --no-healthcheck \
--v /srv/containers/inova/cache/samba:/var/cache/samba \
--v /srv/containers/inova/lib/samba:/var/lib/samba \
--v /srv/containers/inova/log:/var/log \
--v /srv/containers/inova/run/samba:/run/samba \
--v /srv/containers/inova/etc:/etc \
+-v /srv/containers/SAMBA_SHARE/cache/samba:/var/cache/samba \
+-v /srv/containers/SAMBA_SHARE/lib/samba:/var/lib/samba \
+-v /srv/containers/SAMBA_SHARE/log:/var/log \
+-v /srv/containers/SAMBA_SHARE/run/samba:/run/samba \
+-v /srv/containers/SAMBA_SHARE/etc:/etc \
 -v /mnt/3tb1:/mnt/3tb1 -v /mnt/vm:/mnt/vm -v /mnt/diogo:/mnt/diogo \
 urbancompasspony/migrate-samba
