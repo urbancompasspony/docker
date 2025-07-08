@@ -98,20 +98,21 @@ a2dissite 000-default.conf
 echo "Testando configuração..."
 
 if apache2ctl configtest; then
-    echo "Configuração OK!"
     mkdir -p /var/www/samba-admin/cgi-bin
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/samba-admin.cgi | tee /var/www/samba-admin/cgi-bin/samba-admin.cgi
-    mkdir -p /var/www/samba-admin
+    
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/index.html | tee /var/www/samba-admin/index.html
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/script.js | tee /var/www/samba-admin/script.js
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/style.css | tee /var/www/samba-admin/style.css
-    echo "3. Permissões: chmod 755 /var/www/samba-admin/cgi-bin/samba-admin.cgi"
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/script1.js | tee /var/www/samba-admin/script1.js
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/script2.js | tee /var/www/samba-admin/script2.js
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/samba-admin.cgi | tee /var/www/samba-admin/cgi-bin/samba-admin.cgi
+    
     chmod +x /var/www/samba-admin/cgi-bin/samba-admin.cgi
     chmod 755 /var/www/samba-admin/cgi-bin/samba-admin.cgi
-    echo "Reiniciando Apache..."
+    
     service apache2 restart
 else
     echo "ERRO na configuração do Apache!"
     echo "Verifique os logs: /var/log/apache2/error.log"
+    echo "INSTALAÇÃO FALHOU."
     exit 1
 fi
