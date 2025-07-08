@@ -30,12 +30,12 @@
                     <h3>💻 Ferramentas de Computadores</h3>
                     <p>Gerenciar computadores do domínio, adicionar, remover e mover entre OUs.</p>
                 </div>
-                
+
                 <div class="menu-card" onclick="showSubmenu('ou-tools')">
                     <h3>🏢 Unidades Organizacionais</h3>
                     <p>Criar e gerenciar OUs para organizar objetos do Active Directory.</p>
                 </div>
-                
+
                 <div class="menu-card" onclick="showSubmenu('shared-folders')">
                     <h3>📁 Gestão de Pastas Compartilhadas</h3>
                     <p>Criar e gerenciar compartilhamentos de rede, definir permissões e ACLs.</p>
@@ -195,14 +195,14 @@
                     <p style="margin-bottom: 8px;">• <strong>Histórico = 24:</strong> Usuários devem usar 24 senhas diferentes antes de reutilizar</p>
                     <p style="color: #666; font-size: 14px;">⚠️ Valor recomendado: entre 12 e 24 senhas</p>
                 </div>
-                
+
                 <form onsubmit="submitForm(event, 'set-password-history')">
                     <div class="form-group">
                         <label for="history-length">Tamanho do histórico (número de senhas):</label>
                         <input type="number" id="history-length" name="history-length" min="0" max="1024" placeholder="24" required>
                         <small style="color: #666;">Entre 0 (sem histórico) e 1024 senhas</small>
                     </div>
-                    
+
                     <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">
                         <h5 style="color: #856404; margin: 0 0 8px 0;">⚠️ Exemplos práticos:</h5>
                         <p style="color: #856404; margin: 0; font-size: 14px;">
@@ -211,7 +211,7 @@
                             <strong>24:</strong> Deve criar 24 senhas diferentes (recomendado)
                         </p>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-success">Definir Histórico</button>
                     <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
                 </form>
@@ -226,7 +226,7 @@
                         <input type="number" id="min-length" name="min-length" min="0" max="255" placeholder="7" required>
                         <small style="color: #666;">Entre 0 (sem limite) e 255 caracteres</small>
                     </div>
-                    
+
                     <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #28a745;">
                         <h5 style="color: #155724; margin: 0 0 8px 0;">💡 Recomendações:</h5>
                         <p style="color: #155724; margin: 0; font-size: 14px;">
@@ -235,7 +235,7 @@
                             <strong>16+:</strong> Alta segurança
                         </p>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-success">Definir Tamanho Mínimo</button>
                     <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
                 </form>
@@ -249,14 +249,14 @@
                     <p style="margin-bottom: 8px;">• <strong>Validade mínima:</strong> Tempo que o usuário deve esperar antes de trocar a senha novamente</p>
                     <p style="color: #666; font-size: 14px;">Evita que usuários troquem rapidamente para voltar à senha antiga</p>
                 </div>
-                
+
                 <form onsubmit="submitForm(event, 'set-password-min-age')">
                     <div class="form-group">
                         <label for="min-age">Validade mínima (dias):</label>
                         <input type="number" id="min-age" name="min-age" min="0" max="999" placeholder="1" required>
                         <small style="color: #666;">Entre 0 (pode trocar imediatamente) e 999 dias</small>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-success">Definir Validade Mínima</button>
                     <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
                 </form>
@@ -271,7 +271,7 @@
                         <input type="number" id="max-age" name="max-age" min="0" max="999" placeholder="90" required>
                         <small style="color: #666;">Entre 0 (nunca expira) e 999 dias</small>
                     </div>
-                    
+
                     <div style="background: #f8d7da; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #dc3545;">
                         <h5 style="color: #721c24; margin: 0 0 8px 0;">🚨 Importante:</h5>
                         <p style="color: #721c24; margin: 0; font-size: 14px;">
@@ -280,7 +280,7 @@
                             <strong>30-60:</strong> Alta segurança
                         </p>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-success">Definir Validade Máxima</button>
                     <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
                 </form>
@@ -294,14 +294,14 @@
                     <p style="margin-bottom: 8px;">• Define quantas tentativas de senha incorreta antes de bloquear a conta</p>
                     <p style="color: #666; font-size: 14px;">⚠️ 0 = sem bloqueio (menos seguro)</p>
                 </div>
-                
+
                 <form onsubmit="submitForm(event, 'set-login-attempts')">
                     <div class="form-group">
                         <label for="max-attempts">Máximo de tentativas incorretas:</label>
                         <input type="number" id="max-attempts" name="max-attempts" min="0" max="999" placeholder="5" required>
                         <small style="color: #666;">Entre 0 (sem limite) e 999 tentativas</small>
                     </div>
-                    
+
                     <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #28a745;">
                         <h5 style="color: #155724; margin: 0 0 8px 0;">💡 Recomendações:</h5>
                         <p style="color: #155724; margin: 0; font-size: 14px;">
@@ -310,7 +310,7 @@
                             <strong>10:</strong> Mais flexível
                         </p>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-success">Definir Tentativas</button>
                     <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
                 </form>
@@ -324,14 +324,14 @@
                     <p style="margin-bottom: 8px;">• Define por quanto tempo a conta fica bloqueada após errar a senha</p>
                     <p style="color: #666; font-size: 14px;">⚠️ 0 = bloqueio permanente até desbloqueio manual</p>
                 </div>
-                
+
                 <form onsubmit="submitForm(event, 'set-lockout-duration')">
                     <div class="form-group">
                         <label for="lockout-duration">Duração do bloqueio (minutos):</label>
                         <input type="number" id="lockout-duration" name="lockout-duration" min="0" max="99999" placeholder="30" required>
                         <small style="color: #666;">Entre 0 (permanente) e 99999 minutos</small>
                     </div>
-                    
+
                     <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">
                         <h5 style="color: #856404; margin: 0 0 8px 0;">💡 Exemplos práticos:</h5>
                         <p style="color: #856404; margin: 0; font-size: 14px;">
@@ -340,7 +340,7 @@
                             <strong>1440:</strong> Desbloqueio automático em 24 horas
                         </p>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-success">Definir Duração</button>
                     <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
                 </form>
@@ -354,14 +354,14 @@
                     <p style="margin-bottom: 8px;">• Define quando o contador de tentativas incorretas é zerado</p>
                     <p style="color: #666; font-size: 14px;">Permite que usuário tente novamente após o prazo</p>
                 </div>
-                
+
                 <form onsubmit="submitForm(event, 'set-lockout-reset-time')">
                     <div class="form-group">
                         <label for="reset-time">Tempo para reset (minutos):</label>
                         <input type="number" id="reset-time" name="reset-time" min="0" max="99999" placeholder="30" required>
                         <small style="color: #666;">Entre 0 (nunca reseta) e 99999 minutos</small>
                     </div>
-                    
+
                     <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #28a745;">
                         <h5 style="color: #155724; margin: 0 0 8px 0;">💡 Como funciona:</h5>
                         <p style="color: #155724; margin: 0; font-size: 14px;">
@@ -369,12 +369,12 @@
                             <strong>Exemplo:</strong> Reset = 30 min → contador zera a cada 30 min
                         </p>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-success">Definir Tempo de Reset</button>
                     <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
                 </form>
             </div>
-                
+
                 <!-- Formulário Criar Usuário -->
                 <div id="create-user-form" class="form-container">
                     <h3>Criar Usuário</h3>
@@ -656,7 +656,7 @@
                         <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
                     </form>
                 </div>
-                
+
                 <!-- Formulário Copiar Membros de Grupo -->
                 <div id="copy-group-members-form" class="form-container">
                     <h3>Copiar Membros de um Grupo</h3>
@@ -667,20 +667,20 @@
                         <p style="margin-bottom: 8px;">• <strong>Resultado:</strong> Todos os membros do grupo origem serão adicionados ao grupo destino</p>
                         <p style="color: #666; font-size: 14px;">⚠️ Membros já existentes no destino serão ignorados (sem erro)</p>
                     </div>
-    
+
                     <form onsubmit="submitForm(event, 'copy-group-members')">
                         <div class="form-group">
                             <label for="source-group">Grupo de Origem (copiar membros DE):</label>
                             <input type="text" id="source-group" name="source-group" placeholder="ex: Vendas" required>
                             <small style="color: #666;">Nome do grupo que possui os membros a serem copiados</small>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="target-group">Grupo de Destino (copiar membros PARA):</label>
                             <input type="text" id="target-group" name="target-group" placeholder="ex: Marketing" required>
                             <small style="color: #666;">Nome do grupo que receberá os membros copiados</small>
                         </div>
-                        
+
                         <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">
                             <h5 style="color: #856404; margin: 0 0 8px 0;">⚠️ Exemplo prático:</h5>
                             <p style="color: #856404; margin: 0; font-size: 14px;">
@@ -689,7 +689,7 @@
                                 <strong>Resultado:</strong> "Marketing" ficará com: ana, carlos, joão, maria, pedro
                             </p>
                         </div>
-                        
+
                         <button type="submit" class="btn btn-success">🔄 Copiar Membros do Grupo</button>
                         <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
                     </form>
@@ -1189,8 +1189,9 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-    
+    <script src="script1.js"></script>
+    <script src="script2.js"></script>
+
     <div class="loading" style="display:none"><div class="spinner"></div>Carregando...</div>
     <div class="result-container" style="display:none"></div>
         <div id="confirmOverlay" class="confirm-overlay">
@@ -1209,15 +1210,15 @@
                 <h3 style="margin: 0; color: #2c3e50;">📁 Selecionar Pasta</h3>
                 <button onclick="closeFolderBrowser()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
             </div>
-            
+
             <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-family: monospace;">
                 <strong>Caminho atual:</strong> <span id="currentBrowsePath">/mnt</span>
             </div>
-            
+
             <div id="folderTree" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: white; border-radius: 5px;">
                 <div class="loading-tree">🔄 Carregando pastas...</div>
             </div>
-            
+
             <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
                 <button onclick="selectCurrentPath()" class="btn btn-success">Usar Esta Pasta</button>
                 <button onclick="closeFolderBrowser()" class="btn">Cancelar</button>
