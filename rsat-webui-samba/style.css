@@ -1,0 +1,270 @@
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          padding: 20px;
+        }
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: rgba(255, 255, 255, 0.95);
+          border-radius: 15px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+          overflow: hidden;
+        }
+        .header {
+          background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+          color: white;
+          padding: 30px;
+          text-align: center;
+        }
+        .header h1 {
+          font-size: 2.5em;
+          margin-bottom: 10px;
+          font-weight: 300;
+        }
+        .header p { font-size: 1.1em; opacity: 0.9;}
+        .main-content { padding: 40px; }
+        .menu-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 20px;
+          margin-bottom: 30px;
+        }
+        .menu-card {
+          background: white;
+          border-radius: 10px;
+          padding: 25px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
+          cursor: pointer;
+          border: 2px solid transparent;
+        }
+        .menu-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+          border-color: #3498db;
+        }
+        .menu-card h3 { color: #2c3e50; margin-bottom: 15px; font-size: 1.3em;}
+        .menu-card p { color: #7f8c8d; line-height: 1.6;}
+        .submenu {
+          display: none;
+          margin-top: 30px;
+          padding: 20px;
+          background: #f8f9fa;
+          border-radius: 10px;
+        }
+        .submenu.active { display: block; }
+        .submenu h3 {
+          color: #2c3e50;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 2px solid #3498db;
+        }
+        .submenu-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 15px;
+        }
+        .submenu-item {
+          background: white;
+          padding: 15px;
+          border-radius: 8px;
+          border-left: 4px solid #3498db;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .submenu-item:hover { background: #3498db; color: white;}
+        .form-container {
+          display: none;
+          margin-top: 20px;
+          padding: 25px;
+          background: white;
+          border-radius: 10px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .form-container.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: 600;
+          color: #2c3e50;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+          width: 100%;
+          padding: 12px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          font-size: 14px;
+          transition: border-color 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+          outline: none;
+          border-color: #3498db;
+        }
+        .btn {
+          background: #3498db;
+          color: white;
+          padding: 12px 25px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 16px;
+          transition: background 0.3s ease;
+          margin-right: 10px;
+        }
+        .btn:hover { background: #2980b9;}
+        .btn-danger { background: #e74c3c;}
+        .btn-danger:hover { background: #c0392b;}
+        .btn-success { background: #27ae60;}
+        .btn-success:hover { background: #229954;}
+        .back-btn {
+          background: #95a5a6;
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          margin-bottom: 20px;
+        }
+        .back-btn:hover { background: #7f8c8d;}
+        .result-container {
+          margin-top: 20px;
+          padding: 20px;
+          background: #f8f9fa;
+          border-radius: 10px;
+          border-left: 4px solid #3498db;
+          display: none;
+        }
+        .result-container.active { display: block;}
+        .result-container pre {
+          background: #2c3e50;
+          color: #ecf0f1;
+          padding: 15px;
+          border-radius: 6px;
+          overflow-x: auto;
+          font-family: 'Courier New', monospace;
+        }
+        .loading { display: none; text-align: center; padding: 20px;}
+        .loading.active { display: block;}
+        .spinner {
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #3498db;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 10px;
+        }
+        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 6px; display: none;}
+        .alert.active { display: block;}
+        .alert-success {
+          background: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+          background: #f8d7da;
+          color: #721c24;
+          border: 1px solid #f5c6cb;
+        }
+        .alert-warning {
+          background: #fff3cd;
+          color: #856404;
+          border: 1px solid #ffeaa7;
+        }
+        .checkbox-group {
+          display: flex;
+          align-items: center;
+          margin-bottom: 15px;
+        }
+        .checkbox-group input[type="checkbox"],
+        .checkbox-group input[type="radio"] {
+          width: auto;
+          margin-right: 10px;
+        }
+        .domain-info {
+          background: #f8f9fa;
+          padding: 20px;
+          border-radius: 10px;
+          margin-bottom: 20px;
+        }
+        .domain-info h4 { color: #2c3e50; margin-bottom: 10px;}
+        .domain-info p { color: #7f8c8d; margin-bottom: 5px;}
+        .instruction-panel {
+          background: #f9f9f9;
+          border-radius: 10px;
+          padding: 22px 24px;
+          margin: 18px 0 24px 0;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+          display: none;
+          max-width: 600px;
+        }
+        .confirm-overlay {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0, 0, 0, 0.5); z-index: 9999; display: none;
+          align-items: center; justify-content: center;
+        }
+        .confirm-overlay.active { display: flex; }
+        .confirm-box {
+          background: white; border-radius: 10px; padding: 25px;
+          max-width: 400px; width: 90%; text-align: center;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .confirm-message { font-size: 18px; color: #2c3e50; margin-bottom: 25px; }
+        .confirm-buttons { display: flex; gap: 15px; justify-content: center; }
+        .confirm-btn { padding: 12px 25px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; min-width: 80px; }
+        .confirm-btn-yes { background: #e74c3c; color: white; }
+        .confirm-btn-no { background: #95a5a6; color: white;
+        }
+        /* Melhorias para radio buttons */
+        .checkbox-group input[type="radio"] {
+          width: 18px;
+          height: 18px;
+          margin-right: 10px;
+          accent-color: #3498db;
+        }
+
+        .checkbox-group label {
+          font-size: 16px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+        }
+
+        .checkbox-group:hover {
+          background: rgba(52, 152, 219, 0.1);
+          border-radius: 5px;
+          padding: 5px;
+          margin: -5px;
+        }
+        /* Estilos para o browser de pastas */
+        .folder-item {
+          transition: all 0.2s ease;
+        }
+
+        .folder-item:hover {
+          transform: translateX(2px);
+        }
+
+        .loading-tree {
+          text-align: center;
+          padding: 20px;
+          color: #666;
+        }
+
+        #folderTree {
+        font-size: 14px;
+        line-height: 1.4;
+        }
+
+        #folderTree .folder-item.current {
+        margin-bottom: 15px;
+        }
