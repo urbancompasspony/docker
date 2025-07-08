@@ -1,0 +1,20 @@
+docker stop SAMBA_SHARE
+docker rm SAMBA_SHARE
+
+docker run -d \
+-h SAMBA_SHARE \
+--ip 172.20.0.55 \
+--name SAMBA_SHARE \
+--privileged \
+--dns=1.1.1.1 \
+--restart=unless-stopped \
+-v /etc/localtime:/etc/localtime:ro \
+--network macvlan \
+--no-healthcheck \
+-v /srv/containers/inova/cache/samba:/var/cache/samba \
+-v /srv/containers/inova/lib/samba:/var/lib/samba \
+-v /srv/containers/inova/log:/var/log \
+-v /srv/containers/inova/run/samba:/run/samba \
+-v /srv/containers/inova/etc:/etc \
+-v /mnt/3tb1:/mnt/3tb1 -v /mnt/vm:/mnt/vm -v /mnt/diogo:/mnt/diogo \
+urbancompasspony/migrate-samba
