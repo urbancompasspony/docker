@@ -186,194 +186,194 @@
 
             <!-- Área de Formulários -->
             <div id="form-area">
-<!-- Formulário Histórico de Senhas -->
-<div id="password-history-form" class="form-container">
-    <h3>Configurar Histórico de Senhas</h3>
-    <div class="instruction-panel" style="display: block; background: #e8f4fd; border-left: 4px solid #2196F3;">
-        <h4 style="color: #1976D2; margin-bottom: 10px;">💡 Como funciona:</h4>
-        <p style="margin-bottom: 8px;">• <strong>Histórico = 0:</strong> Usuários podem reutilizar a mesma senha imediatamente</p>
-        <p style="margin-bottom: 8px;">• <strong>Histórico = 24:</strong> Usuários devem usar 24 senhas diferentes antes de reutilizar</p>
-        <p style="color: #666; font-size: 14px;">⚠️ Valor recomendado: entre 12 e 24 senhas</p>
-    </div>
-    
-    <form onsubmit="submitForm(event, 'set-password-history')">
-        <div class="form-group">
-            <label for="history-length">Tamanho do histórico (número de senhas):</label>
-            <input type="number" id="history-length" name="history-length" min="0" max="1024" placeholder="24" required>
-            <small style="color: #666;">Entre 0 (sem histórico) e 1024 senhas</small>
-        </div>
-        
-        <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">
-            <h5 style="color: #856404; margin: 0 0 8px 0;">⚠️ Exemplos práticos:</h5>
-            <p style="color: #856404; margin: 0; font-size: 14px;">
-                <strong>0:</strong> Pode usar sempre a mesma senha<br>
-                <strong>12:</strong> Deve criar 12 senhas diferentes antes de reutilizar<br>
-                <strong>24:</strong> Deve criar 24 senhas diferentes (recomendado)
-            </p>
-        </div>
-        
-        <button type="submit" class="btn btn-success">Definir Histórico</button>
-        <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
-    </form>
-</div>
+            <!-- Formulário Histórico de Senhas -->
+            <div id="password-history-form" class="form-container">
+                <h3>Configurar Histórico de Senhas</h3>
+                <div class="instruction-panel" style="display: block; background: #e8f4fd; border-left: 4px solid #2196F3;">
+                    <h4 style="color: #1976D2; margin-bottom: 10px;">💡 Como funciona:</h4>
+                    <p style="margin-bottom: 8px;">• <strong>Histórico = 0:</strong> Usuários podem reutilizar a mesma senha imediatamente</p>
+                    <p style="margin-bottom: 8px;">• <strong>Histórico = 24:</strong> Usuários devem usar 24 senhas diferentes antes de reutilizar</p>
+                    <p style="color: #666; font-size: 14px;">⚠️ Valor recomendado: entre 12 e 24 senhas</p>
+                </div>
+                
+                <form onsubmit="submitForm(event, 'set-password-history')">
+                    <div class="form-group">
+                        <label for="history-length">Tamanho do histórico (número de senhas):</label>
+                        <input type="number" id="history-length" name="history-length" min="0" max="1024" placeholder="24" required>
+                        <small style="color: #666;">Entre 0 (sem histórico) e 1024 senhas</small>
+                    </div>
+                    
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">
+                        <h5 style="color: #856404; margin: 0 0 8px 0;">⚠️ Exemplos práticos:</h5>
+                        <p style="color: #856404; margin: 0; font-size: 14px;">
+                            <strong>0:</strong> Pode usar sempre a mesma senha<br>
+                            <strong>12:</strong> Deve criar 12 senhas diferentes antes de reutilizar<br>
+                            <strong>24:</strong> Deve criar 24 senhas diferentes (recomendado)
+                        </p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Definir Histórico</button>
+                    <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
+                </form>
+            </div>
 
-<!-- Formulário Tamanho Mínimo de Senha -->
-<div id="password-min-length-form" class="form-container">
-    <h3>Configurar Tamanho Mínimo de Senhas</h3>
-    <form onsubmit="submitForm(event, 'set-password-min-length')">
-        <div class="form-group">
-            <label for="min-length">Tamanho mínimo da senha (caracteres):</label>
-            <input type="number" id="min-length" name="min-length" min="0" max="255" placeholder="7" required>
-            <small style="color: #666;">Entre 0 (sem limite) e 255 caracteres</small>
-        </div>
-        
-        <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #28a745;">
-            <h5 style="color: #155724; margin: 0 0 8px 0;">💡 Recomendações:</h5>
-            <p style="color: #155724; margin: 0; font-size: 14px;">
-                <strong>7-8:</strong> Mínimo básico<br>
-                <strong>12:</strong> Recomendado para segurança média<br>
-                <strong>16+:</strong> Alta segurança
-            </p>
-        </div>
-        
-        <button type="submit" class="btn btn-success">Definir Tamanho Mínimo</button>
-        <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
-    </form>
-</div>
+            <!-- Formulário Tamanho Mínimo de Senha -->
+            <div id="password-min-length-form" class="form-container">
+                <h3>Configurar Tamanho Mínimo de Senhas</h3>
+                <form onsubmit="submitForm(event, 'set-password-min-length')">
+                    <div class="form-group">
+                        <label for="min-length">Tamanho mínimo da senha (caracteres):</label>
+                        <input type="number" id="min-length" name="min-length" min="0" max="255" placeholder="7" required>
+                        <small style="color: #666;">Entre 0 (sem limite) e 255 caracteres</small>
+                    </div>
+                    
+                    <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #28a745;">
+                        <h5 style="color: #155724; margin: 0 0 8px 0;">💡 Recomendações:</h5>
+                        <p style="color: #155724; margin: 0; font-size: 14px;">
+                            <strong>7-8:</strong> Mínimo básico<br>
+                            <strong>12:</strong> Recomendado para segurança média<br>
+                            <strong>16+:</strong> Alta segurança
+                        </p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Definir Tamanho Mínimo</button>
+                    <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
+                </form>
+            </div>
 
-<!-- Formulário Validade Mínima de Senhas -->
-<div id="password-min-age-form" class="form-container">
-    <h3>Configurar Validade Mínima de Senhas</h3>
-    <div class="instruction-panel" style="display: block; background: #fff3cd; border-left: 4px solid #ffc107;">
-        <h4 style="color: #856404; margin-bottom: 10px;">⚠️ Atenção:</h4>
-        <p style="margin-bottom: 8px;">• <strong>Validade mínima:</strong> Tempo que o usuário deve esperar antes de trocar a senha novamente</p>
-        <p style="color: #666; font-size: 14px;">Evita que usuários troquem rapidamente para voltar à senha antiga</p>
-    </div>
-    
-    <form onsubmit="submitForm(event, 'set-password-min-age')">
-        <div class="form-group">
-            <label for="min-age">Validade mínima (dias):</label>
-            <input type="number" id="min-age" name="min-age" min="0" max="999" placeholder="1" required>
-            <small style="color: #666;">Entre 0 (pode trocar imediatamente) e 999 dias</small>
-        </div>
-        
-        <button type="submit" class="btn btn-success">Definir Validade Mínima</button>
-        <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
-    </form>
-</div>
+            <!-- Formulário Validade Mínima de Senhas -->
+            <div id="password-min-age-form" class="form-container">
+                <h3>Configurar Validade Mínima de Senhas</h3>
+                <div class="instruction-panel" style="display: block; background: #fff3cd; border-left: 4px solid #ffc107;">
+                    <h4 style="color: #856404; margin-bottom: 10px;">⚠️ Atenção:</h4>
+                    <p style="margin-bottom: 8px;">• <strong>Validade mínima:</strong> Tempo que o usuário deve esperar antes de trocar a senha novamente</p>
+                    <p style="color: #666; font-size: 14px;">Evita que usuários troquem rapidamente para voltar à senha antiga</p>
+                </div>
+                
+                <form onsubmit="submitForm(event, 'set-password-min-age')">
+                    <div class="form-group">
+                        <label for="min-age">Validade mínima (dias):</label>
+                        <input type="number" id="min-age" name="min-age" min="0" max="999" placeholder="1" required>
+                        <small style="color: #666;">Entre 0 (pode trocar imediatamente) e 999 dias</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Definir Validade Mínima</button>
+                    <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
+                </form>
+            </div>
 
-<!-- Formulário Validade Máxima de Senhas -->
-<div id="password-max-age-form" class="form-container">
-    <h3>Configurar Validade Máxima de Senhas</h3>
-    <form onsubmit="submitForm(event, 'set-password-max-age')">
-        <div class="form-group">
-            <label for="max-age">Validade máxima (dias):</label>
-            <input type="number" id="max-age" name="max-age" min="0" max="999" placeholder="90" required>
-            <small style="color: #666;">Entre 0 (nunca expira) e 999 dias</small>
-        </div>
-        
-        <div style="background: #f8d7da; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #dc3545;">
-            <h5 style="color: #721c24; margin: 0 0 8px 0;">🚨 Importante:</h5>
-            <p style="color: #721c24; margin: 0; font-size: 14px;">
-                <strong>0:</strong> Senhas nunca expiram (menos seguro)<br>
-                <strong>90:</strong> Recomendado para empresas<br>
-                <strong>30-60:</strong> Alta segurança
-            </p>
-        </div>
-        
-        <button type="submit" class="btn btn-success">Definir Validade Máxima</button>
-        <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
-    </form>
-</div>
+            <!-- Formulário Validade Máxima de Senhas -->
+            <div id="password-max-age-form" class="form-container">
+                <h3>Configurar Validade Máxima de Senhas</h3>
+                <form onsubmit="submitForm(event, 'set-password-max-age')">
+                    <div class="form-group">
+                        <label for="max-age">Validade máxima (dias):</label>
+                        <input type="number" id="max-age" name="max-age" min="0" max="999" placeholder="90" required>
+                        <small style="color: #666;">Entre 0 (nunca expira) e 999 dias</small>
+                    </div>
+                    
+                    <div style="background: #f8d7da; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #dc3545;">
+                        <h5 style="color: #721c24; margin: 0 0 8px 0;">🚨 Importante:</h5>
+                        <p style="color: #721c24; margin: 0; font-size: 14px;">
+                            <strong>0:</strong> Senhas nunca expiram (menos seguro)<br>
+                            <strong>90:</strong> Recomendado para empresas<br>
+                            <strong>30-60:</strong> Alta segurança
+                        </p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Definir Validade Máxima</button>
+                    <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
+                </form>
+            </div>
 
-<!-- Formulário Tentativas de Login -->
-<div id="login-attempts-form" class="form-container">
-    <h3>Configurar Tentativas de Login</h3>
-    <div class="instruction-panel" style="display: block; background: #f8d7da; border-left: 4px solid #dc3545;">
-        <h4 style="color: #721c24; margin-bottom: 10px;">🔒 Bloqueio de Conta:</h4>
-        <p style="margin-bottom: 8px;">• Define quantas tentativas de senha incorreta antes de bloquear a conta</p>
-        <p style="color: #666; font-size: 14px;">⚠️ 0 = sem bloqueio (menos seguro)</p>
-    </div>
-    
-    <form onsubmit="submitForm(event, 'set-login-attempts')">
-        <div class="form-group">
-            <label for="max-attempts">Máximo de tentativas incorretas:</label>
-            <input type="number" id="max-attempts" name="max-attempts" min="0" max="999" placeholder="5" required>
-            <small style="color: #666;">Entre 0 (sem limite) e 999 tentativas</small>
-        </div>
-        
-        <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #28a745;">
-            <h5 style="color: #155724; margin: 0 0 8px 0;">💡 Recomendações:</h5>
-            <p style="color: #155724; margin: 0; font-size: 14px;">
-                <strong>3:</strong> Muito restritivo<br>
-                <strong>5:</strong> Recomendado para empresas<br>
-                <strong>10:</strong> Mais flexível
-            </p>
-        </div>
-        
-        <button type="submit" class="btn btn-success">Definir Tentativas</button>
-        <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
-    </form>
-</div>
+            <!-- Formulário Tentativas de Login -->
+            <div id="login-attempts-form" class="form-container">
+                <h3>Configurar Tentativas de Login</h3>
+                <div class="instruction-panel" style="display: block; background: #f8d7da; border-left: 4px solid #dc3545;">
+                    <h4 style="color: #721c24; margin-bottom: 10px;">🔒 Bloqueio de Conta:</h4>
+                    <p style="margin-bottom: 8px;">• Define quantas tentativas de senha incorreta antes de bloquear a conta</p>
+                    <p style="color: #666; font-size: 14px;">⚠️ 0 = sem bloqueio (menos seguro)</p>
+                </div>
+                
+                <form onsubmit="submitForm(event, 'set-login-attempts')">
+                    <div class="form-group">
+                        <label for="max-attempts">Máximo de tentativas incorretas:</label>
+                        <input type="number" id="max-attempts" name="max-attempts" min="0" max="999" placeholder="5" required>
+                        <small style="color: #666;">Entre 0 (sem limite) e 999 tentativas</small>
+                    </div>
+                    
+                    <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #28a745;">
+                        <h5 style="color: #155724; margin: 0 0 8px 0;">💡 Recomendações:</h5>
+                        <p style="color: #155724; margin: 0; font-size: 14px;">
+                            <strong>3:</strong> Muito restritivo<br>
+                            <strong>5:</strong> Recomendado para empresas<br>
+                            <strong>10:</strong> Mais flexível
+                        </p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Definir Tentativas</button>
+                    <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
+                </form>
+            </div>
 
-<!-- Formulário Duração do Bloqueio -->
-<div id="lockout-duration-form" class="form-container">
-    <h3>Configurar Duração do Bloqueio</h3>
-    <div class="instruction-panel" style="display: block; background: #f8d7da; border-left: 4px solid #dc3545;">
-        <h4 style="color: #721c24; margin-bottom: 10px;">⏰ Duração do Bloqueio:</h4>
-        <p style="margin-bottom: 8px;">• Define por quanto tempo a conta fica bloqueada após errar a senha</p>
-        <p style="color: #666; font-size: 14px;">⚠️ 0 = bloqueio permanente até desbloqueio manual</p>
-    </div>
-    
-    <form onsubmit="submitForm(event, 'set-lockout-duration')">
-        <div class="form-group">
-            <label for="lockout-duration">Duração do bloqueio (minutos):</label>
-            <input type="number" id="lockout-duration" name="lockout-duration" min="0" max="99999" placeholder="30" required>
-            <small style="color: #666;">Entre 0 (permanente) e 99999 minutos</small>
-        </div>
-        
-        <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">
-            <h5 style="color: #856404; margin: 0 0 8px 0;">💡 Exemplos práticos:</h5>
-            <p style="color: #856404; margin: 0; font-size: 14px;">
-                <strong>0:</strong> Bloqueio permanente (admin deve desbloquear)<br>
-                <strong>30:</strong> Desbloqueio automático em 30 minutos<br>
-                <strong>1440:</strong> Desbloqueio automático em 24 horas
-            </p>
-        </div>
-        
-        <button type="submit" class="btn btn-success">Definir Duração</button>
-        <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
-    </form>
-</div>
+            <!-- Formulário Duração do Bloqueio -->
+            <div id="lockout-duration-form" class="form-container">
+                <h3>Configurar Duração do Bloqueio</h3>
+                <div class="instruction-panel" style="display: block; background: #f8d7da; border-left: 4px solid #dc3545;">
+                    <h4 style="color: #721c24; margin-bottom: 10px;">⏰ Duração do Bloqueio:</h4>
+                    <p style="margin-bottom: 8px;">• Define por quanto tempo a conta fica bloqueada após errar a senha</p>
+                    <p style="color: #666; font-size: 14px;">⚠️ 0 = bloqueio permanente até desbloqueio manual</p>
+                </div>
+                
+                <form onsubmit="submitForm(event, 'set-lockout-duration')">
+                    <div class="form-group">
+                        <label for="lockout-duration">Duração do bloqueio (minutos):</label>
+                        <input type="number" id="lockout-duration" name="lockout-duration" min="0" max="99999" placeholder="30" required>
+                        <small style="color: #666;">Entre 0 (permanente) e 99999 minutos</small>
+                    </div>
+                    
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">
+                        <h5 style="color: #856404; margin: 0 0 8px 0;">💡 Exemplos práticos:</h5>
+                        <p style="color: #856404; margin: 0; font-size: 14px;">
+                            <strong>0:</strong> Bloqueio permanente (admin deve desbloquear)<br>
+                            <strong>30:</strong> Desbloqueio automático em 30 minutos<br>
+                            <strong>1440:</strong> Desbloqueio automático em 24 horas
+                        </p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Definir Duração</button>
+                    <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
+                </form>
+            </div>
 
-<!-- Formulário Tempo para Reset -->
-<div id="lockout-reset-form" class="form-container">
-    <h3>Configurar Reset do Contador</h3>
-    <div class="instruction-panel" style="display: block; background: #e8f4fd; border-left: 4px solid #2196F3;">
-        <h4 style="color: #1976D2; margin-bottom: 10px;">🔄 Reset do Contador:</h4>
-        <p style="margin-bottom: 8px;">• Define quando o contador de tentativas incorretas é zerado</p>
-        <p style="color: #666; font-size: 14px;">Permite que usuário tente novamente após o prazo</p>
-    </div>
-    
-    <form onsubmit="submitForm(event, 'set-lockout-reset-time')">
-        <div class="form-group">
-            <label for="reset-time">Tempo para reset (minutos):</label>
-            <input type="number" id="reset-time" name="reset-time" min="0" max="99999" placeholder="30" required>
-            <small style="color: #666;">Entre 0 (nunca reseta) e 99999 minutos</small>
-        </div>
-        
-        <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #28a745;">
-            <h5 style="color: #155724; margin: 0 0 8px 0;">💡 Como funciona:</h5>
-            <p style="color: #155724; margin: 0; font-size: 14px;">
-                Se usuário errar 3x e esperar 30 min, pode tentar novamente.<br>
-                <strong>Exemplo:</strong> Reset = 30 min → contador zera a cada 30 min
-            </p>
-        </div>
-        
-        <button type="submit" class="btn btn-success">Definir Tempo de Reset</button>
-        <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
-    </form>
-</div>
+            <!-- Formulário Tempo para Reset -->
+            <div id="lockout-reset-form" class="form-container">
+                <h3>Configurar Reset do Contador</h3>
+                <div class="instruction-panel" style="display: block; background: #e8f4fd; border-left: 4px solid #2196F3;">
+                    <h4 style="color: #1976D2; margin-bottom: 10px;">🔄 Reset do Contador:</h4>
+                    <p style="margin-bottom: 8px;">• Define quando o contador de tentativas incorretas é zerado</p>
+                    <p style="color: #666; font-size: 14px;">Permite que usuário tente novamente após o prazo</p>
+                </div>
+                
+                <form onsubmit="submitForm(event, 'set-lockout-reset-time')">
+                    <div class="form-group">
+                        <label for="reset-time">Tempo para reset (minutos):</label>
+                        <input type="number" id="reset-time" name="reset-time" min="0" max="99999" placeholder="30" required>
+                        <small style="color: #666;">Entre 0 (nunca reseta) e 99999 minutos</small>
+                    </div>
+                    
+                    <div style="background: #d4edda; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #28a745;">
+                        <h5 style="color: #155724; margin: 0 0 8px 0;">💡 Como funciona:</h5>
+                        <p style="color: #155724; margin: 0; font-size: 14px;">
+                            Se usuário errar 3x e esperar 30 min, pode tentar novamente.<br>
+                            <strong>Exemplo:</strong> Reset = 30 min → contador zera a cada 30 min
+                        </p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Definir Tempo de Reset</button>
+                    <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
+                </form>
+            </div>
                 
                 <!-- Formulário Criar Usuário -->
                 <div id="create-user-form" class="form-container">
@@ -485,102 +485,102 @@
                     </form>
                 </div>
 
-<!-- Formulário Verificar Senha do Usuário -->
-<!-- Formulário Expiração de Senha -->
-<div id="password-expiry-form" class="form-container">
-    <h3>Configurar Expiração de Senha</h3>
-    <form onsubmit="handlePasswordExpiry(event)">
-        <div class="form-group">
-            <label for="expiry-username">Nome do Usuário:</label>
-            <input type="text" id="expiry-username" name="username" required>
-        </div>
-        <button type="submit" class="btn btn-success">Configurar Expiração</button>
-        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
-    </form>
-</div>
-
-<!-- Formulário Dias para Expirar -->
-<div id="password-expiry-days-form" class="form-container">
-    <h3>Definir Dias para Expiração</h3>
-    <form onsubmit="submitForm(event, 'password-expiry-days')">
-        <div class="form-group">
-            <label for="expiry-days-username">Nome do Usuário:</label>
-            <input type="text" id="expiry-days-username" name="username" required>
-        </div>
-        <div class="form-group">
-            <label for="expiry-days">Dias para expiração:</label>
-            <input type="number" id="expiry-days" name="days" min="0" required>
-        </div>
-        <button type="submit" class="btn btn-success">Definir Prazo</button>
-        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
-    </form>
-</div>
-
-<!-- Formulário Definir Expiração da Conta -->
-<div id="account-expiry-form" class="form-container">
-    <h3>Usuário deve expirar?</h3>
-    <form onsubmit="handleAccountExpiry(event)">
-        <div class="form-group">
-            <label for="account-expiry-username">Nome do Usuário:</label>
-            <input type="text" id="account-expiry-username" name="username" required>
-        </div>
-
-        <div class="form-group">
-            <label style="font-weight: 600; color: #2c3e50; margin-bottom: 15px; display: block;">Opções de Expiração:</label>
-
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <div class="checkbox-group" style="margin-bottom: 15px;">
-                    <input type="radio" id="expiry-date-option" name="expiry-type" value="date" checked onchange="toggleExpiryFields()">
-                    <label for="expiry-date-option" style="font-weight: normal;">📅 Definir data específica de expiração</label>
+                <!-- Formulário Verificar Senha do Usuário -->
+                <!-- Formulário Expiração de Senha -->
+                <div id="password-expiry-form" class="form-container">
+                    <h3>Configurar Expiração de Senha</h3>
+                    <form onsubmit="handlePasswordExpiry(event)">
+                        <div class="form-group">
+                            <label for="expiry-username">Nome do Usuário:</label>
+                            <input type="text" id="expiry-username" name="username" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Configurar Expiração</button>
+                        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
+                    </form>
                 </div>
 
-                <div id="date-field" style="margin-left: 25px; margin-bottom: 15px;">
-                    <label for="account-expiry-date" style="font-size: 14px; color: #666;">Data de expiração:</label>
-                    <input type="date" id="account-expiry-date" name="expiry-date" style="margin-top: 5px;">
-                    <small style="color: #666; display: block; margin-top: 5px;">A conta será desabilitada nesta data</small>
+                <!-- Formulário Dias para Expirar -->
+                <div id="password-expiry-days-form" class="form-container">
+                    <h3>Definir Dias para Expiração</h3>
+                    <form onsubmit="submitForm(event, 'password-expiry-days')">
+                        <div class="form-group">
+                            <label for="expiry-days-username">Nome do Usuário:</label>
+                            <input type="text" id="expiry-days-username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expiry-days">Dias para expiração:</label>
+                            <input type="number" id="expiry-days" name="days" min="0" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Definir Prazo</button>
+                        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
+                    </form>
                 </div>
 
-                <div class="checkbox-group">
-                    <input type="radio" id="never-expire-option" name="expiry-type" value="never" onchange="toggleExpiryFields()">
-                    <label for="never-expire-option" style="font-weight: normal;">∞ Conta nunca expira</label>
+                <!-- Formulário Definir Expiração da Conta -->
+                <div id="account-expiry-form" class="form-container">
+                    <h3>Usuário deve expirar?</h3>
+                    <form onsubmit="handleAccountExpiry(event)">
+                        <div class="form-group">
+                            <label for="account-expiry-username">Nome do Usuário:</label>
+                            <input type="text" id="account-expiry-username" name="username" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="font-weight: 600; color: #2c3e50; margin-bottom: 15px; display: block;">Opções de Expiração:</label>
+
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                                <div class="checkbox-group" style="margin-bottom: 15px;">
+                                    <input type="radio" id="expiry-date-option" name="expiry-type" value="date" checked onchange="toggleExpiryFields()">
+                                    <label for="expiry-date-option" style="font-weight: normal;">📅 Definir data específica de expiração</label>
+                                </div>
+
+                                <div id="date-field" style="margin-left: 25px; margin-bottom: 15px;">
+                                    <label for="account-expiry-date" style="font-size: 14px; color: #666;">Data de expiração:</label>
+                                    <input type="date" id="account-expiry-date" name="expiry-date" style="margin-top: 5px;">
+                                    <small style="color: #666; display: block; margin-top: 5px;">A conta será desabilitada nesta data</small>
+                                </div>
+
+                                <div class="checkbox-group">
+                                    <input type="radio" id="never-expire-option" name="expiry-type" value="never" onchange="toggleExpiryFields()">
+                                    <label for="never-expire-option" style="font-weight: normal;">∞ Conta nunca expira</label>
+                                </div>
+                                <small style="color: #666; display: block; margin-left: 25px; margin-top: 5px;">A conta permanecerá ativa indefinidamente</small>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Configurar Expiração</button>
+                        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
+                    </form>
                 </div>
-                <small style="color: #666; display: block; margin-left: 25px; margin-top: 5px;">A conta permanecerá ativa indefinidamente</small>
-            </div>
-        </div>
 
-        <button type="submit" class="btn btn-success">Configurar Expiração</button>
-        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
-    </form>
-</div>
+                <!-- Formulário Forçar Troca de Senha -->
+                <div id="force-password-change-form" class="form-container">
+                    <h3>Forçar Troca de Senha Imediata</h3>
+                    <form onsubmit="submitForm(event, 'force-password-change')">
+                        <div class="form-group">
+                            <label for="force-change-username">Nome do Usuário:</label>
+                            <input type="text" id="force-change-username" name="username" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Forçar Troca Imediata</button>
+                        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
+                    </form>
+                </div>
 
-<!-- Formulário Forçar Troca de Senha -->
-<div id="force-password-change-form" class="form-container">
-    <h3>Forçar Troca de Senha Imediata</h3>
-    <form onsubmit="submitForm(event, 'force-password-change')">
-        <div class="form-group">
-            <label for="force-change-username">Nome do Usuário:</label>
-            <input type="text" id="force-change-username" name="username" required>
-        </div>
-        <button type="submit" class="btn btn-danger">Forçar Troca Imediata</button>
-        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
-    </form>
-</div>
-
-<div id="verify-password-form" class="form-container">
-    <h3>Verificar Senha do Usuário</h3>
-    <form onsubmit="submitForm(event, 'verify-password')">
-        <div class="form-group">
-            <label for="verify-username">Nome do Usuário:</label>
-            <input type="text" id="verify-username" name="username" required>
-        </div>
-        <div class="form-group">
-            <label for="verify-password">Senha:</label>
-            <input type="password" id="verify-password" name="password" required>
-        </div>
-        <button type="submit" class="btn btn-info">Verificar Senha</button>
-        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
-    </form>
-</div>
+                <div id="verify-password-form" class="form-container">
+                    <h3>Verificar Senha do Usuário</h3>
+                    <form onsubmit="submitForm(event, 'verify-password')">
+                        <div class="form-group">
+                            <label for="verify-username">Nome do Usuário:</label>
+                            <input type="text" id="verify-username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="verify-password">Senha:</label>
+                            <input type="password" id="verify-password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-info">Verificar Senha</button>
+                        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
+                    </form>
+                </div>
 
                 <!-- Formulário Criar Grupo -->
                 <div id="create-group-form" class="form-container">
@@ -612,88 +612,88 @@
                     </form>
                 </div>
 
-<!-- Formulário Adicionar Grupo ao Grupo -->
-<div id="add-group-to-group-form" class="form-container">
-    <h3>Adicionar Grupo a outro Grupo</h3>
-    <form onsubmit="submitForm(event, 'add-group-to-group')">
-        <div class="form-group">
-            <label for="source-group-name">Grupo de Origem (que será adicionado):</label>
-            <input type="text" id="source-group-name" name="source-group" placeholder="ex: TI_Desenvolvedores" required>
-            <small style="color: #666;">Nome do grupo que será membro de outro grupo</small>
-        </div>
-        <div class="form-group">
-            <label for="target-group-name">Grupo de Destino (que receberá o grupo):</label>
-            <input type="text" id="target-group-name" name="target-group" placeholder="ex: TI_Todos" required>
-            <small style="color: #666;">Nome do grupo que receberá o novo membro</small>
-        </div>
-        <div style="background: #e8f4fd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #2196F3;">
-            <h5 style="color: #1976D2; margin: 0 0 8px 0;">💡 Exemplo:</h5>
-            <p style="color: #1976D2; margin: 0; font-size: 14px;">
-                Origem: "TI_Desenvolvedores" → Destino: "TI_Todos"<br>
-                <strong>Resultado:</strong> Grupo "TI_Desenvolvedores" se torna membro de "TI_Todos"
-            </p>
-        </div>
-        <button type="submit" class="btn btn-success">Adicionar Grupo ao Grupo</button>
-        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
-    </form>
-</div>
+                <!-- Formulário Adicionar Grupo ao Grupo -->
+                <div id="add-group-to-group-form" class="form-container">
+                    <h3>Adicionar Grupo a outro Grupo</h3>
+                    <form onsubmit="submitForm(event, 'add-group-to-group')">
+                        <div class="form-group">
+                            <label for="source-group-name">Grupo de Origem (que será adicionado):</label>
+                            <input type="text" id="source-group-name" name="source-group" placeholder="ex: TI_Desenvolvedores" required>
+                            <small style="color: #666;">Nome do grupo que será membro de outro grupo</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="target-group-name">Grupo de Destino (que receberá o grupo):</label>
+                            <input type="text" id="target-group-name" name="target-group" placeholder="ex: TI_Todos" required>
+                            <small style="color: #666;">Nome do grupo que receberá o novo membro</small>
+                        </div>
+                        <div style="background: #e8f4fd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #2196F3;">
+                            <h5 style="color: #1976D2; margin: 0 0 8px 0;">💡 Exemplo:</h5>
+                            <p style="color: #1976D2; margin: 0; font-size: 14px;">
+                                Origem: "TI_Desenvolvedores" → Destino: "TI_Todos"<br>
+                                <strong>Resultado:</strong> Grupo "TI_Desenvolvedores" se torna membro de "TI_Todos"
+                            </p>
+                        </div>
+                        <button type="submit" class="btn btn-success">Adicionar Grupo ao Grupo</button>
+                        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
+                    </form>
+                </div>
 
-<!-- Formulário Remover Grupo do Grupo -->
-<div id="remove-group-from-group-form" class="form-container">
-    <h3>Remover Grupo de outro Grupo</h3>
-    <form onsubmit="submitForm(event, 'remove-group-from-group')">
-        <div class="form-group">
-            <label for="remove-source-group">Grupo a ser Removido:</label>
-            <input type="text" id="remove-source-group" name="source-group" placeholder="ex: TI_Desenvolvedores" required>
-            <small style="color: #666;">Nome do grupo que será removido</small>
-        </div>
-        <div class="form-group">
-            <label for="remove-target-group">Grupo Principal:</label>
-            <input type="text" id="remove-target-group" name="target-group" placeholder="ex: TI_Todos" required>
-            <small style="color: #666;">Nome do grupo do qual o outro será removido</small>
-        </div>
-        <button type="submit" class="btn btn-danger">Remover Grupo do Grupo</button>
-        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
-    </form>
-</div>
+                <!-- Formulário Remover Grupo do Grupo -->
+                <div id="remove-group-from-group-form" class="form-container">
+                    <h3>Remover Grupo de outro Grupo</h3>
+                    <form onsubmit="submitForm(event, 'remove-group-from-group')">
+                        <div class="form-group">
+                            <label for="remove-source-group">Grupo a ser Removido:</label>
+                            <input type="text" id="remove-source-group" name="source-group" placeholder="ex: TI_Desenvolvedores" required>
+                            <small style="color: #666;">Nome do grupo que será removido</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="remove-target-group">Grupo Principal:</label>
+                            <input type="text" id="remove-target-group" name="target-group" placeholder="ex: TI_Todos" required>
+                            <small style="color: #666;">Nome do grupo do qual o outro será removido</small>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Remover Grupo do Grupo</button>
+                        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
+                    </form>
+                </div>
                 
                 <!-- Formulário Copiar Membros de Grupo -->
-<div id="copy-group-members-form" class="form-container">
-    <h3>Copiar Membros de um Grupo</h3>
-    <div class="instruction-panel" style="display: block; background: #e8f4fd; border-left: 4px solid #2196F3;">
-        <h4 style="color: #1976D2; margin-bottom: 10px;">💡 Como funciona:</h4>
-        <p style="margin-bottom: 8px;">• <strong>Grupo de Origem:</strong> De onde copiar os membros</p>
-        <p style="margin-bottom: 8px;">• <strong>Grupo de Destino:</strong> Para onde copiar os membros</p>
-        <p style="margin-bottom: 8px;">• <strong>Resultado:</strong> Todos os membros do grupo origem serão adicionados ao grupo destino</p>
-        <p style="color: #666; font-size: 14px;">⚠️ Membros já existentes no destino serão ignorados (sem erro)</p>
-    </div>
+                <div id="copy-group-members-form" class="form-container">
+                    <h3>Copiar Membros de um Grupo</h3>
+                    <div class="instruction-panel" style="display: block; background: #e8f4fd; border-left: 4px solid #2196F3;">
+                        <h4 style="color: #1976D2; margin-bottom: 10px;">💡 Como funciona:</h4>
+                        <p style="margin-bottom: 8px;">• <strong>Grupo de Origem:</strong> De onde copiar os membros</p>
+                        <p style="margin-bottom: 8px;">• <strong>Grupo de Destino:</strong> Para onde copiar os membros</p>
+                        <p style="margin-bottom: 8px;">• <strong>Resultado:</strong> Todos os membros do grupo origem serão adicionados ao grupo destino</p>
+                        <p style="color: #666; font-size: 14px;">⚠️ Membros já existentes no destino serão ignorados (sem erro)</p>
+                    </div>
     
-    <form onsubmit="submitForm(event, 'copy-group-members')">
-        <div class="form-group">
-            <label for="source-group">Grupo de Origem (copiar membros DE):</label>
-            <input type="text" id="source-group" name="source-group" placeholder="ex: Vendas" required>
-            <small style="color: #666;">Nome do grupo que possui os membros a serem copiados</small>
-        </div>
-        
-        <div class="form-group">
-            <label for="target-group">Grupo de Destino (copiar membros PARA):</label>
-            <input type="text" id="target-group" name="target-group" placeholder="ex: Marketing" required>
-            <small style="color: #666;">Nome do grupo que receberá os membros copiados</small>
-        </div>
-        
-        <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">
-            <h5 style="color: #856404; margin: 0 0 8px 0;">⚠️ Exemplo prático:</h5>
-            <p style="color: #856404; margin: 0; font-size: 14px;">
-                Se "Vendas" tem os membros: joão, maria, pedro<br>
-                E "Marketing" tem: ana, carlos<br>
-                <strong>Resultado:</strong> "Marketing" ficará com: ana, carlos, joão, maria, pedro
-            </p>
-        </div>
-        
-        <button type="submit" class="btn btn-success">🔄 Copiar Membros do Grupo</button>
-        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
-    </form>
-</div>
+                    <form onsubmit="submitForm(event, 'copy-group-members')">
+                        <div class="form-group">
+                            <label for="source-group">Grupo de Origem (copiar membros DE):</label>
+                            <input type="text" id="source-group" name="source-group" placeholder="ex: Vendas" required>
+                            <small style="color: #666;">Nome do grupo que possui os membros a serem copiados</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="target-group">Grupo de Destino (copiar membros PARA):</label>
+                            <input type="text" id="target-group" name="target-group" placeholder="ex: Marketing" required>
+                            <small style="color: #666;">Nome do grupo que receberá os membros copiados</small>
+                        </div>
+                        
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">
+                            <h5 style="color: #856404; margin: 0 0 8px 0;">⚠️ Exemplo prático:</h5>
+                            <p style="color: #856404; margin: 0; font-size: 14px;">
+                                Se "Vendas" tem os membros: joão, maria, pedro<br>
+                                E "Marketing" tem: ana, carlos<br>
+                                <strong>Resultado:</strong> "Marketing" ficará com: ana, carlos, joão, maria, pedro
+                            </p>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">🔄 Copiar Membros do Grupo</button>
+                        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
+                    </form>
+                </div>
 
                 <!-- Formulário Criar Compartilhamento -->
                 <div id="create-share-form" class="form-container">
@@ -703,13 +703,13 @@
                             <label for="share-name">Nome do Compartilhamento:</label>
                             <input type="text" id="share-name" name="share-name" placeholder="nome_do_compartilhamento" required>
                         </div>
-<div class="form-group">
-    <label for="share-path">Caminho (/mnt):</label>
-    <div style="display: flex; gap: 10px;">
-        <input type="text" id="share-path" name="share-path" placeholder="/pasta_compartilhada" required style="flex: 1;">
-        <button type="button" class="btn" onclick="openFolderBrowser(function(path) { document.getElementById('share-path').value = path; })" style="padding: 12px 20px;">📁 Navegar</button>
-    </div>
-</div>
+                        <div class="form-group">
+                            <label for="share-path">Caminho (/mnt):</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="share-path" name="share-path" placeholder="/pasta_compartilhada" required style="flex: 1;">
+                                <button type="button" class="btn" onclick="openFolderBrowser(function(path) { document.getElementById('share-path').value = path; })" style="padding: 12px 20px;">📁 Navegar</button>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="share-users">Grupos/Usuários (separados por vírgula):</label>
                             <input type="text" id="share-users" name="share-users" placeholder="@grupo, usuario" required>
@@ -741,13 +741,13 @@
                             <label for="sync-share-name">Nome do Compartilhamento:</label>
                             <input type="text" id="sync-share-name" name="share-name" placeholder="nome_do_compartilhamento" required>
                         </div>
-<div class="form-group">
-    <label for="sync-share-path">Caminho (/mnt):</label>
-    <div style="display: flex; gap: 10px;">
-        <input type="text" id="sync-share-path" name="share-path" placeholder="/pasta_sync" required style="flex: 1;">
-        <button type="button" class="btn" onclick="openFolderBrowser(function(path) { document.getElementById('sync-share-path').value = path; })" style="padding: 12px 20px;">📁 Navegar</button>
-    </div>
-</div>
+                        <div class="form-group">
+                            <label for="sync-share-path">Caminho (/mnt):</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="sync-share-path" name="share-path" placeholder="/pasta_sync" required style="flex: 1;">
+                                <button type="button" class="btn" onclick="openFolderBrowser(function(path) { document.getElementById('sync-share-path').value = path; })" style="padding: 12px 20px;">📁 Navegar</button>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="sync-share-users">Grupos/Usuários (separados por vírgula):</label>
                             <input type="text" id="sync-share-users" name="share-users" placeholder="@Sync, @Desativar_Sync" required>
@@ -1069,22 +1069,22 @@
                     </form>
                 </div>
 
-<!-- Formulário Copiar Grupos de Usuário -->
-<div id="copy-user-groups-form" class="form-container">
-    <h3>Copiar Grupos de um Usuário</h3>
-    <form onsubmit="submitForm(event, 'copy-user-groups')">
-        <div class="form-group">
-            <label for="source-username">Usuário de Origem (copiar grupos DE):</label>
-            <input type="text" id="source-username" name="source-username" required>
-        </div>
-        <div class="form-group">
-            <label for="target-username">Usuário de Destino (copiar grupos PARA):</label>
-            <input type="text" id="target-username" name="target-username" required>
-        </div>
-        <button type="submit" class="btn btn-success">Copiar Grupos</button>
-        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
-    </form>
-</div>
+                <!-- Formulário Copiar Grupos de Usuário -->
+                <div id="copy-user-groups-form" class="form-container">
+                    <h3>Copiar Grupos de um Usuário</h3>
+                    <form onsubmit="submitForm(event, 'copy-user-groups')">
+                        <div class="form-group">
+                            <label for="source-username">Usuário de Origem (copiar grupos DE):</label>
+                            <input type="text" id="source-username" name="source-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="target-username">Usuário de Destino (copiar grupos PARA):</label>
+                            <input type="text" id="target-username" name="target-username" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Copiar Grupos</button>
+                        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
+                    </form>
+                </div>
 
                 <!-- Formulários Adicionais para Usuários -->
                 <div id="show-user-groups-form" class="form-container">
@@ -1139,23 +1139,23 @@
                     </form>
                 </div>
 
-                <!-- Formulários de Política de Senha -->
-<div id="password-policy-form" class="form-container">
-    <h3>Configurações de Política de Senha</h3>
-    <div class="submenu-grid">
-        <div class="submenu-item" onclick="executeCommand('show-password-policy')">Mostrar Status das Regras de Senhas</div>
-        <div class="submenu-item" onclick="executeCommand('enable-complexity')">Ativar complexidade das senhas</div>
-        <div class="submenu-item" onclick="executeCommand('disable-complexity')">Desativar complexidade das senhas</div>
-        <div class="submenu-item" onclick="showForm('password-history')">Tamanho do histórico das senhas</div>
-        <div class="submenu-item" onclick="showForm('password-min-length')">Tamanho mínimo das senhas</div>
-        <div class="submenu-item" onclick="showForm('password-min-age')">Validade mínima das senhas</div>
-        <div class="submenu-item" onclick="showForm('password-max-age')">Validade máxima das senhas</div>
-        <div class="submenu-item" onclick="showForm('login-attempts')">Tentativas de login antes de bloquear</div>
-        <div class="submenu-item" onclick="showForm('lockout-duration')">Duração do bloqueio de contas</div>
-        <div class="submenu-item" onclick="showForm('lockout-reset')">Tempo para reset do contador</div>
-    </div>
-    <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
-</div>
+                                <!-- Formulários de Política de Senha -->
+                <div id="password-policy-form" class="form-container">
+                    <h3>Configurações de Política de Senha</h3>
+                    <div class="submenu-grid">
+                        <div class="submenu-item" onclick="executeCommand('show-password-policy')">Mostrar Status das Regras de Senhas</div>
+                        <div class="submenu-item" onclick="executeCommand('enable-complexity')">Ativar complexidade das senhas</div>
+                        <div class="submenu-item" onclick="executeCommand('disable-complexity')">Desativar complexidade das senhas</div>
+                        <div class="submenu-item" onclick="showForm('password-history')">Tamanho do histórico das senhas</div>
+                        <div class="submenu-item" onclick="showForm('password-min-length')">Tamanho mínimo das senhas</div>
+                        <div class="submenu-item" onclick="showForm('password-min-age')">Validade mínima das senhas</div>
+                        <div class="submenu-item" onclick="showForm('password-max-age')">Validade máxima das senhas</div>
+                        <div class="submenu-item" onclick="showForm('login-attempts')">Tentativas de login antes de bloquear</div>
+                        <div class="submenu-item" onclick="showForm('lockout-duration')">Duração do bloqueio de contas</div>
+                        <div class="submenu-item" onclick="showForm('lockout-reset')">Tempo para reset do contador</div>
+                    </div>
+                    <button type="button" class="btn" onclick="backToDomainSettings()">Voltar</button>
+                </div>
 
                 <!-- Formulários de Permissões -->
                 <div id="permissions-form" class="form-container">
@@ -1191,38 +1191,38 @@
 
     <script src="script.js"></script>
     
-<div class="loading" style="display:none"><div class="spinner"></div>Carregando...</div>
-<div class="result-container" style="display:none"></div>
-    <div id="confirmOverlay" class="confirm-overlay">
-    <div class="confirm-box">
-        <div id="confirmMessage" class="confirm-message">Deseja realizar esta ação?</div>
-        <div class="confirm-buttons">
-            <button id="confirmYes" class="confirm-btn confirm-btn-yes">Sim</button>
-            <button id="confirmNo" class="confirm-btn confirm-btn-no">Não</button>
+    <div class="loading" style="display:none"><div class="spinner"></div>Carregando...</div>
+    <div class="result-container" style="display:none"></div>
+        <div id="confirmOverlay" class="confirm-overlay">
+        <div class="confirm-box">
+            <div id="confirmMessage" class="confirm-message">Deseja realizar esta ação?</div>
+            <div class="confirm-buttons">
+                <button id="confirmYes" class="confirm-btn confirm-btn-yes">Sim</button>
+                <button id="confirmNo" class="confirm-btn confirm-btn-no">Não</button>
+            </div>
         </div>
     </div>
-</div>
     <!-- Modal do Browser de Pastas -->
-<div id="folderBrowserModal" class="confirm-overlay" style="z-index: 10000;">
-    <div class="confirm-box" style="max-width: 600px; width: 90%; max-height: 80vh;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="margin: 0; color: #2c3e50;">📁 Selecionar Pasta</h3>
-            <button onclick="closeFolderBrowser()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
-        </div>
-        
-        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-family: monospace;">
-            <strong>Caminho atual:</strong> <span id="currentBrowsePath">/mnt</span>
-        </div>
-        
-        <div id="folderTree" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: white; border-radius: 5px;">
-            <div class="loading-tree">🔄 Carregando pastas...</div>
-        </div>
-        
-        <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
-            <button onclick="selectCurrentPath()" class="btn btn-success">Usar Esta Pasta</button>
-            <button onclick="closeFolderBrowser()" class="btn">Cancelar</button>
+    <div id="folderBrowserModal" class="confirm-overlay" style="z-index: 10000;">
+        <div class="confirm-box" style="max-width: 600px; width: 90%; max-height: 80vh;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #2c3e50;">📁 Selecionar Pasta</h3>
+                <button onclick="closeFolderBrowser()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-family: monospace;">
+                <strong>Caminho atual:</strong> <span id="currentBrowsePath">/mnt</span>
+            </div>
+            
+            <div id="folderTree" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: white; border-radius: 5px;">
+                <div class="loading-tree">🔄 Carregando pastas...</div>
+            </div>
+            
+            <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="selectCurrentPath()" class="btn btn-success">Usar Esta Pasta</button>
+                <button onclick="closeFolderBrowser()" class="btn">Cancelar</button>
+            </div>
         </div>
     </div>
-</div>
 </body>
 </html>
