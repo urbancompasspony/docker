@@ -103,6 +103,8 @@ if apache2ctl configtest; then
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/samba-admin.cgi | tee /var/www/samba-admin/cgi-bin/samba-admin.cgi
     mkdir -p /var/www/samba-admin
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/index.html | tee /var/www/samba-admin/index.html
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/script.js | tee /var/www/samba-admin/script.js
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/style.css | tee /var/www/samba-admin/style.css
     echo "3. Permissões: chmod 755 /var/www/samba-admin/cgi-bin/samba-admin.cgi"
     chmod +x /var/www/samba-admin/cgi-bin/samba-admin.cgi
     chmod 755 /var/www/samba-admin/cgi-bin/samba-admin.cgi
