@@ -27,8 +27,6 @@ VALUE10=""
 
 function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{logs,data,lib,postgresql,fonts}
-  # sudo touch /srv/containers/"$NOMECONTAINER"/file
-  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
 :; }
 
 function docker_create {
@@ -63,12 +61,6 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/postgresql:/var/lib/postgresql \
   -v /srv/containers/"$NOMECONTAINER"/fonts:/usr/share/fonts/truetype/custom \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
