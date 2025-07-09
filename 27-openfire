@@ -45,8 +45,6 @@ function docker_create {
   # Se NAO for numerico, execute como host!
   if [[ ! "$VALUE2" =~ $ip_regex ]]; then
 
-
-
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
@@ -67,20 +65,13 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/usr/:/usr/share/openfire/ \
   -v /srv/containers/"$NOMECONTAINER"/default/:/etc/default/ \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
-docker exec $NOMECONTAINER bash -c "wget https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire_4.7.3_all.deb -O openfire.deb"
+docker exec $NOMECONTAINER bash -c "DEBIAN_FRONTEND=noninteractive wget https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire_4.7.3_all.deb -O openfire.deb && yes n | dpkg -i --force-confold openfire.deb"
 docker restart $NOMECONTAINER
-
 clear
-
+echo "Acesso pela porta 9090"
 echo ""
 echo "QUALQUER QUE SEJA A CIRCUNSTANCIA QUE TE FEZ REINSTALAR ESSE CONTAINER"
 echo "ESTEJA PREPARADO PRA RECONFIGURA-LO EM TODAS AS ESTACOES DE TRABALHO!"
