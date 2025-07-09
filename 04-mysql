@@ -44,7 +44,7 @@ function docker_create {
     -e MYSQL_USER="$VALUE5" \
     -e MYSQL_PASSWORD="$VALUE6" \
     -v $VALUE7/mysql:/var/lib/mysql \
-    $docker_repo:$VALUE8
+    "$docker_repo:$VALUE8"
 
     return
   fi
@@ -57,7 +57,7 @@ function docker_create {
   -e MYSQL_USER="$VALUE5" \
   -e MYSQL_PASSWORD="$VALUE6" \
   -v $VALUE7/mysql:/var/lib/mysql \
-  $docker_repo:$VALUE8
+  "$docker_repo:$VALUE8"
 }
 
 function docker_extras {
@@ -91,7 +91,7 @@ function check_macvlan {
 }
 
 function try_pull {
-  if ! docker pull $docker_repo:$VALUE8; then
+  if ! docker pull "$docker_repo:$VALUE8"; then
     echo "Erro: docker pull falhou... saindo."; sleep 3
     exit 1
   fi
