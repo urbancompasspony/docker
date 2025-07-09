@@ -1,5 +1,7 @@
 #!/bin/bash
 
+JWT_SECRET_0=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
+
 NOMECONTAINER="onlyoffice-server"
 
 docker_repo="onlyoffice/documentserver"
@@ -7,7 +9,7 @@ imagem="onlyoffice"
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
-CustmN4=""
+CustmN4="secret"
 CustmN5=""
 CustmN6=""
 CustmN7=""
@@ -17,7 +19,7 @@ CustmN10=""
 
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
-VALUE4=""
+VALUE4="$JWT_SECRET_0"
 VALUE5=""
 VALUE6=""
 VALUE7=""
@@ -30,8 +32,6 @@ function set_mkdir {
 :; }
 
 function docker_create {
-  JWT_SECRET_0=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
-
   local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
 
   # Se NAO for numerico, execute como host!
@@ -40,7 +40,7 @@ function docker_create {
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host -p 80:80 \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -e JWT_SECRET="$JWT_SECRET_0" \
+    -e JWT_SECRET="$VALUE4" \
     -v /srv/containers/"$NOMECONTAINER"/logs:/var/log/onlyoffice  \
     -v /srv/containers/"$NOMECONTAINER"/data:/var/www/onlyoffice/Data \
     -v /srv/containers/"$NOMECONTAINER"/lib:/var/lib/onlyoffice \
@@ -54,7 +54,7 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" -p 80:80 \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -e JWT_SECRET="$JWT_SECRET_0" \
+  -e JWT_SECRET="$VALUE4" \
   -v /srv/containers/"$NOMECONTAINER"/logs:/var/log/onlyoffice  \
   -v /srv/containers/"$NOMECONTAINER"/data:/var/www/onlyoffice/Data \
   -v /srv/containers/"$NOMECONTAINER"/lib:/var/lib/onlyoffice \
@@ -67,9 +67,9 @@ function docker_extras {
   clear
   echo "==================================================================================================================="
   echo ""
-  echo "Generating JWT Secret.... Your Token is:"
+  echo "Your Token is:"
   echo ""
-  echo $JWT_SECRET_0 | sudo tee /srv/containers/"$NOMECONTAINER"/secret
+  echo $VALUE4 | sudo tee /srv/containers/"$NOMECONTAINER"/secret
   echo ""
   echo "==================================================================================================================="
   echo ""
