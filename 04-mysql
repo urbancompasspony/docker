@@ -2,7 +2,7 @@
 
 NOMECONTAINER="mysql-generic"
 
-docker_repo="mysql:8.0.42"
+docker_repo="mysql"
 imagem="mysql"
 
 CustmN2="local_ip"
@@ -11,7 +11,7 @@ CustmN4="database"
 CustmN5="db_user"
 CustmN6="db_pass"
 CustmN7="db_path"
-CustmN8=""
+CustmN8="version"
 CustmN9=""
 CustmN10=""
 
@@ -21,7 +21,7 @@ VALUE4=""
 VALUE5=""
 VALUE6=""
 VALUE7="/srv/containers/$NOMECONTAINER"
-VALUE8=""
+VALUE8="8.0.42"
 VALUE9=""
 VALUE10=""
 
@@ -44,7 +44,7 @@ function docker_create {
     -e MYSQL_USER="$VALUE5" \
     -e MYSQL_PASSWORD="$VALUE6" \
     -v $VALUE7/mysql:/var/lib/mysql \
-    "$docker_repo"
+    "$docker_repo":$VALUE8
 
     return
   fi
@@ -57,7 +57,7 @@ function docker_create {
   -e MYSQL_USER="$VALUE5" \
   -e MYSQL_PASSWORD="$VALUE6" \
   -v $VALUE7/mysql:/var/lib/mysql \
-  "$docker_repo"
+  "$docker_repo":$VALUE8
 }
 
 function docker_extras {
