@@ -42,7 +42,7 @@ version=30
 
 NOMECONTAINER="nextcloud"
 
-docker_repo="nextcloud:$version"
+docker_repo="nextcloud"
 imagem="nextcloud"
 
 CustmN2="local_ip"
@@ -94,7 +94,7 @@ function docker_create {
     -v /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini \
     -v "$VALUE5"/data:/var/www/html/data \
     $VALUE6 \
-    "$docker_repo"
+    "$docker_repo:$VALUE4"
 
     return
   fi
@@ -108,13 +108,7 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/php/opcache-recommed.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini \
   -v "$VALUE5"/data:/var/www/html/data \
   $VALUE6 \
-  "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
+  "$docker_repo:$VALUE4"
 }
 
 function docker_extras {
