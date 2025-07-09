@@ -2,7 +2,7 @@
 
 NOMECONTAINER="mariadb-generic"
 
-docker_repo="mariadb:latest"
+docker_repo="mariadb"
 imagem="mariadb"
 
 CustmN2="local_ip"
@@ -11,7 +11,7 @@ CustmN4="database"
 CustmN5="db_user"
 CustmN6="db_pass"
 CustmN7="db_path"
-CustmN8=""
+CustmN8="version"
 CustmN9=""
 CustmN10=""
 
@@ -21,14 +21,13 @@ VALUE4=""
 VALUE5=""
 VALUE6=""
 VALUE7="/srv/containers/$NOMECONTAINER"
-VALUE8=""
+VALUE8="11.8.2"
 VALUE9=""
 VALUE10=""
 
 function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"
-  # sudo touch /srv/containers/"$NOMECONTAINER"/file
-  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
+  sudo mkdir -p $VALUE7
 :; }
 
 function docker_create {
@@ -45,7 +44,7 @@ function docker_create {
     -e MARIADB_USER="$VALUE5" \
     -e MARIADB_PASSWORD="$VALUE6" \
     -v "$var7"/mysql:/var/lib/mysql \
-    "$docker_repo"
+    "$docker_repo":"$VALUE8"
 
     return
   fi
@@ -58,18 +57,11 @@ function docker_create {
   -e MARIADB_USER="$VALUE5" \
   -e MARIADB_PASSWORD="$VALUE6" \
   -v "$var7"/mysql:/var/lib/mysql \
-  "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
+  "$docker_repo":"$VALUE8"
 }
 
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+
 :; }
 
 # ----------------------------------------------------------------------
