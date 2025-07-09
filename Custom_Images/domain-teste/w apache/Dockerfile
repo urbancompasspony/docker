@@ -15,7 +15,7 @@ RUN apt update && apt upgrade -y
 RUN apt install -y pkg-config
 
 # Common Apps
-RUN apt install -y samba smbclient ldap-utils libnss-winbind winbind libpam-winbind krb5-user libpam-krb5 samba-dsdb-modules samba-vfs-modules krb5-kdc \
+RUN apt install -y samba smbclient ldap-utils libnss-winbind winbind libpam-winbind krb5-user libpam-krb5 samba-dsdb-modules samba-vfs-modules samba-vfs-modules-extra krb5-kdc \
     apt-utils attr acl curl dialog supervisor openvpn inetutils-ping nano wget less tree iperf
 
 # System Tools
