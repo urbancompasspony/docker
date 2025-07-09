@@ -2,7 +2,7 @@
 
 NOMECONTAINER="mysql-generic"
 
-docker_repo="mysql:8.0"
+docker_repo="mysql:8.0.42"
 imagem="mysql"
 
 CustmN2="local_ip"
