@@ -1,4 +1,5 @@
 FROM ubuntu:24.04
+# ubuntu:rolling ?
 
 ENV TZ="America/Bahia"
 ENV CUPSADMIN="admin"
