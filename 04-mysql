@@ -27,8 +27,7 @@ VALUE10=""
 
 function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"
-  # sudo touch /srv/containers/"$NOMECONTAINER"/file
-  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
+  sudo mkdir -p $VALUE7
 :; }
 
 function docker_create {
@@ -44,7 +43,7 @@ function docker_create {
     -e MYSQL_DATABASE="$VALUE4" \
     -e MYSQL_USER="$VALUE5" \
     -e MYSQL_PASSWORD="$VALUE6" \
-    -v "$var7"/mysql:/var/lib/mysql \
+    -v $VALUE7/mysql:/var/lib/mysql \
     "$docker_repo"
 
     return
@@ -57,19 +56,12 @@ function docker_create {
   -e MYSQL_DATABASE="$VALUE4" \
   -e MYSQL_USER="$VALUE5" \
   -e MYSQL_PASSWORD="$VALUE6" \
-  -v "$var7"/mysql:/var/lib/mysql \
+  -v $VALUE7/mysql:/var/lib/mysql \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+
 :; }
 
 # ----------------------------------------------------------------------
