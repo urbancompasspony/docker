@@ -73,12 +73,6 @@ docker restart $NOMECONTAINER
 clear
 echo "Acesso pela porta 9090"
 echo ""
-echo "QUALQUER QUE SEJA A CIRCUNSTANCIA QUE TE FEZ REINSTALAR ESSE CONTAINER"
-echo "ESTEJA PREPARADO PRA RECONFIGURA-LO EM TODAS AS ESTACOES DE TRABALHO!"
-echo "Em caso de erros graves do OpenFire Server (web em erro 500 ou 503) reinstale do zero"
-echo "e reconfigure do zero, puxando o banco de dados anterior seja ele o AD, MariaDB ou o MySQL"
-echo "Isso perde todos os certificados, portanto precisara refazer os acessos nas maquinas clientes!"
-echo ""
 
 sleep 10
 :; }
