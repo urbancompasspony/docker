@@ -21,7 +21,7 @@ VALUE4=""
 VALUE5=""
 VALUE6=""
 VALUE7="/srv/containers/$NOMECONTAINER"
-VALUE8="11.8.2"
+VALUE8="conferir-11.8.2"
 VALUE9=""
 VALUE10=""
 
@@ -44,7 +44,7 @@ function docker_create {
     -e MARIADB_USER="$VALUE5" \
     -e MARIADB_PASSWORD="$VALUE6" \
     -v "$var7"/mysql:/var/lib/mysql \
-    "$docker_repo:$VALUE8"
+    "$docker_repo":"$VALUE8"
 
     return
   fi
@@ -57,7 +57,7 @@ function docker_create {
   -e MARIADB_USER="$VALUE5" \
   -e MARIADB_PASSWORD="$VALUE6" \
   -v "$var7"/mysql:/var/lib/mysql \
-  "$docker_repo:$VALUE8"
+  "$docker_repo":"$VALUE8"
 }
 
 function docker_extras {
@@ -91,7 +91,7 @@ function check_macvlan {
 }
 
 function try_pull {
-  if ! docker pull "$docker_repo"; then
+  if ! docker pull "$docker_repo":"$VALUE8"; then
     echo "Erro: docker pull falhou... saindo."; sleep 3
     exit 1
   fi
