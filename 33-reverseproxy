@@ -74,17 +74,10 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/certbot:/etc/letsencrypt \
   -v /srv/containers/"$NOMECONTAINER"/cache:/var/cache/apache2/mod_cache_disk/routing \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+
 :; }
 
 # ----------------------------------------------------------------------
