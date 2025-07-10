@@ -27,8 +27,7 @@ VALUE10=""
 
 function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/Data
-  # sudo touch /srv/containers/"$NOMECONTAINER"/file
-  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
+  sudo mkdir -p $VALUE4
 :; }
 
 function docker_create {
@@ -36,10 +35,6 @@ function docker_create {
 
   # Se NAO for numerico, execute como host!
   if [[ ! "$VALUE2" =~ $ip_regex ]]; then
-
-
- \
-$docker_repo
   
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
@@ -55,12 +50,6 @@ $docker_repo
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -v "$VALUE4":/usr/local/apache2/htdocs/ \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
@@ -73,6 +62,7 @@ function docker_extras {
 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
       exit
     fi
+
     username0=$(echo "$VALUE10" | sed -n 1p)
     password0=$(echo "$VALUE10" | sed -n 2p)
 
