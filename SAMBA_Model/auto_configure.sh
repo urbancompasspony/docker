@@ -5,7 +5,7 @@
 
 # Definir valores padrão
 ORIGEM_CONF="${1:-/etc/samba/smb.conf}"
-DESTINO_CONF="${2:-/etc/samba/smb.conf.new}"
+DESTINO_CONF="${ORIGEM_CONF}.new"
 
 # Verificar se o arquivo de origem existe
 if [ ! -f "$ORIGEM_CONF" ]; then
@@ -206,6 +206,5 @@ fi
 echo ""
 echo "Exemplos de uso:"
 echo "  ./adapt_smb_conf.sh # Usa arquivo padrão"
-echo "  ./adapt_smb_conf.sh /etc/samba/smb.conf /tmp/smb.conf.new"
-echo "  ./adapt_smb_conf.sh /path/to/smb.conf /path/to/new.conf"
-
+echo "  ./adapt_smb_conf.sh /srv/containers/container1/config/smb.conf"
+echo "  ./adapt_smb_conf.sh /path/to/smb.conf"
