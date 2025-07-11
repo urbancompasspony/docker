@@ -118,6 +118,8 @@ if ! [ -f /srv/containers/"$NOMECONTAINER"/config/smb.conf.bkp ]; then
   echo ""; echo "Removing loopback network from smb.conf"; echo ""
   sudo sed -i '/127.0.0/d' /srv/containers/"$NOMECONTAINER"/config/smb.conf
   docker exec "$NOMECONTAINER" bash -c 'curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/SAMBA_Model/auto_configure.sh | bash'
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/SAMBA_Model/auto_configure.sh | tee /tmp/auto_configure.sh; chmod +x /tmp/auto_configure.sh
+  sudo bash /tmp/auto_configure.sh /srv/containers/$NOMECONTAINER/config/smb.conf
   echo ""; echo "OK"; sleep 0.5
 fi
 
