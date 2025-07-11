@@ -112,17 +112,18 @@ function docker_create {
 }
 
 function docker_extras {
-  if ! [ -f /srv/scripts/cronnc ]; then
-    (sudo crontab -l 2>/dev/null; echo "# Nextcloud") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "*/5 * * * * docker exec -t -u www-data $NOMECONTAINER php -f /var/www/html/cron.php") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "#*/15 * * * * docker exec -t -u www-data $NOMECONTAINER ./occ files:scan --unscanned --all") | sudo crontab -
-    sudo mkdir -p /srv/scripts; sudo touch /srv/scripts/cronnc
-  fi
-
   # Configuring SAMBA
   docker exec -it "$NOMECONTAINER" apt update
   docker exec -it "$NOMECONTAINER" apt install smbclient libsmbclient-dev -y
   docker restart "$NOMECONTAINER"
+
+  # Configuring Cron
+  CRONMENTARIO="# Nextcloud"
+  CRONLINE="*/5 * * * * docker exec -t -u www-data $NOMECONTAINER php -f /var/www/html/cron.php"
+  CRONLINE2="#*/15 * * * * docker exec -t -u www-data $NOMECONTAINER ./occ files:scan --unscanned --all"
+  (sudo crontab -l 2>/dev/null | grep -Fv "$CRONMENTARIO"; echo "$CRONMENTARIO") | sudo crontab -
+  (sudo crontab -l 2>/dev/null | grep -Fv "$CRONLINE"; echo "$CRONLINE") | sudo crontab -
+  (sudo crontab -l 2>/dev/null | grep -Fv "$CRONLINE2"; echo "$CRONLINE2") | sudo crontab -
 :; }
 
 # ----------------------------------------------------------------------
