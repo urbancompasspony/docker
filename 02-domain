@@ -113,10 +113,13 @@ docker exec "$NOMECONTAINER" bash -c "htpasswd -c /etc/apache2/auth/.htpasswd ad
 docker exec "$NOMECONTAINER" bash -c "htpasswd -b /etc/apache2/auth/.htpasswd admin $VALUE10"
 echo ""; echo "OK"; sleep 0.5
 
-echo ""; echo "############################################################"
-echo ""; echo "Removing loopback network from smb.conf"; echo ""
-sudo sed -i '/127.0.0/d' /srv/containers/"$NOMECONTAINER"/config/smb.conf
-echo ""; echo "OK"; sleep 0.5
+if ! [ -f /srv/containers/"$NOMECONTAINER"/config/smb.conf.bkp ]; then
+  echo ""; echo "############################################################"
+  echo ""; echo "Removing loopback network from smb.conf"; echo ""
+  sudo sed -i '/127.0.0/d' /srv/containers/"$NOMECONTAINER"/config/smb.conf
+  docker exec "$NOMECONTAINER" bash -c 'curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/SAMBA_Model/auto_configure.sh | bash'
+  echo ""; echo "OK"; sleep 0.5
+fi
 
 echo ""; echo "############################################################"
 echo ""; echo "Restoring CUPS Default Config"; echo ""
