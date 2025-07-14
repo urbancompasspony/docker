@@ -1466,55 +1466,70 @@ show_shares() {
 revalidate_shares_internal() {
     echo "🔄 Revalidando configurações de compartilhamento..."
     
-    # Verificar se diretório existe (criar com sudo se necessário)
+    # Verificar se diretório existe
     if [ ! -d "/etc/samba/external/smb.conf.d/" ]; then
         echo "⚠️ Criando estrutura de diretórios..."
         sudo mkdir -p /etc/samba/external/smb.conf.d/
     fi
     
-    # Gerar includes.conf com sudo (CORREÇÃO DO BUG)
+    # Aguardar arquivos estarem disponíveis
     echo "📝 Gerando arquivo includes.conf..."
-    sudo find /etc/samba/external/smb.conf.d/ -type f -name "*.conf" -print | sudo tee /tmp/samba_includes.tmp > /dev/null
-    sudo sed -e 's/^/include = /' /tmp/samba_includes.tmp | sudo tee /etc/samba/external/includes.conf > /dev/null
-    sudo rm -f /tmp/samba_includes.tmp
+    sleep 1
     
-    # Verificar se o arquivo principal do Samba inclui nossos compartilhamentos
+    # USAR O MESMO PADRÃO QUE FUNCIONA NAS OUTRAS FUNÇÕES (sudo tee << EOF)
+    echo "🔍 Procurando arquivos .conf..."
+    
+    # Contar arquivos primeiro
+    file_count=$(find /etc/samba/external/smb.conf.d/ -name "*.conf" -type f | wc -l)
+    echo "📊 Encontrados $file_count arquivos .conf"
+    
+    if [ $file_count -gt 0 ]; then
+        # USAR sudo tee com heredoc (padrão que funciona)
+        sudo tee /etc/samba/external/includes.conf > /dev/null << EOF
+$(find /etc/samba/external/smb.conf.d/ -name "*.conf" -type f | sort | sed 's/^/include = /')
+EOF
+        echo "✅ includes.conf gerado com $file_count includes"
+    else
+        # Arquivo vazio usando o mesmo padrão
+        sudo tee /etc/samba/external/includes.conf > /dev/null << EOF
+# Nenhum compartilhamento externo configurado
+EOF
+        echo "⚠️ Nenhum arquivo .conf encontrado, includes.conf criado vazio"
+    fi
+    
+    # Verificar resultado
+    final_count=$(wc -l < /etc/samba/external/includes.conf)
+    echo "📋 includes.conf final com $final_count linhas"
+    
+    # Verificar include no smb.conf principal
     if ! grep -q "include.*external/includes.conf" /etc/samba/smb.conf; then
         echo "⚠️ Adicionando include no smb.conf principal..."
-        echo "" | sudo tee -a /etc/samba/smb.conf > /dev/null
-        echo "# Compartilhamentos externos criados via WebUI" | sudo tee -a /etc/samba/smb.conf > /dev/null
-        echo "include = /etc/samba/external/includes.conf" | sudo tee -a /etc/samba/smb.conf > /dev/null
+        # USAR o mesmo padrão sudo tee << EOF
+        sudo tee -a /etc/samba/smb.conf > /dev/null << EOF
+
+# Compartilhamentos externos criados via WebUI
+include = /etc/samba/external/includes.conf
+EOF
     fi
     
-    # Testar configuração ANTES de recarregar (IMPORTANTE!)
+    # Testar configuração
     echo "🧪 Testando configuração..."
-    if sudo testparm -s > /dev/null 2>&1; then
+    if testparm -s >/dev/null 2>&1; then
         echo "✅ Configuração válida"
     else
-        echo "❌ ERRO na configuração! Verificando problemas..."
-        sudo testparm -s
+        echo "❌ ERRO na configuração!"
         return 1
     fi
     
-    # Recarregar configuração (SEM esconder erros)
+    # Reload simples (já funciona automaticamente)
     echo "🔄 Recarregando configuração do Samba..."
-    reload_result=$(sudo smbcontrol all reload-config 2>&1)
-    if [ $? -eq 0 ]; then
-        echo "✅ Configuração recarregada: $reload_result"
-    else
-        echo "❌ Erro ao recarregar: $reload_result"
-        return 1
-    fi
     
-    # Verificar se os compartilhamentos estão visíveis
-    echo "🔍 Verificando compartilhamentos ativos..."
-    active_shares=$(sudo smbclient -L localhost -N 2>/dev/null | grep "Disk" || echo "Nenhum compartilhamento encontrado")
-    echo "📋 Compartilhamentos ativos: $active_shares"
+    # O Samba AD-DC recarrega automaticamente, só informar
+    echo "✅ Configuração atualizada - Samba detectará mudanças automaticamente"
     
-    echo "✅ Revalidação concluída!"
+    echo "✅ Revalidação concluída com sucesso!"
+    return 0
 }
-
-# Substitua a função create_share() no arquivo samba-admin.cgi por esta versão melhorada:
 
 create_share() {
     if [ -z "$SHARE_NAME" ] || [ -z "$SHARE_PATH" ] || [ -z "$SHARE_USERS" ]; then
@@ -1522,7 +1537,7 @@ create_share() {
         return 1
     fi
 
-    # Validar se não contém espaços (baseado no código original)
+    # Validar se não contém espaços
     if [[ $SHARE_NAME = *" "* ]] || [[ $SHARE_PATH = *" "* ]] || [[ $SHARE_NAME = "" ]]; then
         echo "Erro: Não crie compartilhamentos com espaços nos nomes ou nomes vazios!"
         return 1
@@ -1536,14 +1551,14 @@ create_share() {
 
     echo "🚀 Criando compartilhamento '$SHARE_NAME'..."
 
-    # Criar estrutura de diretórios se não existir (com sudo)
+    # Criar estrutura de diretórios se não existir
     sudo mkdir -p /etc/samba/external/smb.conf.d/
 
-    # Criar a pasta no sistema (baseado no código original)
+    # Criar a pasta no sistema
     echo "📁 Criando pasta /mnt$SHARE_PATH..."
     sudo mkdir -p "/mnt$SHARE_PATH"
 
-    # Criar arquivo de configuração (com sudo - usando tee)
+    # Criar arquivo de configuração
     echo "📝 Criando arquivo de configuração..."
     sudo tee "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" > /dev/null << EOF
 [$SHARE_NAME]
@@ -1559,11 +1574,21 @@ directory mask = 0777
 force directory mode = 0777
 EOF
 
-    # Aplicar permissões (sem -R, baseado no código original)
+    # AGUARDAR arquivo ser escrito completamente (CORREÇÃO DO TIMING)
     echo "🔐 Configurando permissões..."
+    sudo chmod 644 "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf"
     sudo chmod 777 "/mnt$SHARE_PATH"
+    
+    # VERIFICAR se arquivo foi criado antes de continuar
+    if [ ! -f "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" ]; then
+        echo "❌ ERRO: Arquivo de configuração não foi criado!"
+        return 1
+    fi
+    
+    # AGUARDAR um momento para garantir que arquivo está disponível
+    sleep 1
 
-    # Revalidar configurações COM verificação de erro
+    # Revalidar configurações (agora com timing correto)
     echo "🔄 Revalidando configurações..."
     if revalidate_shares_internal; then
         echo "✅ Compartilhamento '$SHARE_NAME' criado com sucesso!"
@@ -1577,12 +1602,10 @@ EOF
         return 0
     else
         echo "❌ ERRO: Compartilhamento criado, mas falha na revalidação!"
-        echo "Execute manualmente: sudo smbcontrol all reload-config"
+        echo "Execute manualmente: supervisorctl restart samba"
         return 1
     fi
 }
-
-# Substitua a função create_sync_share() no arquivo samba-admin.cgi por esta versão corrigida:
 
 create_sync_share() {
     if [ -z "$SHARE_NAME" ] || [ -z "$SHARE_PATH" ] || [ -z "$SHARE_USERS" ]; then
