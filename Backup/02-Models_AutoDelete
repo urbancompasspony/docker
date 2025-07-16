@@ -1,7 +1,11 @@
 #!/bin/bash
 
+# Delete old Backups!
 find "/mnt/disk01/dominio/Lixeira/" -type f -mtime +180 -delete
-
 find "/mnt/disk01/dominio/Lixeira/" -type d -empty -delete
+
+# Delete old Containers (extra backup!)
+#find "/mnt/externo/containers/" -type f -mtime +5 -delete
+#find "/mnt/externo/containers/" -type d -empty -delete
 
 fstrim -a
