@@ -1,6 +1,6 @@
 #!/bin/bash
 
-find "/mnt/disk01/dominio/Lixeira/" -type f -atime +120 -delete
+find "/mnt/disk01/dominio/Lixeira/" -type f -atime +180 -delete
 
 find "/mnt/disk01/dominio/Lixeira/" -type d -empty -delete
 
