@@ -1,3 +1,9 @@
+for dir in /mnt/disk02/rsnapshot/*/localhost/mnt/disk01/Lixeira/; do
+    find "$dir" -type f -mtime +180 -delete
+done
+
+find /mnt/disk02/rsnapshot/*/localhost/mnt/disk01/Lixeira/ -type f -mtime +180 -delete
+
 Model AutoDelete Examples:
 #find "/mnt/disk01/dominio/Lixeira/" -maxdepth 1 -type d -atime +120 -exec rm -rf {}
 #find . -mtime +0 # find files modified greater than 24 hours ago
