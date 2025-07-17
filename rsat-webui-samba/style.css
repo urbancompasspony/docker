@@ -55,7 +55,6 @@
           background: #f8f9fa;
           border-radius: 10px;
         }
-        .submenu.active { display: block; }
         .submenu h3 {
           color: #2c3e50;
           margin-bottom: 20px;
@@ -84,7 +83,6 @@
           border-radius: 10px;
           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        .form-container.active { display: block; }
         .form-group { margin-bottom: 20px; }
         .form-group label {
           display: block;
@@ -212,7 +210,7 @@
   background: rgba(0, 0, 0, 0.5); z-index: 9999; display: none;
   align-items: center; justify-content: center;
 }
-.confirm-overlay.active { display: flex; }
+.confirm-overlay { display: none; }
 .confirm-box {
   background: white; border-radius: 10px; padding: 25px;
   max-width: 400px; width: 90%; text-align: center;

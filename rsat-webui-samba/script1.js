@@ -1,6 +1,12 @@
         // URL do script CGI
         const CGI_URL = '/cgi-bin/samba-admin.cgi';
 
+        // CONTROLE DE RACE CONDITIONS
+        let isNavigating = false;
+        let isFormSubmitting = false;
+        let lastClickTime = 0;
+        const CLICK_DEBOUNCE_MS = 300; // 300ms entre cliques
+
         // Elementos DOM
         let loadingElement = null;
         let resultContainer = null;
@@ -26,6 +32,24 @@
 
             updateCurrentPathDisplay();
             loadFolderTree(currentPath);
+        }
+
+        // Função para prevenir cliques múltiplos rápidos
+        function canClick() {
+            const now = Date.now();
+            if (now - lastClickTime < CLICK_DEBOUNCE_MS) {
+                return false;
+            }
+            lastClickTime = now;
+            return true;
+        }
+
+        // Função para controlar navegação
+        function canNavigate() {
+            if (isNavigating) {
+                return false;
+            }
+            return true;
         }
 
         // Fechar browser de pastas
@@ -221,8 +245,13 @@
             alertContainer.classList.remove('active');
         }
 
-        // Função para executar comandos diretos (sem formulário)
         function executeCommand(action) {
+            // PREVENIR MÚLTIPLOS COMANDOS
+            if (isFormSubmitting) {
+                return;
+            }
+
+            isFormSubmitting = true;
             showLoading();
 
             const params = new URLSearchParams();
@@ -235,38 +264,83 @@
                 },
                 body: params.toString()
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(response => response.text()) // Mudança: usar .text() em vez de .json()
+            .then(text => {
                 hideLoading();
 
-                if (data.status === 'success') {
+                // PROCESSAMENTO MELHORADO DO RESULTADO (do script2.js)
+                let output;
+                try {
+                    output = JSON.parse(text);
+                } catch {
+                    output = { text: text };
+                }
+
+                // Determinar se é sucesso ou erro
+                const isSuccess = output.status === 'success' || (!output.status && !text.toLowerCase().includes('erro'));
+
+                if (isSuccess) {
                     showAlert('Comando executado com sucesso!', 'success');
-                    showResult(`<pre>${data.output || data.message}</pre>`);
                 } else {
-                    showAlert(data.message, 'error');
-                    showResult(`<pre>${data.output || 'Erro ao executar comando'}</pre>`, true);
+                    showAlert(output.message || 'Erro ao executar comando', 'error');
+                }
+
+                // FORMATAÇÃO MELHORADA DO RESULTADO
+                let displayText = '';
+                if (output.text) {
+                    displayText = output.text.trim();
+                } else if (typeof output === 'string') {
+                    displayText = output.trim();
+                } else if (output.output) {
+                    displayText = output.output.trim();
+                } else {
+                    displayText = text.trim();
+                }
+
+                // FORMATAÇÃO ESPECIAL PARA LISTAS (do script2.js)
+                if (displayText.includes('\n')) {
+                    const lines = displayText.split('\n').filter(line => line.trim());
+                    if (lines.length > 1 && lines.every(line => !line.includes('='))) {
+                        // Se parece ser uma lista simples, formatar com bullets
+                        const formattedList = lines.map(line => `• ${line.trim()}`).join('<br>');
+                        showResult(`<div style="font-family: 'Segoe UI', sans-serif; line-height: 1.6;">${formattedList}</div>`, !isSuccess);
+                    } else {
+                        showResult(`<pre>${displayText}</pre>`, !isSuccess);
+                    }
+                } else {
+                    showResult(`<div style="font-family: monospace; padding: 10px; background: white; border-radius: 5px; font-size: 16px; color: #2c3e50;">${displayText}</div>`, !isSuccess);
                 }
             })
             .catch(error => {
                 hideLoading();
                 showAlert('Erro de conexão: ' + error.message, 'error');
+                showResult(`<pre>Erro: ${error.message}</pre>`, true);
                 console.error('Erro:', error);
+            })
+            .finally(() => {
+                // LIBERAR SUBMIT
+                setTimeout(() => {
+                    isFormSubmitting = false;
+                }, 500);
             });
         }
 
-        // Função para submeter formulários
         function submitForm(event, formType) {
             event.preventDefault();
+
+            // PREVENIR MÚLTIPLOS SUBMITS
+            if (isFormSubmitting) {
+                return;
+            }
+
+            isFormSubmitting = true;
             showLoading();
 
             const form = event.target;
             const formData = new FormData(form);
             const params = new URLSearchParams();
 
-            // Adicionar ação baseada no tipo de formulário
             params.append('action', formType);
-
-            // Adicionar dados do formulário
             for (let [key, value] of formData.entries()) {
                 params.append(key, value);
             }
@@ -278,69 +352,196 @@
                 },
                 body: params.toString()
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(response => response.text()) // Mudança: usar .text() em vez de .json()
+            .then(text => {
                 hideLoading();
 
-                if (data.status === 'success') {
+                // PROCESSAMENTO MELHORADO DO RESULTADO (do script2.js)
+                let output;
+                try {
+                    output = JSON.parse(text);
+                } catch {
+                    output = { text: text };
+                }
+
+                // Determinar se é sucesso ou erro
+                const isSuccess = output.status === 'success' || (!output.status && !text.toLowerCase().includes('erro'));
+
+                if (isSuccess) {
                     showAlert('Operação realizada com sucesso!', 'success');
-                    showResult(`<pre>${data.output || data.message}</pre>`);
-                    form.reset(); // Limpar formulário
+                    form.reset();
                 } else {
-                    showAlert(data.message, 'error');
-                    showResult(`<pre>${data.output || 'Erro na operação'}</pre>`, true);
+                    showAlert(output.message || 'Erro na operação', 'error');
+                }
+
+                // FORMATAÇÃO MELHORADA DO RESULTADO
+                let displayText = '';
+                if (output.text) {
+                    displayText = output.text.trim();
+                } else if (typeof output === 'string') {
+                    displayText = output.trim();
+                } else if (output.output) {
+                    displayText = output.output.trim();
+                } else {
+                    displayText = text.trim();
+                }
+
+                // Exibir resultado formatado
+                if (displayText.includes('\n') || displayText.length > 100) {
+                    showResult(`<pre>${displayText}</pre>`, !isSuccess);
+                } else {
+                    showResult(`<div style="font-family: monospace; padding: 10px; background: white; border-radius: 5px;">${displayText}</div>`, !isSuccess);
                 }
             })
             .catch(error => {
                 hideLoading();
                 showAlert('Erro de conexão: ' + error.message, 'error');
+                showResult(`<pre>Erro: ${error.message}</pre>`, true);
                 console.error('Erro:', error);
+            })
+            .finally(() => {
+                // LIBERAR SUBMIT após delay
+                setTimeout(() => {
+                    isFormSubmitting = false;
+                }, 1000);
             });
         }
 
-        // Funções de navegação
         function showSubmenu(submenuId) {
-            hideAlert();
-            hideResult();
+            // PREVENIR RACE CONDITIONS
+            if (!canClick() || !canNavigate()) {
+                return;
+            }
 
-            document.querySelectorAll('.submenu').forEach(function(sub) {
-                sub.classList.remove('active');
-            });
-            document.querySelectorAll('.instruction-panel').forEach(function(panel) {
-                panel.style.display = 'none';
-            });
-            document.getElementById('main-menu').style.display = 'none';
+            isNavigating = true;
 
-            var submenu = document.getElementById(submenuId);
-            if (submenu) submenu.classList.add('active');
+            try {
+                hideAlert();
+                hideResult();
+
+                // ESCONDER MENU PRINCIPAL
+                document.getElementById('main-menu').style.display = 'none';
+
+                // ESCONDER TODOS OS SUBMENUS (APENAS JavaScript - sem classes)
+                document.querySelectorAll('.submenu').forEach(function(sub) {
+                    sub.style.display = 'none';
+                    sub.classList.remove('active'); // Limpar classe residual
+                });
+
+                // ESCONDER TODOS OS FORMULÁRIOS (APENAS JavaScript - sem classes)
+                document.querySelectorAll('.form-container').forEach(function(form) {
+                    form.style.display = 'none';
+                    form.classList.remove('active'); // Limpar classe residual
+                });
+
+                // ESCONDER PAINÉIS DE INSTRUÇÃO
+                document.querySelectorAll('.instruction-panel').forEach(function(panel) {
+                    panel.style.display = 'none';
+                });
+
+                // ESCONDER MODAIS se estiverem abertos
+                const confirmOverlay = document.getElementById('confirmOverlay');
+                if (confirmOverlay) {
+                    confirmOverlay.style.display = 'none';
+                }
+
+                const folderBrowserModal = document.getElementById('folderBrowserModal');
+                if (folderBrowserModal) {
+                    folderBrowserModal.style.display = 'none';
+                }
+
+                // MOSTRAR O SUBMENU ESPECÍFICO (APENAS JavaScript)
+                var submenu = document.getElementById(submenuId);
+                if (submenu) {
+                    submenu.style.display = 'block';
+                }
+            } finally {
+                // LIBERAR NAVEGAÇÃO após um pequeno delay
+                setTimeout(() => {
+                    isNavigating = false;
+                }, 100);
+            }
         }
 
         function showMainMenu() {
-            // LIMPAR RESULTADOS quando voltar ao menu principal
-            const resultContainer = document.querySelector('.result-container');
-            if (resultContainer) {
-                resultContainer.style.display = 'none';
-                resultContainer.innerHTML = '';
+            // PREVENIR RACE CONDITIONS
+            if (!canClick() || !canNavigate()) {
+                return;
             }
 
-            // Limpar loading também
-            const loading = document.querySelector('.loading');
-            if (loading) {
-                loading.style.display = 'none';
+            isNavigating = true;
+
+            try {
+                // LIMPEZA COMPLETA DE TODOS OS ELEMENTOS
+
+                // 1. Limpar resultados
+                const resultContainer = document.querySelector('.result-container');
+                if (resultContainer) {
+                    resultContainer.style.display = 'none';
+                    resultContainer.innerHTML = '';
+                }
+
+                // 2. Limpar loading
+                const loading = document.querySelector('.loading');
+                if (loading) {
+                    loading.style.display = 'none';
+                }
+
+                // 3. Limpar alerts
+                hideAlert();
+
+                // 4. ESCONDER TODOS OS SUBMENUS (APENAS JavaScript)
+                document.querySelectorAll('.submenu').forEach(function(sub) {
+                    sub.style.display = 'none';
+                    sub.classList.remove('active'); // Limpar qualquer classe residual
+                });
+
+                // 5. ESCONDER TODOS OS FORMULÁRIOS (APENAS JavaScript)
+                document.querySelectorAll('.form-container').forEach(function(form) {
+                    form.style.display = 'none';
+                    form.classList.remove('active'); // Limpar qualquer classe residual
+                });
+
+                // 6. ESCONDER PAINÉIS DE INSTRUÇÃO
+                document.querySelectorAll('.instruction-panel').forEach(function(panel) {
+                    panel.style.display = 'none';
+                });
+
+                // 7. ESCONDER MODAIS (se estiverem abertos)
+                const confirmOverlay = document.getElementById('confirmOverlay');
+                if (confirmOverlay) {
+                    confirmOverlay.classList.remove('active');
+                    confirmOverlay.style.display = 'none';
+                }
+
+                const folderBrowserModal = document.getElementById('folderBrowserModal');
+                if (folderBrowserModal) {
+                    folderBrowserModal.style.display = 'none';
+                }
+
+                // 8. MOSTRAR O MENU PRINCIPAL
+                const mainMenu = document.getElementById('main-menu');
+                if (mainMenu) {
+                    mainMenu.style.display = 'grid';
+                }
+
+                // 9. LIMPAR CAMPOS DE FORMULÁRIOS (reset completo)
+                const inputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="date"], input[type="number"], textarea, select');
+                inputs.forEach(input => {
+                    if (input.type === 'radio' || input.type === 'checkbox') {
+                        input.checked = input.defaultChecked;
+                    } else {
+                        input.value = '';
+                    }
+                    input.style.borderColor = '';
+                });
+
+            } finally {
+                // LIBERAR NAVEGAÇÃO
+                setTimeout(() => {
+                    isNavigating = false;
+                }, 100);
             }
-
-            hideAlert();
-
-            document.querySelectorAll('.submenu').forEach(function(sub) {
-                sub.classList.remove('active');
-            });
-            document.querySelectorAll('.form-container').forEach(function(form) {
-                form.classList.remove('active');
-            });
-            document.getElementById('main-menu').style.display = 'grid';
-            document.querySelectorAll('.instruction-panel').forEach(function(panel) {
-                panel.style.display = 'none';
-            });
         }
 
         function showInstructionPanel(id) {
@@ -355,25 +556,67 @@
         }
 
         function showForm(formName) {
-            hideAlert();
-            hideResult();
+            // PREVENIR RACE CONDITIONS
+            if (!canClick() || !canNavigate()) {
+                return;
+            }
 
-            document.querySelectorAll('.form-container').forEach(function(form) {
-                form.classList.remove('active');
-            });
-            var el = document.getElementById(formName + '-form');
-            if (el) el.classList.add('active');
-            document.querySelectorAll('.instruction-panel').forEach(function(panel) {
-                panel.style.display = 'none';
-            });
+            isNavigating = true;
+
+            try {
+                hideAlert();
+                hideResult();
+
+                // Remover TODAS as classes active de formulários
+                document.querySelectorAll('.form-container').forEach(function(form) {
+                    form.classList.remove('active');
+                    form.style.display = 'none';
+                });
+
+                // Mostrar o formulário específico
+                var el = document.getElementById(formName + '-form');
+                if (el) {
+                    el.style.display = 'block';
+                }
+
+                // Esconder painéis de instrução
+                document.querySelectorAll('.instruction-panel').forEach(function(panel) {
+                    panel.style.display = 'none';
+                });
+            } finally {
+                // LIBERAR NAVEGAÇÃO
+                setTimeout(() => {
+                    isNavigating = false;
+                }, 50); // Menor delay para formulários
+            }
         }
 
         function hideForm() {
-            // Esconder todos os formulários
+            // ESCONDER TODOS OS FORMULÁRIOS (APENAS JavaScript)
             const forms = document.querySelectorAll('.form-container');
             forms.forEach(form => {
                 form.style.display = 'none';
+                          form.classList.remove('active'); // Limpar classe residual
             });
+
+            // ESCONDER TODOS OS SUBMENUS também (pode ter ficado aberto)
+            const submenus = document.querySelectorAll('.submenu');
+            submenus.forEach(sub => {
+                sub.style.display = 'none';
+                sub.classList.remove('active'); // Limpar classe residual
+            });
+
+            // ESCONDER MODAIS
+            const confirmOverlay = document.getElementById('confirmOverlay');
+            if (confirmOverlay) {
+                confirmOverlay.style.display = 'none';
+                confirmOverlay.classList.remove('active');
+            }
+
+            const folderBrowserModal = document.getElementById('folderBrowserModal');
+            if (folderBrowserModal) {
+                folderBrowserModal.style.display = 'none';
+            }
 
             // Limpar loading
             const loading = document.querySelector('.loading');
@@ -381,18 +624,16 @@
                 loading.style.display = 'none';
             }
 
-            // NÃO MEXER NO resultContainer - deixar resultado visível
-            // Comentado: resultContainer.style.display = 'none';
-            // Comentado: resultContainer.innerHTML = '';
-
             // Limpar campos dos formulários
-            const inputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="date"], textarea, select');
+            const inputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="date"], input[type="number"], textarea, select');
             inputs.forEach(input => {
                 if (input.type === 'radio' || input.type === 'checkbox') {
                     input.checked = input.defaultChecked;
                 } else {
                     input.value = '';
                 }
+                // Limpar estilos de validação
+                input.style.borderColor = '';
             });
         }
 

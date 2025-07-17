@@ -1,128 +1,3 @@
- // Substitua a função submitForm por esta versão melhorada:
- async function submitForm(event, action) {
-     event.preventDefault();
-
-     const form = event.target;
-     const formData = new FormData(form);
-     formData.append('action', action);
-
-     const resultContainer = document.querySelector('.result-container');
-     if(resultContainer) {
-         resultContainer.style.display = 'none';
-         resultContainer.innerHTML = '';
-     }
-
-     const loading = document.querySelector('.loading');
-     if(loading) loading.style.display = 'block';
-
-     try {
-         const response = await fetch('/cgi-bin/samba-admin.cgi', {
-             method: 'POST',
-             body: new URLSearchParams(formData)
-         });
-
-         let text = await response.text();
-         let output;
-
-         try {
-             output = JSON.parse(text);
-         } catch {
-             output = { text: text };
-         }
-
-         if(resultContainer) {
-             resultContainer.style.display = 'block';
-
-             // Melhor processamento do resultado
-             let displayText = '';
-             if (output.text) {
-                 displayText = output.text.trim(); // Remove \n e espaços extras
-             } else if (typeof output === 'string') {
-                 displayText = output.trim();
-             } else {
-                 displayText = JSON.stringify(output, null, 2);
-             }
-
-             // Se o resultado tem apenas uma linha, exibe simples, senão usa <pre>
-             if (displayText.includes('\n') || displayText.length > 100) {
-                 resultContainer.innerHTML = `<pre>${displayText}</pre>`;
-             } else {
-                 resultContainer.innerHTML = `<div style="font-family: monospace; padding: 10px; background: white; border-radius: 5px;">${displayText}</div>`;
-             }
-         }
-     } catch(e) {
-         if(resultContainer) {
-             resultContainer.style.display = 'block';
-             resultContainer.innerHTML = `<pre>Erro: ${e}</pre>`;
-         }
-     }
-
-     if(loading) loading.style.display = 'none';
- }
-
- // Substitua a função executeCommand por esta versão melhorada:
- async function executeCommand(action) {
-     const resultContainer = document.querySelector('.result-container');
-     if(resultContainer) {
-         resultContainer.style.display = 'none';
-         resultContainer.innerHTML = '';
-     }
-
-     const loading = document.querySelector('.loading');
-     if(loading) loading.style.display = 'block';
-
-     try {
-         const response = await fetch('/cgi-bin/samba-admin.cgi', {
-             method: 'POST',
-             body: new URLSearchParams({action})
-         });
-
-         let text = await response.text();
-         let output;
-
-         try {
-             output = JSON.parse(text);
-         } catch {
-             output = { text: text };
-         }
-
-         if(resultContainer) {
-             resultContainer.style.display = 'block';
-
-             // Melhor processamento do resultado
-             let displayText = '';
-             if (output.text) {
-                 displayText = output.text.trim(); // Remove \n e espaços extras
-             } else if (typeof output === 'string') {
-                 displayText = output.trim();
-             } else {
-                 displayText = JSON.stringify(output, null, 2);
-             }
-
-             // Se o resultado tem múltiplas linhas, usa <pre>, senão exibe simples
-             if (displayText.includes('\n')) {
-                 // Para listas, formatar melhor
-                 const lines = displayText.split('\n').filter(line => line.trim());
-                 if (lines.length > 1) {
-                     const formattedList = lines.map(line => `• ${line.trim()}`).join('<br>');
-                     resultContainer.innerHTML = `<div style="font-family: 'Segoe UI', sans-serif; line-height: 1.6;">${formattedList}</div>`;
-                 } else {
-                     resultContainer.innerHTML = `<div style="font-family: monospace; padding: 10px; background: white; border-radius: 5px;">${displayText}</div>`;
-                 }
-             } else {
-                 resultContainer.innerHTML = `<div style="font-family: monospace; padding: 10px; background: white; border-radius: 5px; font-size: 16px; color: #2c3e50;">${displayText}</div>`;
-             }
-         }
-     } catch(e) {
-         if(resultContainer) {
-             resultContainer.style.display = 'block';
-             resultContainer.innerHTML = `<pre>Erro: ${e}</pre>`;
-         }
-     }
-
-     if(loading) loading.style.display = 'none';
- }
-
  function showConfirmation(message, callback) {
      const overlay = document.getElementById('confirmOverlay');
      const messageEl = document.getElementById('confirmMessage');
@@ -130,24 +5,44 @@
      const noBtn = document.getElementById('confirmNo');
 
      messageEl.innerHTML = message;
-     overlay.classList.add('active');
+     overlay.style.display = 'flex'; // APENAS JavaScript
+     overlay.classList.remove('active'); // Limpar classe se existir
 
-     // Remover event listeners anteriores
-     yesBtn.onclick = null;
-     noBtn.onclick = null;
+     // MÉTODO SEGURO: Clonar elementos para remover TODOS os event listeners
+     const newYesBtn = yesBtn.cloneNode(true);
+     const newNoBtn = noBtn.cloneNode(true);
 
-     yesBtn.onclick = function() {
-         overlay.classList.remove('active');
+     yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+     noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+
+     // Adicionar novos event listeners aos elementos clonados
+     newYesBtn.addEventListener('click', function() {
+         overlay.style.display = 'none';
+         document.removeEventListener('keydown', window.currentEscHandler); // Limpar ESC
          callback(true);
+     });
+
+     newNoBtn.addEventListener('click', function() {
+         overlay.style.display = 'none';
+         document.removeEventListener('keydown', window.currentEscHandler); // Limpar ESC
+         callback(false);
+     });
+
+     // BACKUP: ESC para fechar (com proteção contra duplicatas)
+     const escHandler = function(e) {
+         if (e.key === 'Escape') {
+             overlay.style.display = 'none';
+             document.removeEventListener('keydown', escHandler);
+             callback(false);
+         }
      };
 
-     noBtn.onclick = function() {
-         overlay.classList.remove('active');
-         callback(false);
-     };
+     // REMOVER QUALQUER HANDLER ESC ANTERIOR antes de adicionar novo
+     document.removeEventListener('keydown', window.currentEscHandler);
+     window.currentEscHandler = escHandler;
+     document.addEventListener('keydown', escHandler);
  }
 
- // Função para expiração de senha (sim/não direto)
  function handlePasswordExpiry(event) {
      event.preventDefault();
      const username = document.getElementById('expiry-username').value;
@@ -157,76 +52,58 @@
          return;
      }
 
-     // Usar o modal de confirmação que já existe
-     const overlay = document.getElementById('confirmOverlay');
-     const messageEl = document.getElementById('confirmMessage');
-     const yesBtn = document.getElementById('confirmYes');
-     const noBtn = document.getElementById('confirmNo');
+     // USAR A FUNÇÃO SEGURA showConfirmation()
+     const message = `<strong>CONFIGURAR EXPIRAÇÃO DE SENHA</strong><br><br>Usuário: "${username}"<br><br>A senha deste usuário NÃO deve mais expirar?<br><br>• <strong>SIM</strong> = Senha nunca expira (--noexpiry)<br>• <strong>NÃO</strong> = Senha expira em 90 dias (padrão do domínio)`;
 
-     messageEl.innerHTML = `<strong>CONFIGURAR EXPIRAÇÃO DE SENHA</strong><br><br>Usuário: "${username}"<br><br>A senha deste usuário NÃO deve mais expirar?<br><br>• <strong>SIM</strong> = Senha nunca expira (--noexpiry)<br>• <strong>NÃO</strong> = Senha expira em 90 dias (padrão do domínio)`;
-     overlay.classList.add('active');
+     showConfirmation(message, function(confirmed) {
+         if (confirmed) {
+             // SIM - senha não expira
+             showLoading();
 
-     // Remover event listeners anteriores para evitar conflitos
-     yesBtn.onclick = null;
-     noBtn.onclick = null;
+             const formData = new URLSearchParams();
+             formData.append('action', 'set-no-expiry');
+             formData.append('username', username);
 
-     yesBtn.onclick = function() {
-         overlay.classList.remove('active');
+             fetch('/cgi-bin/samba-admin.cgi', {
+                 method: 'POST',
+                 body: formData
+             })
+             .then(response => response.text())
+             .then(data => {
+                 hideLoading();
+                 showResult(`<pre>${data}</pre>`);
+                 showAlert(`✓ Senha de "${username}" configurada para NUNCA EXPIRAR`, 'success');
+                 document.getElementById('expiry-username').value = '';
+             })
+             .catch(error => {
+                 hideLoading();
+                 showAlert('Erro: ' + error.message, 'error');
+             });
+         } else {
+             // NÃO - define prazo padrão
+             showLoading();
 
-         // Se confirmou SIM, senha não expira
-         showLoading();
+             const formData = new URLSearchParams();
+             formData.append('action', 'set-default-expiry');
+             formData.append('username', username);
 
-         const formData = new URLSearchParams();
-         formData.append('action', 'set-no-expiry');
-         formData.append('username', username);
-
-         fetch('/cgi-bin/samba-admin.cgi', {
-             method: 'POST',
-             body: formData
-         })
-         .then(response => response.text())
-         .then(data => {
-             hideLoading();
-             showResult(`<pre>${data}</pre>`);
-             showAlert(`✓ Senha de "${username}" configurada para NUNCA EXPIRAR`, 'success');
-
-             // Limpar o formulário
-             document.getElementById('expiry-username').value = '';
-         })
-         .catch(error => {
-             hideLoading();
-             showAlert('Erro: ' + error.message, 'error');
-         });
-     };
-
-     noBtn.onclick = function() {
-         overlay.classList.remove('active');
-
-         // Se cancelou (NÃO), define prazo padrão
-         showLoading();
-
-         const formData = new URLSearchParams();
-         formData.append('action', 'set-default-expiry');
-         formData.append('username', username);
-
-         fetch('/cgi-bin/samba-admin.cgi', {
-             method: 'POST',
-             body: formData
-         })
-         .then(response => response.text())
-         .then(data => {
-             hideLoading();
-             showResult(`<pre>${data}</pre>`);
-             showAlert(`✓ Senha de "${username}" vai expirar em 90 dias (padrão)`, 'success');
-
-             // Limpar o formulário
-             document.getElementById('expiry-username').value = '';
-         })
-         .catch(error => {
-             hideLoading();
-             showAlert('Erro: ' + error.message, 'error');
-         });
-     };
+             fetch('/cgi-bin/samba-admin.cgi', {
+                 method: 'POST',
+                 body: formData
+             })
+             .then(response => response.text())
+             .then(data => {
+                 hideLoading();
+                 showResult(`<pre>${data}</pre>`);
+                 showAlert(`✓ Senha de "${username}" vai expirar em 90 dias (padrão)`, 'success');
+                 document.getElementById('expiry-username').value = '';
+             })
+             .catch(error => {
+                 hideLoading();
+                 showAlert('Erro: ' + error.message, 'error');
+             });
+         }
+     });
  }
 
  function confirmDeleteOU(event) {
@@ -310,17 +187,39 @@
      });
  }
 
- // Função para mostrar/ocultar campo de data
  function toggleExpiryFields() {
-     const dateField = document.getElementById('date-field');
-     const expiryType = document.querySelector('input[name="expiry-type"]:checked').value;
+     // PROTEÇÃO CONTRA CLIQUES RÁPIDOS
+     if (!canClick()) {
+         return;
+     }
 
-     if (expiryType === 'date') {
-         dateField.style.display = 'block';
-         document.getElementById('account-expiry-date').required = true;
-     } else {
-         dateField.style.display = 'none';
-         document.getElementById('account-expiry-date').required = false;
+     try {
+         const dateField = document.getElementById('date-field');
+         const expiryTypeElement = document.querySelector('input[name="expiry-type"]:checked');
+
+         // VALIDAÇÃO DE ELEMENTOS
+         if (!dateField || !expiryTypeElement) {
+             return;
+         }
+
+         const expiryType = expiryTypeElement.value;
+
+         if (expiryType === 'date') {
+             dateField.style.display = 'block';
+             const dateInput = document.getElementById('account-expiry-date');
+             if (dateInput) {
+                 dateInput.required = true;
+             }
+         } else {
+             dateField.style.display = 'none';
+             const dateInput = document.getElementById('account-expiry-date');
+             if (dateInput) {
+                 dateInput.required = false;
+                 dateInput.value = ''; // Limpar valor se não for usado
+             }
+         }
+     } catch (error) {
+         return;
      }
  }
 
@@ -341,12 +240,12 @@
          return;
      }
 
+     // USAR showConfirmation() PADRONIZADA
      let confirmMessage;
      if (expiryType === 'never') {
          confirmMessage = `Definir que a CONTA do usuário "${username}" NUNCA expire?`;
          expiryDate = 'never';
      } else {
-         // Converter DD/MM/YYYY para YYYY-MM-DD se necessário
          if (expiryDate.includes('/')) {
              const parts = expiryDate.split('/');
              if (parts.length === 3) {
@@ -373,14 +272,12 @@
              .then(response => response.text())
              .then(data => {
                  if(loading) loading.style.display = 'none';
-
                  const resultContainer = document.querySelector('.result-container');
                  if(resultContainer) {
                      resultContainer.style.display = 'block';
                      resultContainer.innerHTML = `<pre>${data}</pre>`;
                  }
-
-                 showAlert('Comando executado', 'success');
+                 showAlert('Configuração aplicada', 'success');
              })
              .catch(error => {
                  if(loading) loading.style.display = 'none';
@@ -390,28 +287,53 @@
      });
  }
 
- // Função para voltar para Configurações do Domínio
  function backToDomainSettings() {
-     // Limpar resultados
-     const resultContainer = document.querySelector('.result-container');
-     if (resultContainer) {
-         resultContainer.style.display = 'none';
-         resultContainer.innerHTML = '';
+     // USAR PROTEÇÕES PADRÃO COMO OUTRAS FUNÇÕES DE NAVEGAÇÃO
+     if (!canClick() || !canNavigate()) {
+         return;
      }
 
-     // Limpar loading
-     const loading = document.querySelector('.loading');
-     if (loading) {
-         loading.style.display = 'none';
+     isNavigating = true;
+
+     try {
+         // Limpar resultados
+         const resultContainer = document.querySelector('.result-container');
+         if (resultContainer) {
+             resultContainer.style.display = 'none';
+             resultContainer.innerHTML = '';
+         }
+
+         // Limpar loading
+         const loading = document.querySelector('.loading');
+         if (loading) {
+             loading.style.display = 'none';
+         }
+
+         hideAlert();
+
+         // ESCONDER TODOS OS FORMULÁRIOS (padrão JavaScript)
+         document.querySelectorAll('.form-container').forEach(function(form) {
+             form.style.display = 'none';
+             form.classList.remove('active');
+         });
+
+         // ESCONDER TODOS OS SUBMENUS
+         document.querySelectorAll('.submenu').forEach(function(sub) {
+             sub.style.display = 'none';
+             sub.classList.remove('active');
+         });
+
+         // MOSTRAR O SUBMENU DE CONFIGURAÇÕES (padrão JavaScript)
+         const domainSettings = document.getElementById('domain-settings');
+         if (domainSettings) {
+             domainSettings.style.display = 'block';
+         }
+     } finally {
+         // LIBERAR NAVEGAÇÃO
+         setTimeout(() => {
+             isNavigating = false;
+         }, 100);
      }
-
-     hideAlert();
-
-     // Esconder todos os formulários
-     document.querySelectorAll('.form-container').forEach(function(form) {
-         form.classList.remove('active');
-     });
-
-     // Mostrar o submenu de configurações do domínio
-     showSubmenu('domain-settings');
  }
+
+
