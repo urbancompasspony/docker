@@ -1,38 +1,126 @@
 #!/bin/bash
 
-# To run 23:00 everyday!
+# Script de Log Rotate Melhorado
+# Para executar às 23:00 todos os dias:
 # 00 23 * * * bash /path/to/autolog
 
-pathto="/srv/containers/dominio/log/"
-logname="syslog"
+# Configurações
+BASE_PATH="/srv/containers/"
+LOGNAME="syslog"
+SCALE="50000000"  # 50MB em bytes
+DATETIME=$(date +"%H_%M_%S_-_%d_%m_%y")
 
-scale="50000000"
-
-datetime=$(date +"%H_%M_%S_-_%d_%m_%y")
-
-function check_root {
-  [ "$EUID" -ne 0 ] && {
-    echo "Run this script as Root! Exiting..."
-    exit
-    }
+# Função para verificar se é root
+function check_root() {
+    if [ "$EUID" -ne 0 ]; then
+        echo "ERROR: Este script deve ser executado como Root! Saindo..."
+        exit 1
+    fi
 }
 
-function check_size {
-  size=$(du --apparent-size --block-size=1 $pathto$logname | awk {print'$1'})
-
-  [ "$size" -ge "$scale" ] && {
-    #sudo mv "$pathto$logname" "$pathto$logname-$datetime.bkp"
-    sudo tar -I 'lz4 -1 -c -' -cpf "$pathto$logname-$datetime.tar.lz4" "$pathto$logname"
-
-    sudo touch "$pathto$logname"
-    sudo chmod 777 -R "$pathto$logname"
-  } || {
-    echo "Small log file. Exiting" > /dev/null
-  }
+# Função para processar log de uma pasta específica
+function process_log() {
+    local log_path="$1"
+    local log_file="$log_path$LOGNAME"
+    
+    # Verifica se o arquivo de log existe
+    if [ ! -f "$log_file" ]; then
+        echo "AVISO: Arquivo de log não encontrado: $log_file"
+        return 1
+    fi
+    
+    # Verifica o tamanho do arquivo
+    local size=$(du --apparent-size --block-size=1 "$log_file" 2>/dev/null | awk '{print $1}')
+    
+    if [ -z "$size" ]; then
+        echo "ERRO: Não foi possível determinar o tamanho de $log_file"
+        return 1
+    fi
+    
+    echo "Verificando $log_file - Tamanho: $size bytes"
+    
+    if [ "$size" -ge "$SCALE" ]; then
+        echo "Log grande encontrado em $log_path - Iniciando rotação..."
+        
+        # Cria backup comprimido
+        if tar -I 'lz4 -1 -c -' -cpf "$log_path$LOGNAME-$DATETIME.tar.lz4" "$log_file" 2>/dev/null; then
+            echo "Backup criado: $log_path$LOGNAME-$DATETIME.tar.lz4"
+            
+            # Limpa o arquivo original (mantém handles abertos)
+            if > "$log_file"; then
+                chmod 644 "$log_file"
+                echo "Log rotacionado com sucesso: $log_file"
+            else
+                echo "ERRO: Falha ao limpar o arquivo de log: $log_file"
+                return 1
+            fi
+        else
+            echo "ERRO: Falha ao criar backup de $log_file"
+            return 1
+        fi
+    else
+        echo "Log pequeno em $log_path - Não necessita rotação"
+    fi
 }
 
-# Start Here!
-check_root
-check_size
+# Função para encontrar e processar todas as pastas com "dominio"
+function find_and_process_logs() {
+    local found_dirs=()
+    
+    echo "Procurando por diretórios com 'dominio' em $BASE_PATH..."
+    
+    # Encontra todos os diretórios que contêm "dominio" no nome
+    while IFS= read -r -d '' dir; do
+        found_dirs+=("$dir")
+    done < <(find "$BASE_PATH" -maxdepth 1 -type d -name "*dominio*" -print0 2>/dev/null)
+    
+    if [ ${#found_dirs[@]} -eq 0 ]; then
+        echo "AVISO: Nenhum diretório com 'dominio' encontrado em $BASE_PATH"
+        return 1
+    fi
+    
+    echo "Encontrados ${#found_dirs[@]} diretório(s) com 'dominio':"
+    
+    # Processa cada diretório encontrado
+    for dir in "${found_dirs[@]}"; do
+        local log_path="$dir/log/"
+        echo "Processando: $dir"
+        
+        # Verifica se a pasta log existe
+        if [ -d "$log_path" ]; then
+            process_log "$log_path"
+        else
+            echo "AVISO: Pasta log não encontrada: $log_path"
+        fi
+        echo "---"
+    done
+}
 
-exit 1
+# Função principal
+function main() {
+    echo "=== Iniciando Log Rotate - $(date) ==="
+    
+    # Verifica se é root
+    check_root
+    
+    # Verifica se o caminho base existe
+    if [ ! -d "$BASE_PATH" ]; then
+        echo "ERRO: Caminho base não encontrado: $BASE_PATH"
+        exit 1
+    fi
+    
+    # Verifica se lz4 está instalado
+    if ! command -v lz4 &> /dev/null; then
+        echo "ERRO: lz4 não está instalado. Instale com: apt install lz4"
+        exit 1
+    fi
+    
+    # Processa os logs
+    find_and_process_logs
+    
+    echo "=== Log Rotate finalizado - $(date) ==="
+}
+
+# Inicia o script
+main "$@"
+exit 0
