@@ -1,0 +1,47 @@
+#!/bin/bash
+
+function check_source {
+  local origem="$1"
+  
+  # Verifica se parâmetro foi passado
+  if [ -z "$origem" ]; then
+    echo "ERRO: Caminho de origem não especificado!"
+    exit 1
+  fi
+  
+  # Verifica se diretório existe
+  if [ ! -d "$origem" ]; then
+    echo "ERRO: Diretório $origem não existe!"
+    exit 1
+  fi
+  
+  # Verifica se está montado (apenas se for um mount point)
+  if mountpoint -q "$origem" 2>/dev/null; then
+    echo "✓ $origem está montado"
+  fi
+  
+  # Verifica se não está vazio
+  if [ ! "$(ls -A "$origem")" ]; then
+    echo "ERRO: $origem está vazio!"
+    exit 1
+  fi
+  
+  echo "✓ $origem OK e não está vazio"
+}
+
+function rsync_backup {
+  local origem="$1"
+  local destino="$2"
+  
+  echo "Iniciando sincronização de $origem para $destino..."
+  sudo rsync --delete -aHAXv --numeric-ids --sparse "$origem" "$destino"
+}
+
+# Validação dos parâmetros
+if [ $# -ne 2 ]; then
+  echo "Uso: $0 /caminho/origem /caminho/destino"
+  exit 1
+fi
+
+# Executa
+check_source "$1" && rsync_backup "$1" "$2"
