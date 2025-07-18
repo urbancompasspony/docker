@@ -600,11 +600,11 @@
             });
 
             // ESCONDER TODOS OS SUBMENUS também (pode ter ficado aberto)
-            const submenus = document.querySelectorAll('.submenu');
-            submenus.forEach(sub => {
-                sub.style.display = 'none';
-                sub.classList.remove('active'); // Limpar classe residual
-            });
+            //const submenus = document.querySelectorAll('.submenu');
+            //submenus.forEach(sub => {
+            //    sub.style.display = 'none';
+            //    sub.classList.remove('active'); // Limpar classe residual
+            //});
 
             // ESCONDER MODAIS
             const confirmOverlay = document.getElementById('confirmOverlay');
