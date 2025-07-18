@@ -123,6 +123,16 @@ if ! [ -f /srv/containers/"$NOMECONTAINER"/config/smb.conf.bkp ]; then
   echo ""; echo "OK"; sleep 0.5
 fi
 
+if [ -z "$(ls -A /srv/containers/"$NOMECONTAINER"/config/smb.conf.d/)" ]; then
+  echo ""; echo "############################################################"
+  echo ""; echo "smb.conf.d vazia...criando algo"; echo ""
+  sudo touch /srv/containers/"$NOMECONTAINER"/config/smb.conf.d/EMPTY.conf
+  docker exec "$NOMECONTAINER" bash -c 'touch /etc/samba/external/smb.conf.d/EMPTY.conf'
+  docker exec "$NOMECONTAINER" bash -c 'find /etc/samba/external/smb.conf.d/ -type f -print | sed -e 's/^/include = /' > /etc/samba/external/includes.conf'
+  docker exec "$NOMECONTAINER" bash -c 'smbcontrol all reload-config'
+  docker restart "$NOMECONTAINER"
+fi
+
 echo ""; echo "############################################################"
 echo ""; echo "Restoring CUPS Default Config"; echo ""
 docker exec "$NOMECONTAINER" bash -c '
