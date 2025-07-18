@@ -25,12 +25,14 @@ function check_dependencies {
 function check_disk_space {
   local origem="$1"
   local destino="$2"
+  local espaco_disponivel
+  local espaco_origem
   
   # Get available space in destination (in KB)
-  local espaco_disponivel=$(df "$destino" | tail -1 | awk '{print $4}')
+  espaco_disponivel=$(df "$destino" | tail -1 | awk '{print $4}')
   
   # Get space needed from source (in KB) - using apparent size for speed
-  local espaco_origem=$(du -s --apparent-size "$origem" | awk '{print $1}')
+  espaco_origem=$(du -s --apparent-size "$origem" | awk '{print $1}')
   
   # Convert to MB for display
   local disponivel_mb=$(( espaco_disponivel / 1024 ))
@@ -48,6 +50,8 @@ function check_disk_space {
   
   echo "✓ Espaço em disco suficiente"
 }
+
+function check_source {
   local origem="$1"
   local modo="$2"
   
@@ -65,7 +69,7 @@ function check_disk_space {
   
   # Verifica montagem baseado no modo
   case "$modo" in
-    "OD"|"MM")
+    "ML"|"M")
       # Origem deve estar montada
       if ! mountpoint -q "$origem" 2>/dev/null; then
         echo "ERRO: $origem deve estar montado para o modo $modo!"
@@ -73,7 +77,7 @@ function check_disk_space {
       fi
       echo "✓ $origem está montado"
       ;;
-    "DO"|"L")
+    "LM"|"L")
       # Origem é pasta comum - apenas verifica se está montado para informar
       if mountpoint -q "$origem" 2>/dev/null; then
         echo "✓ $origem está montado"
@@ -103,8 +107,7 @@ function check_destination {
   # Cria o diretório de destino se não existir
   if [ ! -d "$destino" ]; then
     echo "Criando diretório de destino: $destino"
-    sudo mkdir -p "$destino"
-    if [ $? -ne 0 ]; then
+    if ! sudo mkdir -p "$destino"; then
       echo "ERRO: Não foi possível criar o diretório $destino!"
       exit 1
     fi
@@ -112,7 +115,7 @@ function check_destination {
   
   # Verifica montagem baseado no modo
   case "$modo" in
-    "DO"|"MM")
+    "LM"|"M")
       # Destino deve estar montado
       if ! mountpoint -q "$destino" 2>/dev/null; then
         echo "ERRO: $destino deve estar montado para o modo $modo!"
@@ -122,7 +125,7 @@ function check_destination {
       fi
       echo "✓ $destino está montado"
       ;;
-    "OD"|"L")
+    "ML"|"L")
       # Destino é pasta comum - apenas verifica se está montado para informar
       if mountpoint -q "$destino" 2>/dev/null; then
         echo "✓ $destino está montado"
@@ -131,7 +134,7 @@ function check_destination {
   esac
   
   # Para modo L, verifica se destino não está vazio (exceto se for novo)
-  if [ "$modo" = "L" ] && [ "$(ls -A "$destino" 2>/dev/null | wc -l)" -gt 0 ]; then
+  if [ "$modo" = "L" ] && [ -n "$(find "$destino" -maxdepth 1 -name '*' -print -quit 2>/dev/null)" ]; then
     echo "✓ $destino não está vazio (modo L)"
   fi
   
@@ -150,7 +153,8 @@ function rsync_backup {
   local modo="$3"
   
   # Create log file with timestamp
-  local timestamp=$(date '+%Y%m%d_%H%M%S')
+  local timestamp
+  timestamp=$(date '+%Y%m%d_%H%M%S')
   local log_file="${destino}/backup_${timestamp}.log"
   
   echo "Iniciando sincronização de $origem para $destino (modo $modo)..."
@@ -190,7 +194,7 @@ function rsync_backup {
       *)
         echo "ERRO: Rsync falhou com código $rsync_exit_code"
         echo "Verifique o log em $log_file para detalhes"
-        exit $rsync_exit_code
+        exit "$rsync_exit_code"
         ;;
     esac
   else
@@ -203,16 +207,16 @@ function show_help {
   echo "Uso: $0 /caminho/origem /caminho/destino MODO"
   echo ""
   echo "MODOS:"
-  echo "  L   = Local-Local (origem e destino são pastas comuns, não podem estar vazias)"
-  echo "  OD  = Origem-Destino (origem montada → destino pasta comum)"
-  echo "  DO  = Destino-Origem (origem pasta comum → destino montado)"
-  echo "  MM  = Mount-Mount (origem e destino montados em /mnt)"
+  echo "  L   = Local (origem e destino são pastas comuns, não podem estar vazias)"
+  echo "  ML  = Mount-Local (origem montada → destino pasta comum)"
+  echo "  LM  = Local-Mount (origem pasta comum → destino montado)"
+  echo "  M   = Mount (origem e destino montados em /mnt)"
   echo ""
   echo "Exemplos:"
   echo "  $0 /home/usuario /backup L"
-  echo "  $0 /mnt/pendrive /home/backup OD"
-  echo "  $0 /var/www /mnt/backup-hd DO"
-  echo "  $0 /mnt/dados /mnt/backup MM"
+  echo "  $0 /mnt/pendrive /home/backup ML"
+  echo "  $0 /var/www /mnt/backup-hd LM"
+  echo "  $0 /mnt/dados /mnt/backup M"
 }
 
 # Validação dos parâmetros
@@ -227,7 +231,7 @@ modo="$3"
 
 # Valida o modo
 case "$modo" in
-  "L"|"OD"|"DO"|"MM")
+  "L"|"ML"|"LM"|"M")
     ;;
   *)
     echo "ERRO: Modo '$modo' inválido!"
@@ -243,16 +247,16 @@ echo ""
 
 case "$modo" in
   "L")
-    echo "Modo L: Pastas locais - ambas devem existir e não estar vazias"
+    echo "Modo L: Local - ambas pastas devem existir e não estar vazias"
     ;;
-  "M1")
-    echo "Modo M1: Origem montada -> Destino pasta comum"
+  "ML")
+    echo "Modo ML: Mount-Local - origem montada → destino pasta comum"
     ;;
-  "M2")
-    echo "Modo M2: Origem pasta comum -> Destino montado"
+  "LM")
+    echo "Modo LM: Local-Mount - origem pasta comum → destino montado"
     ;;
-  "M3")
-    echo "Modo M3: Origem montada -> Destino montado"
+  "M")
+    echo "Modo M: Mount - origem e destino montados"
     ;;
 esac
 
