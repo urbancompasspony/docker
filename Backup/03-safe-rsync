@@ -65,7 +65,7 @@ function check_disk_space {
   
   # Verifica montagem baseado no modo
   case "$modo" in
-    "M1"|"M3")
+    "OD"|"MM")
       # Origem deve estar montada
       if ! mountpoint -q "$origem" 2>/dev/null; then
         echo "ERRO: $origem deve estar montado para o modo $modo!"
@@ -73,7 +73,7 @@ function check_disk_space {
       fi
       echo "✓ $origem está montado"
       ;;
-    "M2"|"L")
+    "DO"|"L")
       # Origem é pasta comum - apenas verifica se está montado para informar
       if mountpoint -q "$origem" 2>/dev/null; then
         echo "✓ $origem está montado"
@@ -112,7 +112,7 @@ function check_destination {
   
   # Verifica montagem baseado no modo
   case "$modo" in
-    "M2"|"M3")
+    "DO"|"MM")
       # Destino deve estar montado
       if ! mountpoint -q "$destino" 2>/dev/null; then
         echo "ERRO: $destino deve estar montado para o modo $modo!"
@@ -122,7 +122,7 @@ function check_destination {
       fi
       echo "✓ $destino está montado"
       ;;
-    "M1"|"L")
+    "OD"|"L")
       # Destino é pasta comum - apenas verifica se está montado para informar
       if mountpoint -q "$destino" 2>/dev/null; then
         echo "✓ $destino está montado"
@@ -203,16 +203,16 @@ function show_help {
   echo "Uso: $0 /caminho/origem /caminho/destino MODO"
   echo ""
   echo "MODOS:"
-  echo "  L   = Pastas locais (origem e destino são pastas comuns, não podem estar vazias)"
-  echo "  M1  = Origem montada + Destino pasta comum"
-  echo "  M2  = Origem pasta comum + Destino montado"
-  echo "  M3  = Origem e destino montados (volumes em /mnt)"
+  echo "  L   = Local-Local (origem e destino são pastas comuns, não podem estar vazias)"
+  echo "  OD  = Origem-Destino (origem montada → destino pasta comum)"
+  echo "  DO  = Destino-Origem (origem pasta comum → destino montado)"
+  echo "  MM  = Mount-Mount (origem e destino montados em /mnt)"
   echo ""
   echo "Exemplos:"
   echo "  $0 /home/usuario /backup L"
-  echo "  $0 /mnt/pendrive /home/backup M1"
-  echo "  $0 /var/www /mnt/backup-hd M2"
-  echo "  $0 /mnt/dados /mnt/backup M3"
+  echo "  $0 /mnt/pendrive /home/backup OD"
+  echo "  $0 /var/www /mnt/backup-hd DO"
+  echo "  $0 /mnt/dados /mnt/backup MM"
 }
 
 # Validação dos parâmetros
@@ -227,7 +227,7 @@ modo="$3"
 
 # Valida o modo
 case "$modo" in
-  "L"|"M1"|"M2"|"M3")
+  "L"|"OD"|"DO"|"MM")
     ;;
   *)
     echo "ERRO: Modo '$modo' inválido!"
