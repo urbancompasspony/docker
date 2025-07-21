@@ -120,6 +120,8 @@ if [ -z "$(ls -A /srv/containers/"$NOMECONTAINER"/config/smb.conf.d/)" ]; then
   docker exec "$NOMECONTAINER" bash -c 'find /etc/samba/external/smb.conf.d/ -type f -print | sed -e "s|^|include = |" > /etc/samba/external/includes.conf'
   docker exec "$NOMECONTAINER" bash -c 'smbcontrol all reload-config'
   echo ""; echo "OK"; sleep 0.5
+else
+  echo ""; echo "smb.conf.d OK"; echo ""
 fi
 
 echo ""; echo "############################################################"
