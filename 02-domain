@@ -99,38 +99,43 @@ function docker_create {
 }
 
 function docker_extras {
-clear
-echo ""; echo "############################################################"
+clear; echo ""; echo "############################################################"
 echo ""; echo "Configuring Apache2"; echo ""
-docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/autoconfig.sh | bash"
-docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Apache2/auth-togle-for-ad.sh  | bash"
-docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auth-toggle.sh > auth-toggle.sh"
-docker exec "$NOMECONTAINER" bash -c "mv auth-toggle.sh /usr/bin/; chmod +x /usr/bin/auth-toggle.sh"
-docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/setup_auth.sh > setup_auth.sh"
-docker exec "$NOMECONTAINER" bash -c "mv setup_auth.sh /usr/bin/; chmod +x /usr/bin/setup_auth.sh"
+docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/autoconfig.sh --output /tmp/autoconfig.sh; bash /tmp/autoconfig.sh"
+docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Apache2/auth-togle-for-ad.sh --output auth-togle-for-ad.sh"
+docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auth-toggle.sh --output /tmp/auth-toggle.sh; mv /tmp/auth-toggle.sh /usr/bin/; chmod +x /usr/bin/auth-toggle.sh"
+docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/setup_auth.sh --output /tmp/setup_auth.sh; mv /tmp/setup_auth.sh /usr/bin/; chmod +x /usr/bin/setup_auth.sh"
 docker exec "$NOMECONTAINER" bash -c "mkdir -p /etc/apache2/auth"
 docker exec "$NOMECONTAINER" bash -c "htpasswd -c /etc/apache2/auth/.htpasswd admin"
 docker exec "$NOMECONTAINER" bash -c "htpasswd -b /etc/apache2/auth/.htpasswd admin $VALUE10"
 echo ""; echo "OK"; sleep 0.5
 
-if ! [ -f /srv/containers/"$NOMECONTAINER"/config/smb.conf.bkp ]; then
-  echo ""; echo "############################################################"
-  echo ""; echo "Removing loopback network from smb.conf"; echo ""
-  sudo sed -i '/127.0.0/d' /srv/containers/"$NOMECONTAINER"/config/smb.conf
-  docker exec "$NOMECONTAINER" bash -c 'curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/SAMBA_Model/auto_configure.sh | bash'
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/SAMBA_Model/auto_configure.sh | tee /tmp/auto_configure.sh; chmod +x /tmp/auto_configure.sh
-  sudo bash /tmp/auto_configure.sh /srv/containers/$NOMECONTAINER/config/smb.conf
+echo ""; echo "############################################################"; echo ""
+if [ -z "$(ls -A /srv/containers/"$NOMECONTAINER"/config/smb.conf.d/)" ]; then
+  echo ""; echo "smb.conf.d vazia... criando algo"; echo ""
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/config/smb.conf.d/
+  sudo touch /srv/containers/"$NOMECONTAINER"/config/smb.conf.d/EMPTY.conf
+  docker exec "$NOMECONTAINER" bash -c 'mkdir -p /etc/samba/external/smb.conf.d/'
+  docker exec "$NOMECONTAINER" bash -c 'touch /etc/samba/external/includes.conf'
+  docker exec "$NOMECONTAINER" bash -c 'find /etc/samba/external/smb.conf.d/ -type f -print | sed -e "s|^|include = |" > /etc/samba/external/includes.conf'
+  docker exec "$NOMECONTAINER" bash -c 'smbcontrol all reload-config'
   echo ""; echo "OK"; sleep 0.5
 fi
 
-if [ -z "$(ls -A /srv/containers/"$NOMECONTAINER"/config/smb.conf.d/)" ]; then
-  echo ""; echo "############################################################"
-  echo ""; echo "smb.conf.d vazia...criando algo"; echo ""
-  sudo touch /srv/containers/"$NOMECONTAINER"/config/smb.conf.d/EMPTY.conf
-  docker exec "$NOMECONTAINER" bash -c 'touch /etc/samba/external/smb.conf.d/EMPTY.conf'
-  docker exec "$NOMECONTAINER" bash -c 'find /etc/samba/external/smb.conf.d/ -type f -print | sed -e 's/^/include = /' > /etc/samba/external/includes.conf'
-  docker exec "$NOMECONTAINER" bash -c 'smbcontrol all reload-config'
-  docker restart "$NOMECONTAINER"
+echo ""; echo "############################################################"
+echo ""; echo "Restarting Domain 1/2"; echo ""
+if docker restart "$NOMECONTAINER"; then
+  echo ""; echo "OK"; sleep 0.5
+fi
+
+echo ""; echo "############################################################"; echo ""
+if ! [ -f /srv/containers/"$NOMECONTAINER"/config/smb.conf.bkp ]; then
+  echo ""; echo "Creating a smb.conf Model-based"; echo ""
+  docker exec "$NOMECONTAINER" bash -c 'curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/SAMBA_Model/auto_configure.sh --output auto_configure.sh; chmod +x auto_configure.sh'
+  docker exec "$NOMECONTAINER" bash -c 'bash auto_configure.sh'
+  curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/SAMBA_Model/auto_configure.sh --output /tmp/auto_configure.sh; chmod +x /tmp/auto_configure.sh
+  sudo bash /tmp/auto_configure.sh /srv/containers/"$NOMECONTAINER"/config/smb.conf
+  echo ""; echo "OK"; sleep 0.5
 fi
 
 echo ""; echo "############################################################"
@@ -145,11 +150,12 @@ docker exec "$NOMECONTAINER" bash -c '
   echo "ServerAlias *" >> /etc/cups/cupsd.conf
   echo "DefaultEncryption Never" >> /etc/cups/cupsd.conf
 '
-echo ""; echo "OK"; sleep 0.5
+# /\ cuidado: tem um apostrofo acima!
+echo "OK"; sleep 0.5
 
 echo ""; echo "############################################################"
 echo ""; echo "Getting MENU for samba-tools"; echo ""
-docker exec "$NOMECONTAINER" bash -c "wget https://raw.githubusercontent.com/urbancompasspony/server/main/domain -O /root/.init"
+docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/server/main/domain --output /root/.init"
 docker exec "$NOMECONTAINER" bash -c "echo '/root/.init' >> /root/.bashrc"
 docker exec "$NOMECONTAINER" bash -c "echo alias menu=\'/root/.init\' >> /root/.bashrc"
 docker exec "$NOMECONTAINER" bash -c "echo alias domain=\'/root/.init\' >> /root/.bashrc"
@@ -157,21 +163,30 @@ docker exec "$NOMECONTAINER" bash -c "chmod +x /root/.init"
 echo ""; echo "OK"; sleep 0.5
 
 echo ""; echo "############################################################"
-echo ""; echo "Adjusting /syslog and NTP"; echo ""
-docker exec "$NOMECONTAINER" rm /run/rsyslog.pid
-docker exec "$NOMECONTAINER" chmod 777 -R /var/log/syslog
-docker exec "$NOMECONTAINER" chmod 777 -R /var/lib/samba/sysvol
-echo ""; echo "OK"; sleep 0.5
+echo ""; echo "Adjusting or fixing /syslog"; echo ""
+if docker exec "$NOMECONTAINER" bash -c "rm /run/rsyslogd.pid"; then
+  echo "OK"; sleep 0.5
+fi
+
+if docker exec "$NOMECONTAINER" chmod 777 -R /var/log/syslog; then
+  echo "OK"; sleep 0.5
+fi
+
+if docker exec "$NOMECONTAINER" chmod 777 -R /var/lib/samba/sysvol; then
+  echo "OK"; sleep 0.5
+fi
 
 echo ""; echo "############################################################"
-echo ""; echo "Restarting Domain!"; echo ""
-docker restart "$NOMECONTAINER"
-echo ""; echo "OK"; sleep 0.5
+echo ""; echo "Restarting Domain 2/2"; echo ""
+if docker restart "$NOMECONTAINER"; then
+  echo ""; echo "OK"; sleep 0.5
+fi
 
 echo ""; echo "############################################################"
-echo ""; echo "Adjusting SYSVOL Permissions"; echo ""
-docker exec "$NOMECONTAINER" samba-tool ntacl sysvolreset -U Administrator
-echo ""; echo "OK"; sleep 0.5
+echo ""; echo "Fixing SYSVOL Permissions"; echo ""
+if docker exec "$NOMECONTAINER" samba-tool ntacl sysvolreset -U Administrator; then
+  echo ""; echo "OK"; sleep 0.5
+fi
 :; }
 
 # ----------------------------------------------------------------------
