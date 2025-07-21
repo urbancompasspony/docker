@@ -129,7 +129,7 @@ cat > "$DESTINO_CONF" << EOF
 
 # Spool
 [printers]
-  browseable = Yes
+  browseable = No
   path = /var/spool/samba
   printable = Yes
   guest ok = No
@@ -140,7 +140,7 @@ cat > "$DESTINO_CONF" << EOF
 [print$]
   path = /var/lib/samba/printers
   read only = No
-  browsable = Yes
+  browsable = No
   guest ok = No
   vfs objects = acl_xattr recycle crossrename
   nt acl support = Yes
