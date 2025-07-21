@@ -48,7 +48,7 @@ function process_log() {
             
             # Limpa o arquivo original (mantém handles abertos)
             if > "$log_file"; then
-                chmod 644 "$log_file"
+                chmod 777 "$log_file"
                 echo "Log rotacionado com sucesso: $log_file"
             else
                 echo "ERRO: Falha ao limpar o arquivo de log: $log_file"
