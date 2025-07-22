@@ -178,10 +178,6 @@ if docker exec "$NOMECONTAINER" chmod 777 -R /var/lib/samba/sysvol; then
   echo "OK"; sleep 0.5
 fi
 
-#not used for now ?
-#docker exec "$NOMECONTAINER" chown root:sambashare /var/lib/samba/usershares/
-#docker exec "$NOMECONTAINER" chmod 1770 /var/lib/samba/usershares/
-
 echo ""; echo "############################################################"
 echo ""; echo "Restarting Domain 2/2"; echo ""
 if docker restart "$NOMECONTAINER"; then
