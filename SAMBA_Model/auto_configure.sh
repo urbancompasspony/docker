@@ -89,7 +89,7 @@ cat > "$DESTINO_CONF" << EOF
   audit:failure = none
   full_audit:success = unlinkat renameat
   full_audit:prefix = IP=%I|USER=%u|MACHINE=%m|VOLUME=%S
-  log level = 0 vfs:0
+  log level = 0 vfs:0 rpc_srv:0 rpc_parse:0
   #syslog = 0
   recycle:repository = /mnt/Lixeira/%U
   recycle:excludedir = /mnt/Lixeira,/recycle,/tmp,/temp,/TMP,/TEMP
