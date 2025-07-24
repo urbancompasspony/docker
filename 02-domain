@@ -108,6 +108,7 @@ docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubuserc
 docker exec "$NOMECONTAINER" bash -c "mkdir -p /etc/apache2/auth"
 docker exec "$NOMECONTAINER" bash -c "htpasswd -c /etc/apache2/auth/.htpasswd admin"
 docker exec "$NOMECONTAINER" bash -c "htpasswd -b /etc/apache2/auth/.htpasswd admin $VALUE10"
+docker exec "$NOMECONTAINER" bash -c "bash /auth-togle-for-ad.sh"
 echo ""; echo "OK"; sleep 0.5
 
 echo ""; echo "############################################################"; echo ""
