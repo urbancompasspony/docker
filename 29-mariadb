@@ -43,7 +43,7 @@ function docker_create {
     -e MARIADB_DATABASE="$VALUE4" \
     -e MARIADB_USER="$VALUE5" \
     -e MARIADB_PASSWORD="$VALUE6" \
-    -v "$var7"/mysql:/var/lib/mysql \
+    -v "$VALUE7"/mysql:/var/lib/mysql \
     "$docker_repo":"$VALUE8"
 
     return
@@ -56,7 +56,7 @@ function docker_create {
   -e MARIADB_DATABASE="$VALUE4" \
   -e MARIADB_USER="$VALUE5" \
   -e MARIADB_PASSWORD="$VALUE6" \
-  -v "$var7"/mysql:/var/lib/mysql \
+  -v "$VALUE7"/mysql:/var/lib/mysql \
   "$docker_repo":"$VALUE8"
 }
 
