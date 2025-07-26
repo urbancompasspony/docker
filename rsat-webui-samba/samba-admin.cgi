@@ -1380,13 +1380,8 @@ samba_processes() {
 show_shares() {
     # Verificar se o diretório existe
     if [ -d "/etc/samba/external/smb.conf.d/" ]; then
-        # Contar compartilhamentos primeiro
-        share_count=0
-        for conf_file in /etc/samba/external/smb.conf.d/*.conf; do
-            if [ -f "$conf_file" ]; then
-                share_count=$((share_count + 1))
-            fi
-        done
+        # Contar compartilhamentos primeiro (otimizado)
+        share_count=$(find /etc/samba/external/smb.conf.d/ -name "*.conf" -type f 2>/dev/null | wc -l)
         
         if [ $share_count -eq 0 ]; then
             echo "📭 Nenhum compartilhamento encontrado em /etc/samba/external/smb.conf.d/"
@@ -1399,9 +1394,9 @@ show_shares() {
         echo "📊 COMPARTILHAMENTOS ENCONTRADOS: $share_count"
         echo ""
         
-        # Listar cada compartilhamento com formatação adequada
+        # Listar cada compartilhamento com formatação adequada (otimizado)
         count=0
-        for conf_file in /etc/samba/external/smb.conf.d/*.conf; do
+        find /etc/samba/external/smb.conf.d/ -name "*.conf" -type f 2>/dev/null | sort | while read conf_file; do
             if [ -f "$conf_file" ]; then
                 count=$((count + 1))
                 share_name=$(basename "$conf_file" .conf)
@@ -1412,26 +1407,39 @@ show_shares() {
                 
                 # Verificar se arquivo não está vazio
                 if [ -s "$conf_file" ]; then
-                    # Extrair informações principais primeiro
-                    path=$(grep "^path" "$conf_file" | cut -d= -f2- | sed 's/^ *//' | head -1)
-                    users=$(grep "^valid users" "$conf_file" | cut -d= -f2- | sed 's/^ *//' | head -1)
-                    writable=$(grep "^writable" "$conf_file" | cut -d= -f2- | sed 's/^ *//' | head -1)
-                    browsable=$(grep "^browsable" "$conf_file" | cut -d= -f2- | sed 's/^ *//' | head -1)
+                    # Extrair informações principais primeiro (otimizado com awk em vez de grep)
+                    path=$(awk -F= '/^path/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
+                    users=$(awk -F= '/^valid users/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
+                    writable=$(awk -F= '/^writable/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
+                    browsable=$(awk -F= '/^browsable/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
                     
                     echo "📁 Caminho: $path"
                     echo "👥 Usuários: $users"
                     echo "✏️ Gravável: $writable"
                     echo "👁️ Navegável: $browsable"
                     
-                    # Verificar se a pasta existe
-                    if [ -n "$path" ] && [ -d "$path" ]; then
-                        echo "✅ Pasta existe no disco"
-                        if command -v du >/dev/null 2>&1; then
-                            folder_size=$(du -sh "$path" 2>/dev/null | cut -f1)
-                            echo "📊 Tamanho: $folder_size"
+                    # Verificar se a pasta existe (com timeout para evitar travamento em pastas grandes)
+                    if [ -n "$path" ]; then
+                        if timeout 3s test -d "$path" 2>/dev/null; then
+                            echo "✅ Pasta existe no disco"
+                            
+                            # Calcular tamanho SEM entrar em pastas do SyncCentre (muito mais rápido)
+                            if ! echo "$path" | grep -iE "(sync|synccentre)" >/dev/null 2>&1; then
+                                if command -v du >/dev/null 2>&1; then
+                                    # Usar timeout para evitar travamento em pastas grandes
+                                    folder_size=$(timeout 5s du -sh "$path" 2>/dev/null | cut -f1)
+                                    if [ -n "$folder_size" ]; then
+                                        echo "📊 Tamanho: $folder_size"
+                                    else
+                                        echo "📊 Tamanho: (calculando em background...)"
+                                    fi
+                                fi
+                            else
+                                echo "📊 Tamanho: (pasta grande - não calculado para performance)"
+                            fi
+                        else
+                            echo "❌ Pasta não existe no disco!"
                         fi
-                    else
-                        echo "❌ Pasta não existe no disco!"
                     fi
                     
                     echo ""
@@ -1745,15 +1753,28 @@ list_directory_tree() {
         return
     fi
 
-    # Gerar estrutura JSON da árvore
+    # Gerar estrutura JSON da árvore COM EXCLUSÕES OTIMIZADAS
     echo "{"
     echo "\"path\": \"$BROWSE_PATH\","
     echo "\"children\": ["
     
     first=true
-    find "$BROWSE_PATH" -maxdepth 3 -type d 2>/dev/null | sort | while IFS= read -r dir; do
+    
+    # COMANDO FIND ULTRA-OTIMIZADO: Excluir pastas problemáticas do SyncCentre
+    # -prune = não entra na pasta E não a lista (muito mais rápido)
+    # timeout = limite de 10 segundos para evitar travamento
+    timeout 10s find "$BROWSE_PATH" -maxdepth 3 -type d \
+        \( -iname "*sync*" -o -iname "*synccentre*" -o -iname "*temp*" -o -iname "*.tmp" -o -iname "*cache*" -o -iname "*log*" -o -iname ".*" \) -prune \
+        -o -type d -print 2>/dev/null | sort | while IFS= read -r dir; do
+        
         # Pular o próprio diretório raiz na primeira iteração
         if [ "$dir" = "$BROWSE_PATH" ]; then
+            continue
+        fi
+        
+        # Verificação adicional: pular se o nome da pasta contém termos problemáticos
+        dir_name=$(basename "$dir")
+        if echo "$dir_name" | grep -iE "(sync|synccentre|temp|\.tmp|cache|log|^\.|recycle)" >/dev/null 2>&1; then
             continue
         fi
         
@@ -1767,11 +1788,11 @@ list_directory_tree() {
         relative_path=${dir#$BROWSE_PATH}
         relative_path=${relative_path#/}
         
-        # Verificar se é pasta vazia
-        if [ -z "$(ls -A "$dir" 2>/dev/null)" ]; then
-            empty=true
-        else
+        # Verificar se é pasta vazia (com timeout super rápido de 1 segundo)
+        if timeout 1s find "$dir" -maxdepth 1 -mindepth 1 -print -quit 2>/dev/null | grep -q .; then
             empty=false
+        else
+            empty=true
         fi
         
         # Adicionar vírgula se não for o primeiro
