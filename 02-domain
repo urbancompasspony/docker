@@ -126,7 +126,7 @@ else
 fi
 
 echo ""; echo "############################################################"
-echo ""; echo "Restarting Domain 1/2"; echo ""
+echo ""; echo "Restarting Domain 1/3"; echo ""
 if docker restart "$NOMECONTAINER"; then
   echo ""; echo "OK"; sleep 0.5
 fi
@@ -138,6 +138,12 @@ if ! [ -f /srv/containers/"$NOMECONTAINER"/config/smb.conf.bkp ]; then
   docker exec "$NOMECONTAINER" bash -c 'bash auto_configure.sh'
   curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/SAMBA_Model/auto_configure.sh --output /tmp/auto_configure.sh; chmod +x /tmp/auto_configure.sh
   sudo bash /tmp/auto_configure.sh /srv/containers/"$NOMECONTAINER"/config/smb.conf
+  echo ""; echo "OK"; sleep 0.5
+fi
+
+echo ""; echo "############################################################"
+echo ""; echo "Restarting Domain 2/3"; echo ""
+if docker restart "$NOMECONTAINER"; then
   echo ""; echo "OK"; sleep 0.5
 fi
 
@@ -180,7 +186,7 @@ if docker exec "$NOMECONTAINER" chmod 777 -R /var/lib/samba/sysvol; then
 fi
 
 echo ""; echo "############################################################"
-echo ""; echo "Restarting Domain 2/2"; echo ""
+echo ""; echo "Restarting Domain 3/3"; echo ""
 if docker restart "$NOMECONTAINER"; then
   echo ""; echo "OK"; sleep 0.5
 fi
