@@ -1,34 +1,21 @@
 #!/bin/bash
 
-# Script para adaptar smb.conf para a nova estrutura
-# Uso: ./adapt_smb_conf.sh [arquivo_origem] [arquivo_destino]
+echo "Iniciando adaptação automática do arquivo: $ORIGEM_CONF"
+echo "Extraindo configurações do arquivo original..."
 
 # Definir valores padrão
 ORIGEM_CONF="${1:-/etc/samba/smb.conf}"
 DESTINO_CONF="${ORIGEM_CONF}.new"
-
-# Verificar se o arquivo de origem existe
-if [ ! -f "$ORIGEM_CONF" ]; then
-    echo "Erro: Arquivo de origem '$ORIGEM_CONF' não encontrado!"
-    exit 1
-fi
-
-# Verificar se já existe backup (implica que script já foi executado)
 BKP_FILE="${ORIGEM_CONF}.bkp"
-if [ -f "$BKP_FILE" ]; then
-    echo "Erro: Já existe um backup '$BKP_FILE'!"
-    echo "Isso indica que o script já foi executado anteriormente."
-    echo "Para executar novamente:"
-    echo "1. Remova o backup: rm '$BKP_FILE'"
-    echo "2. Ou restaure o original: mv '$BKP_FILE' '$ORIGEM_CONF'"
-    exit 1
-fi
 
-# Extrair valores do arquivo original
 DNS_FORWARDER=$(grep -i "dns forwarder" "$ORIGEM_CONF" | head -1 | cut -d'=' -f2 | xargs)
 NETBIOS_NAME=$(grep -i "netbios name" "$ORIGEM_CONF" | head -1 | cut -d'=' -f2 | xargs)
 ORIGINAL_REALM=$(grep -i "realm" "$ORIGEM_CONF" | head -1 | cut -d'=' -f2 | xargs)
 WORKGROUP=$(grep -i "workgroup" "$ORIGEM_CONF" | head -1 | cut -d'=' -f2 | xargs)
+
+# Extrair caminhos da lixeira
+RECYCLE_REPOSITORY=$(grep -i "recycle:repository" "$ORIGEM_CONF" | head -1 | cut -d'=' -f2 | xargs | sed 's|/%U$||')
+RECYCLE_EXCLUDEDIR=$(grep -i "recycle:excludedir" "$ORIGEM_CONF" | head -1 | cut -d'=' -f2 | xargs)
 
 # Extrair a empresa do realm original (ex: de AD.CPD.LOCAL extrai CPD)
 EMPRESA=$(echo "$ORIGINAL_REALM" | cut -d'.' -f2 | tr '[:lower:]' '[:upper:]')
@@ -38,12 +25,31 @@ DNS_FORWARDER=${DNS_FORWARDER:-"1.0.0.1"}
 NETBIOS_NAME=${NETBIOS_NAME:-"$EMPRESA"}
 WORKGROUP=${WORKGROUP:-"AD"}
 
+# Se não encontrou configuração da lixeira, usar valores padrão
+if [ -z "$RECYCLE_REPOSITORY" ]; then
+    RECYCLE_REPOSITORY="/mnt/Lixeira"
+fi
+
+if [ -z "$RECYCLE_EXCLUDEDIR" ]; then
+    RECYCLE_EXCLUDEDIR="$RECYCLE_REPOSITORY,/recycle,/tmp,/temp,/TMP,/TEMP"
+else
+    # Verificar se o caminho da lixeira está no excludedir
+    FIRST_EXCLUDE_PATH=$(echo "$RECYCLE_EXCLUDEDIR" | cut -d',' -f1 | xargs)
+    
+    # Se o primeiro caminho não for igual ao repository, atualizar
+    if [ "$FIRST_EXCLUDE_PATH" != "$RECYCLE_REPOSITORY" ]; then
+        # Substituir o primeiro caminho pelo repository, mantendo o resto
+        REST_EXCLUDES=$(echo "$RECYCLE_EXCLUDEDIR" | cut -d',' -f2- | sed 's/^[[:space:]]*//')
+        RECYCLE_EXCLUDEDIR="$RECYCLE_REPOSITORY,$REST_EXCLUDES"
+    fi
+fi
+
 # Extrair domínio original do netlogon path
 DOMINIO_ORIGINAL=$(grep -i "path.*netlogon" "$ORIGEM_CONF" | head -1 | sed 's/.*sysvol\/\([^\/]*\)\/.*/\1/')
 
 # Se não conseguiu extrair do netlogon, tenta extrair do realm
 if [ -z "$DOMINIO_ORIGINAL" ]; then
-    # Converte AD.CPD.LOCAL para ad.cpd.local
+    # Converte por exemplo AD.CPD.LOCAL para ad.cpd.local
     DOMINIO_ORIGINAL=$(echo "$ORIGINAL_REALM" | tr '[:upper:]' '[:lower:]')
 fi
 
@@ -51,14 +57,6 @@ fi
 if [ -z "$DOMINIO_ORIGINAL" ]; then
     DOMINIO_ORIGINAL="ad.${EMPRESA,,}.local"
 fi
-
-echo "Adaptando configuração..."
-echo "- Empresa extraída: $EMPRESA"
-echo "- DNS Forwarder: $DNS_FORWARDER"
-echo "- NetBIOS Name: $NETBIOS_NAME"
-echo "- Realm original: $ORIGINAL_REALM"
-echo "- Workgroup: $WORKGROUP"
-echo "- Domínio para netlogon: $DOMINIO_ORIGINAL"
 
 # Criar o novo arquivo smb.conf
 cat > "$DESTINO_CONF" << EOF
@@ -91,8 +89,8 @@ cat > "$DESTINO_CONF" << EOF
   full_audit:prefix = IP=%I|USER=%u|MACHINE=%m|VOLUME=%S
   log level = 0 vfs:0 rpc_srv:0 rpc_parse:0
   #syslog = 0
-  recycle:repository = /mnt/Lixeira/%U
-  recycle:excludedir = /mnt/Lixeira,/recycle,/tmp,/temp,/TMP,/TEMP
+  recycle:repository = $RECYCLE_REPOSITORY/%U
+  recycle:excludedir = $RECYCLE_EXCLUDEDIR
   recycle:keeptree = yes
   recycle:versions = yes
   recycle:touch = yes
@@ -166,45 +164,12 @@ cat > "$DESTINO_CONF" << EOF
   include = /etc/samba/external/includes.conf
 EOF
 
-echo "Novo arquivo criado: $DESTINO_CONF"
-echo ""
+echo "Aplicando mudanças..."
 
-echo "Aplicando mudanças automaticamente..."
+# Fazer backup do original
+cp "$ORIGEM_CONF" "$BKP_FILE"
+echo "✓ Backup criado: $BKP_FILE"
 
-# Renomear arquivo original para .bkp
-mv "$ORIGEM_CONF" "$BKP_FILE"
-echo "Arquivo original renomeado para: $BKP_FILE"
-
-# Mover novo arquivo para o local original
+# Aplicar nova configuração
 mv "$DESTINO_CONF" "$ORIGEM_CONF"
-echo "Novo arquivo aplicado: $ORIGEM_CONF"
-
-# Testar configuração
-echo ""
-echo "Testando nova configuração..."
-if command -v testparm >/dev/null 2>&1; then
-    if testparm -s "$ORIGEM_CONF" >/dev/null 2>&1; then
-        echo "✓ Configuração válida!"
-        echo ""
-        echo "✓ Script executado com sucesso!"
-        echo ""
-        echo "Backup mantido em: $BKP_FILE"
-    else
-        echo "✗ Erro na configuração!"
-        echo "Restaurando backup..."
-        mv "$ORIGEM_CONF" "${ORIGEM_CONF}.erro"
-        mv "$BKP_FILE" "$ORIGEM_CONF"
-        echo "Backup restaurado. Arquivo com erro salvo como: ${ORIGEM_CONF}.erro"
-        exit 1
-    fi
-else
-    echo "⚠ testparm não encontrado, mas arquivo aplicado."
-    echo ""
-    echo "Backup mantido em: $BKP_FILE"
-fi
-
-echo ""
-echo "Exemplos de uso:"
-echo "  ./adapt_smb_conf.sh # Usa arquivo padrão"
-echo "  ./adapt_smb_conf.sh /srv/containers/container1/config/smb.conf"
-echo "  ./adapt_smb_conf.sh /path/to/smb.conf"
+echo "✓ Nova configuração aplicada: $ORIGEM_CONF"
