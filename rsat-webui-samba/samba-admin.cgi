@@ -112,18 +112,18 @@ sanitize_input() {
     SHARE_PATH=$(echo "$SHARE_PATH" | sed 's|[^a-zA-Z0-9/_.\ -]||g')
 
     # Validar path seguro
-    if ! [[ "$SHARE_PATH" =~ ^/?[a-zA-Z0-9/_.-]*$ ]]; then
+    if ! [[ "$SHARE_PATH" =~ ^/?[a-zA-Z0-9/_.\ -]*$ ]]; then
       SHARE_PATH=""
+    fi
+
+    # Validar paths seguros  
+    if ! [[ "$SHARE_PATH" =~ ^/[a-zA-Z0-9/_.\ -]+$ ]]; then
+        SHARE_PATH=""
     fi
 
     # Validar email
     if [ -n "$EMAIL" ] && ! [[ "$EMAIL" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
         EMAIL=""
-    fi
-
-    # Validar paths seguros
-    if ! [[ "$SHARE_PATH" =~ ^/[a-zA-Z0-9/_.-]+$ ]]; then
-        SHARE_PATH=""
     fi
 }
 
@@ -1752,7 +1752,7 @@ list_directory_tree() {
     fi
 
     # Validar caminho por segurança
-    if ! echo "$BROWSE_PATH" | grep -qE '^/mnt(/[a-zA-Z0-9._-]*)*/?$'; then
+    if ! echo "$BROWSE_PATH" | grep -qE '^/mnt(/[a-zA-Z0-9._\ -]*)*/?$'; then
         echo '{"error": "Caminho inválido"}'
         return
     fi
