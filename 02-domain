@@ -101,14 +101,7 @@ function docker_create {
 function docker_extras {
 clear; echo ""; echo "############################################################"
 echo ""; echo "Configuring Apache2"; echo ""
-docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/autoconfig.sh --output /tmp/autoconfig.sh; bash /tmp/autoconfig.sh"
-docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Apache2/auth-togle-for-ad.sh --output auth-togle-for-ad.sh"
-docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auth-toggle.sh --output /tmp/auth-toggle.sh; mv /tmp/auth-toggle.sh /usr/bin/; chmod +x /usr/bin/auth-toggle.sh"
-docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/setup_auth.sh --output /tmp/setup_auth.sh; mv /tmp/setup_auth.sh /usr/bin/; chmod +x /usr/bin/setup_auth.sh"
-docker exec "$NOMECONTAINER" bash -c "mkdir -p /etc/apache2/auth"
-docker exec "$NOMECONTAINER" bash -c "htpasswd -c /etc/apache2/auth/.htpasswd admin"
-docker exec "$NOMECONTAINER" bash -c "htpasswd -b /etc/apache2/auth/.htpasswd admin $VALUE10"
-docker exec "$NOMECONTAINER" bash -c "bash /auth-togle-for-ad.sh"
+curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auto-upgrade_yaml_based.sh | sudo bash
 echo ""; echo "OK"; sleep 0.5
 
 echo ""; echo "############################################################"; echo ""
