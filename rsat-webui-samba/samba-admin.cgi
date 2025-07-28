@@ -108,10 +108,12 @@ sanitize_input() {
     COMPUTER=$(echo "$COMPUTER" | cut -c1-15)  # Computadores têm limite menor
 
     # Shares
-    SHARE_NAME=$(echo "$SHARE_NAME" | sed 's/[^a-zA-Z0-9._-]//g')
-    SHARE_PATH=$(echo "$SHARE_PATH" | sed 's|[^a-zA-Z0-9/_.-]||g')
+    SHARE_NAME=$(echo "$SHARE_NAME" | sed 's/[;&|`(){}[\]*?<>]//g' | tr -d '\n\r')
+    SHARE_PATH=$(echo "$SHARE_PATH" | sed 's|[;&|`(){}[\]*?<>]||g' | tr -d '\n\r')
+    SHARE_USERS=$(echo "$SHARE_USERS" | sed 's/[;&|`(){}[\]*?<>]//g' | tr -d '\n\r')
+
     # Validar path seguro
-    if ! [[ "$SHARE_PATH" =~ ^/?[a-zA-Z0-9/_.-]*$ ]]; then
+    if ! [[ "$SHARE_PATH" =~ ^/?[a-zA-Z0-9/_. -]*$ ]]; then
       SHARE_PATH=""
     fi
 
@@ -1418,7 +1420,8 @@ show_shares() {
                 # Verificar se arquivo não está vazio
                 if [ -s "$conf_file" ]; then
                     # Extrair informações principais primeiro (otimizado com awk em vez de grep)
-                    path=$(awk -F= '/^path/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
+                    # path=$(awk -F= '/^path/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file") #<<<semespaços
+                    path=$(awk -F= '/^path/ {gsub(/^ +| +$/, "", $2); gsub(/"/, "", $2); print $2; exit}' "$conf_file")
                     users=$(awk -F= '/^valid users/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
                     writable=$(awk -F= '/^writable/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
                     browsable=$(awk -F= '/^browsable/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
@@ -1555,14 +1558,15 @@ create_share() {
         return 1
     fi
 
-    # Validar se não contém espaços
-    if [[ $SHARE_NAME = *" "* ]] || [[ $SHARE_PATH = *" "* ]] || [[ $SHARE_NAME = "" ]]; then
-        echo "Erro: Não crie compartilhamentos com espaços nos nomes ou nomes vazios!"
+    # NOVA VALIDAÇÃO: Apenas caracteres realmente perigosos (permite espaços)
+    if [[ $SHARE_NAME =~ [;&|`(){}[\]*?<>] ]] || [[ $SHARE_PATH =~ [;&|`(){}[\]*?<>] ]]; then
+        echo "Erro: Nome ou caminho contém caracteres inválidos (;&|`(){}[]*?<>)"
         return 1
     fi
 
-    # Verificar se já existe
-    if [ -f "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" ]; then
+    # Verificar se já existe (arquivo .conf não pode ter espaços no nome)
+    SHARE_CONF_NAME=$(echo "$SHARE_NAME" | sed 's/ /_/g')  # Converter espaços para _ no nome do arquivo
+    if [ -f "/etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf" ]; then
         echo "Erro: Um compartilhamento com este nome já existe na rede!"
         return 1
     fi
@@ -1572,15 +1576,15 @@ create_share() {
     # Criar estrutura de diretórios se não existir
     sudo mkdir -p /etc/samba/external/smb.conf.d/
 
-    # Criar a pasta no sistema
-    echo "📁 Criando pasta /mnt$SHARE_PATH..."
+    # Criar a pasta no sistema (COM ASPAS para suportar espaços)
+    echo "📁 Criando pasta \"/mnt$SHARE_PATH\"..."
     sudo mkdir -p "/mnt$SHARE_PATH"
 
-    # Criar arquivo de configuração
+    # Criar arquivo de configuração (nome do arquivo sem espaços, mas conteúdo COM ASPAS)
     echo "📝 Criando arquivo de configuração..."
-    sudo tee "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" > /dev/null << EOF
+    sudo tee "/etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf" > /dev/null << EOF
 [$SHARE_NAME]
-path = /mnt$SHARE_PATH
+path = "/mnt$SHARE_PATH"
 valid users = $SHARE_USERS
 admin users = $SHARE_USERS
 writable = ${WRITABLE:-yes}
@@ -1594,11 +1598,11 @@ EOF
 
     # AGUARDAR arquivo ser escrito completamente (CORREÇÃO DO TIMING)
     echo "🔐 Configurando permissões..."
-    sudo chmod 644 "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf"
+    sudo chmod 644 "/etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf"
     sudo chmod 777 "/mnt$SHARE_PATH"
     
     # VERIFICAR se arquivo foi criado antes de continuar
-    if [ ! -f "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" ]; then
+    if [ ! -f "/etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf" ]; then
         echo "❌ ERRO: Arquivo de configuração não foi criado!"
         return 1
     fi
@@ -1610,13 +1614,17 @@ EOF
     echo "🔄 Revalidando configurações..."
     if revalidate_shares_internal; then
         echo "✅ Compartilhamento '$SHARE_NAME' criado com sucesso!"
-        echo "📁 Pasta: /mnt$SHARE_PATH"
+        echo "📁 Pasta: \"/mnt$SHARE_PATH\""
         echo "👥 Usuários: $SHARE_USERS"
-        echo "📝 Configuração: /etc/samba/external/smb.conf.d/$SHARE_NAME.conf"
+        echo "📝 Configuração: /etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf"
         echo ""
         echo "🌐 VERIFICAÇÃO DE REDE:"
         echo "   Execute: smbclient -L localhost -N"
-        echo "   Ou acesse: \\\\SERVIDOR\\$SHARE_NAME"
+        if [[ "$SHARE_NAME" =~ [[:space:]] ]]; then
+            echo "   Ou acesse: \\\\\\\\SERVIDOR\\\\\"$SHARE_NAME\""
+        else
+            echo "   Ou acesse: \\\\\\\\SERVIDOR\\\\$SHARE_NAME"
+        fi
         return 0
     else
         echo "❌ ERRO: Compartilhamento criado, mas falha na revalidação!"
@@ -1631,14 +1639,15 @@ create_sync_share() {
         return 1
     fi
 
-    # Validar se não contém espaços
-    if [[ $SHARE_NAME = *" "* ]] || [[ $SHARE_PATH = *" "* ]] || [[ $SHARE_NAME = "" ]]; then
-        echo "Erro: Não crie compartilhamentos com espaços nos nomes ou nomes vazios!"
+    # NOVA VALIDAÇÃO: Apenas caracteres realmente perigosos (permite espaços)
+    if [[ $SHARE_NAME =~ [;&|`(){}[\]*?<>] ]] || [[ $SHARE_PATH =~ [;&|`(){}[\]*?<>] ]]; then
+        echo "Erro: Nome ou caminho contém caracteres inválidos (;&|`(){}[]*?<>)"
         return 1
     fi
 
-    # Verificar se já existe
-    if [ -f "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" ]; then
+    # Verificar se já existe (arquivo .conf não pode ter espaços no nome)
+    SHARE_CONF_NAME=$(echo "$SHARE_NAME" | sed 's/ /_/g')
+    if [ -f "/etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf" ]; then
         echo "Erro: Um compartilhamento com este nome já existe na rede!"
         return 1
     fi
@@ -1648,15 +1657,15 @@ create_sync_share() {
     # Criar estrutura de diretórios se não existir (com sudo)
     sudo mkdir -p /etc/samba/external/smb.conf.d/
 
-    # Criar a pasta no sistema
-    echo "📁 Criando pasta /mnt$SHARE_PATH..."
+    # Criar a pasta no sistema (COM ASPAS para espaços)
+    echo "📁 Criando pasta \"/mnt$SHARE_PATH\"..."
     sudo mkdir -p "/mnt$SHARE_PATH"
 
-    # Criar arquivo de configuração para Sync (com sudo - usando tee)
+    # Criar arquivo de configuração para Sync (COM ASPAS no path)
     echo "📝 Criando configuração Sync Center..."
-    sudo tee "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" > /dev/null << EOF
+    sudo tee "/etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf" > /dev/null << EOF
 [$SHARE_NAME]
-path = /mnt$SHARE_PATH
+path = "/mnt$SHARE_PATH"
 valid users = $SHARE_USERS
 browsable = ${BROWSABLE:-no}
 writable = yes
@@ -1675,11 +1684,11 @@ EOF
     echo "🔄 Revalidando configurações..."
     if revalidate_shares_internal; then
         echo "✅ Compartilhamento Sync '$SHARE_NAME' criado com sucesso!"
-        echo "📁 Pasta: /mnt$SHARE_PATH"
+        echo "📁 Pasta: \"/mnt$SHARE_PATH\""
         echo "👥 Usuários: $SHARE_USERS"
         echo "🔒 Tipo: Estruturado para Sync Center"
         echo "👁️ Navegável: ${BROWSABLE:-no}"
-        echo "📝 Configuração: /etc/samba/external/smb.conf.d/$SHARE_NAME.conf"
+        echo "📝 Configuração: /etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf"
         echo ""
         echo "🎯 CARACTERÍSTICAS DO SYNC SHARE:"
         echo "   • Permissões mais restritivas (755/700)"
@@ -1689,7 +1698,11 @@ EOF
         echo ""
         echo "🌐 VERIFICAÇÃO DE REDE:"
         echo "   Execute: smbclient -L localhost -N"
-        echo "   Ou acesse: \\\\SERVIDOR\\$SHARE_NAME"
+        if [[ "$SHARE_NAME" =~ [[:space:]] ]]; then
+            echo "   Ou acesse: \\\\\\\\SERVIDOR\\\\\"$SHARE_NAME\""
+        else
+            echo "   Ou acesse: \\\\\\\\SERVIDOR\\\\$SHARE_NAME"
+        fi
         return 0
     else
         echo "❌ ERRO: Compartilhamento criado, mas falha na revalidação!"
@@ -1706,17 +1719,20 @@ delete_share() {
         return
     fi
 
+    # Converter nome para arquivo (espaços viram _)
+    SHARE_CONF_NAME=$(echo "$SHARE_NAME" | sed 's/ /_/g')
+
     # Verificar se o arquivo de configuração existe
-    if [ ! -f "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" ]; then
+    if [ ! -f "/etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf" ]; then
         echo "Erro: O compartilhamento '$SHARE_NAME' não existe!"
         return
     fi
 
-    # Obter caminho da pasta antes de remover (para informar ao usuário)
-    share_path=$(grep "^path" "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" | cut -d= -f2 | tr -d ' ')
+    # Obter caminho da pasta antes de remover (removendo aspas da exibição)
+    share_path=$(grep "^path" "/etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf" | cut -d= -f2 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/"//g')
 
     # Remover APENAS o arquivo de configuração (não a pasta) - com sudo
-    sudo rm "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf"
+    sudo rm "/etc/samba/external/smb.conf.d/$SHARE_CONF_NAME.conf"
 
     # Revalidar configurações
     revalidate_shares_internal
@@ -1726,7 +1742,7 @@ delete_share() {
     echo "🗑️ Apenas a configuração de compartilhamento foi removida"
     echo ""
     echo "💡 Para remover a pasta também, execute manualmente:"
-    echo "   rm -rf '$share_path'"
+    echo "   rm -rf \"$share_path\""
 }
 
 revalidate_shares() {
