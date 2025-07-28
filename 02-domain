@@ -134,9 +134,9 @@ fi
 echo ""; echo "############################################################"; echo ""
 if ! [ -f /srv/containers/"$NOMECONTAINER"/config/smb.conf.bkp ]; then
   echo ""; echo "Creating a smb.conf Model-based"; echo ""
-  docker exec "$NOMECONTAINER" bash -c 'curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/SAMBA_Model/auto_configure.sh --output auto_configure.sh; chmod +x auto_configure.sh'
-  docker exec "$NOMECONTAINER" bash -c 'bash auto_configure.sh'
-  curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/SAMBA_Model/auto_configure.sh --output /tmp/auto_configure.sh; chmod +x /tmp/auto_configure.sh
+  docker exec "$NOMECONTAINER" bash -c 'curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/ajust_smbconf.sh --output /tmp/auto_configure.sh; chmod +x /tmp/auto_configure.sh'
+  docker exec "$NOMECONTAINER" bash -c 'bash /tmp/auto_configure.sh'
+  curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/ajust_smbconf.sh; chmod +x /tmp/auto_configure.sh
   sudo bash /tmp/auto_configure.sh /srv/containers/"$NOMECONTAINER"/config/smb.conf
   echo ""; echo "OK"; sleep 0.5
 fi
