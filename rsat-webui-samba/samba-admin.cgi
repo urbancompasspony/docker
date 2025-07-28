@@ -32,99 +32,139 @@ log_action() {
 # Função para processar parâmetros CGI
 parse_cgi_params() {
     if [ "$REQUEST_METHOD" = "POST" ]; then
-        read -n "$CONTENT_LENGTH" QUERY_STRING
+        # Usar dd em vez de read -n para melhor compatibilidade
+        if [ -n "$CONTENT_LENGTH" ] && [ "$CONTENT_LENGTH" -gt 0 ]; then
+            QUERY_STRING=$(dd bs=1 count="$CONTENT_LENGTH" 2>/dev/null || echo "")
+        else
+            read -r QUERY_STRING
+        fi
     fi
 
-    # Decodifica parâmetros URL
-    QUERY_STRING=$(echo "$QUERY_STRING" | sed 's/+/ /g')
+    # Decodifica parâmetros URL sem Python
+    QUERY_STRING=$(echo "$QUERY_STRING" | sed 's/+/ /g; s/%20/ /g; s/%2F/\//g; s/%40/@/g')
 
     IFS='&'
     for param in $QUERY_STRING; do
-        key=$(echo "$param" | cut -d'=' -f1)
-        value=$(echo "$param" | cut -d'=' -f2- | python3 -c "import sys, urllib.parse; print(urllib.parse.unquote(sys.stdin.read().strip()))")
-
-        case "$key" in
-            "action") ACTION="$value" ;;
-            "username") USERNAME="$value" ;;
-            "source-group") SOURCE_GROUP="$value" ;;
-            "target-group") TARGET_GROUP="$value" ;;
-            "display-name") FIRSTNAME="$value" ;;
-            "password") PASSWORD="$value" ;;
-            "email") EMAIL="$value" ;;
-            "must-change-password") MUST_CHANGE_PASSWORD="$value" ;;
-            "group") GROUP="$value" ;;
-            "computer") COMPUTER="$value" ;;
-            "share-name") SHARE_NAME="$value" ;;
-            "share-path") SHARE_PATH="$value" ;;
-            "share-users") SHARE_USERS="$value" ;;
-            "writable") WRITABLE="$value" ;;
-            "browsable") BROWSABLE="$value" ;;
-            "ou-name") OU_NAME="$value" ;;
-            "silo-name") SILO_NAME="$value" ;;
-            "search-term") SEARCH_TERM="$value" ;;
-            "source-username") SOURCE_USERNAME="$value" ;;
-            "target-username") TARGET_USERNAME="$value" ;;
-            "expiry-date") EXPIRY_DATE="$value" ;;
-            "days") DAYS="$value" ;;
-            "history-length") HISTORY_LENGTH="$value" ;;
-            "min-length") MIN_LENGTH="$value" ;;
-            "min-age") MIN_AGE="$value" ;;
-            "max-age") MAX_AGE="$value" ;;
-            "max-attempts") MAX_ATTEMPTS="$value" ;;
-            "lockout-duration") LOCKOUT_DURATION="$value" ;;
-            "reset-time") RESET_TIME="$value" ;;
-            "browse-path") BROWSE_PATH="$value" ;;
+        # Verificar se contém =
+        case "$param" in
+            *=*)
+                key=$(echo "$param" | cut -d'=' -f1)
+                value=$(echo "$param" | cut -d'=' -f2-)
+                
+                case "$key" in
+                    "action") ACTION="$value" ;;
+                    "username") USERNAME="$value" ;;
+                    "source-group") SOURCE_GROUP="$value" ;;
+                    "target-group") TARGET_GROUP="$value" ;;
+                    "display-name") FIRSTNAME="$value" ;;
+                    "password") PASSWORD="$value" ;;
+                    "email") EMAIL="$value" ;;
+                    "must-change-password") MUST_CHANGE_PASSWORD="$value" ;;
+                    "group") GROUP="$value" ;;
+                    "computer") COMPUTER="$value" ;;
+                    "share-name") SHARE_NAME="$value" ;;
+                    "share-path") SHARE_PATH="$value" ;;
+                    "share-users") SHARE_USERS="$value" ;;
+                    "writable") WRITABLE="$value" ;;
+                    "browsable") BROWSABLE="$value" ;;
+                    "ou-name") OU_NAME="$value" ;;
+                    "silo-name") SILO_NAME="$value" ;;
+                    "search-term") SEARCH_TERM="$value" ;;
+                    "source-username") SOURCE_USERNAME="$value" ;;
+                    "target-username") TARGET_USERNAME="$value" ;;
+                    "expiry-date") EXPIRY_DATE="$value" ;;
+                    "days") DAYS="$value" ;;
+                    "history-length") HISTORY_LENGTH="$value" ;;
+                    "min-length") MIN_LENGTH="$value" ;;
+                    "min-age") MIN_AGE="$value" ;;
+                    "max-age") MAX_AGE="$value" ;;
+                    "max-attempts") MAX_ATTEMPTS="$value" ;;
+                    "lockout-duration") LOCKOUT_DURATION="$value" ;;
+                    "reset-time") RESET_TIME="$value" ;;
+                    "browse-path") BROWSE_PATH="$value" ;;
+                esac
+                ;;
         esac
     done
 }
 
+# Função para validar caminhos (corrige erro SC1072)
+validate_share_path() {
+    local path="$1"
+    case "$path" in
+        "") return 1 ;;
+        /*) # Caminho absoluto
+            case "$path" in
+                *[[:space:]]*) return 1 ;; # Sem espaços
+                *[!a-zA-Z0-9/_.-]*) return 1 ;; # Apenas caracteres seguros
+                *) return 0 ;;
+            esac
+            ;;
+        *) return 1 ;; # Deve ser absoluto
+    esac
+}
+
+# Função para validar email
+validate_email() {
+    local email="$1"
+    case "$email" in
+        *@*.*) 
+            case "$email" in
+                .*@*|*@.*|*@*@*|*..*)
+                    return 1 ;;
+                *)
+                    return 0 ;;
+            esac
+            ;;
+        *) return 1 ;;
+    esac
+}
+
 # Função de validação e sanitização
 sanitize_input() {
-    # Remove apenas caracteres perigosos para comandos shell
-    # USUÁRIOS: Remove $ (não devem ter $)
-    USERNAME=$(echo "$USERNAME" | sed 's/[;&|`$(){}[\]*?<>]//g' | tr -d '\n\r')
-    SOURCE_USERNAME=$(echo "$SOURCE_USERNAME" | sed 's/[;&|`$(){}[\]*?<>]//g' | tr -d '\n\r')
-    TARGET_USERNAME=$(echo "$TARGET_USERNAME" | sed 's/[;&|`$(){}[\]*?<>]//g' | tr -d '\n\r')
+    # Remove caracteres perigosos usando tr (mais seguro que regex)
+    USERNAME=$(echo "$USERNAME" | tr -d ';&|`$(){}[]*?<>' | tr -cd 'a-zA-Z0-9._-\n')
+    SOURCE_USERNAME=$(echo "$SOURCE_USERNAME" | tr -d ';&|`$(){}[]*?<>' | tr -cd 'a-zA-Z0-9._-\n')
+    TARGET_USERNAME=$(echo "$TARGET_USERNAME" | tr -d ';&|`$(){}[]*?<>' | tr -cd 'a-zA-Z0-9._-\n')
     
-    # GRUPOS: Remove $ (grupos padrão não têm $)
-    GROUP=$(echo "$GROUP" | sed 's/[;&|`$(){}[\]*?<>]//g' | tr -d '\n\r')
-    SOURCE_GROUP=$(echo "$SOURCE_GROUP" | sed 's/[;&|`$(){}[\]*?<>]//g' | tr -d '\n\r')
-    TARGET_GROUP=$(echo "$TARGET_GROUP" | sed 's/[;&|`$(){}[\]*?<>]//g' | tr -d '\n\r')
+    # GRUPOS: Remove caracteres perigosos
+    GROUP=$(echo "$GROUP" | tr -d ';&|`$(){}[]*?<>' | tr -cd 'a-zA-Z0-9._-\n')
+    SOURCE_GROUP=$(echo "$SOURCE_GROUP" | tr -d ';&|`$(){}[]*?<>' | tr -cd 'a-zA-Z0-9._-\n')
+    TARGET_GROUP=$(echo "$TARGET_GROUP" | tr -d ';&|`$(){}[]*?<>' | tr -cd 'a-zA-Z0-9._-\n')
     
     # COMPUTADORES: Preserva $ porque o código adiciona automaticamente
-    COMPUTER=$(echo "$COMPUTER" | sed 's/[;&|`(){}[\]*?<>]//g' | tr -d '\n\r')
+    COMPUTER=$(echo "$COMPUTER" | tr -d ';&|`(){}[]*?<>' | tr -cd 'a-zA-Z0-9._-\n')
     
-    # OUTROS: Remove caracteres perigosos mas preserva espaços e acentos
-    FIRSTNAME=$(echo "$FIRSTNAME" | sed 's/[;&|`(){}[\]*?<>]//g' | tr -d '\n\r')
-    OU_NAME=$(echo "$OU_NAME" | sed 's/[;&|`(){}[\]*?<>]//g' | tr -d '\n\r')
-    SILO_NAME=$(echo "$SILO_NAME" | sed 's/[;&|`(){}[\]*?<>]//g' | tr -d '\n\r')
-    SEARCH_TERM=$(echo "$SEARCH_TERM" | sed 's/[;&|`(){}[\]*?<>]//g' | tr -d '\n\r')
+    # OUTROS: Remove caracteres perigosos mas preserva espaços e acentos válidos
+    FIRSTNAME=$(echo "$FIRSTNAME" | tr -d ';&|`(){}[]*?<>')
+    OU_NAME=$(echo "$OU_NAME" | tr -d ';&|`(){}[]*?<>')
+    SILO_NAME=$(echo "$SILO_NAME" | tr -d ';&|`(){}[]*?<>')
+    SEARCH_TERM=$(echo "$SEARCH_TERM" | tr -d ';&|`(){}[]*?<>')
 
     # Limitar tamanho para evitar buffer overflow
     USERNAME=$(echo "$USERNAME" | cut -c1-64)
     GROUP=$(echo "$GROUP" | cut -c1-64)
     SOURCE_GROUP=$(echo "$SOURCE_GROUP" | cut -c1-64)
     TARGET_GROUP=$(echo "$TARGET_GROUP" | cut -c1-64)
-    COMPUTER=$(echo "$COMPUTER" | cut -c1-15)  # Computadores têm limite menor
+    COMPUTER=$(echo "$COMPUTER" | cut -c1-15)
 
-    # Shares
-    SHARE_NAME=$(echo "$SHARE_NAME" | sed 's/[;&|`(){}[\]*?<>]//g' | tr -d '\n\r')
-    SHARE_PATH=$(echo "$SHARE_PATH" | sed 's|[;&|`(){}[\]*?<>]||g' | tr -d '\n\r')
-    SHARE_USERS=$(echo "$SHARE_USERS" | sed 's/[;&|`(){}[\]*?<>]//g' | tr -d '\n\r')
+    # Shares - sanitização melhorada
+    SHARE_NAME=$(echo "$SHARE_NAME" | tr -d ';&|`(){}[]*?<>')
+    SHARE_PATH=$(echo "$SHARE_PATH" | tr -d ';&|`(){}[]*?<>')
+    SHARE_USERS=$(echo "$SHARE_USERS" | tr -d ';&|`(){}[]*?<>')
 
-    # Validar path seguro
-    if ! [[ "$SHARE_PATH" =~ ^/?[a-zA-Z0-9/_. -]*$ ]]; then
-      SHARE_PATH=""
+    # Validar path seguro usando função em vez de regex
+    if [ -n "$SHARE_PATH" ]; then
+        if ! validate_share_path "$SHARE_PATH"; then
+            SHARE_PATH=""
+        fi
     fi
 
-    # Validar email
-    if [ -n "$EMAIL" ] && ! [[ "$EMAIL" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
-        EMAIL=""
-    fi
-
-    # Validar paths seguros
-    if ! [[ "$SHARE_PATH" =~ ^/[a-zA-Z0-9/_.-]+$ ]]; then
-        SHARE_PATH=""
+    # Validar email usando função em vez de regex
+    if [ -n "$EMAIL" ]; then
+        if ! validate_email "$EMAIL"; then
+            EMAIL=""
+        fi
     fi
 }
 
