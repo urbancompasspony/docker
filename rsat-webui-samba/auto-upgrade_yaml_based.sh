@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Script para configurar containers com img_base = active-directory
-# Lê /srv/containers.yaml e executa comandos nos containers encontrados
-
 YAML_FILE="/srv/containers.yaml"
 
 # Verifica se o arquivo existe
@@ -13,20 +10,13 @@ fi
 
 # Função para extrair nome_custom de containers com img_base = active-directory
 get_ad_containers() {
-    grep -B 10 -A 10 "img_base: active-directory" "$YAML_FILE" | \
-    grep "nome_custom:" | \
-    awk '{print $2}'
+    yq '.[] | select(.img_base == "active-directory") | .nome_custom' "$YAML_FILE" | tr '\n' ' '
 }
 
-# Função para extrair ADM_Pass de um container específico
-get_adm_pass() {
+# Função para extrair WEB_Pass de um container específico
+get_web_pass() {
     local container_name="$1"
-    # Encontra o bloco do container e extrai o ADM_Pass
-    awk "
-    /^${container_name}:/ { found=1; next }
-    found && /^[a-zA-Z0-9_-]+:/ && !/^  / { found=0 }
-    found && /ADM_Pass:/ { gsub(/^[ \t]*ADM_Pass:[ \t]*/, \"\"); print; found=0 }
-    " "$YAML_FILE"
+    yq ".${container_name}.WebPass" "$YAML_FILE"
 }
 
 # Função para executar comandos no container
@@ -41,45 +31,22 @@ configure_container() {
         return 1
     fi
     
-    # Extrai a senha ADM_Pass do YAML
-    local ADM_PASS=$(get_adm_pass "$NOMECONTAINER")
-    if [ -z "$ADM_PASS" ]; then
-        echo "Erro: Não foi possível encontrar ADM_Pass para $NOMECONTAINER"
+    # Extrai a senha WebPass do YAML
+    local WEB_PASS=$(get_web_pass "$NOMECONTAINER")
+    if [ -z "$WEB_PASS" ]; then
+        echo "Erro: Não foi possível encontrar WEB_PASS para $NOMECONTAINER"
         return 1
     fi
+       
+    docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/autoconfig.sh --output /tmp/autoconfig.sh; bash /tmp/autoconfig.sh"
+    docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auth-toggle.sh --output /tmp/auth-toggle.sh; mv /tmp/auth-toggle.sh /usr/bin/; chmod +x /usr/bin/auth-toggle.sh"
+    docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/setup_auth.sh --output /tmp/setup_auth.sh; mv /tmp/setup_auth.sh /usr/bin/; chmod +x /usr/bin/setup_auth.sh"
+    docker exec "$NOMECONTAINER" bash -c "curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Apache2/auth-togle-for-ad.sh --output auth-togle-for-ad.sh"
     
-    echo "  - Senha ADM_Pass encontrada para $NOMECONTAINER"
-    
-    # Executa os comandos de configuração
-    echo "  - Executando autoconfig.sh..."
-    docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/autoconfig.sh | bash"
-    
-    echo "  - Executando auth-togle-for-ad.sh..."
-    docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Apache2/auth-togle-for-ad.sh | bash"
-    
-    echo "  - Baixando auth-toggle.sh..."
-    docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/auth-toggle.sh > auth-toggle.sh"
-    
-    echo "  - Movendo auth-toggle.sh para /usr/bin/..."
-    docker exec "$NOMECONTAINER" bash -c "mv auth-toggle.sh /usr/bin/; chmod +x /usr/bin/auth-toggle.sh"
-    
-    echo "  - Baixando setup_auth.sh..."
-    docker exec "$NOMECONTAINER" bash -c "curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/setup_auth.sh > setup_auth.sh"
-    
-    echo "  - Movendo setup_auth.sh para /usr/bin/..."
-    docker exec "$NOMECONTAINER" bash -c "mv setup_auth.sh /usr/bin/; chmod +x /usr/bin/setup_auth.sh"
-    
-    echo "  - Criando diretório de autenticação..."
     docker exec "$NOMECONTAINER" bash -c "mkdir -p /etc/apache2/auth"
-    
-    echo "  - Criando arquivo .htpasswd..."
     docker exec "$NOMECONTAINER" bash -c "htpasswd -c /etc/apache2/auth/.htpasswd admin"
-    
-    echo "  - Configurando senha do admin com ADM_Pass..."
-    docker exec "$NOMECONTAINER" bash -c "htpasswd -b /etc/apache2/auth/.htpasswd admin '$ADM_PASS'"
-    
-    echo "Container $NOMECONTAINER configurado com sucesso!"
-    echo "----------------------------------------"
+    docker exec "$NOMECONTAINER" bash -c "htpasswd -b /etc/apache2/auth/.htpasswd admin '$WEB_PASS'"
+    docker exec "$NOMECONTAINER" bash -c "bash /auth-togle-for-ad.sh"
 }
 
 # Main
