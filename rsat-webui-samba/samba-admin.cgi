@@ -108,8 +108,9 @@ sanitize_input() {
     COMPUTER=$(echo "$COMPUTER" | cut -c1-15)  # Computadores têm limite menor
 
     # Shares
-    SHARE_NAME=$(echo "$SHARE_NAME" | sed 's/[^a-zA-Z0-9._-]//g')
-    SHARE_PATH=$(echo "$SHARE_PATH" | sed 's|[^a-zA-Z0-9/_.-]||g')
+    SHARE_NAME=$(echo "$SHARE_NAME" | sed 's/[^a-zA-Z0-9._ -]//g')
+    SHARE_PATH=$(echo "$SHARE_PATH" | sed 's|[^a-zA-Z0-9/_.\ -]||g')
+
     # Validar path seguro
     if ! [[ "$SHARE_PATH" =~ ^/?[a-zA-Z0-9/_.-]*$ ]]; then
       SHARE_PATH=""
@@ -1555,10 +1556,9 @@ create_share() {
         return 1
     fi
 
-    # Validar se não contém espaços
-    if [[ $SHARE_NAME = *" "* ]] || [[ $SHARE_PATH = *" "* ]] || [[ $SHARE_NAME = "" ]]; then
-        echo "Erro: Não crie compartilhamentos com espaços nos nomes ou nomes vazios!"
-        return 1
+    if [[ $SHARE_NAME = "" ]] || [[ $SHARE_PATH = "" ]]; then
+    echo "Erro: Nome e caminho não podem estar vazios!"
+      return 1
     fi
 
     # Verificar se já existe
@@ -1580,7 +1580,7 @@ create_share() {
     echo "📝 Criando arquivo de configuração..."
     sudo tee "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" > /dev/null << EOF
 [$SHARE_NAME]
-path = /mnt$SHARE_PATH
+path = "/mnt$SHARE_PATH"
 valid users = $SHARE_USERS
 admin users = $SHARE_USERS
 writable = ${WRITABLE:-yes}
@@ -1631,9 +1631,9 @@ create_sync_share() {
         return 1
     fi
 
-    # Validar se não contém espaços
-    if [[ $SHARE_NAME = *" "* ]] || [[ $SHARE_PATH = *" "* ]] || [[ $SHARE_NAME = "" ]]; then
-        echo "Erro: Não crie compartilhamentos com espaços nos nomes ou nomes vazios!"
+    # Validar apenas se não está vazio
+    if [[ $SHARE_NAME = "" ]] || [[ $SHARE_PATH = "" ]]; then
+        echo "Erro: Nome e caminho não podem estar vazios!"
         return 1
     fi
 
@@ -1656,7 +1656,7 @@ create_sync_share() {
     echo "📝 Criando configuração Sync Center..."
     sudo tee "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" > /dev/null << EOF
 [$SHARE_NAME]
-path = /mnt$SHARE_PATH
+path = "/mnt$SHARE_PATH"
 valid users = $SHARE_USERS
 browsable = ${BROWSABLE:-no}
 writable = yes
@@ -1713,7 +1713,7 @@ delete_share() {
     fi
 
     # Obter caminho da pasta antes de remover (para informar ao usuário)
-    share_path=$(grep "^path" "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" | cut -d= -f2 | tr -d ' ')
+    share_path=$(grep "^path" "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf" | cut -d= -f2 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d '"')
 
     # Remover APENAS o arquivo de configuração (não a pasta) - com sudo
     sudo rm "/etc/samba/external/smb.conf.d/$SHARE_NAME.conf"
