@@ -1407,7 +1407,7 @@ show_shares() {
         
         # Listar cada compartilhamento com formatação adequada (otimizado)
         count=0
-        find /etc/samba/external/smb.conf.d/ -name "*.conf" -type f 2>/dev/null | sort | while read conf_file; do
+        find /etc/samba/external/smb.conf.d/ -name "*.conf" -type f 2>/dev/null | sort | while read -r conf_file; do
             if [ -f "$conf_file" ]; then
                 count=$((count + 1))
                 share_name=$(basename "$conf_file" .conf)
@@ -1419,7 +1419,7 @@ show_shares() {
                 # Verificar se arquivo não está vazio
                 if [ -s "$conf_file" ]; then
                     # Extrair informações principais primeiro (otimizado com awk em vez de grep)
-                    path=$(awk -F= '/^path/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
+                    path=$(awk -F= '/^path/ {gsub(/^ +| +$/, "", $2); gsub(/^"/, "", $2); gsub(/"$/, "", $2); print $2; exit}' "$conf_file")
                     users=$(awk -F= '/^valid users/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
                     writable=$(awk -F= '/^writable/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
                     browsable=$(awk -F= '/^browsable/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$conf_file")
