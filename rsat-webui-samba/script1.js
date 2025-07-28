@@ -15,6 +15,7 @@
         // Inicializar elementos quando DOM carregar
         document.addEventListener('DOMContentLoaded', function() {
             createUIElements();
+            loadDomainInfo();
             showMainMenu();
         });
 
@@ -190,6 +191,48 @@
             loadingElement = document.querySelector('.loading');
             resultContainer = document.querySelector('.result-container');
             alertContainer = document.querySelector('.alert');
+        }
+
+        // Carregar informações do domínio automaticamente
+        function loadDomainInfo() {
+            const domainDisplay = document.getElementById('domain-info-display');
+            const loadingSpan = domainDisplay.querySelector('.domain-loading');
+            const nameSpan = domainDisplay.querySelector('.domain-name');
+
+            // Fazer requisição para obter info do domínio
+            fetch(CGI_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'get-domain-name'
+                })
+            })
+            .then(response => response.text())
+            .then(text => {
+                // Extrair nome do forest/domínio
+                const forestMatch = text.match(/Forest\s*:\s*([^\s\n]+)/i);
+                const domainMatch = text.match(/Domain\s*:\s*([^\s\n]+)/i);
+
+                let domainName = '';
+                if (forestMatch && forestMatch[1]) {
+                    domainName = `🌳 Forest: ${forestMatch[1]}`;
+                } else if (domainMatch && domainMatch[1]) {
+                    domainName = `🏢 Domínio: ${domainMatch[1]}`;
+                } else {
+                    domainName = '🏢 Domínio Local';
+                }
+
+                // Atualizar display
+                loadingSpan.style.display = 'none';
+                nameSpan.textContent = domainName;
+                nameSpan.style.display = 'inline';
+            })
+            .catch(error => {
+                console.error('Erro ao carregar info do domínio:', error);
+                loadingSpan.textContent = '⚠️ Erro ao carregar domínio';
+            });
         }
 
         function showLoading() {

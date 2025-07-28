@@ -1347,6 +1347,16 @@ show_domain_info() {
     execute_samba_command sudo samba-tool domain info 127.0.0.1
 }
 
+get_domain_name() {
+    # Função otimizada para obter apenas o nome do domínio/forest
+    domain_info=$(sudo samba-tool domain info 127.0.0.1 2>/dev/null)
+    if [ $? -eq 0 ]; then
+        echo "$domain_info"
+    else
+        echo "Domain: Local Domain"
+    fi
+}
+
 show_domain_level() {
     execute_samba_command sudo samba-tool domain level show
 }
@@ -2269,6 +2279,7 @@ main() {
         "active-sessions") active_sessions ;;
         "active-shares") active_shares ;;
         "samba-processes") samba_processes ;;
+        "get-domain-name") get_domain_name ;;
 
         # Configurações
         "show-password-policy") show_password_policy ;;
