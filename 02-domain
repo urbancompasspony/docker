@@ -140,7 +140,7 @@ if [ -f /srv/containers/"$NOMECONTAINER"/config/smb.conf ]; then
   sudo bash /tmp/auto_configure.sh /srv/containers/"$NOMECONTAINER"/config/smb.conf
   echo ""; echo "OK"; sleep 0.5
 else
-  echo "ERRO ABSOLUTO: Nao encontramos um arquivo smb.conf valido! Verifique o sistema!"
+  echo "ERRO: Nao encontramos um arquivo smb.conf valido!"
   exit 1
 fi
 
