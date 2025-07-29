@@ -4,6 +4,16 @@
 find "/mnt/disk01/dominio/Lixeira/" -type f -mtime +180 -delete
 find "/mnt/disk01/dominio/Lixeira/" -type d -empty -delete
 
+# Delete old Pentests if exists.
+if [ -d /srv/containers/pentest/Pentests ]; then
+  find "/srv/containers/pentest/Pentests/Ataque_Bem-Sucedido/" -type f -mtime +180 -delete
+  find "/srv/containers/pentest/Pentests/Historico/" -type f -mtime +180 -delete
+  find "/srv/containers/pentest/Pentests/Todos_os_Resultados/" -type f -mtime +180 -delete
+  find "/srv/containers/pentest/Pentests/Ataque_Bem-Sucedido/" -type d -empty -delete
+  find "/srv/containers/pentest/Pentests/Historico/" -type d -empty -delete
+  find "/srv/containers/pentest/Pentests/Todos_os_Resultados/" -type d -empty -delete
+fi
+
 # Delete old Containers (extra backup!)
 #find "/mnt/externo/containers/" -type f -mtime +5 -delete
 #find "/mnt/externo/containers/" -type d -empty -delete
