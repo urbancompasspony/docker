@@ -1,8 +1,8 @@
 #!/bin/bash
 
-source=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
+source=$(sed -n '1p' /srv/scripts/config/backupcont)
 
-destiny=$(sed -n '2p' /srv/containers/scripts/config/backupcont)
+destiny=$(sed -n '2p' /srv/scripts/config/backupcont)
 
 cd "$source"
 
