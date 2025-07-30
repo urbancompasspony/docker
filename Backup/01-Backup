@@ -22,8 +22,7 @@ function checkB {
 function checkpi {
   for logfile in /srv/containers/*pihole*/log/pihole.log; do
     if [ -f "$logfile" ]; then
-        tail -n 50 "$logfile" > "${logfile}.tmp" && mv "${logfile}.tmp" "$logfile"
-        echo "Processado: $logfile"
+        tail -n 500 "$logfile" | tee "${logfile}.tmp" && mv "${logfile}.tmp" "$logfile"
     fi
   done
 }
