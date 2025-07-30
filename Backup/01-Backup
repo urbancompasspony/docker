@@ -19,6 +19,15 @@ function checkB {
   find "$destiny"/ -type f -mtime +1 -delete
 }
 
+function checkpi {
+  for logfile in /srv/containers/*pihole*/log/pihole.log; do
+    if [ -f "$logfile" ]; then
+        tail -n 50 "$logfile" > "${logfile}.tmp" && mv "${logfile}.tmp" "$logfile"
+        echo "Processado: $logfile"
+    fi
+  done
+}
+
 function dockerctrl {
   docker "$1" $(docker ps -a -q)
 }
@@ -31,9 +40,9 @@ function backup {
 }
 
 checkA
-rm /srv/containers/pihole*/log/pihole.log
-dockerctrl stop &&
 checkB
+dockerctrl stop &&
+checkpi
 backup
 dockerctrl start &&
 
