@@ -1,22 +1,147 @@
 #!/bin/bash
+# Backup Oracle Express 21c com armazenamento interno/externo
+# Data da última modificação: 30/07/2025
 
-source="/srv/containers/oraclexe21c"
-destiny="/home/administrador/Shared"
+# Variáveis
+source="/srv/containers"
+internal_hd="/mnt/disk01/BKP_Oracle"
+external_hd="/mnt/externo/Oracle"
+logs="/srv/scripts/Logs_BKP_Oracle"
+datetime=$(date +"%d_%m_%y_-_%H_%M")
 
-cd "$source"
+# Configurações de limpeza
+max_internal_days=45
+max_external_days=90
+min_space=15000000 # 15 GB em KB
 
-datetime=$(date +"%d_%m_%y")
+# Prevenir execução simultânea
+LOCKFILE="/tmp/oracle_backup.lock"
+if [ -e "${LOCKFILE}" ] && kill -0 "$(cat "${LOCKFILE}")"; then
+    echo "Backup já está em execução."
+    exit 1
+fi
 
-function checkA {
+trap 'rm -f "${LOCKFILE}"; exit $?' INT TERM EXIT
+echo $$ > "${LOCKFILE}"
+
+function checkRoot {
   [ "$EUID" -ne 0 ] && {
-    echo "Run this script as Root!"
-    exit
+    echo "Execute este script como Root!"
+    exit 1
     }
 }
 
-checkA
-docker stop oraclexe21c &&
-tar -I 'lz4 -1 -c -' -cpf "$destiny"/oraclexe21c-"$datetime".tar.lz4 "oraclexe21c"
-docker start oraclexe21c &&
+function checkDirectories {
+    # Verificar se o HD interno está montado (obrigatório)
+    if ! mountpoint -q /mnt/disk01; then
+        echo "${datetime} - ERRO: HD interno /mnt/disk01 não está montado! Backup cancelado." | tee -a "${logs}"
+        exit 1
+    fi
+}
 
-exit 1
+function checkSpace {
+    local target_dir="$1"
+    local avail_space
+    avail_space=$(df -k "${target_dir}" | awk 'NR==2 {print $4}')
+
+    if [ "${avail_space}" -lt "${min_space}" ]; then
+        echo "${datetime} - ERRO: Espaço insuficiente em ${target_dir}. Disponível: ${avail_space}KB" | tee -a "${logs}"
+        return 1
+    fi
+    return 0
+}
+
+function createBackup {
+    echo "${datetime} - Iniciando backup do Oracle..." | tee -a "${logs}"
+
+    # Verificar espaço no HD interno antes de começar
+    if ! checkSpace "${internal_hd}"; then
+        exit 1
+    fi
+
+    cd "${source}" || exit
+
+    # Parar container Oracle
+    if ! docker stop oraclexe21c; then
+        echo "${datetime} - ERRO: Falha ao parar container Oracle!" | tee -a "${logs}"
+        exit 1
+    fi
+
+    # Criar backup compactado diretamente no HD interno
+    find . -maxdepth 1 -path "./*oraclexe21c*" -type d | while IFS= read -r dir; do
+        dir_name="${dir#./}"  # Remove o ./ do início
+        echo "${datetime} - Criando backup de ${dir_name} diretamente no HD interno..." | tee -a "${logs}"
+
+        if ! tar -I 'lz4 -1 -c -' -cpf "${internal_hd}/${dir_name}-${datetime}.tar.lz4" "${dir_name}"; then
+            echo "${datetime} - ERRO: Falha na criação do backup!" | tee -a "${logs}"
+            docker start oraclexe21c
+            exit 1
+        fi
+    done
+
+    # Reiniciar container Oracle
+    if ! docker start oraclexe21c; then
+        echo "${datetime} - AVISO: Falha ao reiniciar container Oracle!" | tee -a "${logs}"
+    fi
+
+    echo "${datetime} - Backup criado no HD interno com sucesso!" | tee -a "${logs}"
+    sync
+}
+
+function cleanOldBackups {
+    echo "${datetime} - Limpando backups antigos do HD interno..." | tee -a "${logs}"
+
+    # Limpar arquivos antigos no HD interno
+    find "${internal_hd}" -name "*.tar.lz4" -type f -mtime +"${max_internal_days}" -delete
+}
+
+function copyToExternal {
+    # Tentar montar HD externo
+    /bin/mount /mnt/externo 2>/dev/null
+
+    if mountpoint -q /mnt/externo; then
+        echo "${datetime} - HD externo detectado, iniciando cópia..." | tee -a "${logs}"
+
+        # Verificar espaço no HD externo
+        if ! checkSpace "${external_hd}"; then
+            /bin/umount /mnt/externo
+            return 1
+        fi
+
+        # Limpar arquivos antigos no HD externo
+        echo "${datetime} - Removendo arquivos externos com mais de ${max_external_days} dias..." | tee -a "${logs}"
+        find "${external_hd}" -name "*.tar.lz4" -type f -mtime +"${max_external_days}" -delete
+
+        # Copiar apenas os arquivos novos do HD interno para o externo
+        if rsync -a --update "${internal_hd}"/*.tar.lz4 "${external_hd}/"; then
+            echo "${datetime} - Backup copiado para HD externo com sucesso!" | tee -a "${logs}"
+            sync
+            fstrim -a 2>/dev/null
+        else
+            echo "${datetime} - ERRO: Falha ao copiar para HD externo!" | tee -a "${logs}"
+        fi
+
+        # Desmontar HD externo
+        if ! /bin/umount /mnt/externo; then
+            echo "${datetime} - AVISO: Falha ao desmontar HD externo!" | tee -a "${logs}"
+        fi
+    else
+        echo "${datetime} - HD externo não disponível, backup mantido apenas no HD interno." | tee -a "${logs}"
+    fi
+}
+
+# Execução principal
+echo "${datetime} - Iniciando processo de backup Oracle..." | tee -a "${logs}"
+
+checkRoot
+checkDirectories
+cleanOldBackups
+createBackup
+copyToExternal
+
+echo "${datetime} - Processo de backup concluído!" | tee -a "${logs}"
+echo " " | tee -a "${logs}"
+
+rm -f "${LOCKFILE}"
+
+exit 0
