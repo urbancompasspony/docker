@@ -129,7 +129,7 @@ if [ -f /srv/containers/"$NOMECONTAINER"/config/smb.conf ]; then
   echo ""; echo "Creating or Recreating a smb.conf model-based"; echo ""
   docker exec "$NOMECONTAINER" bash -c 'curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/ajust_smbconf.sh --output /tmp/auto_configure.sh; chmod +x /tmp/auto_configure.sh'
   docker exec "$NOMECONTAINER" bash -c 'bash /tmp/auto_configure.sh'
-  curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/ajust_smbconf.sh; chmod +x /tmp/auto_configure.sh
+  curl -sSL --silent https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/rsat-webui-samba/ajust_smbconf.sh --output /tmp/auto_configure.sh; chmod +x /tmp/auto_configure.sh
   sudo bash /tmp/auto_configure.sh /srv/containers/"$NOMECONTAINER"/config/smb.conf
   echo ""; echo "OK"; sleep 0.5
 else
