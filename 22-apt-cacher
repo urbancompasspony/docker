@@ -39,7 +39,7 @@ function docker_create {
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -p 3142:3142 \
-    -v "/srv/containers/$NOMECONTAINER/cache:/var/cache/apt-cacher-ng \
+    -v /srv/containers/"$NOMECONTAINER"/cache:/var/cache/apt-cacher-ng \
     "$docker_repo"
 
     return
@@ -49,7 +49,7 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -p 3142:3142 \
-  -v "/srv/containers/$NOMECONTAINER/cache:/var/cache/apt-cacher-ng \
+  -v /srv/containers/"$NOMECONTAINER"/cache:/var/cache/apt-cacher-ng \
   "$docker_repo"
 }
 
