@@ -1,7 +1,7 @@
 #!/bin/bash
 
-UUIDD=$(sed -n '1p' /srv/containers/scripts/config/backup_disk)
-mountpoint=$(sed -n '2p' /srv/containers/scripts/config/backup_disk)
+UUIDD=$(sed -n '1p' /srv/scripts/config/backup_disk)
+mountpoint=$(sed -n '2p' /srv/scripts/config/backup_disk)
 
 function checkA {
   [ "$EUID" -ne 0 ] && {
