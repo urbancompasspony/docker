@@ -2,7 +2,7 @@
 
 datetime=$(date +"%d_%m_%y_%H_%M")
 
-source=$(sed -n '1p' /srv/containers/scripts/config/backupcont)
+source=$(sed -n '1p' /srv/scripts/config/backupcont)
 
 destiny="/srv/restoredcloud"
 
@@ -61,7 +61,6 @@ O container sera parado, o backup restaurado e o servico iniciado em seguida aut
 
 function retoring0 {
   clear; echo ""; echo "Restaurando o backup escolhido. Aguarde pacientemente, isso pode levar VARIOS minutos!"; echo ""
-  #sudo tar -xvf "$file" -C /srv/containers/ && sleep 3
   sudo tar -I 'lz4 -d -c -' -xf "$file" -C /srv/containers/ && sleep 3
   clear; echo ""; echo "Iniciando o container $file2 sob a restauracao realizada..."; echo ""
   docker start "$file2" &&
