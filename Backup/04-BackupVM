@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VM_NAME="Server2022"
-BACKUP_DIR="/mnt/backup/BACKUP_VM"
+BACKUP_DIR="/mnt/disk02/BACKUP_VM"
 RETENTION_DAYS=5
 BACKUP_PREFIX="daily-backup"
 
