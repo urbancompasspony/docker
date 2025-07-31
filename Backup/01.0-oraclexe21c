@@ -7,12 +7,15 @@ source="/srv/containers"
 internal_hd="/mnt/disk01/BKP_Oracle"
 external_hd="/mnt/externo/Oracle"
 logs="/srv/scripts/Logs_BKP_Oracle"
+
 datetime=$(date +"%d_%m_%y_-_%H_%M")
 
 # Configurações de limpeza
 max_internal_days=45
 max_external_days=90
 min_space=15000000 # 15 GB em KB
+
+touch "$logs"
 
 # Prevenir execução simultânea
 LOCKFILE="/tmp/oracle_backup.lock"
