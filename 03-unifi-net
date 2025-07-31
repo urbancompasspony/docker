@@ -31,8 +31,6 @@ VALUE10=""
 
 function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/config
-  # sudo touch /srv/containers/"$NOMECONTAINER"/file
-  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
 :; }
 
 function docker_create {
@@ -67,17 +65,12 @@ function docker_create {
   "$docker_repo"
 
 makecontextra
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function makecontextra {
   mkdir -p /srv/containers/"$VALUE4"
   sudo touch /srv/containers/"$VALUE4"/init-mongo.sh
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Contratos/mongodb-model | tee /srv/containers/"$VALUE4"/init-mongo.sh
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Custom_Images/Config/mongodb | tee /srv/containers/"$VALUE4"/init-mongo.sh
   
   docker run -d \
   --name="$VALUE4" \
@@ -100,8 +93,7 @@ function makecontextra {
 }
 
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+
 :; }
 
 # ----------------------------------------------------------------------
