@@ -144,6 +144,7 @@ sqlplus / as sysdba @/tmp/startup.sql"
   docker restart "$NOMECONTAINER"
 else
   docker exec "$NOMECONTAINER" bash -c '
+  # Definindo as permissões para o usuário oracle (UID 54321)
   chown -R 54321:54321 /opt/oracle/oradata/
   chown -R 54321:54321 /opt/oracle/admin/XE
   chown -R 54321:54321 /opt/oracle/homes/OraDBHome21cXE/network/admin
