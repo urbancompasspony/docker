@@ -54,14 +54,14 @@ function docker_create {
 
 function docker_extras {
   if ! dialog --title "Definir Usuario e Senha!" --yesno "Deseja proteger o acesso?" 6 40; then
-    exit 0
+    return
   fi
 
   if ! VALUE10=$(dialog --ok-label "Definir" --title "Novo Usuario e Senha" --form "Container: $NOMECONTAINER" 9 40 0 \
 "Username: " 1 1 "$VALUE5" 1 11 50 0 \
 "Password: " 2 1 "$VALUE6" 2 11 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
-    exit 0
+    return
   fi
 
   username0=$(echo "$VALUE10" | sed -n 1p)
