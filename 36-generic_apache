@@ -53,7 +53,7 @@ function docker_create {
 }
 
 function docker_extras {
-  if dialog --title "Definir Usuario e Senha!" --yesno "Deseja proteger o acesso?" 6 40; then
+  if ! dialog --title "Definir Usuario e Senha!" --yesno "Deseja proteger o acesso?" 6 40; then
     exit
   fi
     if VALUE10=$(dialog --ok-label "Definir" --title "Novo Usuario e Senha" --form "Container: $NOMECONTAINER" 9 40 0 \
