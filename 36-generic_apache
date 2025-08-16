@@ -54,25 +54,26 @@ function docker_create {
 
 function docker_extras {
   if ! dialog --title "Definir Usuario e Senha!" --yesno "Deseja proteger o acesso?" 6 40; then
-    exit
+    exit 0
   fi
-    if VALUE10=$(dialog --ok-label "Definir" --title "Novo Usuario e Senha" --form "Container: $NOMECONTAINER" 9 40 0 \
+
+  if ! VALUE10=$(dialog --ok-label "Definir" --title "Novo Usuario e Senha" --form "Container: $NOMECONTAINER" 9 40 0 \
 "Username: " 1 1 "admin" 1 11 50 0 \
 "Password: " 2 1 "p4ssw0rd" 2 11 50 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty); then
-      exit
-    fi
+    exit 0
+  fi
 
-    username0=$(echo "$VALUE10" | sed -n 1p)
-    password0=$(echo "$VALUE10" | sed -n 2p)
+  username0=$(echo "$VALUE10" | sed -n 1p)
+  password0=$(echo "$VALUE10" | sed -n 2p)
 
-    docker exec "$NOMECONTAINER" apt update
-    docker exec "$NOMECONTAINER" apt install nano wget -y
-    docker exec "$NOMECONTAINER" touch .htpasswd
-    docker exec "$NOMECONTAINER" bash -c "wget https://raw.githubusercontent.com/urbancompasspony/docker/main/Apache2/Password/httpd.conf -O /usr/local/apache2/conf/httpd.conf"
-    docker exec "$NOMECONTAINER" bash -c "echo $password0 | tee /usr/local/apache2/webpass"
-    docker exec "$NOMECONTAINER" bash -c "htpasswd -c -i .htpasswd $username0 < /usr/local/apache2/webpass"
-    docker restart "$NOMECONTAINER"
+  docker exec "$NOMECONTAINER" apt update
+  docker exec "$NOMECONTAINER" apt install nano wget -y
+  docker exec "$NOMECONTAINER" touch .htpasswd
+  docker exec "$NOMECONTAINER" bash -c "wget https://raw.githubusercontent.com/urbancompasspony/docker/main/Apache2/Password/httpd.conf -O /usr/local/apache2/conf/httpd.conf"
+  docker exec "$NOMECONTAINER" bash -c "echo $password0 | tee /usr/local/apache2/webpass"
+  docker exec "$NOMECONTAINER" bash -c "htpasswd -c -i .htpasswd $username0 < /usr/local/apache2/webpass"
+  docker restart "$NOMECONTAINER"
 :; }
 
 # ----------------------------------------------------------------------
