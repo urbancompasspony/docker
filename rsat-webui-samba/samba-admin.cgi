@@ -1266,8 +1266,8 @@ password_expiry_days() {
 }
 
 force_password_change() {
-    if [ -z "$USERNAME" ]; then
-        echo "Erro: Nome do usuário é obrigatório"
+    if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
+        echo "Erro: Nome do usuário e senha provisória são obrigatórios"
         return
     fi
 
@@ -1278,17 +1278,56 @@ force_password_change() {
         return
     fi
 
-    # Método 1: Usar pwdmustchangenow
-    result1=$(sudo net sam set pwdmustchangenow "$USERNAME" yes 2>&1)
-    
-    # Método 2: Definir expiração para 0 dias (backup)
-    result2=$(sudo samba-tool user setexpiry "$USERNAME" --days=0 2>&1)
-
-    echo "✅ Usuário $USERNAME será OBRIGADO a trocar senha no próximo login"
+    echo "🔄 Forçando troca de senha imediata para: $USERNAME"
     echo ""
-    echo "🔄 Método 1 (pwdmustchangenow): $result1"
-    echo "🔄 Método 2 (setexpiry 0): Aplicado como backup"
-    echo "⚠️ Status: Senha expira IMEDIATAMENTE"
+
+    # PASSO 1: Definir expiração para 90 dias (setfirst)
+    echo "📅 PASSO 1: Configurando expiração da conta para 90 dias..."
+    result1=$(sudo samba-tool user setexpiry "$USERNAME" --days=90 2>&1)
+    exit_code1=$?
+
+    if [ $exit_code1 -eq 0 ]; then
+        echo "✅ Expiração configurada para 90 dias"
+    else
+        echo "❌ Erro no passo 1: $result1"
+        return
+    fi
+
+    echo ""
+
+    # PASSO 2: Definir senha temporária com obrigação de troca (setsecond)
+    echo "🔐 PASSO 2: Definindo senha provisória e forçando troca no próximo login..."
+    result2=$(sudo samba-tool user setpassword "$USERNAME" --newpassword="$PASSWORD" --must-change-at-next-login 2>&1)
+    exit_code2=$?
+
+    if [ $exit_code2 -eq 0 ]; then
+        echo "✅ Senha provisória definida com obrigação de troca"
+        echo ""
+        echo "🎯 OPERAÇÃO CONCLUÍDA COM SUCESSO!"
+        echo ""
+        echo "📋 RESUMO DA CONFIGURAÇÃO:"
+        echo "   👤 Usuário: $USERNAME"
+        echo "   🔐 Senha provisória: ********** (definida)"
+        echo "   ⏰ Conta expira em: 90 dias"
+        echo "   🔄 Deve trocar senha: SIM (no próximo login)"
+        echo ""
+        echo "💡 PRÓXIMOS PASSOS:"
+        echo "   1. Informe a senha provisória ao usuário de forma segura"
+        echo "   2. No primeiro login, o usuário será obrigado a trocar a senha"
+        echo "   3. Após a troca, a senha seguirá as políticas normais do domínio"
+        echo ""
+        echo "🚨 IMPORTANTE:"
+        echo "   • A senha provisória deve ser comunicada ao usuário por canal seguro"
+        echo "   • O usuário NÃO conseguirá usar o sistema até trocar a senha"
+        echo "   • A troca é obrigatória no primeiro login"
+        
+    else
+        echo "❌ Erro no passo 2: $result2"
+        echo ""
+        echo "⚠️ ATENÇÃO: Passo 1 foi executado com sucesso, mas passo 2 falhou"
+        echo "   Pode ser necessário executar manualmente:"
+        echo "   sudo samba-tool user setpassword $USERNAME --must-change-at-next-login"
+    fi
 }
 
 set_no_expiry() {
