@@ -552,18 +552,42 @@
                     </form>
                 </div>
 
-                <!-- Formulário Forçar Troca de Senha -->
-                <div id="force-password-change-form" class="form-container">
-                    <h3>Forçar Troca de Senha Imediata</h3>
-                    <form onsubmit="submitForm(event, 'force-password-change')">
-                        <div class="form-group">
-                            <label for="force-change-username">Nome do Usuário:</label>
-                            <input type="text" id="force-change-username" name="username" required>
-                        </div>
-                        <button type="submit" class="btn btn-danger">Forçar Troca Imediata</button>
-                        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
-                    </form>
-                </div>
+<!-- Formulário Forçar Troca de Senha CORRIGIDO -->
+<div id="force-password-change-form" class="form-container">
+    <h3>Forçar Troca de Senha Imediata</h3>
+    
+    <div class="instruction-panel" style="display: block; background: #fff3cd; border-left: 4px solid #ffc107;">
+        <h4 style="color: #856404; margin-bottom: 10px;">⚠️ Como funciona:</h4>
+        <p style="margin-bottom: 8px;">• <strong>Passo 1:</strong> Define expiração da conta para 90 dias</p>
+        <p style="margin-bottom: 8px;">• <strong>Passo 2:</strong> Define senha provisória + obrigação de troca</p>
+        <p style="color: #856404; font-size: 14px;">🔒 O usuário será OBRIGADO a trocar a senha no próximo login</p>
+    </div>
+
+    <form onsubmit="submitForm(event, 'force-password-change')">
+        <div class="form-group">
+            <label for="force-change-username">Nome do Usuário:</label>
+            <input type="text" id="force-change-username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="temp-password">Senha Provisória:</label>
+            <input type="password" id="temp-password" name="password" required>
+            <small style="color: #666;">Esta senha será temporária - usuário deve trocar no primeiro login</small>
+        </div>
+        
+        <div style="background: #f8d7da; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #dc3545;">
+            <h5 style="color: #721c24; margin: 0 0 8px 0;">🚨 IMPORTANTE:</h5>
+            <p style="color: #721c24; margin: 0; font-size: 14px;">
+                <strong>1.</strong> O usuário receberá uma senha provisória<br>
+                <strong>2.</strong> No primeiro login será OBRIGADO a trocar a senha<br>
+                <strong>3.</strong> Não conseguirá usar o sistema até trocar a senha
+            </p>
+        </div>
+        
+        <button type="submit" class="btn btn-danger">🔄 Forçar Troca Imediata</button>
+        <button type="button" class="btn" onclick="hideForm()">Cancelar</button>
+    </form>
+</div>
 
                 <div id="verify-password-form" class="form-container">
                     <h3>Verificar Senha do Usuário</h3>
