@@ -2,7 +2,7 @@ FROM debian:12-slim
 
 # Metadados
 LABEL maintainer="PlocateWebUI"
-LABEL description="Plocate WebUI - Interface web segura para busca rápida de arquivos"
+LABEL description="pLocate WebUI - Interface web segura para busca rápida de arquivos"
 LABEL version="1.0"
 
 # Variáveis de ambiente
@@ -58,7 +58,7 @@ COPY <<EOF /etc/apache2/sites-available/plocate-web.conf
 
     <Directory "/var/www/plocate-web/cgi-bin/">
         AuthType Basic
-        AuthName "Plocate WebUI - Login Required"
+        AuthName "pLocate WebUI - Login Required"
         AuthUserFile /etc/apache2/auth/.htpasswd
         Require valid-user
 
@@ -69,7 +69,7 @@ COPY <<EOF /etc/apache2/sites-available/plocate-web.conf
 
     <Directory "/var/www/plocate-web">
         AuthType Basic
-        AuthName "Plocate WebUI - Login Required"
+        AuthName "pLocate WebUI - Login Required"
         AuthUserFile /etc/apache2/auth/.htpasswd
         Require valid-user
 
@@ -94,7 +94,7 @@ COPY <<EOF /var/www/plocate-web/index.html
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plocate WebUI</title>
+    <title>pLocate WebUI</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -776,7 +776,7 @@ COPY <<EOF /usr/local/bin/start.sh
 #!/bin/bash
 set -e
 
-echo "🚀 Iniciando Plocate WebUI Seguro..."
+echo "🚀 Iniciando pLocate WebUI Seguro..."
 
 # Verificar volumes
 if [ ! -d "/data" ]; then
