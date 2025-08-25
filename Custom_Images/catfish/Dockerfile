@@ -32,11 +32,16 @@ RUN apt-get install -y \
     openssh-server \
     ssh-askpass
 
-# Instalar xpra
-RUN wget -q -O- https://xpra.org/gpg.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/xpra.gpg && \
-    echo 'deb [signed-by=/etc/apt/trusted.gpg.d/xpra.gpg arch=amd64] https://xpra.org jammy main' > /etc/apt/sources.list.d/xpra.list && \
+# Instalar xpra - detectar arquitetura automaticamente
+RUN ARCH=$(dpkg --print-architecture) && \
+    wget -q -O- https://xpra.org/gpg.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/xpra.gpg && \
+    echo "deb [signed-by=/etc/apt/trusted.gpg.d/xpra.gpg arch=${ARCH}] https://xpra.org jammy main" > /etc/apt/sources.list.d/xpra.list && \
     apt-get update && \
-    apt-get install -y xpra xpra-x11 xpra-html5 --no-install-recommends
+    apt-get install -y xpra --no-install-recommends || \
+    (echo "Xpra não disponível para $ARCH, instalando do repositório Ubuntu" && \
+     rm /etc/apt/sources.list.d/xpra.list && \
+     apt-get update && \
+     apt-get install -y xpra --no-install-recommends)
 
 # Instalar Catfish e dependências (removendo qualquer referência ao virt-manager)
 RUN apt-get install -y --no-install-recommends \
@@ -80,7 +85,7 @@ WORKDIR /home/${LOCAL_USER}
 # Variáveis de ambiente para configuração
 ENV PORTS="9876"
 ENV passw0rd="P4ss0rd"
-ENV resolution="1920x1080"
+ENV resolution="1024x768"
 
 COPY start.sh /start.sh
 
