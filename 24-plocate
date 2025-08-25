@@ -1,32 +1,32 @@
 #!/bin/bash
 
-NOMECONTAINER="catfish"
+NOMECONTAINER="plocate-web"
 
-docker_repo="urbancompasspony/catfish"
-imagem="catfish"
+docker_repo="urbancompasspony/plocate"
+imagem="plocate"
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
-CustmN4="password"
-CustmN5="disp.res."
-CustmN6="port"
-CustmN7="PATH_DIR"
+CustmN4="WEB_USERNAME"
+CustmN5="WEB_PASSWORD"
+CustmN6="PATH_DATA"
+CustmN7=""
 CustmN8=""
 CustmN9=""
 CustmN10=""
 
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
-VALUE4="p4ssw0rd"
-VALUE5="1024x768"
-VALUE6="9876"
-VALUE7="/mnt/disk01"
+VALUE4="admin"
+VALUE5="p4ss0rd"
+VALUE6="/mnt"
+VALUE7=""
 VALUE8=""
 VALUE9=""
 VALUE10=""
 
 function set_mkdir {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/home/user
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/database
 :; }
 
 function docker_create {
@@ -38,13 +38,12 @@ function docker_create {
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -e DARK_MODE=true \
-    -e passw0rd="$VALUE4" \
-    -e resolution="$VALUE5" \
-    -e PORTS="$VALUE6" \
-    -e INDEX_PATH="$VALUE7" \
-    -v /srv/containers/$NOMECONTAINER/home:/home \
-    "$docker_repo" &
+    -e WEB_USERNAME="$VALUE4" \
+    -e WEB_PASSWORD="$VALUE5" \
+    -p 8080:80 \
+    -v /srv/containers/"$NOMECONTAINER"/database:/var/lib/plocate \
+    -v "$VALUE6":/data:ro \
+    "$docker_repo"
 
     return
   fi
@@ -52,17 +51,18 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -e DARK_MODE=true \
-  -e passw0rd="$VALUE4" \
-  -e resolution="$VALUE5" \
-  -e PORTS="$VALUE6" \
-  -e INDEX_PATH="$VALUE7" \
-  -v /srv/containers/$NOMECONTAINER/home:/home \
+  -e WEB_USERNAME="$VALUE4" \
+  -e WEB_PASSWORD="$VALUE5" \
+  -p 8080:80 \
+  -v /srv/containers/"$NOMECONTAINER"/database:/var/lib/plocate \
+  -v "$VALUE6":/data:ro \
   "$docker_repo"
 }
 
 function docker_extras {
-
+  clear ; echo "Fazendo updatedb..."
+  docker exec $NOMECONTAINER updatedb
+  clear; echo "Use it on crontab: 0 7 * * * docker exec $NOMECONTAINER updatedb"
 :; }
 
 # ----------------------------------------------------------------------
