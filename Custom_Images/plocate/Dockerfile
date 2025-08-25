@@ -307,7 +307,7 @@ COPY <<EOF /var/www/plocate-web/index.html
     <div class="container">
         <div class="header">
             <div class="auth-badge">🔒 Secure</div>
-            <h1>🔍 Plocate WebUI</h1>
+            <h1>🔍 pLocate WebUI</h1>
             <p>Interface Web Segura para Busca Rápida de Arquivos</p>
         </div>
 
