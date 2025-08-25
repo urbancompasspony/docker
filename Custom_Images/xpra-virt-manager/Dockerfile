@@ -1,7 +1,3 @@
-
-WIP!
-CHECK XPRA REPO
-
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -36,16 +32,10 @@ RUN apt-get install -y \
     openssh-server \
     ssh-askpass
 
-RUN apt-get install -y wget && \
-    wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
-    echo "deb https://xpra.org/ jammy main" >> /etc/apt/sources.list.d/xpra.list && \
-    apt-get update && \
-    apt-get install -y xpra
-
-    wget -q -O- https://xpra.org/gpg.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/xpra.gpg
-    echo 'deb [signed-by=/etc/apt/trusted.gpg.d/xpra.gpg arch=amd64] https://xpra.org jammy main' > /etc/apt/sources.list.d/xpra.list
-    apt-get update
-    apt-get install -y xpra xpra-x11 xpra-html5 --no-install-recommends
+RUN wget -q -O- https://xpra.org/gpg.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/xpra.gpg
+RUN echo 'deb [signed-by=/etc/apt/trusted.gpg.d/xpra.gpg arch=amd64] https://xpra.org jammy main' > /etc/apt/sources.list.d/xpra.list
+RUN apt-get update
+RUN apt-get install -y xpra xpra-x11 xpra-html5 --no-install-recommends
 
 RUN apt-get install -y --no-install-recommends \
     virt-manager \
