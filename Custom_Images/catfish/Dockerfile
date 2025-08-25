@@ -45,7 +45,6 @@ RUN apt-get install -y --no-install-recommends \
     libglib2.0-bin \
     gtk2-engines-pixbuf \
     gtk2-engines-murrine \
-    ttf-ubuntu-font-family \
     thunar \
     at-spi2-core
 
