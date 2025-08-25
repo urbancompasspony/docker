@@ -26,9 +26,7 @@ VALUE9=""
 VALUE10=""
 
 function set_mkdir {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{data,config}
-  # sudo touch /srv/containers/"$NOMECONTAINER"/file
-  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"
 :; }
 
 function docker_create {
