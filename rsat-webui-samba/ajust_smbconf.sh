@@ -68,7 +68,9 @@ cat > "$DESTINO_CONF" << EOF
   server role = active directory domain controller
   workgroup = $WORKGROUP
   idmap_ldb:use rfc2307 = yes
-
+  idmap config * : backend = tdb
+  idmap config * : range = 3000-7999
+  
   local master = yes
   domain master = yes
   preferred master = yes
