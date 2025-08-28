@@ -87,8 +87,7 @@ cat > "$DESTINO_CONF" << EOF
   audit:failure = none
   full_audit:success = unlinkat renameat
   full_audit:prefix = IP=%I|USER=%u|MACHINE=%m|VOLUME=%S
-  log level = 0 vfs:0 rpc_srv:0 rpc_parse:0
-  #syslog = 0
+  log level = 1
   recycle:repository = $RECYCLE_REPOSITORY/%U
   recycle:excludedir = $RECYCLE_EXCLUDEDIR
   recycle:keeptree = yes
