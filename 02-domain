@@ -188,22 +188,22 @@ if docker restart "$NOMECONTAINER"; then
 fi
 
 echo ""; echo "############################################################"
-echo ""; echo "Fixing SYSVOL Permissions"; echo ""
+echo ""; echo "Fixing SYSVOL Permissions"
 if docker exec "$NOMECONTAINER" samba-tool ntacl sysvolreset -U Administrator; then
   echo "OK"; sleep 0.5
 fi
 
-echo ""; echo "Check SYSVOL Permissions after fixing"; echo ""
+echo ""; echo "Check SYSVOL Permissions after fixing"
 if docker exec "$NOMECONTAINER" samba-tool ntacl sysvolcheck -U Administrator; then
   echo "OK"; sleep 0.5
 fi
 
-echo ""; echo "Fixing general ACLs Permissions"; echo ""
+echo ""; echo "Fixing general ACLs Permissions"
 if docker exec "$NOMECONTAINER" samba-tool dbcheck --cross-ncs --fix --yes; then
   echo "OK"; sleep 0.5
 fi
 
-echo ""; echo "Fixing Well-Known ACLs Permissions"; echo ""
+echo ""; echo "Fixing Well-Known ACLs Permissions"
 if docker exec "$NOMECONTAINER" samba-tool dbcheck --cross-ncs --reset-well-known-acls --fix --yes; then
   echo "OK"; sleep 0.5
 fi
