@@ -41,7 +41,7 @@ function docker_create {
     --cpus=$VALUE6 -m "$VALUE5" \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -p 8384:8384 -p 22000:22000/tcp -p 22000:22000/udp -p 21027:21027/udp \
-    -e STHOMEDIR=/config \
+    -e STHOMEDIR=/config -e PUID=0 -e PGID=0 \
     -v /srv/containers/"$NOMECONTAINER"/config:/config \
     -v $VALUE4:/data \
     "$docker_repo"
@@ -54,7 +54,7 @@ function docker_create {
   --cpus=$VALUE6 -m "$VALUE5" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -p 8384:8384 -p 22000:22000/tcp -p 22000:22000/udp -p 21027:21027/udp \
-  -e STHOMEDIR=/config \
+  -e STHOMEDIR=/config -e PUID=0 -e PGID=0 \
   -v /srv/containers/"$NOMECONTAINER"/config:/config \
   -v $VALUE4:/data \
   "$docker_repo"
