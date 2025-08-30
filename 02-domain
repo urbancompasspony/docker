@@ -172,13 +172,21 @@ echo ""; echo "Adjusting or fixing syslog"; echo ""
 if docker exec "$NOMECONTAINER" bash -c "rm /run/rsyslogd.pid"; then
   echo "OK"; sleep 0.5
 fi
+if docker exec "$NOMECONTAINER" bash -c "rm /var/run/rsyslogd.pid"; then
+  echo "OK"; sleep 0.5
+fi
 
 if docker exec "$NOMECONTAINER" chmod 777 -R /var/log/syslog; then
   echo "OK"; sleep 0.5
 fi
-
 if docker exec "$NOMECONTAINER" chmod 777 -R /var/lib/samba/sysvol; then
   echo "OK"; sleep 0.5
+fi
+
+if ! docker exec "$NOMECONTAINER" rsyslogd; then
+  echo "OK"; sleep 0.5
+else
+  echo "NOW IT IS OK"; sleep 0.5
 fi
 
 echo ""; echo "############################################################"
