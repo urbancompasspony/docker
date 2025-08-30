@@ -183,7 +183,7 @@ if docker exec "$NOMECONTAINER" chmod 777 -R /var/lib/samba/sysvol; then
   echo "OK"; sleep 0.5
 fi
 
-if ! docker exec "$NOMECONTAINER" rsyslogd; then
+if ! docker exec "$NOMECONTAINER" rsyslogd 2>/dev/null; then
   echo "OK"; sleep 0.5
 else
   echo "NOW IT IS OK"; sleep 0.5
