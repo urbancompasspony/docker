@@ -2,12 +2,7 @@
 
 NOMECONTAINER="dominio"
 
-if [ "$(arch)" = "x86_64" ]; then
-  docker_repo="urbancompasspony/domain:latest"
-else
-  docker_repo="urbancompasspony/domain-arm:latest"
-fi
-
+docker_repo="urbancompasspony/domain:latest"
 imagem="active-directory"
 
 CustmN2="F.Q.D.N."
