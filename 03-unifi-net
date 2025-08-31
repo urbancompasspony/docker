@@ -60,7 +60,6 @@ function docker_create {
   -e PUID=1000 -e PGID=1000 \
   -e MEM_LIMIT=1024 -e MEM_STARTUP=1024 \
   -e MONGO_USER=unifi -e MONGO_PASS="$VALUE6" -e MONGO_HOST="$VALUE5" -e MONGO_PORT=27017 -e MONGO_DBNAME=unifi -e MONGO_AUTHSOURCE=admin -e MONGO_TLS= \
-  -p 8443:8443 -p 3478:3478/udp -p 10001:10001/udp -p 8080:8080 -p 1900:1900/udp -p 8843:8843 -p 8880:8880 -p 6789:6789 -p 5514:5514/udp \
   -v /srv/containers/"$NOMECONTAINER"/config:/config \
   "$docker_repo"
 
