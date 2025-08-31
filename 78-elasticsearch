@@ -57,7 +57,6 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   --ulimit memlock=-1:-1 --cpus="$VALUE5" -m "$VALUE4" \
-  -p 9200:9200 \
   -e PUID=1000 -e PGID=1000 \
   -e discovery.type=single-node \
   -e xpack.security.enabled=false \
@@ -65,12 +64,6 @@ function docker_create {
   -e "ES_JAVA_OPTS=-Xms1g -Xmx1g" \
   -v /srv/containers/"$NOMECONTAINER"/data:/data \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
