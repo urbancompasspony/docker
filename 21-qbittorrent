@@ -38,17 +38,13 @@ function docker_create {
   # Se NAO for numerico, execute como host!
   if [[ ! "$VALUE2" =~ $ip_regex ]]; then
 
-
-
-
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -e PUID=1000 -e PGID=1000 \
     -e WEBUI_PORT="$VALUE5" \
-    -p "$VALUE5":"$VALUE5" \
     -e TORRENTING_PORT="$VALUE6" \
-    -p "$VALUE6":"$VALUE6" -p "$VALUE6":"$VALUE6"/udp \
+    -p "$VALUE5":"$VALUE5" -p "$VALUE6":"$VALUE6" -p "$VALUE6":"$VALUE6"/udp \
     -v /srv/containers/"$NOMECONTAINER"/config:/config \
     -v "$VALUE4":/downloads \
     "$docker_repo"
@@ -61,18 +57,10 @@ function docker_create {
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -e PUID=1000 -e PGID=1000 \
   -e WEBUI_PORT="$VALUE5" \
-  -p "$VALUE5":"$VALUE5" \
   -e TORRENTING_PORT="$VALUE6" \
-  -p "$VALUE6":"$VALUE6" -p "$VALUE6":"$VALUE6"/udp \
   -v /srv/containers/"$NOMECONTAINER"/config:/config \
   -v "$VALUE4":/downloads \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
