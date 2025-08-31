@@ -54,19 +54,13 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -e PORT="$VALUE4" -p "$VALUE4":7575 \
+  -e PORT="$VALUE4" \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /srv/containers/"$NOMECONTAINER"/data:/data \
   -v /srv/containers/"$NOMECONTAINER"/icons:/app/public/icons \
   -v /srv/containers/"$NOMECONTAINER"/configs:/app/data/configs \
   -v /srv/containers/"$NOMECONTAINER"/backgrounds:/app/public/imgs/backgrounds \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
