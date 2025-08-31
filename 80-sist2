@@ -54,19 +54,12 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -p 4090:4090 -p 8080:8080 \
   -m "$VALUE5" \
   -w /root/sist2-admin/ \
   -v /etc/localtime:/etc/localtime:ro \
   -v "$VALUE4" \
   -v /srv/containers/"$NOMECONTAINER"/data:/sist2-admin/ \
   --entrypoint python3 $docker_repo /root/sist2-admin/sist2_admin/app.py
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
