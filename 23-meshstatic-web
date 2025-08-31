@@ -49,7 +49,6 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -p 8080:8080 \
   -v "/srv/containers/$NOMECONTAINER/config:/config" \
   -v "/srv/containers/$NOMECONTAINER/data:/data" \
   "$docker_repo"
