@@ -59,7 +59,6 @@ function docker_create {
   -e DOCKER_HUB_USERNAME=USER \
   -e DOCKER_HUB_PASSWORD=PASS \
   -e DOCKER_MTU=1500 \
-  -p 3000:3000 -p 443:443 \
   -v /srv/containers/"$NOMECONTAINER"/data:/opt \
   -v /srv/containers/"$NOMECONTAINER"/profiles:/profiles \
   -v /dev/input:/dev/input \
