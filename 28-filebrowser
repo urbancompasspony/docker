@@ -57,17 +57,11 @@ $docker_repo
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -u $(id -u):$(id -g) -p 8081:80 \
+  -u $(id -u):$(id -g) \
   -v /srv/containers/"$NOMECONTAINER"/config/.filebrowser.json:/.filebrowser.json \
   -v /srv/containers/"$NOMECONTAINER"/database:/database \
   -v "$VALUE4":/srv \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
