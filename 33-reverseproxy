@@ -64,7 +64,7 @@ function docker_create {
   fi
 
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-  --network macvlan --ip="$VALUE2" --dns="$VALUE3" -p 80:80 -p 443:443 \
+  --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -v /srv/containers/"$NOMECONTAINER"/apache2/mpm_event.conf:/etc/apache2/mods-available/mpm_event.conf \
   -v /srv/containers/"$NOMECONTAINER"/apache2/mpm_worker.conf:/etc/apache2/mods-available/mpm_worker.conf \
