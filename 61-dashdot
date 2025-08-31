@@ -50,15 +50,9 @@ function docker_create {
   docker run --privileged -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -e DASHDOT_PORT="$VALUE4" -p 80:"$VALUE4" \
+  -e DASHDOT_PORT="$VALUE4" \
   -v /:/mnt/host:ro \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
