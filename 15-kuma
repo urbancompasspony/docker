@@ -55,16 +55,10 @@ function docker_create {
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -e UPTIME_KUMA_DISABLE_FRAME_SAMEORIGIN=true \
   -e UPTIME_KUMA_PORT="$VALUE4" \
-  -p "$VALUE4":"$VALUE4" \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /srv/containers/"$NOMECONTAINER"/data:/app/data \
   "$docker_repo"
 
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
