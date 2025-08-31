@@ -59,7 +59,6 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   --no-healthcheck \
-  -p 8080:80 \
   -v /srv/containers/"$NOMECONTAINER"/data/messages.json:/var/www/html/data/messages.json \
   -v /srv/containers/"$NOMECONTAINER"/data/users.json:/var/www/html/data/users.json \
   -v /srv/containers/"$NOMECONTAINER"/data/container.log:/srv/containers/simple-web-chat/data/container.log \
