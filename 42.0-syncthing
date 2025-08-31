@@ -53,7 +53,6 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --cpus=$VALUE6 -m "$VALUE5" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -p 8384:8384 -p 22000:22000 -p 21027:21027/udp \
   -e STHOMEDIR=/config -e PUID=0 -e PGID=0 \
   -v /srv/containers/"$NOMECONTAINER"/config:/config \
   -v $VALUE4:/data \
