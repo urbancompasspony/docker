@@ -48,7 +48,6 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -p 3142:3142 \
   -v /srv/containers/"$NOMECONTAINER"/cache:/var/cache/apt-cacher-ng \
   "$docker_repo"
 }
