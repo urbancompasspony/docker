@@ -54,22 +54,14 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --device /dev/bus/usb \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -p 631:631 \
   -e CUPSADMIN=$VALUE4 \
   -e CUPSPASSWORD=$VALUE5 \
   -v /srv/containers/"$NOMECONTAINER"/config:/etc/cups \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+
 :; }
 
 # ----------------------------------------------------------------------
