@@ -54,17 +54,11 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --shm-size=256m \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -p 30000:30000/udp \
   -e PUID=1000 -e PGID=1000 \
   -e CLI_ARGS="$VALUE4" \
   -v /srv/containers/"$NOMECONTAINER"/config:/config/.minetest \
   "$docker_repo"
 
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
