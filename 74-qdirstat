@@ -53,18 +53,11 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -p 3000:3000 -p 3001:3001 \
   -e PUID=1000 -e PGID=1000 \
   -e CUSTOM_USER="$VALUE5" -e PASSWORD="$VALUE6" \
   -v /srv/containers/"$NOMECONTAINER"/config:/config \
   -v $VALUE4 \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
