@@ -53,18 +53,11 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -p 20:20 -p 21:21 -p 47400-47470:47400-47470 \
   -e FTP_USER="$VALUE6" -e FTP_PASS="$VALUE7" -e PASV_ADDRESS="$VALUE2" \
   -v "/srv/containers/$NOMECONTAINER/config:/config" \
   -v "/srv/containers/$NOMECONTAINER/data:/data" \
   $VALUE5 \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
