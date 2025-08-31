@@ -55,12 +55,6 @@ function docker_create {
   -v /srv/containers/"$NOMECONTAINER"/cache:/cache \
   -v "$VALUE4":/media \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
