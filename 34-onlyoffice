@@ -52,7 +52,7 @@ function docker_create {
   fi
 
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-  --network macvlan --ip="$VALUE2" --dns="$VALUE3" -p 80:80 \
+  --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -e JWT_SECRET="$VALUE4" \
   -v /srv/containers/"$NOMECONTAINER"/logs:/var/log/onlyoffice  \
