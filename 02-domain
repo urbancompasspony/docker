@@ -73,8 +73,6 @@ function docker_create {
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   --device /dev/bus/usb \
   --ulimit nofile=1024:1024 \
-  -p "$VALUE3":53:53 -p "$VALUE3":53:53/udp -p "$VALUE3":88:88 -p "$VALUE3":88:88/udp -p "$VALUE3":135:135 -p "$VALUE3":137:137 -p "$VALUE3":137:137/udp -p "$VALUE3":138:138 -p "$VALUE3":138:138/udp -p "$VALUE3":139:139 \
-  -p "$VALUE3":389:389 -p "$VALUE3":389:389/udp -p "$VALUE3":445:445 -p "$VALUE3":464:464 -p "$VALUE3":464:464/udp -p "$VALUE3":636:636 -p "$VALUE3":1024-1044:1024-1044 -p "$VALUE3":3268-3269:3268-3269 -p 631:631 -p 631:631/udp \
   -e DOMAIN="$VALUE2" \
   -e DOMAINPASS="$VALUE4" \
   -e DNSFORWARDER="$VALUE5" \
