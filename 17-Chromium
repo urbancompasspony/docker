@@ -57,17 +57,10 @@ function docker_create {
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   --security-opt seccomp=unconfined \
   --shm-size="1gb" \
-  -p 3000:3000 -p 3001:3001 \
   -e CHROME_CLI="$VALUE4" \
   -e PUID=1000 -e PGID=1000 \
   -v $VALUE5:/config \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
