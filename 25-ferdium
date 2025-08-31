@@ -60,15 +60,8 @@ function docker_create {
   -e CUSTOM_USER="$VALUE4" -e PASSWORD="$VALUE5" \
   -e PUID=1000 -e PGID=1000 \
   -e TZ=America/Bahia \
-  -p 3000:3000 -p 3001:3001 \
   -v /srv/containers/"$NOMECONTAINER"/config:/config \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
