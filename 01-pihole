@@ -55,7 +55,6 @@ function docker_create {
 
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network macvlan --ip="$VALUE2" --dns="1.0.0.1" --dns="8.8.4.4" \
-    -p 80:80 -p 443:443 -p 67:67/tcp -p 67:67/udp -p 53:53/tcp -p 53:53/udp \
     --no-healthcheck --restart=unless-stopped \
     --shm-size=512m \
     -e TZ="$VALUE5" \
