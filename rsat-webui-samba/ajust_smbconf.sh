@@ -70,6 +70,8 @@ cat > "$DESTINO_CONF" << EOF
   idmap_ldb:use rfc2307 = yes
   idmap config * : backend = tdb
   idmap config * : range = 3000-7999
+
+  usershare max shares = 0
   
   local master = yes
   domain master = yes
