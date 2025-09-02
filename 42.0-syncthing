@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NOMECONTAINER="syncthing-global"
+NOMECONTAINER="syncthing-$HOSTNAME"
 
 docker_repo="syncthing/syncthing:latest"
 imagem="syncthing"
@@ -17,7 +17,7 @@ CustmN10=""
 
 VALUE2="localhost"
 VALUE3="1.0.0.1"
-VALUE4="/mnt"
+VALUE4="-v /mnt:/mnt"
 VALUE5="2048m"
 VALUE6="1"
 VALUE7=""
@@ -43,7 +43,7 @@ function docker_create {
     -p 8384:8384 -p 22000:22000 -p 21027:21027/udp \
     -e STHOMEDIR=/config -e PUID=0 -e PGID=0 \
     -v /srv/containers/"$NOMECONTAINER"/config:/config \
-    -v $VALUE4:/data \
+    $VALUE4 \
     "$docker_repo"
 
     return
@@ -55,7 +55,7 @@ function docker_create {
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -e STHOMEDIR=/config -e PUID=0 -e PGID=0 \
   -v /srv/containers/"$NOMECONTAINER"/config:/config \
-  -v $VALUE4:/data \
+  $VALUE4 \
   "$docker_repo"
 }
 
