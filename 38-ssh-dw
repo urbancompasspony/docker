@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Ultra OP Complete (and Dangerous):
+#docker run -it \
+#  --privileged \
+#  --pid=host \
+#  --network=host \
+#  --ipc=host \
+#  --uts=host \
+#  -v /:/host \
+#  -v /var/run/docker.sock:/var/run/docker.sock \
+#  --cap-add=ALL \
+#  --security-opt seccomp=unconfined \
+#  --security-opt apparmor=unconfined \
+#  ubuntu bash
+
 NOMECONTAINER="ssh-dw"
 
 docker_repo="urbancompasspony/ssh-dw:latest"
@@ -40,6 +54,7 @@ function docker_create {
     --network host --add-host=host.docker.internal:host-gateway \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -v /srv/containers/"$NOMECONTAINER"/data:/usr/share \
+    -v /mnt:/mnt \
     "$docker_repo"
 
     return
@@ -49,6 +64,7 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" --add-host=host.docker.internal:host-gateway \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -v /srv/containers/"$NOMECONTAINER"/data:/usr/share \
+  -v /mnt:/mnt \
   "$docker_repo"
 
 }
