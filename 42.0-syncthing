@@ -60,6 +60,10 @@ function docker_create {
 }
 
 function docker_extras {
+  clear; echo ""
+  echo "Pela natureza do host, acesse o syncthing através do http://$HOSTNAME:8384 utilizando algum serviço como o Tailscale!"
+  echo "Ou acesse localhost:8384 pelo DWService, ou ainda, estando na mesma rede LAN, IP_DO_SERVIDOR:8384"
+  sleep 5
 :; }
 
 # ----------------------------------------------------------------------
