@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NOMECONTAINER="syncthing-client"
+NOMECONTAINER="syncthing-global"
 
 docker_repo="syncthing/syncthing:latest"
 imagem="syncthing"
@@ -15,7 +15,7 @@ CustmN8=""
 CustmN9=""
 CustmN10=""
 
-VALUE2="0.0.0.0"
+VALUE2="localhost"
 VALUE3="1.0.0.1"
 VALUE4="/mnt"
 VALUE5="2048m"
