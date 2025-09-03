@@ -1,18 +1,14 @@
 #!/bin/bash
 
-# Criar usuário/grupo syslog se não existir
-if ! getent group syslog >/dev/null; then
-    groupadd -r syslog
+if [ -f /run/rsyslogd.pid ]; then
+    OLD_PID=$(cat /run/rsyslogd.pid)
+    if kill -0 $OLD_PID 2>/dev/null; then
+        echo "Matando rsyslogd anterior (PID: $OLD_PID)"
+        kill $OLD_PID
+        sleep 2
+    fi
+    rm -f /run/rsyslogd.pid
 fi
-if ! getent passwd syslog >/dev/null; then
-    useradd -r -g syslog -d /var/log -s /usr/sbin/nologin syslog
-fi
-
-# Criar diretórios necessários
-mkdir -p /var/log /var/run/rsyslog /var/spool/rsyslog
-chown syslog:adm /var/log
-chown syslog:syslog /var/spool/rsyslog
-chmod 755 /var/log /var/run/rsyslog /var/spool/rsyslog
 
 # rsyslog => log
 /usr/sbin/rsyslogd &
