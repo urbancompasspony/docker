@@ -61,8 +61,8 @@ function docker_create {
 }
 
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+  clear; echo ""
+  echo "Access: https://$VALUE2:3001/"
 :; }
 
 # ----------------------------------------------------------------------
