@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Criar usuário/grupo syslog se não existir
+if ! getent group syslog >/dev/null; then
+    groupadd -r syslog
+fi
+if ! getent passwd syslog >/dev/null; then
+    useradd -r -g syslog -d /var/log -s /usr/sbin/nologin syslog
+fi
+
+# Criar diretórios necessários
+mkdir -p /var/log /var/run/rsyslog /var/spool/rsyslog
+chown syslog:adm /var/log
+chown syslog:syslog /var/spool/rsyslog
+chmod 755 /var/log /var/run/rsyslog /var/spool/rsyslog
+
 # rsyslog => log
 /usr/sbin/rsyslogd &
 
