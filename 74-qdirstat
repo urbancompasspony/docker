@@ -63,6 +63,7 @@ function docker_create {
 function docker_extras {
   clear; echo ""
   echo "Access: https://$VALUE2:3001/"
+  sleep 5
 :; }
 
 # ----------------------------------------------------------------------
