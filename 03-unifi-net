@@ -69,7 +69,7 @@ makecontextra
 function makecontextra {
   mkdir -p /srv/containers/"$VALUE4"
   sudo touch /srv/containers/"$VALUE4"/init-mongo.sh
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Custom_Images/Config/mongodb | tee /srv/containers/"$VALUE4"/init-mongo.sh
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker_custom/refs/heads/main/Config/mongodb | tee /srv/containers/"$VALUE4"/init-mongo.sh
   
   docker run -d \
   --name="$VALUE4" \
