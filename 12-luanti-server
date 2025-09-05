@@ -68,7 +68,7 @@ function docker_extras {
     sudo rm /home/administrador/minetest_game.zip
 
     sudo rm /srv/containers/"$NOMECONTAINER"/config/main-config/minetest.conf
-    wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Custom_Images/Config/minetest.conf -O /srv/containers/"$NOMECONTAINER"/config/main-config/minetest.conf
+    wget https://raw.githubusercontent.com/urbancompasspony/docker_custom/refs/heads/main/Config/minetest.conf -O /srv/containers/"$NOMECONTAINER"/config/main-config/minetest.conf
   fi
 :; }
 
