@@ -2,7 +2,7 @@
 
 NOMECONTAINER="syslog-ng"
 
-docker_repo="  lscr.io/linuxserver/syslog-ng:latest"
+docker_repo="lscr.io/linuxserver/syslog-ng:latest"
 imagem="syslog"
 
 CustmN2="local_ip"
