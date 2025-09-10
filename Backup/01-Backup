@@ -32,7 +32,8 @@ function dockerctrl {
 }
 
 function backup {
-  #for dir in $(find * -maxdepth 0 ! -path "*oraclexe21c*")
+  cp -r /srv/scripts "$destiny"
+
   for dir in $(find * -maxdepth 0)
     do
       tar -I 'lz4 -1 -c -' -cpf "$destiny"/"$dir"-"$datetime".tar.lz4 "$dir"
@@ -47,3 +48,5 @@ backup
 dockerctrl start &&
 
 exit 0
+
+#for dir in $(find * -maxdepth 0 ! -path "*oraclexe21c*")
