@@ -55,7 +55,7 @@ function docker_create {
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -e PUID=1000 -e PGID=1000 \
     -e MEM_LIMIT=2048 -e MEM_STARTUP=1024 \
-    -e MONGO_USER=unifi \
+    -e MONGO_USER=admin \
     -e MONGO_AUTHSOURCE=admin \
     -e MONGO_DBNAME="$VALUE4" \
     -e MONGO_PASS="$VALUE5" \
@@ -74,7 +74,7 @@ function docker_create {
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -e PUID=1000 -e PGID=1000 \
   -e MEM_LIMIT=1024 -e MEM_STARTUP=1024 \
-  -e MONGO_USER=unifi \
+  -e MONGO_USER=admin \
   -e MONGO_AUTHSOURCE=admin \
   -e MONGO_DBNAME="$VALUE4" \
   -e MONGO_PASS="$VALUE5" \
