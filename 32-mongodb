@@ -1,15 +1,15 @@
 #!/bin/bash
 
-NOMECONTAINER="A-CUSTOM-A"
+NOMECONTAINER="mongodb"
 
-docker_repo="CUSTOM/DOCKER:LATEST"
-imagem="pihole dwservice etc"
+docker_repo="docker.io/mongo:4.4"
+imagem="mongodb"
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
-CustmN4=""
-CustmN5=""
-CustmN6=""
+CustmN4="db_name"
+CustmN5="db_pass"
+CustmN6="db_port"
 CustmN7=""
 CustmN8=""
 CustmN9=""
@@ -17,18 +17,18 @@ CustmN10=""
 
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
-VALUE4=""
-VALUE5=""
-VALUE6=""
+VALUE4="unifi"
+VALUE5="$randompass"
+VALUE6="27017"
 VALUE7=""
 VALUE8=""
 VALUE9=""
 VALUE10=""
 
 function set_mkdir {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{data,config}
-  # sudo touch /srv/containers/"$NOMECONTAINER"/file
-  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/db
+  sudo touch /srv/containers/"$NOMECONTAINER"/init-mongo.sh
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker_custom/refs/heads/main/Config/mongodb | tee /srv/containers/"$NOMECONTAINER"/init-mongo.sh
 :; }
 
 function docker_create {
@@ -40,9 +40,17 @@ function docker_create {
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -p 80:80 \ ???
-    -v "/srv/containers/$NOMECONTAINER/config:/config" \
-    -v "/srv/containers/$NOMECONTAINER/data:/data" \
+    -e MONGO_AUTHSOURCE=admin \
+    -e MONGO_USER=unifi \
+    -e MONGO_INITDB_ROOT_USERNAME=root \
+    -e MONGO_PASS="$VALUE5" \
+    -e MONGO_INITDB_ROOT_PASSWORD="$VALUE5" \
+    -e MONGO_DBNAME="$VALUE4" \
+    -e MONGO_HOST="$NOMECONTAINER" \
+    -e MONGO_PORT="$VALUE6" \
+    -p "$VALUE6":"$VALUE6" \
+    -v /srv/containers/"$VALUE4"/db:/data/db \
+    -v /srv/containers/"$VALUE4"/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro \
     "$docker_repo"
 
     return
@@ -51,20 +59,21 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -v "/srv/containers/$NOMECONTAINER/config:/config" \
-  -v "/srv/containers/$NOMECONTAINER/data:/data" \
+  -e MONGO_AUTHSOURCE=admin \
+  -e MONGO_USER=unifi \
+  -e MONGO_INITDB_ROOT_USERNAME=root \
+  -e MONGO_PASS="$VALUE5" \
+  -e MONGO_INITDB_ROOT_PASSWORD="$VALUE5" \
+  -e MONGO_DBNAME="$VALUE4" \
+  -e MONGO_HOST="$NOMECONTAINER" \
+  -e MONGO_PORT="$VALUE6" \
+  -v /srv/containers/"$NOMECONTAINER"/db:/data/db \
+  -v /srv/containers/"$NOMECONTAINER"/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+
 :; }
 
 # ----------------------------------------------------------------------
