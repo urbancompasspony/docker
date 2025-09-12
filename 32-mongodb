@@ -45,7 +45,7 @@ function docker_create {
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -e MONGO_AUTHSOURCE=admin \
-    -e MONGO_USER=unifi \
+    -e MONGO_USER=admin \
     -e MONGO_INITDB_ROOT_USERNAME=root \
     -e MONGO_PASS="$VALUE5" \
     -e MONGO_INITDB_ROOT_PASSWORD="$VALUE5" \
@@ -53,8 +53,8 @@ function docker_create {
     -e MONGO_HOST="$NOMECONTAINER" \
     -e MONGO_PORT="$VALUE6" \
     -p "$VALUE6":"$VALUE6" \
-    -v /srv/containers/"$VALUE4"/db:/data/db \
-    -v /srv/containers/"$VALUE4"/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro \
+    -v /srv/containers/"$NOMECONTAINER"/db:/data/db \
+    -v /srv/containers/"$NOMECONTAINER"/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro \
     "$docker_repo"
 
     return
@@ -64,7 +64,7 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -e MONGO_AUTHSOURCE=admin \
-  -e MONGO_USER=unifi \
+  -e MONGO_USER=admin \
   -e MONGO_INITDB_ROOT_USERNAME=root \
   -e MONGO_PASS="$VALUE5" \
   -e MONGO_INITDB_ROOT_PASSWORD="$VALUE5" \
