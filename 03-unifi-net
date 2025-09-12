@@ -2,7 +2,7 @@
 
 version0="4.4"
 
-NOMECONTAINER="unifi"
+NOMECONTAINER="unifi-network"
 
 docker_repo="lscr.io/linuxserver/unifi-network-application:latest"
 docker_repo1="docker.io/mongo:$version0"
