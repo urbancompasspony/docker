@@ -103,15 +103,11 @@ sudo chmod +x /srv/containers/"$VALUE4"/init-mongo.sh
     if docker stop "$VALUE4"; then
       docker rm "$VALUE4"
       clear; echo "SIGTERM + STOP + CLEAN: O container $VALUE4 estava executando, foi parado e removido. Continuando..."; sleep 3
-      return
     elif docker rm "$VALUE4"; then
       clear; echo "STOP + CLEAN: O container $VALUE4 estava parado e foi removido. Continuando..."; sleep 3
-      return
     else
       clear; echo "CLEAN: O container $VALUE4 nao estava executando. Continuando..."; sleep 3
     fi
-
-    return
   fi
 
   if docker rm -f "$VALUE4"; then
@@ -123,7 +119,6 @@ sudo chmod +x /srv/containers/"$VALUE4"/init-mongo.sh
   --network macvlan \
   --ip="$VALUE5" \
   --dns=1.1.1.1  \
-  --dns=127.0.0.1 \
   -e MONGO_INITDB_ROOT_USERNAME=root \
   -e MONGO_INITDB_ROOT_PASSWORD="$VALUE6" \
   -e MONGO_USER=unifi \
