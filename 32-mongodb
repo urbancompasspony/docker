@@ -2,7 +2,7 @@
 
 SECRET0=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
 
-NOMECONTAINER="mongodb"
+NOMECONTAINER="mongodb-unifi"
 
 version0="4.4"
 imagem="mongodb"
@@ -13,7 +13,7 @@ CustmN4="db_name"
 CustmN5="db_pass"
 CustmN6="db_port"
 CustmN7="db_version"
-CustmN8=""
+CustmN8="db_user"
 CustmN9=""
 CustmN10=""
 
@@ -23,7 +23,7 @@ VALUE4="unifi"
 VALUE5="$SECRET0"
 VALUE6="27017"
 VALUE7="4.4"
-VALUE8=""
+VALUE8="unifi"
 VALUE9=""
 VALUE10=""
 
@@ -45,12 +45,12 @@ function docker_create {
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -e MONGO_AUTHSOURCE=admin \
-    -e MONGO_USER=admin \
+    -e MONGO_USER="$VALUE8" \
     -e MONGO_INITDB_ROOT_USERNAME=root \
     -e MONGO_PASS="$VALUE5" \
     -e MONGO_INITDB_ROOT_PASSWORD="$VALUE5" \
     -e MONGO_DBNAME="$VALUE4" \
-    -e MONGO_HOST="$NOMECONTAINER" \
+    -e MONGO_HOST="localhost" \
     -e MONGO_PORT="$VALUE6" \
     -p "$VALUE6":"$VALUE6" \
     -v /srv/containers/"$NOMECONTAINER"/db:/data/db \
@@ -64,12 +64,12 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -e MONGO_AUTHSOURCE=admin \
-  -e MONGO_USER=admin \
+  -e MONGO_USER="$VALUE8" \
   -e MONGO_INITDB_ROOT_USERNAME=root \
   -e MONGO_PASS="$VALUE5" \
   -e MONGO_INITDB_ROOT_PASSWORD="$VALUE5" \
   -e MONGO_DBNAME="$VALUE4" \
-  -e MONGO_HOST="$NOMECONTAINER" \
+  -e MONGO_HOST="$CustmN2" \
   -e MONGO_PORT="$VALUE6" \
   -v /srv/containers/"$NOMECONTAINER"/db:/data/db \
   -v /srv/containers/"$NOMECONTAINER"/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro \
