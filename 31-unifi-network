@@ -11,6 +11,7 @@ if [ "$DB_PASS" != "null" ] && [ -n "$DB_PASS" ]; then
     DB_NAME=$(yq ".mongodb.db_name" "$configfile")
     DB_IP=$(yq ".mongodb.local_ip" "$configfile")
     DB_PORT=$(yq ".mongodb.db_port" "$configfile")
+    DB_USER=$(yq ".mongodb.db_user" "$configfile")
 else
     clear
     echo "ERRO: CRIE OU RECRIE O BANCO DE DADOS MONGODB PRIMEIRO!"
@@ -26,7 +27,7 @@ CustmN4="col_db_name"
 CustmN5="col_db_pass"
 CustmN6="col_db_port"
 CustmN7="col_db_ip"
-CustmN8=""
+CustmN8="col_db_user"
 CustmN9=""
 CustmN10=""
 
@@ -36,7 +37,7 @@ VALUE4="$DB_NAME"
 VALUE5="$DB_PASS"
 VALUE6="$DB_PORT"
 VALUE7="$DB_IP"
-VALUE8=""
+VALUE8="$DB_USER"
 VALUE9=""
 VALUE10=""
 
@@ -55,7 +56,7 @@ function docker_create {
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -e PUID=1000 -e PGID=1000 \
     -e MEM_LIMIT=2048 -e MEM_STARTUP=1024 \
-    -e MONGO_USER=admin \
+    -e MONGO_USER="$VALUE8" \
     -e MONGO_AUTHSOURCE=admin \
     -e MONGO_DBNAME="$VALUE4" \
     -e MONGO_PASS="$VALUE5" \
@@ -74,7 +75,7 @@ function docker_create {
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -e PUID=1000 -e PGID=1000 \
   -e MEM_LIMIT=1024 -e MEM_STARTUP=1024 \
-  -e MONGO_USER=admin \
+  -e MONGO_USER="$VALUE8" \
   -e MONGO_AUTHSOURCE=admin \
   -e MONGO_DBNAME="$VALUE4" \
   -e MONGO_PASS="$VALUE5" \
