@@ -10,7 +10,7 @@ if [ "$DB_PASS" != "null" ] && [ -n "$DB_PASS" ]; then
     clear; echo "Dados encontrados!"; sleep 1
 else
     clear
-    echo "ERROR: CRIE OU RECRIE O BANCO DE DADOS MONGODB PRIMEIRO!"
+    echo "ERRO: CRIE OU RECRIE O BANCO DE DADOS MONGODB PRIMEIRO!"
     echo "Saindo..."
     echo ""
     sleep 5
@@ -19,12 +19,13 @@ fi
 
 DB_NAME=$(yq ".\"${mongodb}\".db_name" "/srv/containers.yaml")
 DB_IP=$(yq ".\"${mongodb}\".local_ip" "/srv/containers.yaml")
+DB_PORT=$(yq ".\"${mongodb}\".db_port" "/srv/containers.yaml")
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
 CustmN4="db_name"
 CustmN5="db_pass"
-CustmN6=""
+CustmN6="db_port"
 CustmN7=""
 CustmN8=""
 CustmN9=""
@@ -34,7 +35,7 @@ VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
 VALUE4="$DB_NAME"
 VALUE5="$DB_PASS"
-VALUE6=""
+VALUE6="$DB_PORT"
 VALUE7=""
 VALUE8=""
 VALUE9=""
