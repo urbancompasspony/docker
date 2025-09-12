@@ -27,21 +27,14 @@ VALUE10=""
 
 function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{config,database}
-  sudo wget https://raw.githubusercontent.com/filebrowser/filebrowser/master/docker/root/defaults/settings.json -O /srv/containers/"$NOMECONTAINER"/config/.filebrowser.json
-  # sudo touch /srv/containers/"$NOMECONTAINER"/file
-  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker_custom/refs/heads/main/Config/file-browser/settings.json -O /srv/containers/"$NOMECONTAINER"/config/.filebrowser.json
 :; }
 
 function docker_create {
   local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
 
   # Se NAO for numerico, execute como host!
-  if [[ ! "$VALUE2" =~ $ip_regex ]]; then
-
-
-
-$docker_repo
-  
+  if [[ ! "$VALUE2" =~ $ip_regex ]]; then  
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
@@ -65,8 +58,7 @@ $docker_repo
 }
 
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+
 :; }
 
 # ----------------------------------------------------------------------
