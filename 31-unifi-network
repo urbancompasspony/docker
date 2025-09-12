@@ -6,11 +6,11 @@ docker_repo="lscr.io/linuxserver/unifi-network-application:latest"
 imagem="unifi"
 
 configfile="/srv/containers.yaml"
-DB_PASS=$(yq ".\"${mongodb}\".db_pass" "$configfile")
+DB_PASS=$(yq ".mongodb.db_pass" "$configfile")
 if [ "$DB_PASS" != "null" ] && [ -n "$DB_PASS" ]; then
-    DB_NAME=$(yq ".\"${mongodb}\".db_name" "$configfile")
-    DB_IP=$(yq ".\"${mongodb}\".local_ip" "$configfile")
-    DB_PORT=$(yq ".\"${mongodb}\".db_port" "$configfile")
+    DB_NAME=$(yq ".mongodb.db_name" "$configfile")
+    DB_IP=$(yq ".mongodb.local_ip" "$configfile")
+    DB_PORT=$(yq ".mongodb.db_port" "$configfile")
 else
     clear
     echo "ERRO: CRIE OU RECRIE O BANCO DE DADOS MONGODB PRIMEIRO!"
