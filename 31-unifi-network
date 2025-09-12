@@ -28,7 +28,7 @@ VALUE9=""
 VALUE10=""
 
 function set_mkdir {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{data,config}
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/config
 :; }
 
 function docker_create {
