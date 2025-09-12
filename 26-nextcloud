@@ -152,7 +152,7 @@ function check_macvlan {
 }
 
 function try_pull {
-  if ! docker pull "$docker_repo":"$VALUE4"; then
+  if ! docker pull "$docker_repo"; then
     echo "Erro: docker pull falhou... saindo."; sleep 3
     exit 1
   fi
