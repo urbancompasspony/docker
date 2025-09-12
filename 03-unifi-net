@@ -1,11 +1,13 @@
 #!/bin/bash
 
-NOMECONTAINER="unifi-network"
+version0="4.4"
+
+NOMECONTAINER="unifi"
 
 docker_repo="lscr.io/linuxserver/unifi-network-application:latest"
-docker_repo1="docker.io/mongo:4.4"
+docker_repo1="docker.io/mongo:$version0"
 
-imagem="unifi-net & mongo-db"
+imagem="unifi-network"
 
 randompass=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 8; echo)
 
@@ -14,7 +16,7 @@ CustmN3="servidor_dns"
 CustmN4="db_name"
 CustmN5="db_ip"
 CustmN6="db_pass"
-CustmN7=""
+CustmN7="db_version"
 CustmN8=""
 CustmN9=""
 CustmN10=""
@@ -24,7 +26,7 @@ VALUE3="8.8.4.4"
 VALUE4="mongodb-unifi"
 VALUE5="0.0.0.0"
 VALUE6="$randompass"
-VALUE7=""
+VALUE7="$version0"
 VALUE8=""
 VALUE9=""
 VALUE10=""
@@ -38,28 +40,25 @@ function docker_create {
 
   # Se NAO for numerico, execute como host!
   if [[ ! "$VALUE2" =~ $ip_regex ]]; then
-
-    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-    --network host \
-    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -e PUID=1000 -e PGID=1000 \
-    -e MEM_LIMIT=1024 -e MEM_STARTUP=1024 \
-    -e MONGO_USER=unifi -e MONGO_PASS="$VALUE6" -e MONGO_HOST="$VALUE5" -e MONGO_PORT=27017 -e MONGO_DBNAME=unifi -e MONGO_AUTHSOURCE=admin -e MONGO_TLS= \
-    -p 8443:8443 -p 3478:3478/udp -p 10001:10001/udp -p 8080:8080 -p 1900:1900/udp -p 8843:8843 -p 8880:8880 -p 6789:6789 -p 5514:5514/udp \
-    -v /srv/containers/"$NOMECONTAINER"/config:/config \
-    "$docker_repo"
-
-    makecontextra
-    
-    return
+    clear
+    echo "CONTAINER NÃO AUTORIZADO A EXECUTAR COMO HOST! REFAÇA COM IP ADEQUADO."
+    echo "Saindo..."
+    sleep 5
+    exit 1
   fi
 
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -e PUID=1000 -e PGID=1000 \
-  -e MEM_LIMIT=1024 -e MEM_STARTUP=1024 \
-  -e MONGO_USER=unifi -e MONGO_PASS="$VALUE6" -e MONGO_HOST="$VALUE5" -e MONGO_PORT=27017 -e MONGO_DBNAME=unifi -e MONGO_AUTHSOURCE=admin -e MONGO_TLS= \
+  -e MEM_LIMIT=1536 -e MEM_STARTUP=1536 \
+  -e MONGO_USER=unifi \
+  -e MONGO_PASS="$VALUE6" \
+  -e MONGO_HOST="$VALUE5" \
+  -e MONGO_PORT=27017 \
+  -e MONGO_DBNAME=unifi \
+  -e MONGO_AUTHSOURCE=admin \
+  -e MONGO_TLS= \
   -v /srv/containers/"$NOMECONTAINER"/config:/config \
   "$docker_repo"
 
@@ -67,10 +66,58 @@ makecontextra
 }
 
 function makecontextra {
+  if ! docker pull "$docker_repo1"; then
+    echo "Erro: docker pull falhou... saindo."; sleep 3
+    exit 1
+  fi
+
   mkdir -p /srv/containers/"$VALUE4"
-  sudo touch /srv/containers/"$VALUE4"/init-mongo.sh
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Custom_Images/Config/mongodb | tee /srv/containers/"$VALUE4"/init-mongo.sh
-  
+
+sudo cat > /srv/containers/"$VALUE4"/init-mongo.sh << 'EOF'
+#!/bin/bash
+if which mongosh > /dev/null 2>&1; then
+  mongo_init_bin='mongosh'
+else
+  mongo_init_bin='mongo'
+fi
+
+"${mongo_init_bin}" <<EOF
+use ${MONGO_AUTHSOURCE}
+db.auth("${MONGO_INITDB_ROOT_USERNAME}", "${MONGO_INITDB_ROOT_PASSWORD}")
+
+db.createUser({
+  user: "${MONGO_USER}",
+  pwd: "${MONGO_PASS}",
+  roles: [
+    { db: "${MONGO_DBNAME}", role: "dbOwner" },
+    { db: "${MONGO_DBNAME}_stat", role: "dbOwner" },
+    { db: "${MONGO_DBNAME}_audit", role: "dbOwner" }
+  ]
+})
+EOF
+EOF
+
+sudo chmod +x /srv/containers/"$VALUE4"/init-mongo.sh
+
+  if [ -d /srv/containers/"$VALUE4" ]; then
+    if docker stop "$VALUE4"; then
+      docker rm "$VALUE4"
+      clear; echo "SIGTERM + STOP + CLEAN: O container $VALUE4 estava executando, foi parado e removido. Continuando..."; sleep 3
+      return
+    elif docker rm "$VALUE4"; then
+      clear; echo "STOP + CLEAN: O container $VALUE4 estava parado e foi removido. Continuando..."; sleep 3
+      return
+    else
+      clear; echo "CLEAN: O container $VALUE4 nao estava executando. Continuando..."; sleep 3
+    fi
+
+    return
+  fi
+
+  if docker rm -f "$VALUE4"; then
+    clear; echo "SIGKILL + RM: O container $VALUE4 estava executando SEM VOLUME! Foi morto e removido. Continuando..."; sleep 3
+  fi
+
   docker run -d \
   --name="$VALUE4" \
   --network macvlan \
