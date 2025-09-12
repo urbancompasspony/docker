@@ -7,7 +7,7 @@ NOMECONTAINER="unifi-network"
 docker_repo="lscr.io/linuxserver/unifi-network-application:latest"
 docker_repo1="docker.io/mongo:$version0"
 
-imagem="unifi-network"
+imagem="unifi"
 
 randompass=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 8; echo)
 
