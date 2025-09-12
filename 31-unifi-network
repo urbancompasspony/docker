@@ -1,9 +1,11 @@
 #!/bin/bash
 
-NOMECONTAINER="A-CUSTOM-A"
+NOMECONTAINER="unifi-network"
 
-docker_repo="CUSTOM/DOCKER:LATEST"
-imagem="pihole dwservice etc"
+docker_repo="lscr.io/linuxserver/unifi-network-application:latest"
+imagem="unifi"
+
+randompass=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 8; echo)
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
@@ -27,8 +29,6 @@ VALUE10=""
 
 function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{data,config}
-  # sudo touch /srv/containers/"$NOMECONTAINER"/file
-  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
 :; }
 
 function docker_create {
@@ -40,9 +40,11 @@ function docker_create {
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -p 80:80 \ ???
-    -v "/srv/containers/$NOMECONTAINER/config:/config" \
-    -v "/srv/containers/$NOMECONTAINER/data:/data" \
+    -e PUID=1000 -e PGID=1000 \
+    -e MEM_LIMIT=1024 -e MEM_STARTUP=1024 \
+    -e MONGO_USER=unifi -e MONGO_PASS="$VALUE6" -e MONGO_HOST="$VALUE5" -e MONGO_PORT=27017 -e MONGO_DBNAME=unifi -e MONGO_AUTHSOURCE=admin -e MONGO_TLS= \
+    -p 8443:8443 -p 3478:3478/udp -p 10001:10001/udp -p 8080:8080 -p 1900:1900/udp -p 8843:8843 -p 8880:8880 -p 6789:6789 -p 5514:5514/udp \
+    -v /srv/containers/"$NOMECONTAINER"/config:/config \
     "$docker_repo"
 
     return
@@ -51,20 +53,15 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -v "/srv/containers/$NOMECONTAINER/config:/config" \
-  -v "/srv/containers/$NOMECONTAINER/data:/data" \
+  -e PUID=1000 -e PGID=1000 \
+  -e MEM_LIMIT=1024 -e MEM_STARTUP=1024 \
+  -e MONGO_USER=unifi -e MONGO_PASS="$VALUE6" -e MONGO_HOST="$VALUE5" -e MONGO_PORT=27017 -e MONGO_DBNAME=unifi -e MONGO_AUTHSOURCE=admin -e MONGO_TLS= \
+  -v /srv/containers/"$NOMECONTAINER"/config:/config \
   "$docker_repo"
-
-# Examples
-# PATH: $VALUE3 \
-# -e variavel1="$VALUE4" \
-# --privileged
-# --network host --add-host=host.docker.internal:host-gateway \
 }
 
 function docker_extras {
-#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
-#docker restart "$NOMECONTAINER"
+
 :; }
 
 # ----------------------------------------------------------------------
