@@ -67,13 +67,13 @@ makecontextra
 
 function makecontextra {
   if ! docker pull "$docker_repo1"; then
-    echo "Erro: docker pull falhou... saindo."; sleep 3
+    echo "Erro: docker pull do MongoDB falhou... saindo."; sleep 3
     exit 1
   fi
 
   mkdir -p /srv/containers/"$VALUE4"
 
-sudo cat > /srv/containers/"$VALUE4"/init-mongo.sh << 'EOF'
+cat << 'EOF' | sudo tee /srv/containers/"$VALUE4"/init-mongo.sh > /dev/null
 #!/bin/bash
 if which mongosh > /dev/null 2>&1; then
   mongo_init_bin='mongosh'
@@ -139,7 +139,8 @@ sudo chmod +x /srv/containers/"$VALUE4"/init-mongo.sh
 }
 
 function docker_extras {
-
+  # Aqui é o que roda depois que tudo estiver funcionando.
+  # No caso do MongoDB e do Unifi... nada consta.
 :; }
 
 # ----------------------------------------------------------------------
