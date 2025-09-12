@@ -2,7 +2,7 @@
 
 NOMECONTAINER="mongodb"
 
-docker_repo="docker.io/mongo:4.4"
+version0="4.4"
 imagem="mongodb"
 
 CustmN2="local_ip"
@@ -10,7 +10,7 @@ CustmN3="servidor_dns"
 CustmN4="db_name"
 CustmN5="db_pass"
 CustmN6="db_port"
-CustmN7=""
+CustmN7="db_version"
 CustmN8=""
 CustmN9=""
 CustmN10=""
@@ -20,10 +20,12 @@ VALUE3="8.8.4.4"
 VALUE4="unifi"
 VALUE5="$randompass"
 VALUE6="27017"
-VALUE7=""
+VALUE7="4.4"
 VALUE8=""
 VALUE9=""
 VALUE10=""
+
+docker_repo="docker.io/mongo:$VALUE7"
 
 function set_mkdir {
   sudo mkdir -p /srv/containers/"$NOMECONTAINER"/db
