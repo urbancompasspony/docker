@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SECRET0=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
+
 NOMECONTAINER="mongodb"
 
 version0="4.4"
@@ -18,7 +20,7 @@ CustmN10=""
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
 VALUE4="unifi"
-VALUE5="$randompass"
+VALUE5="$SECRET0"
 VALUE6="27017"
 VALUE7="4.4"
 VALUE8=""
