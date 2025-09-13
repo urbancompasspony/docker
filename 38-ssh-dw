@@ -72,7 +72,70 @@ function docker_create {
 }
 
 function docker_extras {
-:; }
+  # Criar diretório para arquivos de configuração se não existir
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/data/config
+  
+  # Criar arquivo .bashrc personalizado
+  cat > /srv/containers/"$NOMECONTAINER"/data/config/.bashrc << 'EOF'
+#!/bin/bash
+
+# Configuração padrão do bashrc
+if [ -f /etc/bash.bashrc ]; then
+    . /etc/bash.bashrc
+fi
+
+# Cores para o terminal
+export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+
+# Aliases úteis
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# ============================================
+# MENSAGEM DE BOAS-VINDAS PERSONALIZADA
+# ============================================
+clear
+echo -e "\033[1;36m"
+echo "╔══════════════════════════════════════════════════════════════╗"
+echo "║                                                              ║"
+echo "║  🔧  Acesso Root: Habilitado                                  ║"
+echo "║                                                              ║"
+echo "║  ⚠️  ATENÇÃO: Use com responsabilidade!                       ║"
+echo "║                                                              ║"
+echo "╚══════════════════════════════════════════════════════════════╝"
+echo -e "\033[0m"
+echo ""
+echo -e "\033[1;33mComandos Úteis:\033[0m"
+echo -e "  • \033[1;32mcd /host\033[0m         - Acessar sistema host"
+echo -e "  • \033[1;32mchroot /host\033[0m     - Conectar ao sistema host"
+echo -e "  • \033[1;32mexit\033[0m             - Sair do container"
+echo ""
+# Definir diretório inicial:
+cd
+
+EOF
+
+  # Definir permissões corretas
+  sudo chmod 644 /srv/containers/"$NOMECONTAINER"/data/config/.bashrc
+  
+  # Aguardar o container estar rodando antes de copiar o arquivo
+  echo "Aguardando container inicializar..."
+  sleep 3
+  
+  # Verificar se o container está rodando
+  if docker ps | grep -q "$NOMECONTAINER"; then
+    # Copiar .bashrc para o container
+    docker cp /srv/containers/"$NOMECONTAINER"/data/config/.bashrc "$NOMECONTAINER":/root/.bashrc
+    
+    # Também copiar para /etc/skel para novos usuários
+    docker cp /srv/containers/"$NOMECONTAINER"/data/config/.bashrc "$NOMECONTAINER":/etc/skel/.bashrc
+    
+    echo "✅ Arquivo .bashrc personalizado injetado com sucesso!"
+  else
+    echo "⚠️  Container não está rodando, .bashrc será aplicado na próxima inicialização"
+  fi
+}
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
