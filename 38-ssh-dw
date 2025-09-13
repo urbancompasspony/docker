@@ -8,8 +8,8 @@ imagem="dwservice"
 SECRET0=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
 
 CustmN2="local_ip"
-CustmN3="ubuntu_pass"
-CustmN4="root_pass"
+CustmN3="password"
+CustmN4=""
 CustmN5=""
 CustmN6=""
 CustmN7=""
@@ -18,8 +18,8 @@ CustmN9=""
 CustmN10=""
 
 VALUE2="hostonly"
-VALUE3="ubuntu"
-VALUE4="$SECRET0"
+VALUE3="$SECRET0"
+VALUE4=""
 VALUE5=""
 VALUE6=""
 VALUE7=""
@@ -43,7 +43,7 @@ function docker_create {
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -e PUID=0 -e PGID=0 \
     -e UBUNTU_PASSWORD="$VALUE3" \
-    -e ROOT_PASSWORD="$VALUE4" \
+    -e ROOT_PASSWORD="$VALUE3" \
     -v /srv/containers/"$NOMECONTAINER"/data:/usr/share \
     -v /:/host \
     "$docker_repo"
