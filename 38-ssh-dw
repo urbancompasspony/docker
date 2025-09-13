@@ -61,14 +61,11 @@ function docker_create {
     return
   fi
 
-  docker run -d --privileged --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-  --network macvlan --ip="$VALUE2" --dns="$VALUE3" --add-host=host.docker.internal:host-gateway \
-  --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -e PUID=0 -e PGID=0 \
-  -v /srv/containers/"$NOMECONTAINER"/data:/usr/share \
-  -v /:/host \
-  "$docker_repo"
-
+  echo "Este sistema não admite executar com IP pré estabelecido."
+  echo "Execute diretamente como hostonly!"
+  echo "Saindo..."
+  sleep 5
+  exit 1
 }
 
 function docker_extras {
