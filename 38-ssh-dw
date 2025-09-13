@@ -53,8 +53,9 @@ function docker_create {
     docker run -d --privileged --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host --add-host=host.docker.internal:host-gateway \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -e PUID=0 -e PGID=0 \
     -v /srv/containers/"$NOMECONTAINER"/data:/usr/share \
-    -v /mnt:/mnt \
+    -v /:/host \
     "$docker_repo"
 
     return
@@ -63,8 +64,9 @@ function docker_create {
   docker run -d --privileged --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" --add-host=host.docker.internal:host-gateway \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+  -e PUID=0 -e PGID=0 \
   -v /srv/containers/"$NOMECONTAINER"/data:/usr/share \
-  -v /mnt:/mnt \
+  -v /:/host \
   "$docker_repo"
 
 }
