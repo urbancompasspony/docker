@@ -1,19 +1,5 @@
 #!/bin/bash
 
-# Ultra OP Complete (and Dangerous):
-#docker run -it \
-#  --privileged \
-#  --pid=host \
-#  --network=host \
-#  --ipc=host \
-#  --uts=host \
-#  -v /:/host \
-#  -v /var/run/docker.sock:/var/run/docker.sock \
-#  --cap-add=ALL \
-#  --security-opt seccomp=unconfined \
-#  --security-opt apparmor=unconfined \
-#  ubuntu bash
-
 NOMECONTAINER="ssh-dw"
 
 docker_repo="urbancompasspony/ssh-dw:latest"
