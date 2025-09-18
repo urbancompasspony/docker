@@ -118,9 +118,6 @@ cat > "$DESTINO_CONF" << EOF
   hide unwriteable files = yes
   hide dot files = yes
 
-  ad dc functional level = 2016
-
-# Printers
   rpc_server:spoolss = external
   rpc_daemon:spoolssd = fork
   spoolss: architecture = Windows x64
@@ -128,30 +125,21 @@ cat > "$DESTINO_CONF" << EOF
   printcap name = cups
   load printers = Yes
 
-# Spool
+  ad dc functional level = 2016
+
 [printers]
-  browseable = No
   path = /var/spool/samba
+  browseable = Yes
+  writeable = No
   printable = Yes
-  guest ok = No
-  read only = Yes
-  create mask = 0700
+#guest ok = No
 
 # Drivers
 [print$]
-  path = /var/lib/samba/printers
-  read only = No
-  browsable = No
+  path = /var/lib/samba/drivers
+  browseable = Yes
   guest ok = No
-  vfs objects = acl_xattr recycle crossrename
-  nt acl support = Yes
-  inherit acls = Yes
-  inherit owner = No
-  inherit permissions = Yes
-  map acl inherit = Yes
-  store dos attributes = Yes
-  create mask = 0775
-  directory mask = 0775
+  read only = Yes
 
 [sysvol]
   path = /var/lib/samba/sysvol
