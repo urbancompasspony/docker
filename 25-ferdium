@@ -3,7 +3,7 @@
 NOMECONTAINER="ferdium"
 
 docker_repo="lscr.io/linuxserver/ferdium:latest"
-imagem="pihole dwservice etc"
+imagem="ferdium"
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
