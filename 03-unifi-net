@@ -214,11 +214,35 @@ function load_data {
     return
   fi
 
-  if [ "$(grep -c -w "$imagem" "$configfile")" -gt 1 ]; then
+  # Verifica quantos containers existem com essa imagem
+  containers_count=$(yq -r "to_entries[] | select(.value.img_base == \"$imagem\") | .key" "$configfile" | wc -l)
+  
+  if [ "$containers_count" -gt 1 ]; then
+    # Múltiplos containers da mesma imagem
     LISTANOMES=$(yq -r 'to_entries[] | select(.value.img_base == "'"$imagem"'") | .value.nome_custom' "$configfile")
     NOMECONTAINER=$(dialog --title "Imagem detectada: $imagem" --backtitle "W A R N I N G" --ok-button "Carregar" --no-cancel --inputbox "Encontrei um ou mais de um container registrado com essa imagem! Qual deseja carregar?\nValores encontrados:\n$LISTANOMES" 0 0 "" 2>&1 > /dev/tty)
+    
+    # Carrega os dados do container selecionado
+    load_container_data
+    button_ok0="Recriar"
+    
+  elif [ "$containers_count" -eq 1 ]; then
+    # Um container existe, pergunta o que fazer
+    existing_container=$(yq -r 'to_entries[] | select(.value.img_base == "'"$imagem"'") | .key' "$configfile")
+    
+    if dialog --title "Container existente detectado" --yes-label "Recriar existente" --no-label "Criar novo" --yesno "Encontrei o container '$existing_container' com a mesma imagem.\n\nO que deseja fazer?" 10 60; then
+      # Usuário escolheu recriar o existente
+      NOMECONTAINER="$existing_container"
+      load_container_data
+      button_ok0="Recriar"
+    else
+      # Usuário escolheu criar um novo, mantém campos vazios
+      return
+    fi
   fi
+}
 
+function load_container_data {
   for i in "${!labels[@]}"; do
     val="$(yq -r '.["'"$NOMECONTAINER"'"].["'"${labels[$i]}"'"]' "$configfile")"
     if [[ "$val" == "null" || -z "$val" ]]; then
@@ -229,10 +253,6 @@ function load_data {
       values[i]="$val"
     fi
   done
-
-  if ! [ "$NOMECONTAINER" = "" ]; then
-    button_ok0="Recriar"
-  fi
 }
 
 function save_config {
