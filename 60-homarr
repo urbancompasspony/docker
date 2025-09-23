@@ -9,8 +9,8 @@ hexstring=$(head -c 32 /dev/urandom | hexdump -v -e '/1 "%02x"')
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
-CustmN4="porta"
-CustmN5="hexstring"
+CustmN4="hexstring"
+CustmN5=""
 CustmN6=""
 CustmN7=""
 CustmN8=""
@@ -19,8 +19,8 @@ CustmN10=""
 
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
-VALUE4="80"
-VALUE5="$hexstring"
+VALUE4="$hexstring"
+VALUE5=""
 VALUE6=""
 VALUE7=""
 VALUE8=""
@@ -40,8 +40,7 @@ function docker_create {
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -e PORT="$VALUE4" -p "$VALUE4":7575 \
-    -e SECRET_ENCRYPTION_KEY="$VALUE5" \
+    -e SECRET_ENCRYPTION_KEY="$VALUE4" \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v /srv/containers/"$NOMECONTAINER"/appdata:/appdata \
     "$docker_repo"
@@ -52,8 +51,7 @@ function docker_create {
   docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-  -e PORT="$VALUE4" \
-  -e SECRET_ENCRYPTION_KEY="$VALUE5" \
+  -e SECRET_ENCRYPTION_KEY="$VALUE4" \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /srv/containers/"$NOMECONTAINER"/appdata:/appdata \
   "$docker_repo"
