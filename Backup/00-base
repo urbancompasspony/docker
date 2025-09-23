@@ -3,6 +3,10 @@
 Using TAR to keep ownership, groups, permissions and other metadata! Run as root.
 With these examples archive.tar will be stored under working directory.
 
+# To Backup just One Container
+cd /srv/containers
+sudo tar -I 'lz4 -1 -c -' -cpf /home/administrador/CONT.tar.lz4 /srv/containers/CONT/
+
 # To backup everything under /srv:
 sudo tar -I 'lz4 -1 -c -' -cpf archive.tar.lz4 /srv/containers/CONTAINER_NAME
 
