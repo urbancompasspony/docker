@@ -91,8 +91,6 @@ function docker_extras {
 
 :; }
 
-check_root
-check_macvlan
-lockfile0
+execute_main
 
 exit 0
