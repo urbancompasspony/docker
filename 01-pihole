@@ -103,8 +103,6 @@ fi
 docker restart "$NOMECONTAINER"
 :; }
 
-check_root
-check_macvlan
-lockfile0
+execute_main
 
 exit 0
