@@ -16,13 +16,10 @@ sudo tar -I 'lz4 -1 -c -' -cpf /home/urbancompasspony/archive.tar -C /home/natha
 # To check if everything is ok:
 sudo tar -I 'lz4 -d -c -' -twf file.tar.lz4 && echo 'backup ok' || echo 'backup quebrado'
 
-# To restore everything over /srv/:
-sudo tar -xvf archive.tar -C /srv/containers/
-
 # To restore everything that is on /home/nathandrake/archive.tar over /home/nathandrake/my_files/omg/:
 sudo tar -I 'lz4 -d -c -' -xf /home/urbancompasspony/archive.tar.lz4 -C /home/urbancompasspony/my_files/omg/
 
-TO BACKUP entire container:
+TO BACKUP an entire container:
 docker save urbancompasspony/razera > razera.tar
 
 TO RESTORE entire container:
