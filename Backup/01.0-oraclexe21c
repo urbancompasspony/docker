@@ -114,7 +114,7 @@ function copyToExternal {
         find "${external_hd}" -name "*.tar.lz4" -type f -mtime +"${max_external_days}" -delete
 
         # Copiar apenas os arquivos novos do HD interno para o externo
-        if rsync -a --update "${internal_hd}"/*.tar.lz4 "${external_hd}/"; then
+        if rsync -aHAX --numeric-ids --sparse --update "${internal_hd}"/*.tar.lz4 "${external_hd}/"; then
             echo "${datetime} - Backup copiado para HD externo com sucesso!" | tee -a "${logs}"
             sync
             fstrim -a 2>/dev/null
