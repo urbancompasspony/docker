@@ -3,13 +3,13 @@
 function macvland {
   var1="0"; var2="0"; var3="0"; var4="0"
 
-  #VALUE1="${meugateway%.*}.0"
+  VALUE1=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+' | sed 's/\.[0-9]\+$/.0/')
   VALUE2=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+')
   VALUE3=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
   VALUE4="macvlan"
 
   VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Criar novo MACVLAN" --form "MACVLAN for Containers" 11 40 0 \
-"Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
+"Subnet24:" 1 1 "$VALUE1" 1 11 30 0 \
 "Gateway :" 2 1 "$VALUE2" 2 11 30 0 \
 "Parent  :" 3 1 "$VALUE3" 3 11 30 0 \
 "Name    :" 4 1 "$VALUE4" 4 11 30 0 \
@@ -141,21 +141,29 @@ EOF
   
   # Adiciona as configurações da nova rede MACVLAN
   echo "📝 Salvando rede '$network_name' no system.yaml..."
-  
+ 
+  MACHINE_ID=$(cat /etc/machine-id)
   sudo yq -i "
     .Redes.\"$network_name\" = {
       \"subnet\": \"$subnet/24\",
       \"gateway\": \"$gateway\",
       \"interface\": \"$interface\",
       \"data_criacao\": \"$datetime\",
-      \"status\": \"ativa\"
+      \"status\": \"ativa\",
+      \"machine_id\": \"$MACHINE_ID\"
     }
   " "$yaml_file"
 }
 
 function dialognet {
   dialog --title "Informação" --msgbox "Checar a existencia de altnames nas informacoes a seguir!" 7 40
-  dialog --title "Informação" --msgbox "$(ip a)" 25 70
+  dialog --title "Interfaces de Rede" --msgbox "$(
+printf "%-15s | %-8s | %s\n" "INTERFACE" "STATUS" "ENDEREÇOS"
+printf "%s\n" "--------------------------------------------"
+ip -br a | grep -v -E '^(docker0|tailscale0|lo)' | while read interface status addresses; do
+    printf "%-15s | %-8s | %s\n" "$interface" "$status" "$addresses"
+done
+)" 0 0
 }
 
 macvland
