@@ -120,9 +120,6 @@ function rmmacvland {
         sudo yq -i ".Redes.\"$network_to_remove\".status = \"removida\"" "$yaml_file" 2>/dev/null
         sudo yq -i ".Redes.\"$network_to_remove\".data_remocao = \"$(date '+%d/%m/%Y - %H:%M:%S')\"" "$yaml_file" 2>/dev/null
         
-        # Opção 2: Remover completamente do YAML (descomente se preferir)
-        # sudo yq -i "del(.Redes.\"$network_to_remove\")" "$yaml_file" 2>/dev/null
-        
         echo "✅ system.yaml atualizado com sucesso!"
         
         dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida com sucesso!\n\n✅ Docker: Rede removida\n✅ YAML: Status atualizado" 10 50
