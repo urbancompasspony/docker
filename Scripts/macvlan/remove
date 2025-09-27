@@ -12,23 +12,23 @@ function rmmacvland {
   fi
   
   # Mostra lista de redes para escolher
-  echo "📋 REDES MACVLAN DISPONÍVEIS PARA REMOCAO:"
+  echo "REDES MACVLAN DISPONIVEIS PARA REMOCAO:"
   echo "=========================================="
   echo ""
   
   for i in "${!existing_networks[@]}"; do
     network="${existing_networks[$i]}"
     
-    # Pega informações da rede do Docker
+    # Pega informacoes da rede do Docker
     subnet=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
     gateway=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "N/A")
     
     # Verifica se existe no system.yaml
-    yaml_status="❓ Não registrada"
+    yaml_status="Nao registrada"
     if [ -f "$yaml_file" ]; then
       yaml_exists=$(yq -r ".Redes.\"$network\"" "$yaml_file" 2>/dev/null)
       if [ "$yaml_exists" != "null" ]; then
-        yaml_status="📋 Registrada no YAML"
+        yaml_status="Registrada no YAML"
       fi
     fi
   done
@@ -56,7 +56,7 @@ function rmmacvland {
     fi
     
     if [ -z "$network_to_remove" ]; then
-      dialog --title "ERRO" --msgbox "Nome da rede não pode estar vazio!" 6 40
+      dialog --title "ERRO" --msgbox "Nome da rede nao pode estar vazio!" 6 40
       return
     fi
   else
@@ -66,61 +66,61 @@ function rmmacvland {
   
   # Verifica se a rede existe
   if ! docker network inspect "$network_to_remove" >/dev/null 2>&1; then
-    dialog --title "ERRO" --msgbox "A rede '$network_to_remove' não existe no Docker!" 6 50
+    dialog --title "ERRO" --msgbox "A rede '$network_to_remove' nao existe no Docker!" 6 50
     return
   fi
   
-  # Mostra informações da rede antes de remover
+  # Mostra informacoes da rede antes de remover
   subnet=$(docker network inspect "$network_to_remove" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
   gateway=$(docker network inspect "$network_to_remove" --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "N/A")
   
   # Verificar se tem containers conectados
   connected_containers=$(docker network inspect "$network_to_remove" --format '{{range .Containers}}{{.Name}} {{end}}' 2>/dev/null)
   
-  warning_msg="ATENCAO: Você está prestes a remover a rede:\\n\\n"
-  warning_msg+="🌐 Nome: $network_to_remove\\n"
-  warning_msg+="📡 Subnet: $subnet\\n"
-  warning_msg+="🚪 Gateway: $gateway\\n\\n"
+  warning_msg="ATENCAO: Voce esta prestes a remover a rede:\\n\\n"
+  warning_msg+="Nome: $network_to_remove\\n"
+  warning_msg+="Subnet: $subnet\\n"
+  warning_msg+="Gateway: $gateway\\n\\n"
   
   if [ -n "$connected_containers" ]; then
-    warning_msg+="⚠️  CONTAINERS CONECTADOS:\\n$connected_containers\\n\\n"
-    warning_msg+="Os containers serão desconectados da rede!\\n\\n"
+    warning_msg+="CONTAINERS CONECTADOS:\\n$connected_containers\\n\\n"
+    warning_msg+="Os containers serao desconectados da rede!\\n\\n"
   fi
   
-  warning_msg+="Esta ação é IRREVERSÍVEL!\\n\\nDeseja continuar?"
+  warning_msg+="Esta acao e IRREVERSIVEL!\\n\\nDeseja continuar?"
   
   if ! dialog --title "CONFIRMACAO" --backtitle "Remocao de Rede MACVLAN" --yesno "$warning_msg" 0 0; then
-    dialog --title "Cancelado" --msgbox "Remocao cancelada pelo usuário." 6 40
+    dialog --title "Cancelado" --msgbox "Remocao cancelada pelo usuario." 6 40
     return
   fi
   
-  echo "🗑️  Removendo rede MACVLAN '$network_to_remove'..."
+  echo "Removendo rede MACVLAN '$network_to_remove'..."
   
   # Remove a rede do Docker
   if docker network rm "$network_to_remove" 2>/dev/null; then
-    echo "✅ Rede '$network_to_remove' removida do Docker com sucesso!"
+    echo "Rede '$network_to_remove' removida do Docker com sucesso!"
     
     # Atualiza o system.yaml se a rede estiver registrada
     if [ -f "$yaml_file" ]; then
       yaml_exists=$(yq -r ".Redes.\"$network_to_remove\"" "$yaml_file" 2>/dev/null)
       if [ "$yaml_exists" != "null" ]; then
-        echo "📝 Atualizando system.yaml..."
+        echo "Atualizando system.yaml..."
         
         sudo yq -i ".Redes.\"$network_to_remove\".status = \"removida\"" "$yaml_file" 2>/dev/null
         sudo yq -i ".Redes.\"$network_to_remove\".data_remocao = \"$(date '+%d/%m/%Y - %H:%M:%S')\"" "$yaml_file" 2>/dev/null
         
-        echo "✅ system.yaml atualizado com sucesso!"
+        echo "system.yaml atualizado com sucesso!"
         
-        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida com sucesso!\\n\\n✅ Docker: Rede removida\\n✅ YAML: Status atualizado" 10 50
+        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida com sucesso!\\n\\nDocker: Rede removida\\nYAML: Status atualizado" 10 50
       else
-        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\\n\\n(Não estava registrada no system.yaml)" 8 50
+        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\\n\\n(Nao estava registrada no system.yaml)" 8 50
       fi
     else
-      dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\\n\\n(Arquivo system.yaml não encontrado)" 8 50
+      dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\\n\\n(Arquivo system.yaml nao encontrado)" 8 50
     fi
     
   else
-    dialog --title "ERRO" --msgbox "Erro ao remover a rede '$network_to_remove'!\\n\\nVerifique se não há containers conectados." 8 50
+    dialog --title "ERRO" --msgbox "Erro ao remover a rede '$network_to_remove'!\\n\\nVerifique se nao ha containers conectados." 8 50
     return 1
   fi
 }
