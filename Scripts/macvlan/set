@@ -1,5 +1,14 @@
 #!/bin/bash
 
+if ! virsh list --all | grep -i pfsense &>/dev/null; then
+  clear; echo ""; echo "pfSense inexistente!"
+  sleep 3
+  echo "Defina o pfSense antes da MACVLAN."
+  sleep 4
+  echo "Se isso estiver correto prossiga, mas com cuidado."
+  sleep 5
+fi
+
 function macvland {
   var1="0"; var2="0"; var3="0"; var4="0"
 
