@@ -53,7 +53,7 @@ echo "$VALUE0"
         dialog --title "ERRO" --msgbox "Falha ao criar a rede MACVLAN '$var4'!" 6 40
       fi
     else
-      dialog --title "ERRO" --msgbox "A rede MACVLAN '$var4' já existe!" 6 40
+      dialog --title "ERRO" --msgbox "A rede MACVLAN '$var4' ja existe!" 6 40
     fi
   fi
 }
@@ -149,7 +149,7 @@ EOF
   MACHINE_ID=$(cat /etc/machine-id)
   sudo yq -i "
     .Redes.\"$network_name\" = {
-      \"subnet\": \"$subnet/24\",
+      \"subnet\": \"$subnet\",
       \"gateway\": \"$gateway\",
       \"interface\": \"$interface\",
       \"data_criacao\": \"$datetime\",
