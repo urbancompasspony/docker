@@ -1,0 +1,121 @@
+#!/bin/bash
+
+function macvland {
+  var1="0"; var2="0"; var3="0"; var4="0"
+
+  #VALUE1="${meugateway%.*}.0"
+  VALUE2=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+')
+  VALUE3=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
+  VALUE4="macvlan"
+
+  VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Criar novo MACVLAN" --form "MACVLAN for Containers" 11 40 0 \
+"Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
+"Gateway :" 2 1 "$VALUE2" 2 11 30 0 \
+"Parent  :" 3 1 "$VALUE3" 3 11 30 0 \
+"Name    :" 4 1 "$VALUE4" 4 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  case $? in
+    0) echo "." > /dev/null ;;
+    1) exit ;;
+    2) dialognet ; macvland ;;
+  esac
+
+echo "$VALUE0"
+
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
+
+  if [ "$var1" = "0" ] || [ "$var2" = "0" ] || [ "$var3" = "0" ] || [ "$var4" = "0" ]; then
+    dialog --title "ERRO" --msgbox "O(s) campo(s) exigidos nao pode(m) ficar em branco. \nPreencha-o(s) adequadamente!" 7 40
+    macvland
+  else
+    if ! docker network inspect macvlan &>/dev/null; then
+      # Cria a rede docker
+      docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" "$var4"
+      
+      # Verifica se a criação foi bem-sucedida
+      if [ $? -eq 0 ]; then
+        echo "✅ Rede $var4 criada com sucesso!"
+        
+        # Salva no settings.yaml
+        save_macvlan_to_yaml "$var1" "$var2" "$var3" "$var4"
+        
+        dialog --title "Sucesso" --msgbox "Rede MACVLAN '$var4' criada e salva no /srv/system.yaml!\n\nSubnet: $var1/24\nGateway: $var2\nInterface: $var3" 10 50
+      else
+        echo "❌ Erro ao criar a rede $var4"
+        dialog --title "ERRO" --msgbox "Falha ao criar a rede MACVLAN '$var4'!" 6 40
+      fi
+    else
+      dialog --title "ERRO" --msgbox "A rede MACVLAN '$var4' já existe!" 6 40
+    fi
+  fi
+}
+
+# Função para salvar configurações MACVLAN no system.yaml
+function save_macvlan_to_yaml {
+  local subnet="$1"
+  local gateway="$2"
+  local interface="$3"
+  local network_name="$4"
+  
+  local yaml_file="/srv/system.yaml"
+  local datetime=$(date +"%d/%m/%Y - %H:%M:%S")
+  
+  echo "💾 Salvando configurações MACVLAN no system.yaml..."
+  
+  # Verifica se o arquivo existe, se não, cria estrutura básica
+  if [ ! -f "$yaml_file" ]; then
+    echo "📝 Criando arquivo system.yaml..."
+    sudo mkdir -p /srv
+    sudo tee "$yaml_file" > /dev/null << EOF
+# Arquivo de configurações do servidor
+# Criado automaticamente em $datetime
+
+Informacoes:
+  Data_Instalacao: "$datetime"
+  Data_Restauracao: "Nunca foi reinstalado."
+
+Hardware:
+  Tipo: "Servidor"
+  Placa: "Desconhecida"
+
+Redes: {}
+EOF
+  fi
+  
+  # Verifica se já existe a seção Redes
+  if ! grep -q "Redes:" "$yaml_file"; then
+    echo "📝 Adicionando seção Redes ao system.yaml..."
+    sudo yq -i '.Redes = {}' "$yaml_file"
+  fi
+  
+  # Adiciona as configurações da nova rede MACVLAN
+  echo "📝 Salvando rede '$network_name' no system.yaml..."
+  
+  sudo yq -i "
+    .Redes.\"$network_name\" = {
+      \"subnet\": \"$subnet/24\",
+      \"gateway\": \"$gateway\",
+      \"interface\": \"$interface\",
+      \"data_criacao\": \"$datetime\",
+      \"status\": \"ativa\"
+    }
+  " "$yaml_file"
+  
+  echo "✅ Configurações salvas com sucesso!"
+  
+  # Mostra confirmação das configurações salvas
+  echo ""
+  echo "📋 CONFIGURAÇÕES SALVAS:"
+  echo "   Nome da rede: $network_name"
+  echo "   Subnet: $subnet/24"
+  echo "   Gateway: $gateway" 
+  echo "   Interface: $interface"
+  echo "   Data: $datetime"
+  echo ""
+}
+
+macvland
