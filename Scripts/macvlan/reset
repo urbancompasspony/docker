@@ -1,35 +1,142 @@
 #!/bin/bash
 
-function remove_macvlan_and_update_yaml {
-  local network_name="$1"
+function rmmacvland {
   local yaml_file="/srv/system.yaml"
   
-  if [ -z "$network_name" ]; then
-    echo "❌ Nome da rede não fornecido!"
-    return 1
+  # Lista redes MACVLAN existentes no Docker
+  existing_networks=($(docker network ls --filter driver=macvlan --format "{{.Name}}" | sort))
+  
+  if [ ${#existing_networks[@]} -eq 0 ]; then
+    dialog --title "Informação" --msgbox "Nenhuma rede MACVLAN encontrada no Docker!" 6 50
+    return
   fi
   
-  echo "🗑️  Removendo rede MACVLAN '$network_name'..."
+  # Mostra lista de redes para escolher
+  echo "📋 REDES MACVLAN DISPONÍVEIS PARA REMOÇÃO:"
+  echo "=========================================="
+  echo ""
   
-  # Remove a rede do Docker
-  if docker network rm "$network_name" 2>/dev/null; then
-    echo "✅ Rede '$network_name' removida do Docker"
+  for i in "${!existing_networks[@]}"; do
+    network="${existing_networks[$i]}"
     
-    # Atualiza o status no system.yaml ou remove completamente
+    # Pega informações da rede do Docker
+    subnet=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+    gateway=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "N/A")
+    
+    # Verifica se existe no system.yaml
+    yaml_status="❓ Não registrada"
     if [ -f "$yaml_file" ]; then
-      # Opção 1: Marcar como removida (manter histórico)
-      sudo yq -i ".Redes.\"$network_name\".status = \"removida\"" "$yaml_file" 2>/dev/null
-      sudo yq -i ".Redes.\"$network_name\".data_remocao = \"$(date '+%d/%m/%Y - %H:%M:%S')\"" "$yaml_file" 2>/dev/null
-      
-      # Opção 2: Remover completamente (descomente a linha abaixo se preferir)
-      # sudo yq -i "del(.Redes.\"$network_name\")" "$yaml_file" 2>/dev/null
-      
-      echo "✅ Configurações atualizadas no system.yaml"
+      yaml_exists=$(yq -r ".Redes.\"$network\"" "$yaml_file" 2>/dev/null)
+      if [ "$yaml_exists" != "null" ]; then
+        yaml_status="📋 Registrada no YAML"
+      fi
+    fi
+    
+    echo "$((i+1))) $network"
+    echo "   📡 Subnet: $subnet"
+    echo "   🚪 Gateway: $gateway"
+    echo "   📄 Status: $yaml_status"
+    echo ""
+  done
+  
+  # Dialog para escolher qual remover
+  menu_options=()
+  for i in "${!existing_networks[@]}"; do
+    network="${existing_networks[$i]}"
+    subnet=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+    menu_options+=("$((i+1))" "$network ($subnet)")
+  done
+  
+  # Adiciona opção manual
+  menu_options+=("0" "Digitar nome manualmente")
+  
+  if ! choice=$(dialog --title "Remover Rede MACVLAN" --backtitle "Docker Tools" --menu "Escolha a rede para remover:" 0 0 0 "${menu_options[@]}" 2>&1 > /dev/tty); then
+    return
+  fi
+  
+  # Determina qual rede remover
+  local network_to_remove=""
+  
+  if [ "$choice" = "0" ]; then
+    # Opção manual
+    if ! network_to_remove=$(dialog --title "Nome da Rede" --backtitle "Docker Tools" --inputbox "Digite o nome da rede MACVLAN para remover:" 8 50 2>&1 > /dev/tty); then
+      return
+    fi
+    
+    if [ -z "$network_to_remove" ]; then
+      dialog --title "ERRO" --msgbox "Nome da rede não pode estar vazio!" 6 40
+      return
     fi
   else
-    echo "❌ Erro ao remover a rede '$network_name' ou rede não existe"
+    # Rede selecionada da lista
+    network_to_remove="${existing_networks[$((choice-1))]}"
+  fi
+  
+  # Verifica se a rede existe
+  if ! docker network inspect "$network_to_remove" >/dev/null 2>&1; then
+    dialog --title "ERRO" --msgbox "A rede '$network_to_remove' não existe no Docker!" 6 50
+    return
+  fi
+  
+  # Mostra informações da rede antes de remover
+  subnet=$(docker network inspect "$network_to_remove" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+  gateway=$(docker network inspect "$network_to_remove" --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "N/A")
+  
+  # Verificar se tem containers conectados
+  connected_containers=$(docker network inspect "$network_to_remove" --format '{{range .Containers}}{{.Name}} {{end}}' 2>/dev/null)
+  
+  warning_msg="ATENÇÃO: Você está prestes a remover a rede:\n\n"
+  warning_msg+="🌐 Nome: $network_to_remove\n"
+  warning_msg+="📡 Subnet: $subnet\n"
+  warning_msg+="🚪 Gateway: $gateway\n\n"
+  
+  if [ -n "$connected_containers" ]; then
+    warning_msg+="⚠️  CONTAINERS CONECTADOS:\n$connected_containers\n\n"
+    warning_msg+="Os containers serão desconectados da rede!\n\n"
+  fi
+  
+  warning_msg+="Esta ação é IRREVERSÍVEL!\n\nDeseja continuar?"
+  
+  # Confirmação final
+  if ! dialog --title "CONFIRMAÇÃO" --backtitle "Remoção de Rede MACVLAN" --yesno "$warning_msg" 0 0; then
+    dialog --title "Cancelado" --msgbox "Remoção cancelada pelo usuário." 6 40
+    return
+  fi
+  
+  # Executar remoção
+  echo "🗑️  Removendo rede MACVLAN '$network_to_remove'..."
+  
+  # Remove a rede do Docker
+  if docker network rm "$network_to_remove" 2>/dev/null; then
+    echo "✅ Rede '$network_to_remove' removida do Docker com sucesso!"
+    
+    # Atualiza o system.yaml se a rede estiver registrada
+    if [ -f "$yaml_file" ]; then
+      yaml_exists=$(yq -r ".Redes.\"$network_to_remove\"" "$yaml_file" 2>/dev/null)
+      if [ "$yaml_exists" != "null" ]; then
+        echo "📝 Atualizando system.yaml..."
+        
+        # Opção 1: Marcar como removida (manter histórico)
+        sudo yq -i ".Redes.\"$network_to_remove\".status = \"removida\"" "$yaml_file" 2>/dev/null
+        sudo yq -i ".Redes.\"$network_to_remove\".data_remocao = \"$(date '+%d/%m/%Y - %H:%M:%S')\"" "$yaml_file" 2>/dev/null
+        
+        # Opção 2: Remover completamente do YAML (descomente se preferir)
+        # sudo yq -i "del(.Redes.\"$network_to_remove\")" "$yaml_file" 2>/dev/null
+        
+        echo "✅ system.yaml atualizado com sucesso!"
+        
+        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida com sucesso!\n\n✅ Docker: Rede removida\n✅ YAML: Status atualizado" 10 50
+      else
+        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\n\n(Não estava registrada no system.yaml)" 8 50
+      fi
+    else
+      dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\n\n(Arquivo system.yaml não encontrado)" 8 50
+    fi
+    
+  else
+    dialog --title "ERRO" --msgbox "Erro ao remover a rede '$network_to_remove'!\n\nVerifique se não há containers conectados." 8 50
     return 1
   fi
 }
 
-remove_macvlan_and_update_yaml
+rmmacvland
