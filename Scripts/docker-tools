@@ -19,7 +19,6 @@ function tools {
   13 'NC: Scan User Data' \
   14 'NC: Update htaccess' \
   15 'Remove All Useless Images' \
-  16 'Elevate Functional Level AD' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -40,7 +39,6 @@ function tools {
   13) clear ; scanuser0 ; tools ;;
   14) clear ; updateht0 ; tools ;;
   15) clear ; docker image prune -af ; sleep 2 ; tools ;;
-  16) clear ; functional0 ; tools ;;
   X) return ;;
   esac
 }
@@ -123,14 +121,6 @@ function updateht0 {
   clear
   docker exec -u www-data nextcloud php /var/www/html/occ maintenance:update:htaccess
   sleep 5
-}
-
-function functional0 {
-  echo WIP
-  sleep 1
-  #samba-tool domain schemaupgrade --schema=2019
-  #samba-tool domain functionalprep --function-level=2016
-  #samba-tool domain level raise --domain-level=2016 --forest-level=2016
 }
 
 function scanapp0 {
