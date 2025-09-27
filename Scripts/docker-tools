@@ -1,0 +1,1258 @@
+#!/bin/bash
+
+YAML_FILE="/srv/containers.yaml"
+
+function tools {
+  if ! var0=$(dialog --title "" --backtitle "" --menu " " 0 0 0 \
+  1 'Set MACVLAN' \
+  2 'Remove MACVLAN' \
+  3 'PiHole Maintenance' \
+  4 'PiHole Install Error' \
+  5 'Reset Syncthing Password' \
+  6 'Compare Docker PS and YAML' \
+  7 'NC: filelocks' \
+  8 'NC: add-missing-indices' \
+  9 'NC: check-core & mimetype' \
+  10 'NC: Disable LDAP' \
+  11 'NC: Upgrade Manually CLI' \
+  12 'NC: Scan App Data' \
+  13 'NC: Scan User Data' \
+  14 'NC: Update htaccess' \
+  15 'Remove All Useless Images' \
+  16 'Elevate Functional Level AD' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+  
+  case "$var0" in
+  1) clear ; macvland ;;
+  2) clear ; rmmacvland ;;
+  3) clear ; piholemnt ;;
+  4) clear ; piholeinst ;;
+  5) clear ; syncpass0 ;;
+  6) clear ; comparedocker ;;
+  7) clear ; filelocks ;;
+  8) clear ; missingindices ;;
+  9) clear ; checkcore ;;
+  10) clear ; disableldap ;;
+  11) clear ; upgradenc ;;
+  12) clear ; scanapp0 ;;
+  13) clear ; scanuser0 ;;
+  14) clear ; updateht0 ;;
+  15) clear ; docker image prune -af ; sleep 2 ;;
+  16) clear ; functional0 ;;
+  X) return ;;
+  esac
+}
+
+function comparedocker {
+# Verifica se o arquivo YAML existe
+if [[ ! -f "$YAML_FILE" ]]; then
+    echo "❌ Arquivo $YAML_FILE não encontrado!"
+    exit 1
+fi
+
+# Verifica se yq está instalado
+if ! command -v yq &> /dev/null; then
+    echo "❌ yq não está instalado!"
+    exit 1
+fi
+
+echo "🔍 Comparando containers do Docker with $YAML_FILE..."
+echo "=================================================="
+
+# Obter lista de containers do Docker (apenas nomes)
+echo "📦 Containers no Docker:"
+docker_containers=$(docker ps -a --format "{{.Names}}" | sort)
+echo "$docker_containers"
+echo
+
+# Obter lista de nome_custom do YAML
+echo "📄 Containers no YAML (nome_custom):"
+yaml_containers=$(yq eval 'keys | .[]' "$YAML_FILE" 2>/dev/null | while read -r key; do
+    yq eval ".\"$key\".nome_custom" "$YAML_FILE" 2>/dev/null
+done | sort | grep -v "null")
+echo "$yaml_containers"
+echo
+
+# Containers que estão no Docker mas NÃO estão no YAML
+echo "⚠️  Containers no Docker que NÃO estão no YAML:"
+comm -23 <(echo "$docker_containers") <(echo "$yaml_containers") | while read -r container; do
+    if [[ -n "$container" ]]; then
+        echo "  - $container"
+    fi
+done
+echo
+
+# Containers que estão no YAML mas NÃO estão no Docker
+echo "📋 Containers no YAML que NÃO estão no Docker:"
+comm -13 <(echo "$docker_containers") <(echo "$yaml_containers") | while read -r container; do
+    if [[ -n "$container" ]]; then
+        echo "  - $container"
+    fi
+done
+echo
+
+# Containers que coincidem
+echo "✅ Containers que coincidem:"
+comm -12 <(echo "$docker_containers") <(echo "$yaml_containers") | while read -r container; do
+    if [[ -n "$container" ]]; then
+        echo "  - $container"
+    fi
+done
+echo
+
+# Resumo
+docker_count=$(echo "$docker_containers" | grep -c '^.')
+yaml_count=$(echo "$yaml_containers" | grep -c '^.')
+matching_count=$(comm -12 <(echo "$docker_containers") <(echo "$yaml_containers") | grep -c '^.')
+
+echo "📊 RESUMO:"
+echo "  Containers no Docker: $docker_count"
+echo "  Containers no YAML: $yaml_count"
+echo "  Correspondências: $matching_count"
+
+if [[ $matching_count -eq $docker_count ]] && [[ $matching_count -eq $yaml_count ]]; then
+    echo "  Status: ✅ Todos os containers coincidem!"
+else
+    echo "  Status: ⚠️  Há diferenças entre as listas"
+fi
+}
+
+function updateht0 {
+  clear
+  docker exec -u www-data nextcloud php /var/www/html/occ maintenance:update:htaccess
+  sleep 5
+}
+
+function functional0 {
+  echo WIP
+  sleep 1
+  #samba-tool domain schemaupgrade --schema=2019
+  #samba-tool domain functionalprep --function-level=2016
+  #samba-tool domain level raise --domain-level=2016 --forest-level=2016
+}
+
+function scanapp0 {
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+  
+  # Extrai o valor do dialog
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  clear; echo "Scanning app data..."
+  docker exec -u 33 "$var1" ./occ files:scan-app-data
+  sleep 3
+}
+
+function scanuser0 {  
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+  
+  # Extrai o valor do dialog
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  clear; echo "Scanning all user files..."
+  docker exec -u 33 "$var1" ./occ files:scan --all
+  sleep 3
+}
+
+function syncpass0 { 
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "syncthing" no nome
+  SYNCTHING_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "syncthing"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ syncthing ]]; then
+        # Verifica se é um container Syncthing lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container syncthing, adiciona à lista
+        if [[ -n "$nome_custom" ]]; then
+          SYNCTHING_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#SYNCTHING_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container Syncthing encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#SYNCTHING_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${SYNCTHING_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers Syncthing encontrados:"
+    for i in "${!SYNCTHING_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${SYNCTHING_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#SYNCTHING_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#SYNCTHING_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${SYNCTHING_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Syncthing" 8 35 0 \
+  "NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+  
+  # Extrai o valor do dialog
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  clear
+  docker exec -it "$var1" syncthing generate --gui-password=admin --gui-user=admin
+  echo ""; echo "Usuario e senha da WebGUI foram modificados para admin/admin!"
+}
+
+function upgradenc { 
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+  
+  # Extrai o valor do dialog
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  clear
+  echo "Upgrading..."
+  docker exec -u 33 "$var1" ./occ upgrade
+  sleep 3
+}
+
+function disableldap { 
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Disable LDAP" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+  
+  # Extrai o valor do dialog
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  clear
+  echo "Disabling LDAP Backend!"
+  docker exec -u 33 "$var1" ./occ ldap:set-config "s01" "ldapConfigurationActive" "0"
+  sleep 2
+  docker restart "$var1"
+  sleep 3
+}
+
+function checkcore { 
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+  
+  # Extrai o valor do dialog
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  clear; echo "Checking core integrity..."
+  docker exec -u 33 "$var1" ./occ integrity:check-core
+  docker exec -u 33 "$var1" ./occ maintenance:mimetype:update-js
+  docker exec -u 33 "$var1" ./occ integrity:check-core
+  docker exec -u 33 "$var1" ./occ maintenance:mimetype:update-js
+  sleep 3
+}
+
+function missingindices {  
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome (para container nextcloud, não MySQL)
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container NextCloud (não MySQL) lendo as próximas linhas
+        img_base=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud que NÃO é MySQL, adiciona à lista
+        if [[ "$img_base" != "mysql" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud (aplicação) encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      echo "$((i+1)). ${NEXTCLOUD_CONTAINERS[$i]}"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      SELECTED_CONTAINER="${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche o valor encontrado
+  VALUE1="$SELECTED_CONTAINER"
+  
+  # Mostra dialog para confirmação/edição
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "Nextcloud" 9 35 0 \
+  "NextCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+  
+  # Extrai o valor do dialog
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  
+  clear
+  echo "Adding missing indices..."
+  docker exec -u 33 "$var1" ./occ db:add-missing-indices
+  echo "ok"; sleep 3
+  clear
+  echo "Fixing mimetypes..."
+  docker exec -u 33 "$var1" ./occ maintenance:repair --include-expensive
+  echo "ok"; sleep 3
+  sleep 3
+}
+
+function piholemnt {
+  VALUE1="pihole"
+
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
+  "NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+
+  clear
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  docker exec "$var1" bash -c "pihole -g -r recover"
+  docker exec "$var1" bash -c "rm /etc/pihole/pihole-FTL.db"
+  docker restart "$var1"
+}
+
+function piholeinst {
+  VALUE1="pihole"
+
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "PiHole" 8 35 0 \
+  "NomeCont:" 1 1 "$VALUE1" 1 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+
+  clear
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  docker exec "$var1" bash -c "rm /etc/pihole/gravity.db"
+  docker exec "$var1" bash -c "pihole -g"
+  docker restart "$var1"
+}
+
+function filelocks {  
+  # Verifica se o arquivo YAML existe
+  if [[ ! -f "$YAML_FILE" ]]; then
+    echo "Erro: Arquivo YAML não encontrado: $YAML_FILE"
+    return 1
+  fi
+  
+  # Busca por entradas que contenham "nextcloud" no nome e tenham img_base: mysql
+  NEXTCLOUD_CONTAINERS=()
+  
+  while IFS= read -r line; do
+    # Procura por linhas que terminam com ":" e contêm "nextcloud"
+    if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*$ ]]; then
+      container_name="${BASH_REMATCH[1]}"
+      if [[ "$container_name" =~ nextcloud ]]; then
+        # Verifica se é um container MySQL lendo as próximas linhas
+        img_base=""
+        mysql_pw=""
+        nome_custom=""
+        
+        # Lê as próximas linhas para encontrar img_base, mysql_pw e nome_custom
+        while IFS= read -r next_line; do
+          # Para quando encontrar outro container (nova linha terminando com :)
+          if [[ "$next_line" =~ ^[[:space:]]*[^:]+:[[:space:]]*$ ]] && [[ ! "$next_line" =~ ^[[:space:]]*[[:space:]] ]]; then
+            break
+          fi
+          
+          if [[ "$next_line" =~ ^[[:space:]]*img_base:[[:space:]]*(.+)$ ]]; then
+            img_base="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*mysql_pw:[[:space:]]*(.+)$ ]]; then
+            mysql_pw="${BASH_REMATCH[1]}"
+          elif [[ "$next_line" =~ ^[[:space:]]*nome_custom:[[:space:]]*(.+)$ ]]; then
+            nome_custom="${BASH_REMATCH[1]}"
+          fi
+        done < <(tail -n +$(($(grep -n "^[[:space:]]*${container_name}:" "$YAML_FILE" | cut -d: -f1) + 1)) "$YAML_FILE")
+        
+        # Se encontrou um container nextcloud com img_base mysql, adiciona à lista
+        if [[ "$img_base" == "mysql" ]] && [[ -n "$mysql_pw" ]] && [[ -n "$nome_custom" ]]; then
+          NEXTCLOUD_CONTAINERS+=("$nome_custom|$mysql_pw")
+        fi
+      fi
+    fi
+  done < "$YAML_FILE"
+  
+  # Verifica se encontrou algum container
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 0 ]]; then
+    echo "Nenhum container NextCloud com MySQL encontrado no arquivo YAML."
+    return 1
+  fi
+  
+  # Se encontrou apenas um, usa diretamente
+  if [[ ${#NEXTCLOUD_CONTAINERS[@]} -eq 1 ]]; then
+    IFS='|' read -r SELECTED_CONTAINER SELECTED_PASSWORD <<< "${NEXTCLOUD_CONTAINERS[0]}"
+  else
+    # Se encontrou múltiplos, permite seleção
+    echo "Múltiplos containers NextCloud encontrados:"
+    for i in "${!NEXTCLOUD_CONTAINERS[@]}"; do
+      IFS='|' read -r container_name password <<< "${NEXTCLOUD_CONTAINERS[$i]}"
+      echo "$((i+1)). $container_name"
+    done
+    
+    read -p "Selecione o container (1-${#NEXTCLOUD_CONTAINERS[@]}): " selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#NEXTCLOUD_CONTAINERS[@]} ]]; then
+      IFS='|' read -r SELECTED_CONTAINER SELECTED_PASSWORD <<< "${NEXTCLOUD_CONTAINERS[$((selection-1))]}"
+    else
+      echo "Seleção inválida."
+      return 1
+    fi
+  fi
+  
+  # Pré-preenche os valores encontrados
+  VALUE1="$SELECTED_CONTAINER"
+  VALUE2="$SELECTED_PASSWORD"
+  
+  # Mostra dialog para confirmação/edição
+  if ! VALUE0=$(dialog --ok-label "Ok" --title "Manutencao" --form "MySQL - NextCloud" 9 35 0 \
+  "mSQLcont:" 1 1 "$VALUE1" 1 11 30 0 \
+  "Password:" 2 1 "$VALUE2" 2 11 30 0 \
+  3>&1 1>&2 2>&3 3>&- > /dev/tty); then
+    return
+  fi
+  
+  # Extrai os valores do dialog
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  
+  clear
+  echo "File Locks atualmente no Banco de Dados:"
+  docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
+  sleep 5
+  docker exec "$var1" mysql --user=root --password="$var2" -D nextcloud -e 'delete from oc_file_locks where 1'
+  sleep 1
+  clear
+  echo "Conferencia de limpeza de File Locks:"
+  docker exec "$var1" mysql --user=root -D nextcloud -e 'SELECT * FROM oc_file_locks;'
+  echo "Se nada aparecer aqui, foi limpo com sucesso!"
+  sleep 3
+}
+
+function macvland {
+  var1="0"; var2="0"; var3="0"; var4="0"
+
+  #VALUE1="${meugateway%.*}.0"
+  VALUE2=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+')
+  VALUE3=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
+  VALUE4="macvlan"
+
+  VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Criar novo MACVLAN" --form "MACVLAN for Containers" 11 40 0 \
+"Subnet  :" 1 1 "$VALUE1" 1 11 30 0 \
+"Gateway :" 2 1 "$VALUE2" 2 11 30 0 \
+"Parent  :" 3 1 "$VALUE3" 3 11 30 0 \
+"Name    :" 4 1 "$VALUE4" 4 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  case $? in
+    0) echo "." > /dev/null ;;
+    1) exit ;;
+    2) dialognet ; macvland ;;
+  esac
+
+echo "$VALUE0"
+
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  var4=$(echo "$VALUE0" | sed -n 4p)
+
+  if [ "$var1" = "0" ] || [ "$var2" = "0" ] || [ "$var3" = "0" ] || [ "$var4" = "0" ]; then
+    dialog --title "ERRO" --msgbox "O(s) campo(s) exigidos nao pode(m) ficar em branco. \nPreencha-o(s) adequadamente!" 7 40
+    macvland
+  else
+    if ! docker network inspect macvlan &>/dev/null; then
+      # Cria a rede docker
+      docker network create -d macvlan --subnet="$var1"/24 --gateway="$var2" -o parent="$var3" "$var4"
+      
+      # Verifica se a criação foi bem-sucedida
+      if [ $? -eq 0 ]; then
+        echo "✅ Rede $var4 criada com sucesso!"
+        
+        # Salva no settings.yaml
+        save_macvlan_to_yaml "$var1" "$var2" "$var3" "$var4"
+        
+        dialog --title "Sucesso" --msgbox "Rede MACVLAN '$var4' criada e salva no /srv/system.yaml!\n\nSubnet: $var1/24\nGateway: $var2\nInterface: $var3" 10 50
+      else
+        echo "❌ Erro ao criar a rede $var4"
+        dialog --title "ERRO" --msgbox "Falha ao criar a rede MACVLAN '$var4'!" 6 40
+      fi
+    else
+      dialog --title "ERRO" --msgbox "A rede MACVLAN '$var4' já existe!" 6 40
+    fi
+  fi
+}
+
+# Função para salvar configurações MACVLAN no system.yaml
+function save_macvlan_to_yaml {
+  local subnet="$1"
+  local gateway="$2"
+  local interface="$3"
+  local network_name="$4"
+  
+  local yaml_file="/srv/system.yaml"
+  local datetime=$(date +"%d/%m/%Y - %H:%M:%S")
+  
+  echo "💾 Salvando configurações MACVLAN no system.yaml..."
+  
+  # Verifica se o arquivo existe, se não, cria estrutura básica
+  if [ ! -f "$yaml_file" ]; then
+    echo "📝 Criando arquivo system.yaml..."
+    sudo mkdir -p /srv
+    sudo tee "$yaml_file" > /dev/null << EOF
+# Arquivo de configurações do servidor
+# Criado automaticamente em $datetime
+
+Informacoes:
+  Data_Instalacao: "$datetime"
+  Data_Restauracao: "Nunca foi reinstalado."
+
+Hardware:
+  Tipo: "Servidor"
+  Placa: "Desconhecida"
+
+Redes: {}
+EOF
+  fi
+  
+  # Verifica se já existe a seção Redes
+  if ! grep -q "Redes:" "$yaml_file"; then
+    echo "📝 Adicionando seção Redes ao system.yaml..."
+    sudo yq -i '.Redes = {}' "$yaml_file"
+  fi
+  
+  # Adiciona as configurações da nova rede MACVLAN
+  echo "📝 Salvando rede '$network_name' no system.yaml..."
+  
+  sudo yq -i "
+    .Redes.\"$network_name\" = {
+      \"subnet\": \"$subnet/24\",
+      \"gateway\": \"$gateway\",
+      \"interface\": \"$interface\",
+      \"data_criacao\": \"$datetime\",
+      \"status\": \"ativa\"
+    }
+  " "$yaml_file"
+  
+  echo "✅ Configurações salvas com sucesso!"
+  
+  # Mostra confirmação das configurações salvas
+  echo ""
+  echo "📋 CONFIGURAÇÕES SALVAS:"
+  echo "   Nome da rede: $network_name"
+  echo "   Subnet: $subnet/24"
+  echo "   Gateway: $gateway" 
+  echo "   Interface: $interface"
+  echo "   Data: $datetime"
+  echo ""
+}
+
+# Função adicional para listar redes MACVLAN salvas
+function list_saved_macvlans {
+  local yaml_file="/srv/system.yaml"
+  
+  if [ ! -f "$yaml_file" ]; then
+    echo "❌ Arquivo system.yaml não encontrado!"
+    return 1
+  fi
+  
+  echo "📋 REDES MACVLAN SALVAS NO SYSTEM.YAML:"
+  echo "======================================="
+  
+  # Lista todas as redes MACVLAN salvas
+  networks=$(yq -r '.Redes | keys[]' "$yaml_file" 2>/dev/null)
+  
+  if [ -z "$networks" ]; then
+    echo "ℹ️  Nenhuma rede MACVLAN encontrada no system.yaml"
+    return
+  fi
+  
+  echo ""
+  for network in $networks; do
+    subnet=$(yq -r ".Redes.\"$network\".subnet" "$yaml_file")
+    gateway=$(yq -r ".Redes.\"$network\".gateway" "$yaml_file")
+    interface=$(yq -r ".Redes.\"$network\".interface" "$yaml_file")
+    data_criacao=$(yq -r ".Redes.\"$network\".data_criacao" "$yaml_file")
+    status=$(yq -r ".Redes.\"$network\".status" "$yaml_file")
+    
+    echo "🌐 Rede: $network"
+    echo "   📡 Subnet: $subnet"
+    echo "   🚪 Gateway: $gateway"
+    echo "   🔌 Interface: $interface"
+    echo "   📅 Criada em: $data_criacao"
+    echo "   📊 Status: $status"
+    
+    # Verifica se a rede ainda existe no Docker
+    docker_exists=$(docker network ls --format "{{.Name}}" | grep -x "$network" && echo "exists" || echo "not_found")
+    if [ "$docker_exists" = "exists" ]; then
+      echo "   🐳 Docker: ✅ Rede existe"
+    else
+      echo "   🐳 Docker: ❌ Rede não encontrada"
+    fi
+    echo ""
+  done
+}
+
+# Função para remover rede MACVLAN e atualizar system.yaml
+function remove_macvlan_and_update_yaml {
+  local network_name="$1"
+  local yaml_file="/srv/system.yaml"
+  
+  if [ -z "$network_name" ]; then
+    echo "❌ Nome da rede não fornecido!"
+    return 1
+  fi
+  
+  echo "🗑️  Removendo rede MACVLAN '$network_name'..."
+  
+  # Remove a rede do Docker
+  if docker network rm "$network_name" 2>/dev/null; then
+    echo "✅ Rede '$network_name' removida do Docker"
+    
+    # Atualiza o status no system.yaml ou remove completamente
+    if [ -f "$yaml_file" ]; then
+      # Opção 1: Marcar como removida (manter histórico)
+      sudo yq -i ".Redes.\"$network_name\".status = \"removida\"" "$yaml_file" 2>/dev/null
+      sudo yq -i ".Redes.\"$network_name\".data_remocao = \"$(date '+%d/%m/%Y - %H:%M:%S')\"" "$yaml_file" 2>/dev/null
+      
+      # Opção 2: Remover completamente (descomente a linha abaixo se preferir)
+      # sudo yq -i "del(.Redes.\"$network_name\")" "$yaml_file" 2>/dev/null
+      
+      echo "✅ Configurações atualizadas no system.yaml"
+    fi
+  else
+    echo "❌ Erro ao remover a rede '$network_name' ou rede não existe"
+    return 1
+  fi
+}
+
+# Exemplo de uso das novas funções:
+# list_saved_macvlans
+# remove_macvlan_and_update_yaml "macvlan"
+
+function rmmacvland {
+  local yaml_file="/srv/system.yaml"
+  
+  # Lista redes MACVLAN existentes no Docker
+  existing_networks=($(docker network ls --filter driver=macvlan --format "{{.Name}}" | sort))
+  
+  if [ ${#existing_networks[@]} -eq 0 ]; then
+    dialog --title "Informação" --msgbox "Nenhuma rede MACVLAN encontrada no Docker!" 6 50
+    return
+  fi
+  
+  # Mostra lista de redes para escolher
+  echo "📋 REDES MACVLAN DISPONÍVEIS PARA REMOÇÃO:"
+  echo "=========================================="
+  echo ""
+  
+  for i in "${!existing_networks[@]}"; do
+    network="${existing_networks[$i]}"
+    
+    # Pega informações da rede do Docker
+    subnet=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+    gateway=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "N/A")
+    
+    # Verifica se existe no system.yaml
+    yaml_status="❓ Não registrada"
+    if [ -f "$yaml_file" ]; then
+      yaml_exists=$(yq -r ".Redes.\"$network\"" "$yaml_file" 2>/dev/null)
+      if [ "$yaml_exists" != "null" ]; then
+        yaml_status="📋 Registrada no YAML"
+      fi
+    fi
+    
+    echo "$((i+1))) $network"
+    echo "   📡 Subnet: $subnet"
+    echo "   🚪 Gateway: $gateway"
+    echo "   📄 Status: $yaml_status"
+    echo ""
+  done
+  
+  # Dialog para escolher qual remover
+  menu_options=()
+  for i in "${!existing_networks[@]}"; do
+    network="${existing_networks[$i]}"
+    subnet=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+    menu_options+=("$((i+1))" "$network ($subnet)")
+  done
+  
+  # Adiciona opção manual
+  menu_options+=("0" "Digitar nome manualmente")
+  
+  if ! choice=$(dialog --title "Remover Rede MACVLAN" --backtitle "Docker Tools" --menu "Escolha a rede para remover:" 0 0 0 "${menu_options[@]}" 2>&1 > /dev/tty); then
+    return
+  fi
+  
+  # Determina qual rede remover
+  local network_to_remove=""
+  
+  if [ "$choice" = "0" ]; then
+    # Opção manual
+    if ! network_to_remove=$(dialog --title "Nome da Rede" --backtitle "Docker Tools" --inputbox "Digite o nome da rede MACVLAN para remover:" 8 50 2>&1 > /dev/tty); then
+      return
+    fi
+    
+    if [ -z "$network_to_remove" ]; then
+      dialog --title "ERRO" --msgbox "Nome da rede não pode estar vazio!" 6 40
+      return
+    fi
+  else
+    # Rede selecionada da lista
+    network_to_remove="${existing_networks[$((choice-1))]}"
+  fi
+  
+  # Verifica se a rede existe
+  if ! docker network inspect "$network_to_remove" >/dev/null 2>&1; then
+    dialog --title "ERRO" --msgbox "A rede '$network_to_remove' não existe no Docker!" 6 50
+    return
+  fi
+  
+  # Mostra informações da rede antes de remover
+  subnet=$(docker network inspect "$network_to_remove" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+  gateway=$(docker network inspect "$network_to_remove" --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "N/A")
+  
+  # Verificar se tem containers conectados
+  connected_containers=$(docker network inspect "$network_to_remove" --format '{{range .Containers}}{{.Name}} {{end}}' 2>/dev/null)
+  
+  warning_msg="ATENÇÃO: Você está prestes a remover a rede:\n\n"
+  warning_msg+="🌐 Nome: $network_to_remove\n"
+  warning_msg+="📡 Subnet: $subnet\n"
+  warning_msg+="🚪 Gateway: $gateway\n\n"
+  
+  if [ -n "$connected_containers" ]; then
+    warning_msg+="⚠️  CONTAINERS CONECTADOS:\n$connected_containers\n\n"
+    warning_msg+="Os containers serão desconectados da rede!\n\n"
+  fi
+  
+  warning_msg+="Esta ação é IRREVERSÍVEL!\n\nDeseja continuar?"
+  
+  # Confirmação final
+  if ! dialog --title "CONFIRMAÇÃO" --backtitle "Remoção de Rede MACVLAN" --yesno "$warning_msg" 0 0; then
+    dialog --title "Cancelado" --msgbox "Remoção cancelada pelo usuário." 6 40
+    return
+  fi
+  
+  # Executar remoção
+  echo "🗑️  Removendo rede MACVLAN '$network_to_remove'..."
+  
+  # Remove a rede do Docker
+  if docker network rm "$network_to_remove" 2>/dev/null; then
+    echo "✅ Rede '$network_to_remove' removida do Docker com sucesso!"
+    
+    # Atualiza o system.yaml se a rede estiver registrada
+    if [ -f "$yaml_file" ]; then
+      yaml_exists=$(yq -r ".Redes.\"$network_to_remove\"" "$yaml_file" 2>/dev/null)
+      if [ "$yaml_exists" != "null" ]; then
+        echo "📝 Atualizando system.yaml..."
+        
+        # Opção 1: Marcar como removida (manter histórico)
+        sudo yq -i ".Redes.\"$network_to_remove\".status = \"removida\"" "$yaml_file" 2>/dev/null
+        sudo yq -i ".Redes.\"$network_to_remove\".data_remocao = \"$(date '+%d/%m/%Y - %H:%M:%S')\"" "$yaml_file" 2>/dev/null
+        
+        # Opção 2: Remover completamente do YAML (descomente se preferir)
+        # sudo yq -i "del(.Redes.\"$network_to_remove\")" "$yaml_file" 2>/dev/null
+        
+        echo "✅ system.yaml atualizado com sucesso!"
+        
+        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida com sucesso!\n\n✅ Docker: Rede removida\n✅ YAML: Status atualizado" 10 50
+      else
+        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\n\n(Não estava registrada no system.yaml)" 8 50
+      fi
+    else
+      dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\n\n(Arquivo system.yaml não encontrado)" 8 50
+    fi
+    
+  else
+    dialog --title "ERRO" --msgbox "Erro ao remover a rede '$network_to_remove'!\n\nVerifique se não há containers conectados." 8 50
+    return 1
+  fi
+}
+
+# Função auxiliar para listar informações detalhadas das redes (opcional)
+function show_macvlan_details {
+  local yaml_file="/srv/system.yaml"
+  
+  echo "📋 DETALHES DAS REDES MACVLAN:"
+  echo "=============================="
+  echo ""
+  
+  # Redes no Docker
+  docker_networks=($(docker network ls --filter driver=macvlan --format "{{.Name}}" | sort))
+  
+  if [ ${#docker_networks[@]} -gt 0 ]; then
+    echo "🐳 REDES NO DOCKER:"
+    for network in "${docker_networks[@]}"; do
+      subnet=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || echo "N/A")
+      gateway=$(docker network inspect "$network" --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "N/A")
+      echo "   🌐 $network - $subnet (GW: $gateway)"
+    done
+    echo ""
+  fi
+  
+  # Redes no YAML
+  if [ -f "$yaml_file" ]; then
+    yaml_networks=$(yq -r '.Redes | keys[]' "$yaml_file" 2>/dev/null)
+    if [ -n "$yaml_networks" ]; then
+      echo "📄 REDES NO SYSTEM.YAML:"
+      for network in $yaml_networks; do
+        status=$(yq -r ".Redes.\"$network\".status" "$yaml_file")
+        subnet=$(yq -r ".Redes.\"$network\".subnet" "$yaml_file")
+        echo "   📋 $network - $subnet (Status: $status)"
+      done
+    fi
+  fi
+}
+
+function dialognet {
+  dialog --title "Informação" --msgbox "Checar a existencia de altnames nas informacoes a seguir!" 7 40
+  dialog --title "Informação" --msgbox "$(ip a)" 25 70
+}
+
+tools
+
+exit 1
