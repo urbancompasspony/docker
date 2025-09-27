@@ -54,7 +54,6 @@ echo "$VALUE0"
   fi
 }
 
-# Função para salvar configurações MACVLAN no system.yaml
 function save_macvlan_to_yaml {
   local subnet="$1"
   local gateway="$2"
@@ -103,19 +102,55 @@ EOF
       \"data_criacao\": \"$datetime\",
       \"status\": \"ativa\"
     }
+  " "$yaml_file"function save_macvlan_to_yaml {
+  local subnet="$1"
+  local gateway="$2"
+  local interface="$3"
+  local network_name="$4"
+  
+  local yaml_file="/srv/system.yaml"
+  local datetime=$(date +"%d/%m/%Y - %H:%M:%S")
+  
+  echo "💾 Salvando configurações MACVLAN no system.yaml..."
+  
+  # Verifica se o arquivo existe, se não, cria estrutura básica
+  if [ ! -f "$yaml_file" ]; then
+    echo "📝 Criando arquivo system.yaml..."
+    sudo mkdir -p /srv
+    sudo tee "$yaml_file" > /dev/null << EOF
+# Arquivo de configurações do servidor
+# Criado automaticamente em $datetime
+
+Informacoes:
+  Data_Instalacao: "$datetime"
+  Data_Restauracao: "Nunca foi reinstalado."
+
+Hardware:
+  Tipo: "Servidor"
+  Placa: "Desconhecida"
+
+Redes: {}
+EOF
+  fi
+  
+  # Verifica se já existe a seção Redes
+  if ! grep -q "Redes:" "$yaml_file"; then
+    echo "📝 Adicionando seção Redes ao system.yaml..."
+    sudo yq -i '.Redes = {}' "$yaml_file"
+  fi
+  
+  # Adiciona as configurações da nova rede MACVLAN
+  echo "📝 Salvando rede '$network_name' no system.yaml..."
+  
+  sudo yq -i "
+    .Redes.\"$network_name\" = {
+      \"subnet\": \"$subnet/24\",
+      \"gateway\": \"$gateway\",
+      \"interface\": \"$interface\",
+      \"data_criacao\": \"$datetime\",
+      \"status\": \"ativa\"
+    }
   " "$yaml_file"
-  
-  echo "✅ Configurações salvas com sucesso!"
-  
-  # Mostra confirmação das configurações salvas
-  echo ""
-  echo "📋 CONFIGURAÇÕES SALVAS:"
-  echo "   Nome da rede: $network_name"
-  echo "   Subnet: $subnet/24"
-  echo "   Gateway: $gateway" 
-  echo "   Interface: $interface"
-  echo "   Data: $datetime"
-  echo ""
 }
 
 macvland
