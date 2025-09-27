@@ -1,14 +1,5 @@
 #!/bin/bash
 
-if ! virsh list --all | grep -i pfsense &>/dev/null; then
-  clear; echo ""; echo "pfSense inexistente!"
-  sleep 3
-  echo "Defina o pfSense antes da MACVLAN."
-  sleep 4
-  echo "Se isso estiver correto prossiga, mas com cuidado."
-  sleep 5
-fi
-
 function macvland {
   var1="0"; var2="0"; var3="0"; var4="0"
 
@@ -16,6 +7,10 @@ function macvland {
   VALUE2=$(ip route get 1.1.1.1 | grep -oP 'via \K\S+')
   VALUE3=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
   VALUE4="macvlan"
+
+  if ! virsh list --all | grep -i pfsense &>/dev/null; then
+    VALUE2="pfSense_Inexistente $VALUE2"
+  fi
 
   VALUE0=$(dialog --help-button --help-label "Dica" --ok-label "Criar" --title "Criar novo MACVLAN" --form "MACVLAN for Containers" 11 40 0 \
 "Subnet24:" 1 1 "$VALUE1" 1 11 30 0 \
