@@ -146,7 +146,6 @@ EOF
   # Adiciona as configurações da nova rede MACVLAN
   echo "📝 Salvando rede '$network_name' no system.yaml..."
  
-  MACHINE_ID=$(cat /etc/machine-id)
   sudo yq -i "
     .Redes.\"$network_name\" = {
       \"subnet\": \"$subnet\",
