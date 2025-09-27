@@ -193,8 +193,8 @@ if ! command -v yq >/dev/null 2>&1; then
 fi
 
 if ! docker network inspect macvlan &>/dev/null; then
-    dialog --title "ERRO" --msgbox "A rede MACVLAN não existe! Crie uma antes de continuar." 6 40
-    return 1
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/set | sudo bash
+    return
 fi
 
 ensure_common
