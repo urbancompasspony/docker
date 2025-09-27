@@ -153,4 +153,9 @@ EOF
   " "$yaml_file"
 }
 
+function dialognet {
+  dialog --title "Informação" --msgbox "Checar a existencia de altnames nas informacoes a seguir!" 7 40
+  dialog --title "Informação" --msgbox "$(ip a)" 25 70
+}
+
 macvland
