@@ -148,11 +148,11 @@ EOF
  
   sudo yq -i "
     .Redes.\"$network_name\" = {
-      \"subnet\": \"$subnet\",
+      \"subnet\": \"$subnet/24\",
       \"gateway\": \"$gateway\",
       \"interface\": \"$interface\",
       \"data_criacao\": \"$datetime\",
-      \"status\": \"ativa\",
+      \"status\": \"ativa\"
     }
   " "$yaml_file"
 }
