@@ -31,12 +31,6 @@ function rmmacvland {
         yaml_status="📋 Registrada no YAML"
       fi
     fi
-    
-    echo "$((i+1))) $network"
-    echo "   📡 Subnet: $subnet"
-    echo "   🚪 Gateway: $gateway"
-    echo "   📄 Status: $yaml_status"
-    echo ""
   done
   
   # Dialog para escolher qual remover
@@ -85,17 +79,17 @@ function rmmacvland {
   # Verificar se tem containers conectados
   connected_containers=$(docker network inspect "$network_to_remove" --format '{{range .Containers}}{{.Name}} {{end}}' 2>/dev/null)
   
-  warning_msg="ATENÇÃO: Você está prestes a remover a rede:\n\n"
-  warning_msg+="🌐 Nome: $network_to_remove\n"
-  warning_msg+="📡 Subnet: $subnet\n"
-  warning_msg+="🚪 Gateway: $gateway\n\n"
+  warning_msg="ATENÇÃO: Você está prestes a remover a rede:\\n\\n"
+  warning_msg+="🌐 Nome: $network_to_remove\\n"
+  warning_msg+="📡 Subnet: $subnet\\n"
+  warning_msg+="🚪 Gateway: $gateway\\n\\n"
   
   if [ -n "$connected_containers" ]; then
-    warning_msg+="⚠️  CONTAINERS CONECTADOS:\n$connected_containers\n\n"
-    warning_msg+="Os containers serão desconectados da rede!\n\n"
+    warning_msg+="⚠️  CONTAINERS CONECTADOS:\\n$connected_containers\\n\\n"
+    warning_msg+="Os containers serão desconectados da rede!\\n\\n"
   fi
   
-  warning_msg+="Esta ação é IRREVERSÍVEL!\n\nDeseja continuar?"
+  warning_msg+="Esta ação é IRREVERSÍVEL!\\n\\nDeseja continuar?"
   
   # Confirmação final
   if ! dialog --title "CONFIRMAÇÃO" --backtitle "Remoção de Rede MACVLAN" --yesno "$warning_msg" 0 0; then
@@ -122,18 +116,19 @@ function rmmacvland {
         
         echo "✅ system.yaml atualizado com sucesso!"
         
-        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida com sucesso!\n\n✅ Docker: Rede removida\n✅ YAML: Status atualizado" 10 50
+        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida com sucesso!\\n\\n✅ Docker: Rede removida\\n✅ YAML: Status atualizado" 10 50
       else
-        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\n\n(Não estava registrada no system.yaml)" 8 50
+        dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\\n\\n(Não estava registrada no system.yaml)" 8 50
       fi
     else
-      dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\n\n(Arquivo system.yaml não encontrado)" 8 50
+      dialog --title "Sucesso" --msgbox "Rede '$network_to_remove' removida do Docker!\\n\\n(Arquivo system.yaml não encontrado)" 8 50
     fi
     
   else
-    dialog --title "ERRO" --msgbox "Erro ao remover a rede '$network_to_remove'!\n\nVerifique se não há containers conectados." 8 50
+    dialog --title "ERRO" --msgbox "Erro ao remover a rede '$network_to_remove'!\\n\\nVerifique se não há containers conectados." 8 50
     return 1
   fi
 }
 
+# Executar a função
 rmmacvland
