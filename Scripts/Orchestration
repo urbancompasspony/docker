@@ -1,0 +1,201 @@
+#!/bin/bash
+
+export NEEDRESTART_MODE=a
+export DEBIAN_FRONTEND=noninteractive
+
+export var1; export var2
+
+mTITLE="Docker Orchestration"
+bkTTITLE="Sistema Automatizado de Orquestração de Containers"
+
+github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
+common_functions_url="${github}X-COMMON-BASE.sh"
+
+function start {
+  if [ -f /srv/lockfile ]; then
+    local script_to_run=$(cat /srv/lockfile 2>/dev/null)
+    if [ -n "$script_to_run" ]; then
+      echo "Modo automatico detectado. Executando: $script_to_run"
+      curl -sSL "$github$script_to_run" | tee "/tmp/$script_to_run"
+      sudo bash "/tmp/$script_to_run"
+      exit 0
+    fi
+  fi
+
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'Modelo & Ferramentas' \
+  2 'Somente Contrato' \
+  3 'Servicos Gerais' \
+  4 'Bancos de Dados' \
+  5 'Outros' \
+  X 'Sair' 2>&1 > /dev/tty ); then
+    exit
+  fi
+
+  case "$var0" in
+  1) modelstools ; start ;;
+  2) contratos0 ; start ;;
+  3) general ; start ;;
+  4) database ; start ;;
+  5) personal ; start ;;
+  X) exit ;;
+  esac
+}
+
+function contratos0 {
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'File Browser' \
+  2 'Homarr' \
+  3 'PenTest' \
+  4 'UniFi Network' \
+  5 'Reverse Proxy' \
+  6 'OpenFire (Spark)' \
+  7 'OnlyOffice' \
+  8 'Tailscale CLIENT' \
+  9 'QDir Stat' \
+  10 'Sist2 Indexer' \
+  11 'Network UPS Tools Gui (L)' \
+  12 'SMS PowerViewer' \
+  13 'Kuma' \
+  14 'pLocate (W/L)' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) curl -sSL "$github"28-filebrowser | tee /tmp/filebrowser> /dev/null; sudo bash /tmp/filebrowser ;;
+  2) curl -sSL "$github"60-homarr | tee /tmp/homarr> /dev/null; sudo bash /tmp/homarr ;;
+  3) curl -sSL "$github"09-pentest | tee /tmp/pentest> /dev/null; sudo bash /tmp/pentest ;;
+  4) curl -sSL "$github"03-unifi-net | tee /tmp/unifi> /dev/null; sudo bash /tmp/unifi ;;
+  5) curl -sSL "$github"33-reverseproxy | tee /tmp/apacherp> /dev/null; sudo bash /tmp/apacherp ;;
+  6) curl -sSL "$github"27-openfire | tee /tmp/openfire> /dev/null; sudo bash /tmp/openfire ;;
+  7) curl -sSL "$github"34-onlyoffice | tee /tmp/ooffice> /dev/null; sudo bash /tmp/ooffice ;;
+  8) curl -sSL "$github"13-tailscale | tee /tmp/tailscale> /dev/null; sudo bash /tmp/tailscale ;;
+  9) curl -sSL "$github"74-qdirstat | tee /tmp/qdirstat> /dev/null; sudo bash /tmp/qdirstat ;;
+  10) curl -sSL "$github"80-sist2 | tee /tmp/sist2> /dev/null; sudo bash /tmp/sist2 ;;
+  11) curl -sSL "$github"06-nut-gui | tee /tmp/nut-gui> /dev/null; sudo bash /tmp/nut-gui ;;
+  12) curl -sSL "$github"11-SMS-PV | tee /tmp/SMS> /dev/null; sudo bash /tmp/SMS ;;
+  13) curl -sSL "$github"15-kuma | tee /tmp/kuma> /dev/null; sudo bash /tmp/kuma ;;
+  14) curl -sSL "$github"24-plocate | tee /tmp/plocate> /dev/null; sudo bash /tmp/plocate ;;
+  X) return ;;
+  esac
+}
+
+function modelstools {
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'DashDot' \
+  2 'Active Directory' \
+  3 'MySpeed  Test WAN' \
+  4 'OpenSpeedTest LAN' \
+  5 'PiHole' \
+  6 'XPRA VM MGR' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) curl -sSL "$github"61-dashdot | tee /tmp/dashdot> /dev/null; sudo bash /tmp/dashdot ;;
+  2) curl -sSL "$github"02-domain | tee /tmp/domain> /dev/null; sudo bash /tmp/domain ;;
+  3) curl -sSL "$github"20-myspeed-tracker | tee /tmp/myspeed> /dev/null; sudo bash /tmp/myspeed ;;
+  4) curl -sSL "$github"16| teepenspeedtest | tee /tmp/speedtest> /dev/null; sudo bash /tmp/speedtest ;;
+  5) curl -sSL "$github"01-pihole | tee /tmp/pihole> /dev/null; sudo bash /tmp/pihole ;;
+  6) curl -sSL "$github"45-xpra-virt-manager | tee /tmp/45-xpra-virt-manager> /dev/null; sudo bash /tmp/45-xpra-virt-manager ;;
+  X) return ;;
+  esac
+}
+
+function general {
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'Ferdium (RAMBOX)' \
+  2 'NextCloud' \
+  3 'ntfy' \
+  4 'Servidor Apache' \
+  5 'Servidor CUPS' \
+  6 'Servidor FTP' \
+  7 'Syncthing CLIENT' \
+  8 'Chromium Browser' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) curl -sSL "$github"25-ferdium | tee /tmp/ferdium> /dev/null; sudo bash /tmp/ferdium ;;
+  2) curl -sSL "$github"26-nextcloud | tee /tmp/nextcloud> /dev/null; sudo bash /tmp/nextcloud ;;
+  3) curl -sSL "$github"30-ntfy_server | tee /tmp/ntfy_server> /dev/null; sudo bash /tmp/ntfy_server ;;
+  4) curl -sSL "$github"36-generic_apache | tee /tmp/genericapache> /dev/null; sudo bash /tmp/genericapache ;;
+  5) curl -sSL "$github"10-cups | tee /tmp/cups> /dev/null; sudo bash /tmp/cups ;;
+  6) curl -sSL "$github"37-ftp-server | tee /tmp/ftp-server> /dev/null; sudo bash /tmp/ftp-server ;;
+  7) curl -sSL "$github"42.0-syncthing | tee /tmp/syncthing> /dev/null; sudo bash /tmp/syncthing ;;
+  8) curl -sSL "$github"17-Chromium | tee /tmp/Chromium> /dev/null; sudo bash /tmp/Chromium ;;
+  X) return ;;
+  esac
+}
+
+function database {
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'MySQL' \
+  2 'MariaDB' \
+  3 'OracleXE 21C' \
+  4 'ElasticSearch 7.17.22' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) curl -sSL "$github"04-mysql | tee /tmp/mysql> /dev/null; sudo bash /tmp/mysql ;;
+  2) curl -sSL "$github"29-mariadb | tee /tmp/mariadb> /dev/null; sudo bash /tmp/mariadb ;;
+  3) curl -sSL "$github"05-oracle_xe | tee /tmp/oracle_xe> /dev/null; sudo bash /tmp/oracle_xe ;;
+  4) curl -sSL "$github"78-elasticsearch | tee /tmp/elasticsearch> /dev/null; sudo bash /tmp/elasticsearch ;;
+  X) return ;;
+  esac
+}
+
+function personal {
+  if ! var0=$(dialog --title "$mTITLE" --backtitle "$bkTTITLE" --menu "" 0 0 0 \
+  1 'Luanti Server' \
+  2 'SSH DW Backup (L)' \
+  3 'Jellyfin' \
+  4 'qBitTorrent' \
+  5 'Active Directory (BETA)' \
+  6 'Simple Chat Server' \
+  7 'Honeygain' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+
+  case "$var0" in
+  1) curl -sSL "$github"12-luanti-server | tee /tmp/luanti> /dev/null; sudo bash /tmp/luanti ;;
+  2) curl -sSL "$github"38-ssh-dw | tee /tmp/ssho> /dev/null; sudo bash /tmp/ssho ;;
+  3) curl -sSL "$github"19-jellyfin | tee /tmp/jellyfin> /dev/null; sudo bash /tmp/jellyfin ;;
+  4) curl -sSL "$github"21-qbittorrent | tee /tmp/qbittorrent> /dev/null; sudo bash /tmp/qbittorrent ;;
+  5) curl -sSL "$github"58-domain-test | tee /tmp/dtest> /dev/null; sudo bash /tmp/dtest ;;
+  6) curl -sSL "$github"07-simple-web-chat | tee /tmp/chatsimple> /dev/null; sudo bash /tmp/chatsimple ;;
+  7) curl -sSL "$github"08-honeygain | tee /tmp/honeygain> /dev/null; sudo bash /tmp/honeygain ;;
+  X) return ;;
+  esac
+}
+
+function ensure_common {
+  if [ ! -f /tmp/common-functions.sh ]; then
+    echo "Baixando funções comuns..."
+    if ! curl -sSL "$common_functions_url" -o /tmp/common-functions.sh; then
+      echo "ERRO: Falha ao baixar common-functions.sh"
+      sleep 2
+      exit 1
+    fi
+    :;
+  fi
+}
+
+if ! command -v yq >/dev/null 2>&1; then
+  clear; echo "yq não foi encontrado no sistema"; sleep 3
+  return 1
+fi
+
+if ! docker network inspect macvlan &>/dev/null; then
+    dialog --title "ERRO" --msgbox "A rede MACVLAN não existe! Crie uma antes de continuar." 6 40
+    return 1
+fi
+
+ensure_common
+start
