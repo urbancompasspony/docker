@@ -154,7 +154,6 @@ EOF
       \"interface\": \"$interface\",
       \"data_criacao\": \"$datetime\",
       \"status\": \"ativa\",
-      \"machine_id\": \"$MACHINE_ID\"
     }
   " "$yaml_file"
 }
