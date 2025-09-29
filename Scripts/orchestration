@@ -97,7 +97,7 @@ function modelstools {
   1) curl -sSL "$github"61-dashdot | tee /tmp/dashdot> /dev/null; sudo bash /tmp/dashdot ;;
   2) curl -sSL "$github"02-domain | tee /tmp/domain> /dev/null; sudo bash /tmp/domain ;;
   3) curl -sSL "$github"20-myspeed-tracker | tee /tmp/myspeed> /dev/null; sudo bash /tmp/myspeed ;;
-  4) curl -sSL "$github"16| teepenspeedtest | tee /tmp/speedtest> /dev/null; sudo bash /tmp/speedtest ;;
+  4) curl -sSL "$github"16-openspeedtest | tee /tmp/speedtest> /dev/null; sudo bash /tmp/speedtest ;;
   5) curl -sSL "$github"01-pihole | tee /tmp/pihole> /dev/null; sudo bash /tmp/pihole ;;
   6) curl -sSL "$github"45-xpra-virt-manager | tee /tmp/45-xpra-virt-manager> /dev/null; sudo bash /tmp/45-xpra-virt-manager ;;
   X) return ;;
