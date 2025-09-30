@@ -4,7 +4,7 @@ YAML_FILE="/srv/containers.yaml"
 
 function tools {
   if ! var0=$(dialog --title "" --backtitle "" --menu " " 0 0 0 \
-  1 'MACVLAN' \
+  1 'MACVLAN Settings' \
   3 'PiHole Settings' \
   5 'Syncthing Reset Password' \
   6 'Nextcloud Settings' \
@@ -54,14 +54,14 @@ function pihole0 {
 
 function nextcloud0 {
   if ! var0=$(dialog --title "Nextcloud" --backtitle "Nextcloud" --menu " " 0 0 0 \
-  1 'NC: filelocks' \
-  2 'NC: add-missing-indices' \
-  3 'NC: check-core & mimetype' \
-  4 'NC: Disable LDAP' \
-  5 'NC: Upgrade Manually CLI' \
-  6 'NC: Scan App Data' \
-  7 'NC: Scan User Data' \
-  8 'NC: Update htaccess' \
+  1 'remove filelocks' \
+  2 'add-missing-indices' \
+  3 'check-core & mimetype' \
+  4 'Disable LDAP (emergency)' \
+  5 'Upgrade Manually CLI' \
+  6 'reScan App Data' \
+  7 'reScan User Data' \
+  8 'Update .htaccess' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
