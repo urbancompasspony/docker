@@ -4,41 +4,76 @@ YAML_FILE="/srv/containers.yaml"
 
 function tools {
   if ! var0=$(dialog --title "" --backtitle "" --menu " " 0 0 0 \
-  1 'Set MACVLAN' \
-  2 'Remove MACVLAN' \
-  3 'PiHole Maintenance' \
-  4 'PiHole Install Error' \
-  5 'Reset Syncthing Password' \
-  6 'Compare Docker PS and YAML' \
-  7 'NC: filelocks' \
-  8 'NC: add-missing-indices' \
-  9 'NC: check-core & mimetype' \
-  10 'NC: Disable LDAP' \
-  11 'NC: Upgrade Manually CLI' \
-  12 'NC: Scan App Data' \
-  13 'NC: Scan User Data' \
-  14 'NC: Update htaccess' \
-  15 'Remove All Useless Images' \
+  1 'MACVLAN' \
+  3 'PiHole Settings' \
+  5 'Syncthing Reset Password' \
+  6 'Nextcloud Settings' \
+  7 'Compare Docker PS and YAML' \
+  8 'Remove All Useless Images' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
-  
+  case "$var0" in
+  1) clear ; macvlan0 ; tools ;;
+  3) clear ; pihole0 ; tools ;;
+  5) clear ; syncpass0 ; tools ;;
+  6) clear ; nextcloud0 ; tools ;;
+  7) clear ; comparedocker ; tools ;;
+  8) clear ; docker image prune -af ; sleep 1 ; tools ;;
+  X) return ;;
+  esac
+}
+
+function macvlan0 {
+  if ! var0=$(dialog --title "MACVLAN" --backtitle "MACVLAN" --menu " " 0 0 0 \
+  1 'Set' \
+  2 'Remove' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
   case "$var0" in
   1) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/set | sudo bash ; tools ;;
   2) clear ; curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Scripts/macvlan/remove | sudo bash ; tools ;;
-  3) clear ; piholemnt ; tools ;;
-  4) clear ; piholeinst ; tools ;;
-  5) clear ; syncpass0 ; tools ;;
-  6) clear ; comparedocker ; tools ;;
-  7) clear ; filelocks ; tools ;;
-  8) clear ; missingindices ; tools ;;
-  9) clear ; checkcore ; tools ;;
-  10) clear ; disableldap ; tools ;;
-  11) clear ; upgradenc ; tools ;;
-  12) clear ; scanapp0 ; tools ;;
-  13) clear ; scanuser0 ; tools ;;
-  14) clear ; updateht0 ; tools ;;
-  15) clear ; docker image prune -af ; sleep 2 ; tools ;;
+  X) return ;;
+  esac
+}
+
+function pihole0 {
+  if ! var0=$(dialog --title "PiHole" --backtitle "PiHole" --menu " " 0 0 0 \
+  1 'Maintenance' \
+  2 'Install Error' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+  case "$var0" in
+  1) clear ; piholemnt ; tools ;;
+  2) clear ; piholeinst ; tools ;;
+  X) return ;;
+  esac
+}
+
+function nextcloud0 {
+  if ! var0=$(dialog --title "Nextcloud" --backtitle "Nextcloud" --menu " " 0 0 0 \
+  1 'NC: filelocks' \
+  2 'NC: add-missing-indices' \
+  3 'NC: check-core & mimetype' \
+  4 'NC: Disable LDAP' \
+  5 'NC: Upgrade Manually CLI' \
+  6 'NC: Scan App Data' \
+  7 'NC: Scan User Data' \
+  8 'NC: Update htaccess' \
+  X '<' 2>&1 > /dev/tty ); then
+    return
+  fi
+  case "$var0" in
+  1) clear ; filelocks ; tools ;;
+  2) clear ; missingindices ; tools ;;
+  3) clear ; checkcore ; tools ;;
+  4) clear ; disableldap ; tools ;;
+  5) clear ; upgradenc ; tools ;;
+  6) clear ; scanapp0 ; tools ;;
+  7) clear ; scanuser0 ; tools ;;
+  8) clear ; updateht0 ; tools ;;
   X) return ;;
   esac
 }
@@ -865,4 +900,4 @@ function filelocks {
 
 tools
 
-exit 1
+exit 0
