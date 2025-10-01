@@ -1,0 +1,72 @@
+#!/bin/bash
+
+NOMECONTAINER="minecraft-server"
+
+docker_repo="itzg/minecraft-server"
+imagem="minecraft"
+
+CustmN2="local_ip"
+CustmN3="servidor_dns"
+CustmN4=""
+CustmN5=""
+CustmN6=""
+CustmN7=""
+CustmN8=""
+CustmN9=""
+CustmN10=""
+
+VALUE2="0.0.0.0"
+VALUE3="8.8.4.4"
+VALUE4=""
+VALUE5=""
+VALUE6=""
+VALUE7=""
+VALUE8=""
+VALUE9=""
+VALUE10=""
+
+export NOMECONTAINER docker_repo imagem
+export CustmN2 CustmN3 CustmN4 CustmN5 CustmN6 CustmN7 CustmN8 CustmN9 CustmN10
+export VALUE2 VALUE3 VALUE4 VALUE5 VALUE6 VALUE7 VALUE8 VALUE9 VALUE10
+
+if [ -f /tmp/common-functions.sh ]; then
+  source /tmp/common-functions.sh
+else
+  echo "ERRO: common-functions.sh não encontrado!"
+  exit 1
+fi
+
+function set_mkdir {
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/data
+:; }
+
+function docker_create {
+  local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+
+  # Se NAO for numerico, execute como host!
+  if [[ ! "$VALUE2" =~ $ip_regex ]]; then
+
+    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --network host \
+    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -p 25565:25565 \
+    -v "/srv/containers/$NOMECONTAINER/data:/data" \
+    "$docker_repo"
+
+    return
+  fi
+
+  docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+  --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
+  --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+  -v "/srv/containers/$NOMECONTAINER/data:/data" \
+  "$docker_repo"
+}
+
+function docker_extras {
+
+:; }
+
+execute_main
+
+exit 0
