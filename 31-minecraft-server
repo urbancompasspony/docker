@@ -62,6 +62,7 @@ function docker_create {
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -v "/srv/containers/$NOMECONTAINER/data:/data" \
   -e EULA=TRUE \
+  -p 25565:25565 \
   "$docker_repo"
 }
 
