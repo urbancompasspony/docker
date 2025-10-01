@@ -25,7 +25,7 @@ VALUE6="normal"
 VALUE7="survival"
 VALUE8="$SECRET_0"
 VALUE9="25575"
-VALUE10="2G"
+VALUE10="4G"
 
 export NOMECONTAINER docker_repo imagem
 export CustmN2 CustmN3 CustmN4 CustmN5 CustmN6 CustmN7 CustmN8 CustmN9 CustmN10
@@ -58,6 +58,7 @@ function docker_create {
     -e OVERRIDE_WHITELIST=true \
     -e ENABLE_RCON="true" \
     -e ONLINE_MODE=false \
+    -e NETWORK_COMPRESSION_THRESHOLD=512 \
     -e RCON_PASSWORD="$VALUE8" \
     -e RCON_PORT=25575 \
     -e SERVER_PORT="$VALUE5" \
@@ -81,6 +82,7 @@ function docker_create {
   -e OVERRIDE_WHITELIST=true \
   -e ENABLE_RCON="true" \
   -e ONLINE_MODE=false \
+  -e NETWORK_COMPRESSION_THRESHOLD=512 \
   -e RCON_PASSWORD="$VALUE8" \
   -e RCON_PORT=25575 \
   -e SERVER_PORT="$VALUE5" \
