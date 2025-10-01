@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NOMECONTAINER="minecraft-server"
+NOMECONTAINER="minecraft-server-1"
 
 SECRET_0=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
 
@@ -10,22 +10,22 @@ imagem="minecraft"
 CustmN2="local_ip"
 CustmN3="servidor_dns"
 CustmN4="version"
-CustmN5="memory"
+CustmN5="port"
 CustmN6="difficulty"
 CustmN7="gamemode"
 CustmN8="rcon_pass"
-CustmN9=""
-CustmN10=""
+CustmN9="rcon_port"
+CustmN10="memory"
 
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
 VALUE4="1.21.9"
-VALUE5="2G"
+VALUE5="25565"
 VALUE6="normal"
 VALUE7="survival"
 VALUE8="$SECRET_0"
-VALUE9=""
-VALUE10=""
+VALUE9="25575"
+VALUE10="2G"
 
 export NOMECONTAINER docker_repo imagem
 export CustmN2 CustmN3 CustmN4 CustmN5 CustmN6 CustmN7 CustmN8 CustmN9 CustmN10
@@ -51,20 +51,21 @@ function docker_create {
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
-    -e EULA=TRUE \
-    -e DIFFICULTY="$VALUE6" \
-    -e VERSION="$VALUE4" \
-    -e MEMORY="$VALUE5" \
-    -e GAMEMODE="$VALUE7" \
-    -e ONLINE_MODE=FALSE \
-    -e ENABLE_RCON="true" \
-    -e RCON_PASSWORD="$VALUE8" \
-    -e RCON_PORT=25575 \
-    -e ENABLE_LAN_VISIBILITY=true \
-    -e OVERRIDE_WHITELIST=true \
-    -p 0.0.0.0:25565:25565 \
     -v "/srv/containers/$NOMECONTAINER/data:/data" \
     -v "/srv/containers/$NOMECONTAINER/mods:/mods" \
+    -e EULA=TRUE \
+    -e ENABLE_LAN_VISIBILITY=true \
+    -e OVERRIDE_WHITELIST=true \
+    -e ENABLE_RCON="true" \
+    -e ONLINE_MODE=false \
+    -e RCON_PASSWORD="$VALUE8" \
+    -e RCON_PORT=25575 \
+    -e SERVER_PORT="$VALUE5" \
+    -e DIFFICULTY="$VALUE6" \
+    -e VERSION="$VALUE4" \
+    -e MEMORY="$VALUE10" \
+    -e GAMEMODE="$VALUE7" \
+    -p 0.0.0.0:25565:25565 \
     "$docker_repo"
 
     return
@@ -76,16 +77,17 @@ function docker_create {
   -v "/srv/containers/$NOMECONTAINER/data:/data" \
   -v "/srv/containers/$NOMECONTAINER/mods:/mods" \
   -e EULA=TRUE \
-  -e DIFFICULTY="$VALUE6" \
-  -e VERSION="$VALUE4" \
-  -e MEMORY="$VALUE5" \
-  -e GAMEMODE="$VALUE7" \
-  -e ONLINE_MODE=FALSE \
-  -e ENABLE_RCON="true" \
-  -e RCON_PASSWORD="$VALUE8" \
-  -e RCON_PORT=25575 \
   -e ENABLE_LAN_VISIBILITY=true \
   -e OVERRIDE_WHITELIST=true \
+  -e ENABLE_RCON="true" \
+  -e ONLINE_MODE=false \
+  -e RCON_PASSWORD="$VALUE8" \
+  -e RCON_PORT=25575 \
+  -e SERVER_PORT="$VALUE5" \
+  -e DIFFICULTY="$VALUE6" \
+  -e VERSION="$VALUE4" \
+  -e MEMORY="$VALUE10" \
+  -e GAMEMODE="$VALUE7" \
   -p 0.0.0.0:25565:25565 \
   "$docker_repo"
 }
