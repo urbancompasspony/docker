@@ -2,6 +2,8 @@
 
 NOMECONTAINER="minecraft-server"
 
+SECRET_0=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
+
 docker_repo="itzg/minecraft-server"
 imagem="minecraft"
 
@@ -11,7 +13,7 @@ CustmN4="version"
 CustmN5="memory"
 CustmN6="difficulty"
 CustmN7="gamemode"
-CustmN8=""
+CustmN8="rcon_pass"
 CustmN9=""
 CustmN10=""
 
@@ -21,7 +23,7 @@ VALUE4="1.21.9"
 VALUE5="2G"
 VALUE6="normal"
 VALUE7="survival"
-VALUE8=""
+VALUE8="$SECRET_0"
 VALUE9=""
 VALUE10=""
 
@@ -54,6 +56,9 @@ function docker_create {
     -e VERSION="$VALUE4" \
     -e MEMORY="$VALUE5" \
     -e GAMEMODE="$VALUE7" \
+    -e ENABLE_RCON="true" \
+    -e RCON_PASSWORD="$VALUE8" \
+    -e RCON_PORT=25575 \
     -p 0.0.0.0:25565:25565 \
     -v "/srv/containers/$NOMECONTAINER/data:/data" \
     -v "/srv/containers/$NOMECONTAINER/mods:/mods" \
@@ -72,6 +77,9 @@ function docker_create {
   -e VERSION="$VALUE4" \
   -e MEMORY="$VALUE5" \
   -e GAMEMODE="$VALUE7" \
+  -e ENABLE_RCON="true" \
+  -e RCON_PASSWORD="$VALUE8" \
+  -e RCON_PORT=25575 \
   -p 0.0.0.0:25565:25565 \
   "$docker_repo"
 }
