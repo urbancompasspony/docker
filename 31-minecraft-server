@@ -7,20 +7,20 @@ imagem="minecraft"
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
-CustmN4=""
-CustmN5=""
-CustmN6=""
-CustmN7=""
+CustmN4="version"
+CustmN5="memory"
+CustmN6="difficulty"
+CustmN7="gamemode"
 CustmN8=""
 CustmN9=""
 CustmN10=""
 
 VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
-VALUE4=""
-VALUE5=""
-VALUE6=""
-VALUE7=""
+VALUE4="1.21.9"
+VALUE5="2G"
+VALUE6="normal"
+VALUE7="survival"
 VALUE8=""
 VALUE9=""
 VALUE10=""
@@ -37,7 +37,7 @@ else
 fi
 
 function set_mkdir {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/data
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{data,mods}
 :; }
 
 function docker_create {
@@ -50,8 +50,13 @@ function docker_create {
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     -e EULA=TRUE \
-    -p 25565:25565 \
+    -e DIFFICULTY="$VALUE6" \
+    -e VERSION="$VALUE4" \
+    -e MEMORY="$VALUE5" \
+    -e GAMEMODE="$VALUE7" \
+    -p 0.0.0.0:25565:25565 \
     -v "/srv/containers/$NOMECONTAINER/data:/data" \
+    -v "/srv/containers/$NOMECONTAINER/mods:/mods" \
     "$docker_repo"
 
     return
@@ -61,8 +66,13 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -v "/srv/containers/$NOMECONTAINER/data:/data" \
+  -v "/srv/containers/$NOMECONTAINER/mods:/mods" \
   -e EULA=TRUE \
-  -p 25565:25565 \
+  -e DIFFICULTY="$VALUE6" \
+  -e VERSION="$VALUE4" \
+  -e MEMORY="$VALUE5" \
+  -e GAMEMODE="$VALUE7" \
+  -p 0.0.0.0:25565:25565 \
   "$docker_repo"
 }
 
