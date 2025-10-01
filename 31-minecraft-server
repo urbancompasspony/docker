@@ -49,6 +49,7 @@ function docker_create {
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
     --network host \
     --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -e EULA=TRUE \
     -p 25565:25565 \
     -v "/srv/containers/$NOMECONTAINER/data:/data" \
     "$docker_repo"
@@ -60,6 +61,7 @@ function docker_create {
   --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -v "/srv/containers/$NOMECONTAINER/data:/data" \
+  -e EULA=TRUE \
   "$docker_repo"
 }
 
