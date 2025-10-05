@@ -42,7 +42,7 @@ version="31"
 
 NOMECONTAINER="nextcloud"
 
-docker_repo="nextcloud:$version"
+docker_repo="nextcloud"
 imagem="nextcloud"
 
 CustmN2="local_ip"
