@@ -22,13 +22,6 @@ function check_macvlan {
   fi
 }
 
-function try_pull {
-  if ! docker pull "$docker_repo"; then
-    echo "Erro: docker pull falhou... saindo."; sleep 3
-    exit 1
-  fi
-}
-
 function lockfile0 {
   if [ -f /srv/lockfile ]; then
     if ! [ -f "$configfile" ]; then
@@ -61,7 +54,6 @@ function process_container {
   NOMECONTAINER="$container"
   signal0
   set_mkdir
-  try_pull
   docker_create
   docker_extras
   save_config
@@ -157,7 +149,6 @@ function check_IP {
   if [[ ! "$VALUE2" =~ $ip_regex ]]; then
     save_config
     mkdir0
-    try_pull
     docker_create
     docker_extras
     cleanup0
@@ -174,7 +165,6 @@ function check_IP {
   else
     save_config
     mkdir0
-    try_pull
     docker_create
     docker_extras
     cleanup0
