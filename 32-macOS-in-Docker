@@ -1,23 +1,19 @@
 #!/bin/bash
 
-docker run -it --rm --name macos -e "VERSION=15" -p 8006:8006 --device=/dev/kvm --device=/dev/net/tun --cap-add NET_ADMIN -v "${PWD:-.}/macos:/storage" --stop-timeout 120 dockurr/macos
-Source: https://github.com/dockur/macos
+--device /dev/kvm \
+-p 50922:10022 -p 5901:5901 \
+-e SHORTNAME=catalina \
+-e EXTRA="-display none -vnc 0.0.0.0:1" \
+-v ~/docker-osx-sonoma:/home/arch/OSX-KVM \
+sickcodes/docker-osx:latest
 
-
-docker run -it \
-    --device /dev/kvm \
-    -p 50922:10022 \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
-    -e "DISPLAY=${DISPLAY:-:0.0}" \
-    -e GENERATE_UNIQUE=true \
-    -e CPU='Haswell-noTSX' \
-    -e CPUID_FLAGS='kvm=on,vendor=GenuineIntel,+invtsc,vmware-cpuid-freq=on' \
-    -e MASTER_PLIST_URL='https://raw.githubusercontent.com/sickcodes/osx-serial-generator/master/config-custom-sonoma.plist' \
-    -e SHORTNAME=sequoia \
-    sickcodes/docker-osx:latest
-# docker build -t docker-osx .
-Source: https://github.com/sickcodes/Docker-OSX
-
+    -p 5901:5901 \
+    -e SHORTNAME=sonoma \
+    -e RAM=8 \
+    -e CORES=6 \
+    -e SIZE=256G \
+    -e EXTRA="-display none -vnc 0.0.0.0:1" \
+    -v ~/docker-osx-sonoma:/home/arch/OSX-KVM \
 
 
 NOMECONTAINER="A-CUSTOM-A"
