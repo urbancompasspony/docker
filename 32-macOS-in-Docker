@@ -15,6 +15,9 @@ sickcodes/docker-osx:latest
     -e EXTRA="-display none -vnc 0.0.0.0:1" \
     -v ~/docker-osx-sonoma:/home/arch/OSX-KVM \
 
+REMMINA:
+localhost:5901
+
 
 NOMECONTAINER="A-CUSTOM-A"
 
