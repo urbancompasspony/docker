@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# To run:
+# github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
+# common_functions_url="${github}X-COMMON-BASE.sh"
+# curl -sSL "$common_functions_url" -o /tmp/common-functions.sh
+# bash /tmp/common-functions.sh
+
 masterfile="/srv/system.yaml"
 configfile="/srv/containers.yaml"
 button_ok0="Criar"
