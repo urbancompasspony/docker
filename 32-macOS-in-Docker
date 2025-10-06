@@ -5,24 +5,24 @@ NOMECONTAINER="docker-macosx"
 docker_repo="sickcodes/docker-osx:latest"
 imagem="docker-macos"
 
-CustmN2="vnc_port"
-CustmN3="ssh_port"
+CustmN2="ip_lan"
+CustmN3="dns"
 CustmN4="shortname"
 CustmN5="ram_gb"
 CustmN6="cpu_cores"
 CustmN7="disk_size"
-CustmN8="extra_params"
+CustmN8=""
 CustmN9=""
 CustmN10=""
 
 # Valores padrão
-VALUE2="5901"
-VALUE3="50922"
+VALUE2="0.0.0.0"
+VALUE3="1.0.0.1"
 VALUE4="sonoma high-sierra mojave catalina big-sur monterey ventura"
 VALUE5="8"
-VALUE6="6"
+VALUE6="4"
 VALUE7="256G"
-VALUE8="-display none -vnc 0.0.0.0:1"
+VALUE8=""
 VALUE9=""
 VALUE10=""
 
@@ -38,7 +38,7 @@ else
 fi
 
 function set_mkdir {
-  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/OSX-KVM
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"
   sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
 :; }
 
@@ -49,44 +49,47 @@ function docker_create {
   if [[ ! "$VALUE2" =~ $ip_regex ]]; then
 
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-    --device /dev/kvm \
+    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
     --network host \
-    --no-healthcheck --restart=unless-stopped \
-    -v /etc/localtime:/etc/localtime:ro \
-    -p "$VALUE2:5901" \
-    -p "$VALUE3:10022" \
+    --device /dev/kvm \
+    -p 5901:5901 \
+    -p 50922:10022 \
     -e SHORTNAME="$VALUE4" \
     -e RAM="$VALUE5" \
     -e CORES="$VALUE6" \
     -e SIZE="$VALUE7" \
-    -e EXTRA="$VALUE8" \
-    -v "/srv/containers/$NOMECONTAINER/OSX-KVM:/home/arch/OSX-KVM" \
+    -e EXTRA='-display none -vnc 0.0.0.0:1' \
     "$docker_repo"
+
+    clear
+    echo "REMMINA:"
+    echo "VNC: localhost:5901"
+    sleep 5
 
     return
   fi
 
     docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
     --device /dev/kvm \
-    --network host \
-    --no-healthcheck --restart=unless-stopped \
-    -v /etc/localtime:/etc/localtime:ro \
-    -p "$VALUE2:5901" \
-    -p "$VALUE3:10022" \
+    -p 5901:5901 \
+    -p 50922:10022 \
     -e SHORTNAME="$VALUE4" \
     -e RAM="$VALUE5" \
     -e CORES="$VALUE6" \
     -e SIZE="$VALUE7" \
-    -e EXTRA="$VALUE8" \
-    -v "/srv/containers/$NOMECONTAINER/OSX-KVM:/home/arch/OSX-KVM" \
+    -e EXTRA='-display none -vnc 0.0.0.0:1' \
     "$docker_repo"
+
+    clear
+    echo "REMMINA:"
+    echo "VNC: $VALUE2:5901"
+    sleep 5
 }
 
 function docker_extras {
-  clear
-  echo "REMMINA:"
-  echo "VNC: localhost:5901"
-  sleep 5
+
 :; }
 
 execute_main
