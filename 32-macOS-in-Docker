@@ -1,10 +1,10 @@
 #!/bin/bash
 
-NOMECONTAINER="docker-osx"
-docker_repo="sickcodes/docker-osx:latest"
-imagem="docker-osx macos"
+NOMECONTAINER="docker-macosx"
 
-# Campos customizados para Docker-OSX
+docker_repo="sickcodes/docker-osx:latest"
+imagem="docker-macos"
+
 CustmN2="vnc_port"
 CustmN3="ssh_port"
 CustmN4="shortname"
@@ -18,7 +18,7 @@ CustmN10=""
 # Valores padrão
 VALUE2="5901"
 VALUE3="50922"
-VALUE4="sonoma high-sierra mojave catalina big-sur monterey ventura sonoma"
+VALUE4="sonoma high-sierra mojave catalina big-sur monterey ventura"
 VALUE5="8"
 VALUE6="6"
 VALUE7="256G"
@@ -43,47 +43,52 @@ function set_mkdir {
 :; }
 
 function docker_create {
-  docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
-  --device /dev/kvm \
-  --network host \
-  --no-healthcheck --restart=unless-stopped \
-  -v /etc/localtime:/etc/localtime:ro \
-  -p "$VALUE2:5901" \
-  -p "$VALUE3:10022" \
-  -e SHORTNAME="$VALUE4" \
-  -e RAM="$VALUE5" \
-  -e CORES="$VALUE6" \
-  -e SIZE="$VALUE7" \
-  -e EXTRA="$VALUE8" \
-  -v "/srv/containers/$NOMECONTAINER/OSX-KVM:/home/arch/OSX-KVM" \
-  "$docker_repo"
+  local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+
+  # Se NAO for numerico, execute como host!
+  if [[ ! "$VALUE2" =~ $ip_regex ]]; then
+
+    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --device /dev/kvm \
+    --network host \
+    --no-healthcheck --restart=unless-stopped \
+    -v /etc/localtime:/etc/localtime:ro \
+    -p "$VALUE2:5901" \
+    -p "$VALUE3:10022" \
+    -e SHORTNAME="$VALUE4" \
+    -e RAM="$VALUE5" \
+    -e CORES="$VALUE6" \
+    -e SIZE="$VALUE7" \
+    -e EXTRA="$VALUE8" \
+    -v "/srv/containers/$NOMECONTAINER/OSX-KVM:/home/arch/OSX-KVM" \
+    "$docker_repo"
+
+    return
+  fi
+
+    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --device /dev/kvm \
+    --network host \
+    --no-healthcheck --restart=unless-stopped \
+    -v /etc/localtime:/etc/localtime:ro \
+    -p "$VALUE2:5901" \
+    -p "$VALUE3:10022" \
+    -e SHORTNAME="$VALUE4" \
+    -e RAM="$VALUE5" \
+    -e CORES="$VALUE6" \
+    -e SIZE="$VALUE7" \
+    -e EXTRA="$VALUE8" \
+    -v "/srv/containers/$NOMECONTAINER/OSX-KVM:/home/arch/OSX-KVM" \
+    "$docker_repo"
 }
 
 function docker_extras {
-  echo ""
-  echo "════════════════════════════════════════════════════════"
-  echo "  Docker-OSX criado com sucesso!"
-  echo "════════════════════════════════════════════════════════"
-  echo ""
-  echo "  📦 Container: $NOMECONTAINER"
-  echo "  🖥️  macOS: $VALUE4"
-  echo "  💾 RAM: ${VALUE5}GB"
-  echo "  ⚙️  CPU: $VALUE6 cores"
-  echo "  💿 Disco: $VALUE7"
-  echo ""
-  echo "  🔌 Portas:"
-  echo "     VNC:  localhost:$VALUE2"
-  echo "     SSH:  localhost:$VALUE3"
-  echo ""
-  echo "  🎯 Conectar via VNC (Remmina):"
-  echo "     localhost:$VALUE2"
-  echo ""
-  echo "  📁 Volumes:"
-  echo "     /srv/containers/$NOMECONTAINER/OSX-KVM"
-  echo ""
-  echo "════════════════════════════════════════════════════════"
-  echo ""
+  clear
+  echo "REMMINA:"
+  echo "VNC: localhost:5901"
+  sleep 5
 :; }
 
 execute_main
+
 exit 0
