@@ -31,9 +31,13 @@ function check_macvlan {
 function lockfile0 {
   if [ -f /srv/lockfile ]; then
     if ! [ -f "$configfile" ]; then
-      echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile DESTE CONTAINER! Saindo."; sleep 5
+      clear
+      echo ""; echo "ERRO CRITICO: NAO ENCONTREI O $configfile COM DADOS DESTE CONTAINER! Saindo."; sleep 5
       exit 1
     else
+      clear
+      echo "LOCKFILE DETECTADO!"
+      sleep 1
       yq -r "to_entries[] | select(.value.img_base | test(\"$imagem\")) | .key" "$configfile" | while read -r container; do
         process_container "$container"
       done
