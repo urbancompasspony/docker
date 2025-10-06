@@ -217,8 +217,9 @@ function cleanup0 {
     unset "CustmN$i"
   done
 
-  echo ""; echo "Limpando imagens desnecessarias..."
-  docker image prune -af
+  echo ""; echo "Limpando imagens e volumes desnecessarios..."
+  docker image prune -f
+  docker volume prune -f
   sleep 1
 }
 
