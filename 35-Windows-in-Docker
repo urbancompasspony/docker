@@ -1,0 +1,127 @@
+#!/bin/bash
+
+https://github.com/dockur/windows
+
+docker run -it --rm \
+--name windows \
+--device=/dev/kvm \
+--device=/dev/net/tun \
+--cap-add NET_ADMIN \
+--stop-timeout 120 \
+-p 8006:8006 \
+-e DISK_SIZE="256G" \
+-e RAM_SIZE="8G" \
+-e CPU_CORES="4" \
+-e USERNAME="bill" \
+-e PASSWORD="gates" \
+-e LANGUAGE="Brazillian" \
+-e REGION="pt-BR" \
+-e KEYBOARD="pt-BR" \
+-v "${PWD:-.}/windows:/storage" \
+dockurr/windows
+
+# 11	Windows 11 Pro	7.2 GB
+# 11l	Windows 11 LTSC	4.7 GB
+# 11e	Windows 11 Enterprise	6.6 GB
+# 10	Windows 10 Pro	5.7 GB
+# 10l	Windows 10 LTSC	4.6 GB
+# 10e	Windows 10 Enterprise	5.2 GB
+# 8e	Windows 8.1 Enterprise	3.7 GB
+# 7u	Windows 7 Ultimate	3.1 GB
+# vu	Windows Vista Ultimate	3.0 GB
+# xp	Windows XP Professional	0.6 GB
+# 2k	Windows 2000 Professional	0.4 GB
+# 2025	Windows Server 2025	6.7 GB
+# 2022	Windows Server 2022	6.0 GB
+# 2019	Windows Server 2019	5.3 GB
+# 2016	Windows Server 2016	6.5 GB
+# 2012	Windows Server 2012	4.3 GB
+# 2008	Windows Server 2008	3.0 GB
+# 2003	Windows Server 2003	0.6 GB
+
+
+
+
+
+
+NOMECONTAINER="A-CUSTOM-A"
+
+docker_repo="CUSTOM/DOCKER:LATEST"
+imagem="pihole dwservice etc"
+
+CustmN2="local_ip"
+CustmN3="servidor_dns"
+CustmN4=""
+CustmN5=""
+CustmN6=""
+CustmN7=""
+CustmN8=""
+CustmN9=""
+CustmN10=""
+
+VALUE2="0.0.0.0"
+VALUE3="8.8.4.4"
+VALUE4=""
+VALUE5=""
+VALUE6=""
+VALUE7=""
+VALUE8=""
+VALUE9=""
+VALUE10=""
+
+export NOMECONTAINER docker_repo imagem
+export CustmN2 CustmN3 CustmN4 CustmN5 CustmN6 CustmN7 CustmN8 CustmN9 CustmN10
+export VALUE2 VALUE3 VALUE4 VALUE5 VALUE6 VALUE7 VALUE8 VALUE9 VALUE10
+
+if [ -f /tmp/common-functions.sh ]; then
+  source /tmp/common-functions.sh
+else
+  echo "ERRO: common-functions.sh não encontrado!"
+  exit 1
+fi
+
+function set_mkdir {
+  sudo mkdir -p /srv/containers/"$NOMECONTAINER"/{data,config}
+  # sudo touch /srv/containers/"$NOMECONTAINER"/file
+  # sudo chmod -R 777 /srv/containers/"$NOMECONTAINER"
+:; }
+
+function docker_create {
+  local ip_regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+
+  # Se NAO for numerico, execute como host!
+  if [[ ! "$VALUE2" =~ $ip_regex ]]; then
+
+    docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+    --network host \
+    --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+    -p 80:80 \ ???
+    -v "/srv/containers/$NOMECONTAINER/config:/config" \
+    -v "/srv/containers/$NOMECONTAINER/data:/data" \
+    "$docker_repo"
+
+    return
+  fi
+
+  docker run -d --name="$NOMECONTAINER" --hostname="$NOMECONTAINER" \
+  --network macvlan --ip="$VALUE2" --dns="$VALUE3" \
+  --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
+  -v "/srv/containers/$NOMECONTAINER/config:/config" \
+  -v "/srv/containers/$NOMECONTAINER/data:/data" \
+  "$docker_repo"
+
+# Examples
+# PATH: $VALUE3 \
+# -e variavel1="$VALUE4" \
+# --privileged
+# --network host --add-host=host.docker.internal:host-gateway \
+}
+
+function docker_extras {
+#docker exec "$NOMECONTAINER" bash -c "echo 'parameter=0' >> /etc/custom.conf"
+#docker restart "$NOMECONTAINER"
+:; }
+
+execute_main
+
+exit 0
