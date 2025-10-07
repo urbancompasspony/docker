@@ -64,7 +64,12 @@ function process_container {
   NOMECONTAINER="$container"
   signal0
   set_mkdir
-  docker_create
+  if ! docker_create; then
+    echo "ERRO: Falha ao criar o container $NOMECONTAINER!"
+    echo "Saindo..."
+    sleep 3
+    exit 1
+  fi
   docker_extras
   save_config
 }
@@ -159,7 +164,12 @@ function check_IP {
   if [[ ! "$VALUE2" =~ $ip_regex ]]; then
     save_config
     mkdir0
-    docker_create
+    if ! docker_create; then
+      echo "ERRO: Falha ao criar o container $NOMECONTAINER!"
+      echo "Saindo..."
+      sleep 3
+      exit 1
+    fi
     docker_extras
     cleanup0
     return
@@ -175,7 +185,12 @@ function check_IP {
   else
     save_config
     mkdir0
-    docker_create
+    if ! docker_create; then
+      echo "ERRO: Falha ao criar o container $NOMECONTAINER!"
+      echo "Saindo..."
+      sleep 3
+      exit 1
+    fi
     docker_extras
     cleanup0
   fi
