@@ -1,5 +1,31 @@
 #!/bin/bash
 
+exit 1
+docker run -it --rm \
+--name macos \
+--device=/dev/kvm \
+--device=/dev/net/tun \
+--cap-add NET_ADMIN \
+--stop-timeout 120 \
+-p 8006:8006 \
+-p 5901:5901 \
+-p 50922:10022 \
+-e VERSION="14" \
+-e DISK_SIZE="128G" \
+-e RAM_SIZE="8G" \
+-e CPU_CORES="4" \
+-v /etc/localtime:/etc/localtime:ro \
+-v "/home/ztge/Área de trabalho/mequios/:/storage" \
+dockurr/macos
+
+#-e EXTRA='-display none -vnc 0.0.0.0:1' \
+# --device=/dev/sdb:/disk1 or     --device=/dev/disk/by-uuid/abcd1234-5678-90ef-ghij-klmnopqrstuv:/disk1 \
+# -v ./example:/shared
+
+
+
+
+
 NOMECONTAINER="docker-macosx"
 
 docker_repo="sickcodes/docker-osx:latest"
