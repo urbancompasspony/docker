@@ -22,9 +22,11 @@ dockurr/macos
 # --device=/dev/sdb:/disk1 or     --device=/dev/disk/by-uuid/abcd1234-5678-90ef-ghij-klmnopqrstuv:/disk1 \
 # -v ./example:/shared
 
-
-
-
+#15	macOS 15	Sequoia
+#14	macOS 14	Sonoma
+#13	macOS 13	Ventura
+#12	macOS 12	Monterey
+#11	macOS 11	Big Sur
 
 NOMECONTAINER="docker-macosx"
 
