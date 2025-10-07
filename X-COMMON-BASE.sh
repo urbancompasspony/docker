@@ -228,8 +228,8 @@ function cleanup0 {
   done
 
   echo ""; echo "Limpando imagens e volumes desnecessarios..."
-  docker image prune -f
-  docker volume prune -f
+  docker image prune -a -f
+  docker volume prune -a -f
   sleep 1
 }
 
