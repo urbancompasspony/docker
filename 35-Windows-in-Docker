@@ -1,6 +1,39 @@
 #!/bin/bash
 
-https://github.com/dockur/windows
+exit 1
+
+docker run -it --rm \
+--no-healthcheck \
+--name windows \
+--device=/dev/kvm \
+--device=/dev/net/tun \
+--cap-add NET_ADMIN \
+--stop-timeout 120 \
+-p 8006:8006 \
+-p 3389:3389/tcp \
+-p 3389:3389/udp \
+-e VERSION="11" \
+-e DISK_SIZE="128G" \
+-e RAM_SIZE="4G" \
+-e CPU_CORES="4" \
+-e USERNAME="usuario" \
+-e PASSWORD="5V06@uso" \
+-e LANGUAGE="Portuguese" \
+-e REGION="pt-BR" \
+-e KEYBOARD="pt-BR" \
+-v /etc/localtime:/etc/localtime:ro \
+-v "/home/ztge/Área de trabalho/Wuindos/:/storage" \
+-v /var/lib/libvirt/images/9-Windows10.iso:/boot.iso \
+dockurr/windows
+
+# -v /shared:/shared \
+  #-e DISK2_SIZE="32G"
+  #-e DISK3_SIZE="64G"
+  # -v./example2:/storage2
+  # -v./example3:/storage3
+  ## --device=/dev/sdb:/disk1 or     --device=/dev/disk/by-uuid/abcd1234-5678-90ef-ghij-klmnopqrstuv:/disk1 \
+
+#https://github.com/dockur/windows
 
 docker run -it --rm \
 --name windows \
