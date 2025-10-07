@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# SOURCE:
+# https://github.com/dockur/macos
+
 exit 1
 docker run -it --rm \
 --name macos \
