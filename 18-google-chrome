@@ -20,7 +20,7 @@ docker run -d \
 NOMECONTAINER="chromium-web-browser"
 
 docker_repo="lscr.io/linuxserver/chromium:latest"
-imagem="chromium-browser"
+imagem="chrome-browser"
 
 CustmN2="local_ip"
 CustmN3="servidor_dns"
