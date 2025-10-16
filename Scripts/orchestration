@@ -160,7 +160,6 @@ function personal {
   6 'Active Directory (BETA)' \
   7 'Simple Chat Server' \
   8 'macOS on Docker' \
-  9 'N. Switch Games Server' \
   X '<' 2>&1  >/dev/tty ); then
     return
   fi
@@ -174,7 +173,6 @@ function personal {
   6) curl -sSL "$github"58-domain-test | tee /tmp/dtest >/dev/null; sudo bash /tmp/dtest ;;
   7) curl -sSL "$github"07-simple-web-chat | tee /tmp/chatsimple >/dev/null; sudo bash /tmp/chatsimple ;;
   8) curl -sSL "$github"32-macOS-in-Docker | tee /tmp/macOS >/dev/null; sudo bash /tmp/macOS ;;
-  9) curl -sSL "$github"39-tinfoil-nut-nswitch | tee /tmp/tinfoil >/dev/null; sudo bash /tmp/tinfoil ;;
   X) return ;;
   esac
 }
