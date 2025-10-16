@@ -9,7 +9,7 @@ CustmN2="local_ip"
 CustmN3="servidor_dns"
 CustmN4="username"
 CustmN5="password"
-CustmN6=""
+CustmN6="game_path"
 CustmN7=""
 CustmN8=""
 CustmN9=""
@@ -19,7 +19,7 @@ VALUE2="0.0.0.0"
 VALUE3="8.8.4.4"
 VALUE4="admin"
 VALUE5="p4ssw0rd"
-VALUE6=""
+VALUE6="-v /mnt:/games:rw"
 VALUE7=""
 VALUE8=""
 VALUE9=""
@@ -54,7 +54,7 @@ function docker_create {
     -p 9000:9000 \
     -e ID="$VALUE4" \
     -e PASSWORD="$VALUE5" \
-    -v :/games:rw \
+    $VALUE6 \
     "$docker_repo"
 
     return
@@ -65,13 +65,11 @@ function docker_create {
   --no-healthcheck --restart=unless-stopped -v /etc/localtime:/etc/localtime:ro \
   -e ID="$VALUE4" \
   -e PASSWORD="$VALUE5" \
-  -v :/games:rw \
+  $VALUE6 \
   "$docker_repo"
-
 }
 
 function docker_extras {
-
 :; }
 
 execute_main
