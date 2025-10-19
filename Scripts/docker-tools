@@ -10,6 +10,7 @@ function tools {
   6 'Nextcloud Settings' \
   7 'Compare Docker PS and YAML' \
   8 'Remove All Useless Images' \
+  9 'CAUTION: Remove All Inconsistencies' \
   X '<' 2>&1 > /dev/tty ); then
     return
   fi
@@ -20,6 +21,7 @@ function tools {
   6) clear ; nextcloud0 ; tools ;;
   7) clear ; comparedocker ; tools ;;
   8) clear ; docker image prune -af ; sleep 1 ; tools ;;
+  9) clear ; remove_inconsistencies ; tools ;;
   X) return ;;
   esac
 }
@@ -150,6 +152,13 @@ if [[ $matching_count -eq $docker_count ]] && [[ $matching_count -eq $yaml_count
 else
     echo "  Status: ⚠️  Há diferenças entre as listas"
 fi
+
+echo ""
+read -p "Pressione ENTER para continuar!"
+}
+
+function remove_inconsistencies {
+  echo "wip"
 }
 
 function updateht0 {
