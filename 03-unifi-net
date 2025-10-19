@@ -142,11 +142,15 @@ sudo chmod +x /srv/containers/"$VALUE4"/init-mongo.sh
   -v /srv/containers/"$VALUE4"/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro \
   --restart unless-stopped \
   "$docker_repo1"
+
+  datetime0=$(date +"%d-%m-%Y_%H:%M")
+  sudo yq -i ".\"${NOMECONTAINER}\".instalacao = \"${datetime0}\"" "$configfile"
+  sudo yq -i ".\"${NOMECONTAINER}\".img_base = \"${imagem}\"" "$configfile"
 }
 
 function docker_extras {
-  # Aqui é o que roda depois que tudo estiver funcionando.
-  # No caso do MongoDB e do Unifi... nada consta.
+  # NÃO ALTERE AQUI, isso aqui roda após o inicio do principal container.
+  # Edite acima em makecontextra para ajustar detalhes do .db
 :; }
 
 execute_main
