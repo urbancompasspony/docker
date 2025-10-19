@@ -143,12 +143,13 @@ sudo chmod +x /srv/containers/"$VALUE4"/init-mongo.sh
   --restart unless-stopped \
   "$docker_repo1"
 
-  NOMECONTAINER="mongodb-unifi"
+  NOMECONTAINER="$VALUE4"
   datetime0=$(date +"%d-%m-%Y_%H:%M")
   configfile="/srv/containers.yaml"
   imagem="mongodb"
   sudo yq -i ".\"${NOMECONTAINER}\".instalacao = \"${datetime0}\"" "$configfile"
   sudo yq -i ".\"${NOMECONTAINER}\".img_base = \"${imagem}\"" "$configfile"
+  sudo yq -i ".\"${NOMECONTAINER}\".nome_custom = \"${VALUE4}\"" "$configfile"
 }
 
 function docker_extras {
